@@ -206,32 +206,35 @@
       photosInput.value = '';
     });
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const data = {
-        nom: form.nom.value,
-        unite: form.unite.value,
-        description: form.description.value,
-        images: imageList
-      };
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
 
-      try {
-        const response = await fetch("https://script.google.com/macros/s/AKfycbzahXCxFBvw1sLCcpKnvjTxoql6idx-5CJYt_T0ambPRiXrYx2P-J7C9leRnicP7Ru-/exec", {
-          method: "POST",
-          body: JSON.stringify(data),
-          headers: {
-            "Content-Type": "application/json"
-          }
-        });
-alert("Demande envoyée!");
+  const data = {
+    nom: form.nom.value,
+    unite: form.unite.value,
+    description: form.description.value,
+    images: imageList
+  };
 
-        form.reset();
-        preview.innerHTML = '';
-        imageList = [];
-      } catch (error) {
-        alert("Erreur lors de l'envoi du formulaire : " + error.message);
+  try {
+    await fetch("https://script.google.com/macros/s/AKfycbzr7djTkbSuPLyK21wie_6XAE5fhfF8GGCCyVWZ5fTg0OFzhgntyaazWQ283Lbqc0_k/exec", {
+      method: "POST",
+      mode: "no-cors", // ← Important
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json"
       }
     });
+
+    alert("Demande envoyée!");
+    form.reset();
+    preview.innerHTML = '';
+    imageList = [];
+  } catch (error) {
+    alert("Erreur lors de l'envoi du formulaire : " + error.message);
+  }
+});
+
   </script>
 </body>
 </html>

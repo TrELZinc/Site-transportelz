@@ -177,60 +177,70 @@ input, select, textarea, button {
     const preview = document.getElementById('preview');
     let imageList = [];
 
-    photosInput.addEventListener('change', (e) => {
-      const files = Array.from(e.target.files);
-      files.forEach(file => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const imageUrl = reader.result;
-          imageList.push({ name: file.name, type: file.type, data: imageUrl.split(',')[1] });
+const photosInput = document.getElementById('photos');
+const preview = document.getElementById('preview');
+let imageList = [];
 
-          const container = document.createElement('div');
-          container.classList.add('preview-image');
+photosInput.addEventListener('change', (e) => {
+  const files = Array.from(e.target.files);
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const imageUrl = reader.result;
+      imageList.push({ name: file.name, type: file.type, data: imageUrl.split(',')[1] });
 
-          const img = document.createElement('img');
-          img.src = imageUrl;
-          container.appendChild(img);
+      const container = document.createElement('div');
+      container.classList.add('preview-image');
 
-          const removeBtn = document.createElement('div');
-          removeBtn.className = 'remove-btn';
-          removeBtn.textContent = 'X';
-          removeBtn.onclick = () => {
-            container.remove();
-            imageList = imageList.filter(i => i.data !== imageUrl.split(',')[1]);
-          };
+      const img = document.createElement('img');
+      img.src = imageUrl;
+      container.appendChild(img);
 
-          container.appendChild(removeBtn);
-          preview.appendChild(container);
-        };
-        reader.readAsDataURL(file);
-      });
-      photosInput.value = '';
-    });
+      const removeBtn = document.createElement('div');
+      removeBtn.className = 'remove-btn';
+      removeBtn.textContent = 'X';
+      removeBtn.onclick = () => {
+        container.remove();
+        imageList = imageList.filter(i => i.data !== imageUrl.split(',')[1]);
+      };
+
+      container.appendChild(removeBtn);
+      preview.appendChild(container);
+    };
+    reader.readAsDataURL(file);
+  });
+  photosInput.value = '';
+});
+
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
-
-  const formData = new FormData();
-  formData.append("nom", form.nom.value);
-  formData.append("unite", form.unite.value);
-  formData.append("description", form.description.value);
-  formData.append("images", JSON.stringify(imageList)); // toujours en JSON
+  const data = {
+    nom: form.nom.value,
+    unite: form.unite.value,
+    description: form.description.value,
+    images: imageList
+  };
 
   try {
-    await fetch("https://script.google.com/macros/s/AKfycbyOOxRh0jGnzdCza_kv--8_rGhApnuQzRdDWRIXmhH6Mg4kEgDDTKqRi91ZvoA9RCIp/exec", {
+    const response = await fetch("https://script.google.com/macros/s/TON_DEPLOIEMENT/exec", {
       method: "POST",
-      mode: "no-cors",
-      body: formData
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json"
+      }
     });
 
-    alert("Demande envoyée!");
+    const result = await response.json();
+    alert(`Demande envoyée! Numéro du bon : ${result.id}`);
     form.reset();
     preview.innerHTML = '';
     imageList = [];
   } catch (error) {
     alert("Erreur lors de l'envoi du formulaire : " + error.message);
   }
+});
+
 });
 
 

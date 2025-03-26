@@ -1,31 +1,41 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Transport ELZ – Portail Employés</title>
   <style>
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
+      background-color: #f8f8f8;
+      color: #111;
+    }
+
+    .header {
       background-color: #111;
-      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .logo {
+      height: 80px;
+    }
+
+    .container {
       display: flex;
       flex-direction: column;
       align-items: center;
-      min-height: 100vh;
-      padding: 20px;
+      padding: 40px 20px;
     }
-    img.logo {
-      width: 250px;
-      margin: 40px auto 20px;
-    }
+
     h1 {
       font-size: 24px;
       margin-bottom: 40px;
+      color: #111;
       text-align: center;
-      color: #ffffff;
     }
+
     .btn-container {
       display: flex;
       flex-direction: column;
@@ -33,25 +43,34 @@
       width: 100%;
       max-width: 400px;
     }
+
     a.button {
-      display: block;
-      padding: 15px 25px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 15px 20px;
       background-color: #ff281e;
       color: white;
       text-decoration: none;
       border-radius: 10px;
-      text-align: center;
-      font-size: 18px;
+      font-size: 17px;
       font-weight: bold;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
       transition: background 0.3s ease;
     }
+
     a.button:hover {
-      background-color: #0d74d1;
+      background-color: #d31e15;
     }
+
+    .button img {
+      height: 24px;
+      width: 24px;
+    }
+
     footer {
-      margin-top: auto;
-      padding: 30px 0 10px;
+      margin-top: 50px;
+      padding: 20px 0 10px;
       font-size: 12px;
       color: #888;
       text-align: center;
@@ -60,22 +79,38 @@
 </head>
 <body>
 
-  <img src="assets/logo.jpeg" alt="Logo Transport ELZ" class="logo">
-
-  <h1>Portail des employé(e)s</h1>
-
-  <div class="btn-container">
-    <a href="#" class="button">Envoyer une feuille de temps</a>
-    <a href="#" class="button">Envoyer une demande de réparation</a>
-    <a href="#" class="button">Voir la disponibilité des équipements</a>
-    <a href="#" class="button">Prix du diesel</a>
-    <a href="#" class="button">Liste des charges</a>
-    <a href="#" class="button">Projet futur</a>
+  <div class="header">
+    <img src="assets/logo.jpeg" alt="Logo Transport ELZ" class="logo" />
   </div>
 
-  <footer>
-    Transport ELZ inc. – Tous droits réservés
-  </footer>
+  <div class="container">
+    <h1>Portail des employé(e)s</h1>
+
+    <div class="btn-container">
+      <a href="#" class="button">
+        <img src="assets/icones/feuille.png" alt=""> Envoyer une feuille de temps
+      </a>
+      <a href="#" class="button">
+        <img src="assets/icones/outil.png" alt=""> Demande de réparation mécanique
+      </a>
+      <a href="#" class="button">
+        <img src="assets/icones/camion.png" alt=""> Disponibilité des équipements
+      </a>
+      <a href="#" class="button">
+        <img src="assets/icones/fuel.png" alt=""> Prix du diesel
+      </a>
+      <a href="#" class="button">
+        <img src="assets/icones/liste.png" alt=""> Liste des charges
+      </a>
+      <a href="#" class="button">
+        <img src="assets/icones/idee.png" alt=""> Demande de réparation mécanique V2
+      </a>
+    </div>
+
+    <footer>
+      Transport ELZ inc. – Tous droits réservés
+    </footer>
+  </div>
 
 </body>
 </html>

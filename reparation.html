@@ -121,6 +121,28 @@
         font-size: 16px;
       }
     }
+
+    .confirmation-popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #141414;
+      color: white;
+      padding: 20px 30px;
+      border-radius: 16px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+      font-size: 18px;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .confirmation-popup.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
   </style>
 </head>
 <body>
@@ -169,10 +191,15 @@
     </form>
   </div>
 
+  <div id="confirmation" class="confirmation-popup">
+    ✅ Demande envoyée avec succès !
+  </div>
+
   <script>
     const form = document.getElementById('repair-form');
     const photosInput = document.getElementById('photos');
     const preview = document.getElementById('preview');
+    const confirmation = document.getElementById('confirmation');
     let imageList = [];
 
     photosInput.addEventListener('change', (e) => {
@@ -206,35 +233,38 @@
       photosInput.value = '';
     });
 
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = {
+        nom: form.nom.value,
+        unite: form.unite.value,
+        description: form.description.value,
+        images: imageList
+      };
 
-  const data = {
-    nom: form.nom.value,
-    unite: form.unite.value,
-    description: form.description.value,
-    images: imageList
-  };
+      try {
+        await fetch("https://script.google.com/macros/s/AKfycbzr7djTkbSuPLyK21wie_6XAE5fhfF8GGCCyVWZ5fTg0OFzhgntyaazWQ283Lbqc0_k/exec", {
+          method: "POST",
+          mode: "no-cors",
+          body: JSON.stringify(data),
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
 
-  try {
-    await fetch("https://script.google.com/macros/s/AKfycbzr7djTkbSuPLyK21wie_6XAE5fhfF8GGCCyVWZ5fTg0OFzhgntyaazWQ283Lbqc0_k/exec", {
-      method: "POST",
-      mode: "no-cors", // ← Important
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json"
+        // Afficher la popup
+        confirmation.classList.add("show");
+        setTimeout(() => {
+          confirmation.classList.remove("show");
+        }, 4000);
+
+        form.reset();
+        preview.innerHTML = '';
+        imageList = [];
+      } catch (error) {
+        alert("Erreur lors de l'envoi du formulaire : " + error.message);
       }
     });
-
-    alert("Demande envoyée!");
-    form.reset();
-    preview.innerHTML = '';
-    imageList = [];
-  } catch (error) {
-    alert("Erreur lors de l'envoi du formulaire : " + error.message);
-  }
-});
-
   </script>
 </body>
 </html>

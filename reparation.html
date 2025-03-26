@@ -9,7 +9,7 @@
     body {
       font-family: 'Comfortaa', cursive;
       margin: 0;
-      background-color:   #fefefe;
+      background-color: #fefefe;
     }
 
     header {
@@ -30,17 +30,21 @@
       font-size: 24px;
     }
 
-form {
-  max-width: 600px;
-  margin: 30px auto;
-  padding: 20px;
-  padding-inline: 16px; /* équilibre parfaitement les deux côtés */
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  box-sizing: border-box;
-}
+    .form-container {
+      max-width: 600px;
+      margin: 30px auto;
+      padding: 0 16px;
+      box-sizing: border-box;
+    }
 
+    form {
+      width: 100%;
+      padding: 20px;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      box-sizing: border-box;
+    }
 
     label {
       display: block;
@@ -81,7 +85,7 @@ form {
       position: relative;
       display: inline-block;
     }
-    
+
     .preview-image img {
       height: 80px;
       width: auto;
@@ -114,43 +118,45 @@ form {
     <h1>Demande de réparation mécanique</h1>
   </header>
 
-  <form id="repair-form">
-    <label for="nom">Nom du chauffeur</label>
-    <input type="text" id="nom" name="nom" required>
+  <div class="form-container">
+    <form id="repair-form">
+      <label for="nom">Nom du chauffeur</label>
+      <input type="text" id="nom" name="nom" required>
 
-    <label for="unite">Numéro de l'unité</label>
-    <select id="unite" name="unite" required>
-      <option value="">-- Sélectionner une unité --</option>
-      <option>Camion 1103</option>
-      <option>Camion 1202</option>
-      <option>Camion 1303</option>
-      <option>Camion 1404</option>
-      <option>Camion 1502</option>
-      <option>Camion 1602</option>
-      <option>Camion 1603</option>
-      <option>Camion 1703</option>
-      <option>Camion 1803</option>
-      <option>Remorque 1505</option>
-      <option>Remorque 1605</option>
-      <option>Remorque 1805</option>
-      <option>Remorque 1905</option>
-      <option>Remorque 1906</option>
-      <option>Remorque 2006</option>
-      <option>Remorque 2205</option>
-      <option>Remorque 2405</option>
-      <option>Remorque 2506</option>
-      <option>Remorque 2706</option>
-    </select>
+      <label for="unite">Numéro de l'unité</label>
+      <select id="unite" name="unite" required>
+        <option value="">-- Sélectionner une unité --</option>
+        <option>Camion 1103</option>
+        <option>Camion 1202</option>
+        <option>Camion 1303</option>
+        <option>Camion 1404</option>
+        <option>Camion 1502</option>
+        <option>Camion 1602</option>
+        <option>Camion 1603</option>
+        <option>Camion 1703</option>
+        <option>Camion 1803</option>
+        <option>Remorque 1505</option>
+        <option>Remorque 1605</option>
+        <option>Remorque 1805</option>
+        <option>Remorque 1905</option>
+        <option>Remorque 1906</option>
+        <option>Remorque 2006</option>
+        <option>Remorque 2205</option>
+        <option>Remorque 2405</option>
+        <option>Remorque 2506</option>
+        <option>Remorque 2706</option>
+      </select>
 
-    <label for="description">Description du problème</label>
-    <textarea id="description" name="description" rows="4" required></textarea>
+      <label for="description">Description du problème</label>
+      <textarea id="description" name="description" rows="4" required></textarea>
 
-    <label for="photos">Ajouter des photos</label>
-    <input type="file" id="photos" name="photos" accept="image/*" multiple>
-    <div class="preview" id="preview"></div>
+      <label for="photos">Ajouter des photos</label>
+      <input type="file" id="photos" name="photos" accept="image/*" multiple>
+      <div class="preview" id="preview"></div>
 
-    <button type="submit">Envoyer</button>
-  </form>
+      <button type="submit">Envoyer</button>
+    </form>
+  </div>
 
   <script>
     const form = document.getElementById('repair-form');

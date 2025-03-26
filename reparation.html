@@ -2,24 +2,41 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Demande de réparation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Réparation mécanique</title>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: "Segoe UI", sans-serif;
-      background-color: white;
-      padding: 20px;
+      font-family: 'Comfortaa', cursive;
       margin: 0;
-      color: #333;
+      background-color: #f9f9f9;
     }
 
-    h2 {
+    header {
+      background-color: black;
+      color: white;
+      padding: 20px;
       text-align: center;
+    }
+
+    header img {
+      height: 60px;
+      display: block;
+      margin: 0 auto 10px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 24px;
     }
 
     form {
       max-width: 600px;
-      margin: 0 auto;
+      margin: 30px auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
 
     label {
@@ -28,98 +45,79 @@
       font-weight: bold;
     }
 
-    input, select, textarea {
+    input, select, textarea, button {
       width: 100%;
-      padding: 8px;
+      padding: 10px;
       margin-top: 5px;
-      box-sizing: border-box;
+      border-radius: 6px;
       border: 1px solid #ccc;
-      border-radius: 5px;
+      font-family: 'Comfortaa', cursive;
     }
 
-    input[type="file"] {
-      padding: 0;
+    button {
+      background-color: black;
+      color: white;
+      border: none;
+      margin-top: 20px;
+      cursor: pointer;
+      transition: 0.3s;
     }
 
-    .preview-container {
-      display: flex;
-      flex-wrap: wrap;
-      margin-top: 10px;
-      gap: 10px;
+    button:hover {
+      background-color: #333;
     }
 
     .preview {
-      position: relative;
-      width: 90px;
-      height: 90px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
     }
 
-    .preview img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 6px;
-      border: 1px solid #ddd;
+    .preview-image {
+      position: relative;
+      display: inline-block;
+    }
+
+    .preview-image img {
+      height: 80px;
+      width: auto;
+      border-radius: 8px;
+      border: 1px solid #ccc;
     }
 
     .remove-btn {
       position: absolute;
-      top: -8px;
-      right: -8px;
+      top: -10px;
+      right: -10px;
       background-color: red;
+      border: 2px solid black;
       color: white;
-      border: none;
       border-radius: 50%;
       width: 22px;
       height: 22px;
-      cursor: pointer;
       font-size: 14px;
-    }
-
-    button {
-      margin-top: 20px;
-      width: 100%;
-      background-color: #007BFF;
-      color: white;
-      padding: 10px;
-      border: none;
-      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
-      font-size: 16px;
-    }
-
-    button:hover {
-      background-color: #0056b3;
-    }
-
-    .success-popup {
-      background-color: #e6ffe6;
-      border: 1px solid #2ecc71;
-      color: #2d8659;
-      padding: 15px;
-      margin-top: 20px;
-      border-radius: 6px;
-      text-align: center;
-    }
-
-    @media screen and (max-width: 600px) {
-      .preview {
-        width: 80px;
-        height: 80px;
-      }
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
+  <header>
+    <img src="assets/logo.jpeg" alt="Logo ELZ">
+    <h1>Demande de réparation mécanique</h1>
+  </header>
 
-  <h2>Demande de réparation mécanique</h2>
-  <form id="repairForm">
-    <label for="nom">Nom :</label>
+  <form id="repair-form">
+    <label for="nom">Nom du chauffeur</label>
     <input type="text" id="nom" name="nom" required>
 
-    <label for="unite">Unité :</label>
+    <label for="unite">Numéro de l'unité</label>
     <select id="unite" name="unite" required>
-      <option value="">-- Sélectionner --</option>
+      <option value="">-- Sélectionner une unité --</option>
       <option>Camion 1103</option>
       <option>Camion 1202</option>
       <option>Camion 1303</option>
@@ -141,97 +139,78 @@
       <option>Remorque 2706</option>
     </select>
 
-    <label for="description">Description :</label>
+    <label for="description">Description du problème</label>
     <textarea id="description" name="description" rows="4" required></textarea>
 
-    <label for="photos">Photos :</label>
+    <label for="photos">Ajouter des photos</label>
     <input type="file" id="photos" name="photos" accept="image/*" multiple>
-
-    <div class="preview-container" id="previewContainer"></div>
+    <div class="preview" id="preview"></div>
 
     <button type="submit">Envoyer</button>
-    <div id="popup" class="success-popup" style="display:none;"></div>
   </form>
 
   <script>
-    const form = document.getElementById('repairForm');
-    const previewContainer = document.getElementById('previewContainer');
-    const popup = document.getElementById('popup');
-    let selectedFiles = [];
+    const form = document.getElementById('repair-form');
+    const photosInput = document.getElementById('photos');
+    const preview = document.getElementById('preview');
+    let imageList = [];
 
-    document.getElementById('photos').addEventListener('change', function (e) {
+    photosInput.addEventListener('change', (e) => {
       const files = Array.from(e.target.files);
       files.forEach(file => {
         const reader = new FileReader();
-        reader.onload = function (event) {
-          const div = document.createElement('div');
-          div.classList.add('preview');
+        reader.onload = () => {
+          const imageUrl = reader.result;
+          imageList.push({ name: file.name, type: file.type, data: imageUrl.split(',')[1] });
+
+          const container = document.createElement('div');
+          container.classList.add('preview-image');
 
           const img = document.createElement('img');
-          img.src = event.target.result;
+          img.src = imageUrl;
+          container.appendChild(img);
 
-          const btn = document.createElement('button');
-          btn.textContent = 'X';
-          btn.classList.add('remove-btn');
-          btn.onclick = () => {
-            previewContainer.removeChild(div);
-            selectedFiles = selectedFiles.filter(f => f !== file);
+          const removeBtn = document.createElement('div');
+          removeBtn.className = 'remove-btn';
+          removeBtn.textContent = 'X';
+          removeBtn.onclick = () => {
+            container.remove();
+            imageList = imageList.filter(i => i.data !== imageUrl.split(',')[1]);
           };
 
-          div.appendChild(img);
-          div.appendChild(btn);
-          previewContainer.appendChild(div);
+          container.appendChild(removeBtn);
+          preview.appendChild(container);
         };
         reader.readAsDataURL(file);
-        selectedFiles.push(file);
       });
-
-      // Reset input to allow re-selection of the same file
-      e.target.value = '';
+      photosInput.value = '';
     });
 
-    form.addEventListener('submit', async function (e) {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
-
-      const nom = form.nom.value.trim();
-      const unite = form.unite.value.trim();
-      const description = form.description.value.trim();
-
-      const images = await Promise.all(selectedFiles.map(file => {
-        return new Promise(resolve => {
-          const reader = new FileReader();
-          reader.onload = () => {
-            resolve({ data: reader.result.split(',')[1], contentType: file.type });
-          };
-          reader.readAsDataURL(file);
-        });
-      }));
-
-      const payload = { nom, unite, description, images };
+      const data = {
+        nom: form.nom.value,
+        unite: form.unite.value,
+        description: form.description.value,
+        images: imageList
+      };
 
       try {
-        const response = await fetch('https://script.google.com/macros/s/AKfycbyU5ll4uvD19nW5ZTQTTdY2H9_YLBGz4WeKJyVa5VOMoN9y8l3hhaJEbMs2HpDyjIx9/exec', {
-          method: 'POST',
-          body: JSON.stringify(payload),
-          headers: { 'Content-Type': 'application/json' }
+        const response = await fetch("https://script.google.com/macros/s/AKfycbyU5ll4uvD19nW5ZTQTTdY2H9_YLBGz4WeKJyVa5VOMoN9y8l3hhaJEbMs2HpDyjIx9/exec", {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: { "Content-Type": "application/json" }
         });
 
         const result = await response.json();
-
-        if (result.status === 'success') {
-          popup.innerHTML = `Votre demande a été envoyée avec succès !<br>Numéro de bon : <strong>${result.id}</strong>`;
-          popup.style.display = 'block';
-          form.reset();
-          previewContainer.innerHTML = '';
-          selectedFiles = [];
-        } else {
-          alert("Erreur : " + result.message);
-        }
-      } catch (err) {
-        alert("Erreur lors de l’envoi du formulaire : " + err.message);
+        alert(`Demande envoyée! Numéro du bon : ${result.id}`);
+        form.reset();
+        preview.innerHTML = '';
+        imageList = [];
+      } catch (error) {
+        alert("Erreur lors de l'envoi du formulaire : " + error.message);
       }
     });
   </script>
-
 </body>
 </html>

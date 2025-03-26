@@ -45,12 +45,9 @@
       max-width: 400px;
     }
 
-   a.button {
-  display: flex;
-  align-items: center;
-  justify-content: center; /* 👈 Ajouté */
-  text-align: center;      /* 👈 Ajouté */
-  gap: 15px;
+a.button {
+  position: relative;
+  display: block;
   padding: 30px 20px;
   background-color: #ff281e;
   color: white;
@@ -60,16 +57,23 @@
   font-weight: bold;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   transition: background 0.3s ease;
+  text-align: center; /* Centre le texte dans le bouton */
+}
+
 }
 
     a.button:hover {
       background-color: #d31e15;
     }
 
-    .button img {
-      height: 35px;
-      width: 35px;
-    }
+.button img {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 36px;
+  width: 36px;
+}
 
     footer {
       margin-top: 50px;

@@ -30,14 +30,17 @@
       font-size: 24px;
     }
 
-    form {
-      max-width: 600px;
-      margin: 30px auto;
-      padding: 20px;
-      background-color: white;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
+form {
+  max-width: 600px;
+  margin: 30px auto;
+  padding: 20px;
+  padding-inline: 16px; /* équilibre parfaitement les deux côtés */
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+}
+
 
     label {
       display: block;
@@ -78,15 +81,7 @@
       position: relative;
       display: inline-block;
     }
-  .form-container {
-  padding: 2rem;
-  margin: 0 auto;
-  max-width: 700px;
-  box-sizing: border-box;
-}
-
-
-
+    
     .preview-image img {
       height: 80px;
       width: auto;

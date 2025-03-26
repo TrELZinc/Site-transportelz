@@ -223,9 +223,8 @@
             "Content-Type": "application/json"
           }
         });
+alert("Demande envoyée!");
 
-        const result = await response.json();
-        alert(`Demande envoyée! Numéro du bon : ${result.id}`);
         form.reset();
         preview.innerHTML = '';
         imageList = [];

@@ -37,15 +37,14 @@
       box-sizing: border-box;
     }
 
-form {
-  width: 100%;
-  padding: 32px 24px; /* avant : 20px */
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  box-sizing: border-box;
-}
-
+    form {
+      width: 100%;
+      padding: 32px 24px;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      box-sizing: border-box;
+    }
 
     label {
       display: block;
@@ -53,14 +52,19 @@ form {
       font-weight: bold;
     }
 
-input, select, textarea, button {
-  padding: 10px;
-  margin-top: 5px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-family: 'Comfortaa', cursive;
-}
+    input, select, textarea {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+    }
 
+    input, select, textarea, button {
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-family: 'Comfortaa', cursive;
+    }
 
     button {
       background-color: black;
@@ -111,18 +115,12 @@ input, select, textarea, button {
       cursor: pointer;
       font-weight: bold;
     }
-    input, select, textarea {
-  display: block;
-  width: 100%;
-  box-sizing: border-box;
-}
-    
-@media (max-width: 600px) {
-  select {
-    font-size: 16px;
-  }
-}
 
+    @media (max-width: 600px) {
+      select {
+        font-size: 16px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -163,7 +161,7 @@ input, select, textarea, button {
       <label for="description">Description du problème</label>
       <textarea id="description" name="description" rows="4" required></textarea>
 
-      <label for="photos">Ajouter des photos (optionnel)</label>
+      <label for="photos">Ajouter des photos</label>
       <input type="file" id="photos" name="photos" accept="image/*" multiple>
       <div class="preview" id="preview"></div>
 
@@ -177,73 +175,63 @@ input, select, textarea, button {
     const preview = document.getElementById('preview');
     let imageList = [];
 
-const photosInput = document.getElementById('photos');
-const preview = document.getElementById('preview');
-let imageList = [];
+    photosInput.addEventListener('change', (e) => {
+      const files = Array.from(e.target.files);
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const imageUrl = reader.result;
+          imageList.push({ name: file.name, type: file.type, data: imageUrl.split(',')[1] });
 
-photosInput.addEventListener('change', (e) => {
-  const files = Array.from(e.target.files);
-  files.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const imageUrl = reader.result;
-      imageList.push({ name: file.name, type: file.type, data: imageUrl.split(',')[1] });
+          const container = document.createElement('div');
+          container.classList.add('preview-image');
 
-      const container = document.createElement('div');
-      container.classList.add('preview-image');
+          const img = document.createElement('img');
+          img.src = imageUrl;
+          container.appendChild(img);
 
-      const img = document.createElement('img');
-      img.src = imageUrl;
-      container.appendChild(img);
+          const removeBtn = document.createElement('div');
+          removeBtn.className = 'remove-btn';
+          removeBtn.textContent = 'X';
+          removeBtn.onclick = () => {
+            container.remove();
+            imageList = imageList.filter(i => i.data !== imageUrl.split(',')[1]);
+          };
 
-      const removeBtn = document.createElement('div');
-      removeBtn.className = 'remove-btn';
-      removeBtn.textContent = 'X';
-      removeBtn.onclick = () => {
-        container.remove();
-        imageList = imageList.filter(i => i.data !== imageUrl.split(',')[1]);
-      };
-
-      container.appendChild(removeBtn);
-      preview.appendChild(container);
-    };
-    reader.readAsDataURL(file);
-  });
-  photosInput.value = '';
-});
-
-
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const data = {
-    nom: form.nom.value,
-    unite: form.unite.value,
-    description: form.description.value,
-    images: imageList
-  };
-
-  try {
-    const response = await fetch("https://script.google.com/macros/s/TON_DEPLOIEMENT/exec", {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json"
-      }
+          container.appendChild(removeBtn);
+          preview.appendChild(container);
+        };
+        reader.readAsDataURL(file);
+      });
+      photosInput.value = '';
     });
 
-    const result = await response.json();
-    alert(`Demande envoyée! Numéro du bon : ${result.id}`);
-    form.reset();
-    preview.innerHTML = '';
-    imageList = [];
-  } catch (error) {
-    alert("Erreur lors de l'envoi du formulaire : " + error.message);
-  }
-});
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = {
+        nom: form.nom.value,
+        unite: form.unite.value,
+        description: form.description.value,
+        images: imageList
+      };
 
-});
+      try {
+        const response = await fetch("https://script.google.com/macros/s/AKfycbyOOxRh0jGnzdCza_kv--8_rGhApnuQzRdDWRIXmhH6Mg4kEgDDTKqRi91ZvoA9RCIp/exec", {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
 
-
+        const result = await response.json();
+        alert(`Demande envoyée! Numéro du bon : ${result.id}`);
+        form.reset();
+        preview.innerHTML = '';
+        imageList = [];
+      } catch (error) {
+        alert("Erreur lors de l'envoi du formulaire : " + error.message);
+      }
     });
   </script>
 </body>

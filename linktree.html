@@ -135,29 +135,31 @@
   </div>
 
   <script>
-    const role = localStorage.getItem("roleTransportelz");
+    document.addEventListener("DOMContentLoaded", function () {
+      const role = localStorage.getItem("roleTransportelz");
 
-    if (role === "admin") {
-      const btnContainer = document.getElementById("liens");
+      if (role === "admin") {
+        const btnContainer = document.getElementById("liens");
 
-      const lienProjet = document.createElement("a");
-      lienProjet.href = "#";
-      lienProjet.className = "button";
-      lienProjet.innerHTML = `<img src="assets/icones/idee.png" alt=""> Projets futurs`;
-      btnContainer.appendChild(lienProjet);
+        const lienProjet = document.createElement("a");
+        lienProjet.href = "#";
+        lienProjet.className = "button";
+        lienProjet.innerHTML = `<img src="assets/icones/idee.png" alt=""> Projets futurs`;
+        btnContainer.appendChild(lienProjet);
 
-      const lienDispatch = document.createElement("a");
-      lienDispatch.href = "dispatch.html";
-      lienDispatch.className = "button";
-      lienDispatch.innerHTML = `<img src="assets/icones/dispatch.png" alt=""> Dispatch interne`;
-      btnContainer.appendChild(lienDispatch);
-    }
+        const lienDispatch = document.createElement("a");
+        lienDispatch.href = "dispatch.html";
+        lienDispatch.className = "button";
+        lienDispatch.innerHTML = `<img src="assets/icones/dispatch.png" alt=""> Dispatch interne`;
+        btnContainer.appendChild(lienDispatch);
+      }
 
-    function deconnexion() {
-      localStorage.removeItem("rememberTransportelz");
-      localStorage.removeItem("roleTransportelz");
-      window.location.href = "index.html";
-    }
+      window.deconnexion = function () {
+        localStorage.removeItem("rememberTransportelz");
+        localStorage.removeItem("roleTransportelz");
+        window.location.href = "index.html";
+      };
+    });
   </script>
 
 </body>

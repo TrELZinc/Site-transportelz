@@ -113,7 +113,20 @@
       <a href="#" class="button">
         <img src="assets/icones/liste.png" alt=""> Consulter la liste des charges
       </a>
-      <!-- Le lien Projets futurs sera ajouté via JS si admin -->
+    </div>
+
+    <div style="margin-top: 30px;">
+      <button onclick="deconnexion()" style="
+        background-color: #000;
+        color: #fff;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        font-family: 'Comfortaa', sans-serif;
+      ">Se déconnecter</button>
     </div>
 
     <footer>
@@ -144,17 +157,21 @@
       lienProjet.href = "#";
       lienProjet.className = "button";
       lienProjet.innerHTML = `<img src="assets/icones/idee.png" alt=""> Projets futurs`;
-
       btnContainer.appendChild(lienProjet);
+
+      const lienDispatch = document.createElement("a");
+      lienDispatch.href = "dispatch.html";
+      lienDispatch.className = "button";
+      lienDispatch.innerHTML = `<img src="assets/icones/dispatch.png" alt=""> Dispatch interne`;
+      btnContainer.appendChild(lienDispatch);
+    }
+
+    function deconnexion() {
+      localStorage.removeItem("rememberTransportelz");
+      localStorage.removeItem("roleTransportelz");
+      window.location.href = "index.html";
     }
   </script>
-<script>
-  function deconnexion() {
-    localStorage.removeItem("rememberTransportelz");
-    localStorage.removeItem("roleTransportelz");
-    window.location.href = "index.html";
-  }
-</script>
 
 </body>
 </html>

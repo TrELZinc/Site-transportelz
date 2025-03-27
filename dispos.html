@@ -40,7 +40,6 @@
     .top-bar {
       display: flex;
       justify-content: flex-end;
-      align-items: center;
       margin-bottom: 10px;
     }
 
@@ -55,13 +54,13 @@
     form {
       display: flex;
       flex-direction: column;
-      align-items: flex-end;
+      align-items: center;
     }
 
     .form-group {
       margin-bottom: 12px;
       width: 100%;
-      max-width: 400px;
+      max-width: 600px;
     }
 
     label {
@@ -70,7 +69,6 @@
       margin-bottom: 5px;
     }
 
-    input[type="text"],
     textarea {
       width: 100%;
       padding: 8px;
@@ -109,7 +107,7 @@
     .buttons {
       margin-top: 20px;
       display: flex;
-      justify-content: flex-end;
+      justify-content: center;
       gap: 10px;
       flex-wrap: wrap;
     }
@@ -148,16 +146,6 @@
 
     <form id="dispoForm">
       <div class="form-group">
-        <label for="to">To:</label>
-        <input type="text" name="to" id="to" required />
-      </div>
-
-      <div class="form-group">
-        <label for="cc">CC:</label>
-        <input type="text" name="cc" id="cc" />
-      </div>
-
-      <div class="form-group">
         <label for="note">Note:</label>
         <textarea name="note" id="note" rows="2"></textarea>
       </div>
@@ -174,17 +162,15 @@
           </tr>
         </thead>
         <tbody>
-          <!-- 8 lignes -->
-          ${[...Array(8)].map(() => `
-            <tr>
-              <td contenteditable></td>
-              <td><input type="checkbox" /></td>
-              <td contenteditable></td>
-              <td contenteditable></td>
-              <td contenteditable></td>
-              <td contenteditable></td>
-            </tr>
-          `).join('')}
+          <!-- 8 lignes fixes -->
+          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
         </tbody>
       </table>
 
@@ -202,8 +188,6 @@
 
       const formData = new FormData(this);
       const data = {
-        to: formData.get("to"),
-        cc: formData.get("cc"),
         note: formData.get("note"),
         date: document.getElementById("dateSelect").value,
         table: getTableHTML()

@@ -108,7 +108,7 @@
       const erreur = document.getElementById("erreur");
 
       try {
-        const response = await fetch("TON_URL_DU_SCRIPT", {
+        const response = await fetch("https://script.google.com/macros/s/AKfycbwoRpvKfRUSUjTcEW2bE8zZtQOMyox9yjsSkFzDdXWRWsZ5-VR0YWObTApkHGDRrL-pfw/exec", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ identifiant, motdepasse })

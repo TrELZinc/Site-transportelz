@@ -79,6 +79,47 @@
       width: 36px;
     }
 
+    .admin-popup {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .admin-box {
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+
+    .admin-box input {
+      padding: 12px;
+      font-size: 18px;
+      font-family: 'Comfortaa', sans-serif;
+      width: 100%;
+      max-width: 200px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+
+    .admin-box button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      font-family: 'Comfortaa', sans-serif;
+      border: none;
+      border-radius: 8px;
+      background-color: #000;
+      color: #fff;
+      cursor: pointer;
+    }
+
     footer {
       margin-top: 50px;
       padding: 20px 0 10px;
@@ -113,34 +154,15 @@
       <a href="poids.html" class="button">
         <img src="assets/icones/liste.png" alt=""> Consulter la liste des charges
       </a>
-      <button onclick="demanderNIP()" style="
-        background-color: #444;
-        color: white;
-        padding: 12px 20px;
-        border: none;
-        border-radius: 10px;
-        font-size: 16px;
-        font-family: 'Comfortaa', sans-serif;
-        margin-top: 20px;
-        cursor: pointer;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-      ">
+      <button onclick="ouvrirPopup()" style="background-color: #444; color: white; padding: 12px 20px; border: none; border-radius: 10px; font-size: 16px; font-family: 'Comfortaa', sans-serif; margin-top: 20px; cursor: pointer; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);">
         🔐 Accès administrateur
       </button>
     </div>
 
     <div style="margin-top: 30px;">
-      <button onclick="deconnexion()" style="
-        background-color: #000;
-        color: #fff;
-        padding: 12px 24px;
-        border: none;
-        border-radius: 8px;
-        font-size: 16px;
-        cursor: pointer;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        font-family: 'Comfortaa', sans-serif;
-      ">Se déconnecter</button>
+      <button onclick="deconnexion()" style="background-color: #000; color: #fff; padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); font-family: 'Comfortaa', sans-serif;">
+        Se déconnecter
+      </button>
     </div>
 
     <footer>
@@ -148,19 +170,34 @@
     </footer>
   </div>
 
+  <!-- Popup NIP -->
+  <div id="popupNIP" class="admin-popup" style="display:none;">
+    <div class="admin-box">
+      <p>Entrez le NIP pour accéder à cette section :</p>
+      <input id="nipInput" type="tel" inputmode="numeric" maxlength="6" />
+      <br />
+      <button onclick="validerNIP()">Valider</button>
+    </div>
+  </div>
+
   <script>
-    function demanderNIP() {
-      const nip = prompt("Entrez le NIP pour accéder à cette section :");
+    function ouvrirPopup() {
+      document.getElementById("popupNIP").style.display = "flex";
+      document.getElementById("nipInput").focus();
+    }
+
+    function validerNIP() {
+      const nip = document.getElementById("nipInput").value;
       if (nip === "1359") {
         const btnContainer = document.getElementById("liens");
-
         const lienDispatch = document.createElement("a");
         lienDispatch.href = "dispatch.html";
         lienDispatch.className = "button";
         lienDispatch.innerHTML = `<img src="assets/icones/dispatch.png" alt=""> Dispatch interne`;
         btnContainer.appendChild(lienDispatch);
-      } else if (nip !== null) {
-        alert("NIP incorrect. Accès refusé.");
+        document.getElementById("popupNIP").style.display = "none";
+      } else {
+        alert("NIP incorrect.");
       }
     }
 

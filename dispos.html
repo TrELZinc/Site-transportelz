@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Disponibilités</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #f4f4f4;
+    }
+
+    header {
+      background-color: #000;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+    }
+
+    header img {
+      height: 40px;
+    }
+
+    nav a {
+      color: white;
+      margin: 0 10px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .container {
+      padding: 20px;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: white;
+    }
+
+    th, td {
+      border: 1px solid #999;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #ef6d6d;
+      color: white;
+    }
+
+    .buttons {
+      margin-top: 20px;
+      text-align: right;
+    }
+
+    .buttons button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-weight: bold;
+      margin: 5px;
+      cursor: pointer;
+    }
+
+    .reset-btn { background-color: #e74c3c; }
+    .save-btn { background-color: #2ecc71; }
+    .send-btn { background-color: black; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <img src="assets/logo.jpeg" alt="Logo">
+    <nav>
+      <a href="#">Application 1</a>
+      <a href="#">Application 2</a>
+      <a href="#">Application 3</a>
+      <a href="#">Application 4</a>
+      <a href="#">Application 5</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <h2>Disponibilités</h2>
+
+    <form id="dispoForm">
+      <div class="form-group">
+        <label>To:</label>
+        <input type="text" name="to" required />
+      </div>
+      <div class="form-group">
+        <label>CC:</label>
+        <input type="text" name="cc" />
+      </div>
+      <div class="form-group">
+        <label>Subject:</label>
+        <input type="text" name="subject" value="Disponibilités - " />
+      </div>
+      <div class="form-group">
+        <label>Text:</label>
+        <textarea name="text" rows="3">Bonjour,
+Voici les disponibilités pour la journée du</textarea>
+      </div>
+      <div class="form-group">
+        <label>Note:</label>
+        <textarea name="note" rows="2"></textarea>
+      </div>
+
+      <table id="dispoTable">
+        <thead>
+          <tr>
+            <th>CHAUFFEUR</th>
+            <th>US</th>
+            <th>CAMION</th>
+            <th>REMORQUE</th>
+            <th>DÉPART POSSIBLE</th>
+            <th>NOTE</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td contenteditable>AL</td>
+            <td><input type="checkbox" /></td>
+            <td contenteditable>1202</td>
+            <td contenteditable></td>
+            <td contenteditable>0:00</td>
+            <td contenteditable></td>
+          </tr>
+          <!-- Ajoute plus de lignes ici si besoin -->
+        </tbody>
+      </table>
+
+      <div class="buttons">
+        <button type="reset" class="reset-btn">Reset</button>
+        <button type="submit" class="send-btn">Send</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('dispoForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const formData = new FormData(this);
+      const data = {
+        to: formData.get("to"),
+        cc: formData.get("cc"),
+        subject: formData.get("subject"),
+        text: formData.get("text"),
+        note: formData.get("note"),
+        table: getTableHTML()
+      };
+
+      fetch("TON_URL_WEB_APP_GOOGLE_SCRIPT", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }).then(res => {
+        alert("Email envoyé avec succès !");
+        document.getElementById('dispoForm').reset();
+      }).catch(err => {
+        alert("Erreur lors de l'envoi.");
+        console.error(err);
+      });
+    });
+
+    function getTableHTML() {
+      const table = document.getElementById("dispoTable");
+      return table.outerHTML;
+    }
+  </script>
+
+</body>
+</html>

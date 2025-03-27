@@ -52,21 +52,24 @@
       width: 160px;
     }
 
-    .form-section {
+    form {
       width: 100%;
-      background-color: #f4f4f4;
     }
 
-    .note-block, .table-block {
+    .form-section {
       width: 100%;
-      max-width: 1000px;
       margin: auto;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+      width: 100%;
     }
 
     label {
       font-weight: bold;
-      margin-bottom: 5px;
       display: block;
+      margin-bottom: 5px;
     }
 
     textarea {
@@ -75,6 +78,7 @@
       border-radius: 5px;
       border: 1px solid #ccc;
       resize: vertical;
+      box-sizing: border-box;
     }
 
     table {
@@ -82,12 +86,14 @@
       border-collapse: collapse;
       margin-top: 20px;
       background: white;
+      table-layout: fixed;
     }
 
     th, td {
       border: 1px solid #999;
       padding: 8px;
       text-align: center;
+      word-wrap: break-word;
     }
 
     th {
@@ -147,35 +153,34 @@
     </div>
 
     <form id="dispoForm" class="form-section">
-      <div class="note-block">
+      <div class="form-group">
         <label for="note">Note:</label>
         <textarea name="note" id="note" rows="2"></textarea>
       </div>
 
-      <div class="table-block">
-        <table id="dispoTable">
-          <thead>
-            <tr>
-              <th>CHAUFFEUR</th>
-              <th>US</th>
-              <th>CAMION</th>
-              <th>REMORQUE</th>
-              <th>DÉPART</th>
-              <th>NOTE</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-            <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-            <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-            <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-            <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-            <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-            <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-            <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-          </tbody>
-        </table>
-      </div>
+      <table id="dispoTable">
+        <thead>
+          <tr>
+            <th>CHAUFFEUR</th>
+            <th>US</th>
+            <th>CAMION</th>
+            <th>REMORQUE</th>
+            <th>DÉPART</th>
+            <th>NOTE</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- 8 lignes -->
+          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+        </tbody>
+      </table>
 
       <div class="buttons">
         <button type="reset" class="reset-btn" onclick="resetForm(event)">Reset</button>

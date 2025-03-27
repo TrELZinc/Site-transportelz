@@ -138,27 +138,27 @@
       const erreur = document.getElementById("erreur");
 
       try {
-        const response = await fetch("https://script.google.com/macros/s/AKfycbxTl4Hg3ULEwD9cp0GF217-q_kDQFVf5EnEYtBhHqdcByiXfMbmXLOmORDGN2T3oa2sEA/exec", {
+        const response = await fetch("https://script.google.com/macros/s/AKfycbxjbZHAqbzm-7eGvrSK4gHIeOOyTcNwezqG7tFEhgomki4V-nMW2NhDsX1oUorZSQ9Ucg/exec", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ identifiant, motdepasse })
         });
 
         const text = await response.text();
-console.log("Réponse brute :", text);
-const resultat = JSON.parse(text);
-
+        console.log("Réponse brute :", text);
+        const resultat = JSON.parse(text);
 
         if (resultat.success) {
           if (rememberMe) {
             localStorage.setItem("rememberTransportelz", "true");
             localStorage.setItem("roleTransportelz", resultat.role);
           }
-          window.location.href = "linktree.html";
+          window.location.href = "/linktree.html";
         } else {
           erreur.textContent = "Identifiant ou mot de passe invalide.";
         }
       } catch (err) {
+        console.error("Erreur de connexion:", err);
         erreur.textContent = "Erreur de connexion. Réessaye plus tard.";
       }
       return false;

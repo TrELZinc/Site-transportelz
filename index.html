@@ -63,13 +63,14 @@
       margin-top: 10px;
     }
 
-    label {
+.checkbox-wrapper {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 8px;
-  font-size: 14px;
-  margin: 10px 0;
   width: 100%;
+  margin: 10px 0;
+  font-size: 14px;
 }
 
 
@@ -90,10 +91,11 @@
     <input type="text" id="identifiant" placeholder="Identifiant" required>
     <input type="password" id="motdepasse" placeholder="Mot de passe" required>
 
-<label for="rememberMe" style="display: flex; align-items: center; gap: 6px; font-size: 14px; margin: 10px 0; justify-content: flex-start;">
-  <input type="checkbox" id="rememberMe" style="margin: 0;">
-  Rester connecté
-</label>
+<div class="checkbox-wrapper">
+  <input type="checkbox" id="rememberMe" />
+  <label for="rememberMe">Rester connecté</label>
+</div>
+
 
 
 

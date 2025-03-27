@@ -144,7 +144,10 @@
           body: JSON.stringify({ identifiant, motdepasse })
         });
 
-        const resultat = await response.json();
+        const text = await response.text();
+console.log("Réponse brute :", text);
+const resultat = JSON.parse(text);
+
 
         if (resultat.success) {
           if (rememberMe) {

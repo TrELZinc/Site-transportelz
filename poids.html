@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tableau des poids - Transport ELZ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Comfortaa', sans-serif;
+      background-color: #fdfdfd;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+
+    header {
+      background-color: #111;
+      padding: 20px;
+      text-align: center;
+    }
+
+    header img {
+      height: 60px;
+    }
+
+    .container {
+      padding: 20px;
+      max-width: 100%;
+      overflow-x: auto;
+    }
+
+    h1 {
+      color: #c60000;
+      font-size: 24px;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      min-width: 800px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    th {
+      background-color: #c60000;
+      color: white;
+    }
+
+    th.degel {
+      background-color: #ffe5e5;
+      color: #333;
+    }
+
+    td.degel {
+      background-color: #fff2f2;
+    }
+
+    tr.section-title td {
+      background-color: #f0f0f0;
+      font-weight: bold;
+      text-align: left;
+      font-style: italic;
+      color: #c60000;
+    }
+
+    .notes {
+      margin-top: 30px;
+      font-size: 14px;
+      padding: 0 20px;
+    }
+
+    .btn-retour {
+      display: inline-block;
+      margin: 40px auto 0;
+      background-color: #000;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      font-family: 'Comfortaa', sans-serif;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      text-decoration: none;
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 20px;
+      }
+
+      table {
+        font-size: 12px;
+        min-width: unset;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="assets/logo.jpeg" alt="Logo Transport ELZ">
+  </header>
+
+  <div class="container">
+    <h1>Tableau des poids par type de véhicule</h1>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ENDROIT</th>
+          <th>(B.45) 4 ESSIEUX - RÉGULIER</th>
+          <th class="degel">(B.45) 4 ESSIEUX - DÉGEL</th>
+          <th>(B.32) 3 ESSIEUX - RÉGULIER</th>
+          <th class="degel">(B.32) 3 ESSIEUX - DÉGEL</th>
+          <th>(B.31) 3 ESSIEUX CITERNE 2006 - RÉGULIER</th>
+          <th class="degel">(B.31) 3 ESSIEUX CITERNE 2006 - DÉGEL</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>QUEBEC</td><td>57 500 KG</td><td class="degel">50 500 KG</td><td>49 500 KG</td><td class="degel">43 000 KG</td><td>47 500 KG</td><td class="degel">42 000 KG</td></tr>
+        <tr><td>MONTREAL</td><td>57 500 KG</td><td class="degel">50 500 KG</td><td>49 500 KG</td><td class="degel">43 000 KG</td><td>47 500 KG</td><td class="degel">42 000 KG</td></tr>
+        <tr><td>ONTARIO</td><td>57 500 KG</td><td class="degel">50 500 KG</td><td>49 500 KG</td><td class="degel">43 000 KG</td><td>47 500 KG</td><td class="degel">42 000 KG</td></tr>
+        <tr><td>MARITIMES</td><td>55 500 KG</td><td class="degel">50 500 KG</td><td>44 000 KG</td><td class="degel">43 000 KG</td><td>42 000 KG</td><td class="degel">42 000 KG</td></tr>
+        <tr><td>NOUVELLE-ECOSSE</td><td>55 500 KG</td><td class="degel">50 500 KG</td><td>44 000 KG</td><td class="degel">43 000 KG</td><td>42 000 KG</td><td class="degel">42 000 KG</td></tr>
+        <tr class="section-title"><td colspan="7">USA VIA JACKMAN</td></tr>
+        <tr><td>MAINE</td><td>45 300 KG</td><td class="degel">45 300 KG *</td><td>45 300 KG</td><td class="degel">43 000 KG</td><td>45 300 KG</td><td class="degel">42 000 KG</td></tr>
+        <tr><td>NEW HAMPSHIRE</td><td>45 300 KG</td><td class="degel">45 300 KG *</td><td>45 300 KG</td><td class="degel">43 000 KG</td><td>45 300 KG</td><td class="degel">42 000 KG</td></tr>
+        <tr class="section-title"><td colspan="7">USA VIA STANSTEAD</td></tr>
+        <tr><td>MAINE</td><td>44 800 KG</td><td class="degel">44 800 KG *</td><td>44 900 KG</td><td class="degel">43 000 KG</td><td>44 900 KG</td><td class="degel">42 000 KG</td></tr>
+        <tr><td>NEW HAMPSHIRE</td><td>44 800 KG</td><td class="degel">44 800 KG *</td><td>44 900 KG</td><td class="degel">43 000 KG</td><td>44 900 KG</td><td class="degel">42 000 KG</td></tr>
+        <tr><td>VERMONT</td><td>44 800 KG</td><td class="degel">44 800 KG *</td><td>44 900 KG</td><td class="degel">43 000 KG</td><td>44 900 KG</td><td class="degel">42 000 KG</td></tr>
+        <tr><td>MASSACHUSETTS</td><td>44 800 KG</td><td class="degel">44 800 KG *</td><td>44 900 KG</td><td class="degel">43 000 KG</td><td>44 900 KG</td><td class="degel">42 000 KG</td></tr>
+      </tbody>
+    </table>
+
+    <div class="notes">
+      <p><strong>*</strong> IMPORTANT D'AVOIR LES 4 ESSIEUX À TERRE AU QUÉBEC</p>
+      <p>MAINE MAX 100 000 LBS / 45 300 KG</p>
+      <p>VERMONT MAX 99 000 LBS / 44 900 KG</p>
+      <p>NEW HAMPSHIRE MAX 120 000 LBS / 54 400 KG</p>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+      <a href="linktree.html" class="btn-retour">Retour au menu principal</a>
+    </div>
+  </div>
+</body>
+</html>

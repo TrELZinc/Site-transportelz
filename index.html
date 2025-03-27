@@ -142,12 +142,15 @@
     });
 
     function verifierConnexion() {
-      const identifiant = document.getElementById("identifiant").value;
-      const motdepasse = document.getElementById("motdepasse").value;
+      const identifiant = document.getElementById("identifiant").value.toLowerCase();
+      const motdepasse = document.getElementById("motdepasse").value.toLowerCase();
       const rememberMe = document.getElementById("rememberMe").checked;
       const erreur = document.getElementById("erreur");
 
-      const utilisateur = utilisateurs.find(u => u.identifiant === identifiant && u.motdepasse === motdepasse);
+      const utilisateur = utilisateurs.find(u =>
+        u.identifiant.toLowerCase() === identifiant &&
+        u.motdepasse.toLowerCase() === motdepasse
+      );
 
       if (utilisateur) {
         if (rememberMe) {

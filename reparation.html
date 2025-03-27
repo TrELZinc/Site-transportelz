@@ -116,12 +116,6 @@
       font-weight: bold;
     }
 
-    @media (max-width: 600px) {
-      select {
-        font-size: 16px;
-      }
-    }
-
     .confirmation-popup {
       position: fixed;
       top: 50%;
@@ -175,6 +169,12 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+
+    @media screen and (max-width: 600px) {
+      input, select, textarea {
+        font-size: 16px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -221,6 +221,10 @@
 
       <button type="submit">Envoyer</button>
     </form>
+
+    <a href="index.html" style="text-decoration: none;">
+      <button style="margin-top: 10px;">Retour au menu principal</button>
+    </a>
   </div>
 
   <div id="confirmation" class="confirmation-popup">

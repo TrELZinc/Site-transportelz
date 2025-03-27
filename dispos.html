@@ -147,11 +147,11 @@
       <input type="date" id="dateSelect" />
     </div>
 
-    <form id="dispoForm">
-      <div class="form-group">
-        <label for="note">Note:</label>
-        <textarea name="note" id="note" rows="2"></textarea>
-      </div>
+   <form id="dispoForm" style="width: 100%; max-width: 1000px;">
+  <div class="form-group" style="width: 100%;">
+    <label for="note" style="margin-left: 0;">Note:</label>
+    <textarea name="note" id="note" rows="2"></textarea>
+  </div>
 
       <table id="dispoTable">
         <thead>
@@ -177,12 +177,12 @@
         </tbody>
       </table>
 
-      <div class="buttons">
-        <button type="reset" class="reset-btn" onclick="resetForm(event)">Reset</button>
-        <button type="button" class="save-btn" onclick="saveData()">Save</button>
-        <button type="submit" class="send-btn">Send</button>
-      </div>
-    </form>
+  <div class="buttons">
+    <button type="reset" class="reset-btn" onclick="resetForm(event)">Reset</button>
+    <button type="button" class="save-btn" onclick="saveData()">Save</button>
+    <button type="submit" class="send-btn">Send</button>
+  </div>
+</form>
   </div>
 
   <script>

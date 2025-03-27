@@ -194,21 +194,64 @@
 }
 
     }
+    .menu-toggle {
+  display: none;
+  font-size: 28px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 768px) {
+  header {
+    flex-wrap: nowrap;
+    position: relative;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+
+  nav#mainMenu {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 60px;
+    right: 10px;
+    background-color: #000;
+    padding: 10px;
+    border-radius: 8px;
+    z-index: 99;
+  }
+
+  nav#mainMenu a {
+    padding: 6px 12px;
+    white-space: nowrap;
+  }
+
+  nav#mainMenu.show {
+    display: flex;
+  }
+}
+
   </style>
 </head>
 
 <body>
 
-  <header>
-    <img src="assets/logo.jpeg" alt="Logo">
-    <nav>
-      <a href="#">Application 1</a>
-      <a href="#">Application 2</a>
-      <a href="#">Application 3</a>
-      <a href="#">Application 4</a>
-      <a href="#">Application 5</a>
-    </nav>
-  </header>
+<header>
+  <img src="assets/logo.jpeg" alt="Logo">
+  <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+  <nav id="mainMenu">
+    <a href="#">Application 1</a>
+    <a href="#">Application 2</a>
+    <a href="#">Application 3</a>
+    <a href="#">Application 4</a>
+    <a href="#">Application 5</a>
+  </nav>
+</header>
+
 
   <div class="container">
     <div class="top-bar">

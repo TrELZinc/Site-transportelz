@@ -41,7 +41,7 @@
       align-items: stretch;
     }
 
-    input, select, textarea {
+    input[type="text"], input[type="password"], select, textarea {
       padding: 12px;
       margin: 10px 0;
       width: 100%;
@@ -63,16 +63,35 @@
       margin-top: 10px;
     }
 
-.checkbox-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 8px;
-  width: 100%;
-  margin: 10px 0;
-  font-size: 14px;
-}
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      margin: 10px 0;
+      gap: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
 
+    .checkbox-group input[type="checkbox"] {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #000;
+      border-radius: 4px;
+      display: inline-block;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .checkbox-group input[type="checkbox"]:checked::after {
+      content: "\2713";
+      font-size: 14px;
+      position: absolute;
+      top: -2px;
+      left: 2px;
+      color: #000;
+    }
 
     #erreur {
       color: red;
@@ -91,13 +110,10 @@
     <input type="text" id="identifiant" placeholder="Identifiant" required>
     <input type="password" id="motdepasse" placeholder="Mot de passe" required>
 
-<div class="checkbox-wrapper">
-  <input type="checkbox" id="rememberMe" />
-  <label for="rememberMe">Rester connecté</label>
-</div>
-
-
-
+    <label class="checkbox-group">
+      <input type="checkbox" id="rememberMe">
+      Rester connecté
+    </label>
 
     <button type="submit">Se connecter</button>
     <p id="erreur"></p>

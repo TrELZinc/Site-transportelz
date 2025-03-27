@@ -113,6 +113,20 @@
       <a href="#" class="button">
         <img src="assets/icones/liste.png" alt=""> Consulter la liste des charges
       </a>
+      <button onclick="demanderNIP()" style="
+        background-color: #444;
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-family: 'Comfortaa', sans-serif;
+        margin-top: 20px;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      ">
+        🔐 Accès administrateur
+      </button>
     </div>
 
     <div style="margin-top: 30px;">
@@ -135,31 +149,26 @@
   </div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const role = localStorage.getItem("roleTransportelz");
-
-      if (role === "admin") {
+    function demanderNIP() {
+      const nip = prompt("Entrez le NIP pour accéder à cette section :");
+      if (nip === "1357") {
         const btnContainer = document.getElementById("liens");
-
-        const lienProjet = document.createElement("a");
-        lienProjet.href = "#";
-        lienProjet.className = "button";
-        lienProjet.innerHTML = `<img src="assets/icones/idee.png" alt=""> Projets futurs`;
-        btnContainer.appendChild(lienProjet);
 
         const lienDispatch = document.createElement("a");
         lienDispatch.href = "dispatch.html";
         lienDispatch.className = "button";
         lienDispatch.innerHTML = `<img src="assets/icones/dispatch.png" alt=""> Dispatch interne`;
         btnContainer.appendChild(lienDispatch);
+      } else if (nip !== null) {
+        alert("NIP incorrect. Accès refusé.");
       }
+    }
 
-      window.deconnexion = function () {
-        localStorage.removeItem("rememberTransportelz");
-        localStorage.removeItem("roleTransportelz");
-        window.location.href = "index.html";
-      };
-    });
+    function deconnexion() {
+      localStorage.removeItem("rememberTransportelz");
+      localStorage.removeItem("roleTransportelz");
+      window.location.href = "index.html";
+    }
   </script>
 
 </body>

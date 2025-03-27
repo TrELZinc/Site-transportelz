@@ -46,14 +46,13 @@
       align-items: stretch;
     }
 
-    input[type="text"], input[type="password"], select, textarea {
+    input[type="text"], input[type="password"] {
       padding: 12px;
       margin: 10px 0;
       width: 100%;
       border: 1px solid #ccc;
       border-radius: 5px;
       font-size: 16px;
-      box-sizing: border-box;
     }
 
     button {
@@ -125,10 +124,11 @@
   </form>
 
   <script>
-    document.getElementById("loginForm").addEventListener("submit", function(event) {
-      event.preventDefault();
-      verifierConnexion();
-    });
+    const utilisateurs = [
+      { identifiant: "sr01", motdepasse: "sr01", role: "admin" },
+      { identifiant: "md160", motdepasse: "md160", role: "admin" },
+      { identifiant: "sr146", motdepasse: "sr146", role: "user" },
+    ];
 
     const remember = localStorage.getItem("rememberTransportelz");
     const storedRole = localStorage.getItem("roleTransportelz");
@@ -136,47 +136,27 @@
       window.location.href = "/linktree.html";
     }
 
-    async function verifierConnexion() {
-      console.log("Formulaire soumis");
+    document.getElementById("loginForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+      verifierConnexion();
+    });
 
+    function verifierConnexion() {
       const identifiant = document.getElementById("identifiant").value;
       const motdepasse = document.getElementById("motdepasse").value;
       const rememberMe = document.getElementById("rememberMe").checked;
       const erreur = document.getElementById("erreur");
 
-      console.log("Identifiant:", identifiant);
-      console.log("Mot de passe:", motdepasse);
+      const utilisateur = utilisateurs.find(u => u.identifiant === identifiant && u.motdepasse === motdepasse);
 
-      try {
-        const response = await fetch("https://script.google.com/macros/s/AKfycbxTl4Hg3ULEwD9cp0GF217-q_kDQFVf5EnEYtBhHqdcByiXfMbmXLOmORDGN2T3oa2sEA/exec", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ identifiant, motdepasse })
-        });
-
-        console.log("Requête envoyée");
-
-        const text = await response.text();
-        console.log("Réponse brute :", text);
-        const resultat = JSON.parse(text);
-
-        if (resultat.success) {
-          console.log("Connexion réussie");
-
-          if (rememberMe) {
-            localStorage.setItem("rememberTransportelz", "true");
-            localStorage.setItem("roleTransportelz", resultat.role);
-          }
-
-          window.location.href = "/linktree.html";
-        } else {
-          console.log("Identifiants incorrects");
-          erreur.textContent = "Identifiant ou mot de passe invalide.";
+      if (utilisateur) {
+        if (rememberMe) {
+          localStorage.setItem("rememberTransportelz", "true");
+          localStorage.setItem("roleTransportelz", utilisateur.role);
         }
-
-      } catch (err) {
-        console.error("Erreur de connexion:", err);
-        erreur.textContent = "Erreur de connexion. Réessaye plus tard.";
+        window.location.href = "/linktree.html";
+      } else {
+        erreur.textContent = "Identifiant ou mot de passe invalide.";
       }
     }
   </script>

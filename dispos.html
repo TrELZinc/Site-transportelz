@@ -2,13 +2,14 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
   <title>Disponibilités</title>
   <style>
-    body {
+    html, body {
       font-family: Arial, sans-serif;
       margin: 0;
       background-color: #f4f4f4;
+      font-size: 16px; /* Évite le zoom automatique sur iOS */
     }
 
     header {
@@ -60,7 +61,6 @@
     .form-group {
       margin-bottom: 12px;
       width: 100%;
-      max-width: 600px;
     }
 
     label {
@@ -74,6 +74,7 @@
       padding: 8px;
       border-radius: 5px;
       border: 1px solid #ccc;
+      resize: vertical;
     }
 
     table {
@@ -119,6 +120,7 @@
       color: white;
       font-weight: bold;
       cursor: pointer;
+      font-size: 16px;
     }
 
     .reset-btn { background-color: #e74c3c; }
@@ -162,33 +164,35 @@
           </tr>
         </thead>
         <tbody>
-          <!-- 8 lignes fixes -->
-          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+          <!-- 8 lignes -->
+          ${Array.from({ length: 8 }).map(() =>
+            `<tr>
+              <td contenteditable></td>
+              <td><input type="checkbox" /></td>
+              <td contenteditable></td>
+              <td contenteditable></td>
+              <td contenteditable></td>
+              <td contenteditable></td>
+            </tr>`
+          ).join('')}
         </tbody>
       </table>
 
       <div class="buttons">
-        <button type="reset" class="reset-btn">Reset</button>
-        <button type="button" class="save-btn" onclick="alert('Fonction Save à définir')">Save</button>
+        <button type="reset" class="reset-btn" onclick="resetForm(event)">Reset</button>
+        <button type="button" class="save-btn" onclick="saveData()">Save</button>
         <button type="submit" class="send-btn">Send</button>
       </div>
     </form>
   </div>
 
   <script>
+    // Récupérer les données et les envoyer
     document.getElementById('dispoForm').addEventListener('submit', function(e) {
       e.preventDefault();
 
-      const formData = new FormData(this);
       const data = {
-        note: formData.get("note"),
+        note: document.getElementById("note").value,
         date: document.getElementById("dateSelect").value,
         table: getTableHTML()
       };
@@ -200,7 +204,7 @@
       })
       .then(res => {
         alert("Email envoyé avec succès !");
-        document.getElementById('dispoForm').reset();
+        this.reset();
       })
       .catch(err => {
         alert("Erreur lors de l'envoi.");
@@ -209,8 +213,44 @@
     });
 
     function getTableHTML() {
-      const table = document.getElementById("dispoTable");
-      return table.outerHTML;
+      return document.getElementById("dispoTable").outerHTML;
+    }
+
+    // Sauvegarde locale (dans localStorage)
+    function saveData() {
+      const table = document.getElementById("dispoTable").innerHTML;
+      const note = document.getElementById("note").value;
+      const date = document.getElementById("dateSelect").value;
+
+      localStorage.setItem("dispo_table", table);
+      localStorage.setItem("dispo_note", note);
+      localStorage.setItem("dispo_date", date);
+
+      alert("Données sauvegardées !");
+    }
+
+    // Chargement automatique si dispo
+    window.onload = function() {
+      if (localStorage.getItem("dispo_table")) {
+        document.getElementById("dispoTable").innerHTML = localStorage.getItem("dispo_table");
+        document.getElementById("note").value = localStorage.getItem("dispo_note") || "";
+        document.getElementById("dateSelect").value = localStorage.getItem("dispo_date") || "";
+      }
+    };
+
+    // Réinitialiser tout
+    function resetForm(e) {
+      e.preventDefault();
+      document.getElementById("note").value = "";
+      document.getElementById("dateSelect").value = "";
+      const rows = document.querySelectorAll("#dispoTable tbody tr");
+      rows.forEach(row => {
+        row.querySelectorAll("td").forEach((cell, i) => {
+          if (i !== 1) cell.textContent = "";
+        });
+        const checkbox = row.querySelector("input[type='checkbox']");
+        if (checkbox) checkbox.checked = false;
+      });
     }
   </script>
 

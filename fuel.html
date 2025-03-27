@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Feuille de calcul – Transport ELZ</title>
+  <title>Prix du Diesel – Transport ELZ</title>
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet">
   <style>
     body {
-      margin: 0;
       font-family: 'Comfortaa', sans-serif;
       background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -25,18 +26,31 @@
     header img {
       height: 60px;
     }
-    .iframe-container {
-      width: 100%;
-      max-width: 1200px;
-      background-color: white; /* Pour rendre le fond de l'iframe blanc */
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      padding: 20px;
+    table {
+      width: 90%;
       margin-top: 20px;
+      border-collapse: collapse;
+      background-color: white;
+      border-radius: 5px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
-    iframe {
-      width: 100%;
-      height: 80vh;
-      border: none;
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background-color: #c60000;
+      color: white;
+    }
+    tr:hover {
+      background-color: #f4f4f4;
+    }
+    @media (max-width: 768px) {
+      table {
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -46,10 +60,47 @@
     <img src="assets/logo.jpeg" alt="Logo Transport ELZ">
   </header>
 
-  <!-- Conteneur de l'iframe avec fond blanc -->
-  <div class="iframe-container">
-    <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vSZUr8ipkUW4p5KrEC33wbB13oomvkagZnSnTCJNwwDaAIYjzROPFAPvzxaxEkReIOUkkF4rj_gdetK/pubhtml?widget=true&amp;headers=false&amp;range=A1:B49&amp;gid=0"></iframe>
-  </div>
+  <!-- Tableau des prix du diesel -->
+  <table id="prixTable">
+    <thead>
+      <tr>
+        <th>Endroit</th>
+        <th>Prix</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Données remplies via Apps Script ou avec IMPORTRANGE -->
+    </tbody>
+  </table>
+
+  <script>
+    // Exemple d'intégration des données via un fichier JSON ou via Apps Script.
+    // Tu peux utiliser Google Apps Script pour alimenter ce tableau ou IMPORTRANGE
+
+    // Remplacer ce tableau avec les données provenant de ton Google Sheet
+    const data = [
+      { endroit: 'PETRO CANADA MATAGAMI', prix: '1,5221' },
+      { endroit: 'ESSO MATAGAMI', prix: '1,3478' },
+      { endroit: 'PETRO CANADA MONT-LAURIER', prix: '1,4860' },
+      { endroit: 'ESSO MONT-LAURIER', prix: '1,3620' },
+      { endroit: 'ESSO STANSTEAD', prix: '1,3680' }
+    ];
+
+    // Fonction pour ajouter les données au tableau
+    function loadData() {
+      const tableBody = document.querySelector('#prixTable tbody');
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${row.endroit}</td>
+          <td>${row.prix}</td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    }
+
+    loadData(); // Charger les données au démarrage
+  </script>
 
 </body>
 </html>

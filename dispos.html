@@ -6,8 +6,8 @@
   <title>Disponibilités</title>
   <style>
     html, body {
-      font-family: Arial, sans-serif;
       margin: 0;
+      font-family: 'Segoe UI', sans-serif;
       background-color: #f4f4f4;
       font-size: 16px;
     }
@@ -18,6 +18,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      flex-wrap: wrap;
       padding: 10px 20px;
     }
 
@@ -25,11 +26,18 @@
       height: 40px;
     }
 
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-top: 10px;
+    }
+
     nav a {
       color: white;
-      margin: 0 10px;
       text-decoration: none;
       font-weight: bold;
+      white-space: nowrap;
     }
 
     .container {
@@ -45,25 +53,20 @@
     }
 
     .top-bar input[type="date"] {
-      padding: 5px;
+      padding: 6px 10px;
       font-size: 14px;
       border-radius: 4px;
       border: 1px solid #ccc;
       width: 160px;
     }
 
-    form {
-      width: 100%;
-    }
-
     .form-section {
       width: 100%;
-      margin: auto;
     }
 
     .form-group {
-      margin-bottom: 12px;
       width: 100%;
+      margin-bottom: 16px;
     }
 
     label {
@@ -74,31 +77,54 @@
 
     textarea {
       width: 100%;
-      padding: 8px;
-      border-radius: 5px;
+      padding: 10px;
+      border-radius: 8px;
       border: 1px solid #ccc;
       resize: vertical;
       box-sizing: border-box;
+      font-size: 15px;
+    }
+
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
-      background: white;
-      table-layout: fixed;
+      min-width: 700px;
+      border-radius: 10px;
+      overflow: hidden;
     }
 
     th, td {
-      border: 1px solid #999;
-      padding: 8px;
+      border: 1px solid #ddd;
+      padding: 12px 8px;
       text-align: center;
-      word-wrap: break-word;
     }
 
     th {
       background-color: #ef6d6d;
       color: white;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    td {
+      background-color: #fff;
+      font-size: 14px;
+    }
+
+    tr:hover td {
+      background-color: #f9f9f9;
+    }
+
+    td input[type="checkbox"] {
+      transform: scale(1.2);
     }
 
     th:nth-child(5),
@@ -120,20 +146,42 @@
     }
 
     .buttons button {
-      padding: 10px 20px;
+      padding: 12px 24px;
       border: none;
       border-radius: 6px;
       color: white;
       font-weight: bold;
-      cursor: pointer;
       font-size: 16px;
+      cursor: pointer;
     }
 
     .reset-btn { background-color: #e74c3c; }
     .save-btn { background-color: #2ecc71; }
     .send-btn { background-color: black; }
+
+    @media screen and (max-width: 768px) {
+      nav {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        width: 100%;
+      }
+
+      nav a {
+        flex-shrink: 0;
+      }
+
+      .top-bar {
+        justify-content: center;
+      }
+
+      .buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
   </style>
 </head>
+
 <body>
 
   <header>
@@ -158,29 +206,31 @@
         <textarea name="note" id="note" rows="2"></textarea>
       </div>
 
-      <table id="dispoTable">
-        <thead>
-          <tr>
-            <th>CHAUFFEUR</th>
-            <th>US</th>
-            <th>CAMION</th>
-            <th>REMORQUE</th>
-            <th>DÉPART</th>
-            <th>NOTE</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- 8 lignes -->
-          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-        </tbody>
-      </table>
+      <div class="table-wrapper">
+        <table id="dispoTable">
+          <thead>
+            <tr>
+              <th>CHAUFFEUR</th>
+              <th>US</th>
+              <th>CAMION</th>
+              <th>REMORQUE</th>
+              <th>DÉPART</th>
+              <th>NOTE</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- 8 lignes -->
+            <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+            <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+            <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+            <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+            <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+            <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+            <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+            <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+          </tbody>
+        </table>
+      </div>
 
       <div class="buttons">
         <button type="reset" class="reset-btn" onclick="resetForm(event)">Reset</button>
@@ -193,11 +243,10 @@
   <script>
     document.getElementById('dispoForm').addEventListener('submit', function(e) {
       e.preventDefault();
-
       const data = {
         note: document.getElementById("note").value,
         date: document.getElementById("dateSelect").value,
-        table: getTableHTML()
+        table: document.getElementById("dispoTable").outerHTML
       };
 
       fetch("TON_URL_WEB_APP_GOOGLE_SCRIPT", {
@@ -214,10 +263,6 @@
         console.error(err);
       });
     });
-
-    function getTableHTML() {
-      return document.getElementById("dispoTable").outerHTML;
-    }
 
     function saveData() {
       const table = document.getElementById("dispoTable").innerHTML;
@@ -253,6 +298,6 @@
       });
     }
   </script>
-
 </body>
 </html>
+

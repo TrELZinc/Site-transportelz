@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Prix du Diesel – Transport ELZ</title>
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet">
   <style>
@@ -10,12 +10,9 @@
       font-family: 'Comfortaa', sans-serif;
       background-color: #f5f5f5;
       margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
+      padding: 0 0 60px 0;
     }
+
     header {
       background-color: #111;
       text-align: center;
@@ -23,40 +20,66 @@
       padding: 10px 0;
       box-sizing: border-box;
     }
+
     header img {
       height: 60px;
     }
+
     table {
       width: 90%;
-      margin-top: 20px;
+      margin: 20px auto;
       border-collapse: collapse;
       background-color: white;
       border-radius: 5px;
       overflow: hidden;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
+
     th, td {
       padding: 12px;
       border-bottom: 1px solid #ddd;
+      font-size: 16px;
     }
+
     th {
       background-color: #c60000;
       color: white;
+      text-align: center;
     }
+
     td:first-child {
       text-align: left;
     }
+
     td:last-child {
       text-align: center;
     }
-    tr.section-header td {
-      background-color: #eee;
+
+    tr.subsection {
+      background-color: #f0f0f0;
       font-weight: bold;
-      text-transform: uppercase;
+      font-style: italic;
     }
-    .highlight {
-      background-color: #fff9c4 !important;
+
+    .button {
+      display: block;
+      width: fit-content;
+      margin: 30px auto 10px;
+      padding: 12px 24px;
+      background-color: #000;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      transition: background 0.3s ease;
     }
+
+    .button:hover {
+      background-color: #333;
+    }
+
     @media (max-width: 768px) {
       table {
         width: 100%;
@@ -67,7 +90,7 @@
 <body>
 
   <header>
-    <img src="assets/logo.jpeg" alt="Logo Transport ELZ">
+    <img src="assets/logo.jpeg" alt="Logo Transport ELZ" />
   </header>
 
   <table id="prixTable">
@@ -77,64 +100,43 @@
         <th>Prix</th>
       </tr>
     </thead>
-    <tbody></tbody>
+    <tbody>
+      <!-- Rempli dynamiquement -->
+    </tbody>
   </table>
+
+  <a href="linktree.html" class="button">← Retour au menu principal</a>
 
   <script>
     const apiUrl = 'https://script.google.com/macros/s/AKfycbxOlc8H2lw4e3pF0FViso7ds1LTYjW_Z8jdEbeLh634fE-fV4LGRvgp-CAe2M7mQCPQ/exec';
-
-    const blocs = [
-      ["ST-BASILE TRANSPORT", "QUÉBEC RETOUR DE L'EST", "IRVING ST-AUGUSTIN", "PETRO PASS STE-FOY", "QUÉBEC RETOUR DE L'OUEST", "ESSO DESCHAMBAULT", "PETRO PASS TROIS-RIVIÈRES"],
-      ["QUÉBEC CENTRE", "IRVING YAMACHICHE SORTIE 174", "PETRO CANADA L'ASSOMPTION", "IRVING ST-CYRILLE*", "IRVING ST-LIBOIRE", "ESSO DRUMMONDVILLE", "ESSO STANSTEAD"],
-      ["ABITIBI", "PETRO CANADA MATAGAMI", "ESSO MATAGAMI", "PETRO CANADA MONT-LAURIER", "ESSO MONT-LAURIER", "PETRO CANADA ROUYN-NORANDA", "PETRO CANADA VAL D'OR", "PETRO CANADA AMOS"],
-      ["USA (MAINE/VERMONT/NH)", "ESSO STANSTEAD", "IRVING BOW / GORHAM / NEW HAMPTON", "IRVING HOULTON ME", "IRVING FAIRFIELD / AUGUSTA  ME", "IRVING NEWPORT ME"],
-      ["QUÉBEC BAS DU FLEUVE", "PETRO CANADA MONT-JOLI", "ESSO MONT JOLI", "PETRO CANADA ST-JEAN-PORT-JOLI", "ESSO AMQUI"],
-      ["MARITIMES VERS FREDERICTON", "IRVING ST-ANTONIN", "ESSO CABANO", "IRVING DÉGELIS", "IRVING WOODSTOCK", "IRVING FREDERICTON"]
-    ];
 
     async function loadData() {
       try {
         const response = await fetch(apiUrl);
         const data = await response.json();
-        const tableBody = document.querySelector('#prixTable tbody');
+        const tbody = document.querySelector('#prixTable tbody');
 
-        const formattedData = data.map(row => ({
-          endroit: row.endroit,
-          prix: typeof row.prix === 'number' ? row.prix.toFixed(4) : (parseFloat(row.prix) || '').toFixed(4)
-        }));
+        data.forEach(row => {
+          const tr = document.createElement('tr');
+          const isSubSection = row.endroit && !row.prix;
+          const endroit = row.endroit || "";
+          const prix = isSubSection ? "" : formatPrix(row.prix);
 
-        blocs.forEach(bloc => {
-          let minPrix = Infinity;
-          let minEndroit = "";
-
-          bloc.forEach(name => {
-            const match = formattedData.find(r => r.endroit === name && !isNaN(parseFloat(r.prix)));
-            if (match && parseFloat(match.prix) < minPrix) {
-              minPrix = parseFloat(match.prix);
-              minEndroit = name;
-            }
-          });
-
-          bloc.forEach(name => {
-            const row = formattedData.find(r => r.endroit === name);
-            const tr = document.createElement('tr');
-
-            if (row && !row.prix) {
-              tr.classList.add('section-header');
-              tr.innerHTML = `<td colspan="2">${name}</td>`;
-            } else if (row) {
-              const highlightClass = name === minEndroit ? 'highlight' : '';
-              tr.innerHTML = `<td class="${highlightClass}">${row.endroit}</td><td class="${highlightClass}">${row.prix}</td>`;
-            } else {
-              tr.innerHTML = `<td colspan="2">${name}</td>`;
-            }
-
-            tableBody.appendChild(tr);
-          });
+          tr.className = isSubSection ? 'subsection' : '';
+          tr.innerHTML = `
+            <td>${endroit}</td>
+            <td>${prix}</td>
+          `;
+          tbody.appendChild(tr);
         });
       } catch (error) {
         console.error('Erreur lors du chargement des données :', error);
       }
+    }
+
+    function formatPrix(valeur) {
+      const num = parseFloat(valeur);
+      return isNaN(num) ? "" : num.toFixed(4).replace('.', ',');
     }
 
     loadData();

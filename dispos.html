@@ -9,7 +9,7 @@
       font-family: Arial, sans-serif;
       margin: 0;
       background-color: #f4f4f4;
-      font-size: 16px; /* Évite le zoom automatique sur iOS */
+      font-size: 16px;
     }
 
     header {
@@ -61,6 +61,7 @@
     .form-group {
       margin-bottom: 12px;
       width: 100%;
+      max-width: 1000px;
     }
 
     label {
@@ -164,17 +165,15 @@
           </tr>
         </thead>
         <tbody>
-          <!-- 8 lignes -->
-          ${Array.from({ length: 8 }).map(() =>
-            `<tr>
-              <td contenteditable></td>
-              <td><input type="checkbox" /></td>
-              <td contenteditable></td>
-              <td contenteditable></td>
-              <td contenteditable></td>
-              <td contenteditable></td>
-            </tr>`
-          ).join('')}
+          <!-- 8 lignes fixes -->
+          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
         </tbody>
       </table>
 
@@ -187,7 +186,6 @@
   </div>
 
   <script>
-    // Récupérer les données et les envoyer
     document.getElementById('dispoForm').addEventListener('submit', function(e) {
       e.preventDefault();
 
@@ -216,7 +214,6 @@
       return document.getElementById("dispoTable").outerHTML;
     }
 
-    // Sauvegarde locale (dans localStorage)
     function saveData() {
       const table = document.getElementById("dispoTable").innerHTML;
       const note = document.getElementById("note").value;
@@ -229,7 +226,6 @@
       alert("Données sauvegardées !");
     }
 
-    // Chargement automatique si dispo
     window.onload = function() {
       if (localStorage.getItem("dispo_table")) {
         document.getElementById("dispoTable").innerHTML = localStorage.getItem("dispo_table");
@@ -238,7 +234,6 @@
       }
     };
 
-    // Réinitialiser tout
     function resetForm(e) {
       e.preventDefault();
       document.getElementById("note").value = "";

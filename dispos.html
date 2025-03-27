@@ -159,25 +159,40 @@
     .save-btn { background-color: #2ecc71; }
     .send-btn { background-color: black; }
 
-    @media screen and (max-width: 768px) {
-      nav {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        width: 100%;
-      }
+@media screen and (max-width: 768px) {
+  nav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    width: 100%;
+  }
 
-      nav a {
-        flex-shrink: 0;
-      }
+  nav a {
+    flex-shrink: 0;
+  }
 
-      .top-bar {
-        justify-content: center;
-      }
+  .top-bar {
+    justify-content: center;
+  }
 
-      .buttons {
-        flex-direction: column;
-        align-items: center;
-      }
+  .top-bar input[type="date"] {
+    font-size: 16px;
+    padding: 10px;
+    width: 180px;
+  }
+
+  .buttons {
+    flex-direction: row !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .buttons button {
+    flex: 1 0 auto;
+    min-width: 100px;
+  }
+}
+
     }
   </style>
 </head>

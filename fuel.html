@@ -44,7 +44,10 @@
     th {
       background-color: #c60000;
       color: white;
-      text-align: center;
+    }
+
+    .text-left {
+      text-align: left;
     }
 
     td:first-child {
@@ -96,7 +99,7 @@
   <table id="prixTable">
     <thead>
       <tr>
-        <th>Endroit</th>
+        <th class="text-left">Endroit</th>
         <th>Prix</th>
       </tr>
     </thead>
@@ -108,7 +111,7 @@
   <a href="linktree.html" class="button">← Retour au menu principal</a>
 
   <script>
-    const apiUrl = 'https://script.google.com/macros/s/AKfycbxOlc8H2lw4e3pF0FViso7ds1LTYjW_Z8jdEbeLh634fE-fV4LGRvgp-CAe2M7mQCPQ/exec';
+    const apiUrl = 'https://script.google.com/macros/s/AKfycbydS5YW5bSfK8DO5Pay8489XHLM4gLrbBzgreMu5fB4723KP8b3Ar4BvYaCrnEBN5iU/exec';
 
     async function loadData() {
       try {

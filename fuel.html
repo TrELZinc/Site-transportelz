@@ -10,6 +10,11 @@
       margin: 0;
       font-family: 'Comfortaa', sans-serif;
       background: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
     }
     header {
       background-color: #111;
@@ -20,9 +25,10 @@
       height: 60px;
     }
     iframe {
-      width: 100%;
-      height: 90vh;
+      width: 90%;
+      height: 80vh;
       border: none;
+      margin-top: 20px;
     }
   </style>
 </head>
@@ -32,7 +38,8 @@
     <img src="assets/logo.jpeg" alt="Logo Transport ELZ">
   </header>
 
-  <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vSZUr8ipkUW4p5KrEC33wbB13oomvkagZnSnTCJNwwDaAIYjzROPFAPvzxaxEkReIOUkkF4rj_gdetK/pubhtml?widget=true&amp;headers=false"></iframe>
+  <!-- iframe contenant la feuille de calcul -->
+  <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vSZUr8ipkUW4p5KrEC33wbB13oomvkagZnSnTCJNwwDaAIYjzROPFAPvzxaxEkReIOUkkF4rj_gdetK/pubhtml?widget=true&amp;headers=false&amp;gid=0&amp;range=A1:B49"></iframe>
 
 </body>
 </html>

@@ -4,32 +4,154 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Disponibilités</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f4f4;
+      font-size: 16px;
+    }
+
+    header {
+      background-color: #000;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+    }
+
+    header img {
+      height: 40px;
+    }
+
+    .menu-toggle {
+      font-size: 18px;
+      background-color: #333;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .container {
+      padding: 20px;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+
+    .top-bar input[type="date"] {
+      padding: 10px 16px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      width: 200px;
+      background-color: #eaeaea;
+      text-align: center;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      resize: vertical;
+      box-sizing: border-box;
+      font-size: 15px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #ef6d6d;
+      color: white;
+      font-weight: bold;
+    }
+
+    .buttons {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .buttons button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .reset-btn { background-color: #e74c3c; }
+    .save-btn { background-color: #2ecc71; }
+    .send-btn { background-color: black; }
+  </style>
 </head>
 <body>
-  <h1>Formulaire de disponibilités</h1>
-  <input type="date" id="dateSelect" />
-  <br>
-  <textarea id="note" placeholder="Note..." rows="3" cols="50"></textarea>
-  <br><br>
-  <table id="dispoTable" border="1">
-    <thead>
-      <tr>
-        <th>CHAUFFEUR</th>
-        <th>US</th>
-        <th>CAMION</th>
-        <th>REMORQUE</th>
-        <th>DÉPART</th>
-        <th>NOTE</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-      <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-      <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-    </tbody>
-  </table>
-  <br>
-  <button onclick="sendForm()">Envoyer</button>
+  <header>
+    <img src="assets/logo.jpeg" alt="Logo Transport ELZ">
+    <button class="menu-toggle">☰ Menu</button>
+  </header>
+
+  <div class="container">
+    <div class="top-bar">
+      <input type="date" id="dateSelect" />
+    </div>
+
+    <label for="note">Note:</label>
+    <textarea id="note" rows="2"></textarea>
+
+    <table id="dispoTable">
+      <thead>
+        <tr>
+          <th>CHAUFFEUR</th><th>US</th><th>CAMION</th><th>REMORQUE</th><th>DÉPART</th><th>NOTE</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+        <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+        <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+        <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+        <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+        <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+        <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+        <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+      </tbody>
+    </table>
+
+    <div class="buttons">
+      <button class="reset-btn" onclick="resetForm()">Reset</button>
+      <button class="save-btn" onclick="saveData()">Save</button>
+      <button class="send-btn" onclick="sendForm()">Send</button>
+    </div>
+  </div>
 
   <script>
     function sendForm() {
@@ -47,6 +169,34 @@
       });
 
       alert("Disponibilités envoyées !");
+    }
+
+    function resetForm() {
+      document.getElementById("note").value = "";
+      document.getElementById("dateSelect").value = "";
+      const rows = document.querySelectorAll("#dispoTable tbody tr");
+      rows.forEach(row => {
+        row.querySelectorAll("td").forEach((cell, i) => {
+          if (i !== 1) cell.textContent = "";
+        });
+        const checkbox = row.querySelector("input[type='checkbox']");
+        if (checkbox) checkbox.checked = false;
+      });
+    }
+
+    function saveData() {
+      localStorage.setItem("dispo_note", document.getElementById("note").value);
+      localStorage.setItem("dispo_date", document.getElementById("dateSelect").value);
+      localStorage.setItem("dispo_table", document.getElementById("dispoTable").innerHTML);
+      alert("Données sauvegardées !");
+    }
+
+    window.onload = function () {
+      if (localStorage.getItem("dispo_note")) {
+        document.getElementById("note").value = localStorage.getItem("dispo_note");
+        document.getElementById("dateSelect").value = localStorage.getItem("dispo_date");
+        document.getElementById("dispoTable").innerHTML = localStorage.getItem("dispo_table");
+      }
     }
   </script>
 </body>

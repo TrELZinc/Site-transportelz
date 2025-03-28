@@ -307,11 +307,13 @@
         table: document.getElementById("dispoTable").outerHTML
       };
 
-      fetch("https://script.google.com/macros/s/AKfycbyqtFAWS3-w21UvBBpvFqOFDw_bkF9HSSKDD-Vw4CVHVe7TTiqZJkWRO8T5PjJ7jQgKfw/exec", {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: { "Content-Type": "application/json" }
-      })
+fetch("https://script.google.com/macros/s/AKfycbyqtFAWS3-w21UvBBpvFqOFDw_bkF9HSSKDD-Vw4CVHVe7TTiqZJkWRO8T5PjJ7jQgKfw/exec", {
+  method: "POST",
+  mode: "no-cors", // <- C’est ça qui règle le problème
+  body: JSON.stringify(data),
+  headers: { "Content-Type": "application/json" }
+});
+
       .then(res => {
         alert("Email envoyé avec succès !");
         this.reset();

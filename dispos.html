@@ -481,65 +481,66 @@
   </div>
 
   <script>
-    document.getElementById('dispoForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const data = {
-        note: document.getElementById("note").value,
-        date: document.getElementById("dateSelect").value,
-        table: document.getElementById("dispoTable").outerHTML
-      };
-
-fetch("https://script.google.com/macros/s/TON_URL/exec", {
-  method: "POST",
-  mode: "no-cors", // ← Nécessaire pour contourner l'erreur CORS
-  body: JSON.stringify(data),
-  headers: {
-    "Content-Type": "application/json"
-  }
-})
-.then(() => {
-  alert("Email envoyé avec succès !");
-  document.getElementById("dispoForm").reset();
-})
-.catch(err => {
-  alert("Erreur lors de l'envoi.");
-  console.error("Erreur d'envoi :", err);
-});
-
-
-    function saveData() {
-      const table = document.getElementById("dispoTable").innerHTML;
-      const note = document.getElementById("note").value;
-      const date = document.getElementById("dateSelect").value;
-
-      localStorage.setItem("dispo_table", table);
-      localStorage.setItem("dispo_note", note);
-      localStorage.setItem("dispo_date", date);
-
-      alert("Données sauvegardées !");
-    }
-
-    window.onload = function() {
-      if (localStorage.getItem("dispo_table")) {
-        document.getElementById("dispoTable").innerHTML = localStorage.getItem("dispo_table");
-        document.getElementById("note").value = localStorage.getItem("dispo_note") || "";
-        document.getElementById("dateSelect").value = localStorage.getItem("dispo_date") || "";
-      }
+  document.getElementById('dispoForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const data = {
+      note: document.getElementById("note").value,
+      date: document.getElementById("dateSelect").value,
+      table: document.getElementById("dispoTable").outerHTML
     };
 
-    function resetForm(e) {
-      e.preventDefault();
-      document.getElementById("note").value = "";
-      document.getElementById("dateSelect").value = "";
-      const rows = document.querySelectorAll("#dispoTable tbody tr");
-      rows.forEach(row => {
-        row.querySelectorAll("td").forEach((cell, i) => {
-          if (i !== 1) cell.textContent = "";
-        });
-        const checkbox = row.querySelector("input[type='checkbox']");
-        if (checkbox) checkbox.checked = false;
-      });
+    fetch("https://script.google.com/macros/s/AKfycbyl_BWTyDPlyBIZPLtmWQnIi9JdUp8kv9zCUwWAWH2bJWLvWZia-6iKHgm9IA0_ShHLDg/exec", {
+      method: "POST",
+      mode: "no-cors", // ← Nécessaire pour contourner l'erreur CORS
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(() => {
+      alert("Email envoyé avec succès !");
+      document.getElementById("dispoForm").reset();
+    })
+    .catch(err => {
+      alert("Erreur lors de l'envoi.");
+      console.error("Erreur d'envoi :", err);
+    });
+  });
+
+  function saveData() {
+    const table = document.getElementById("dispoTable").innerHTML;
+    const note = document.getElementById("note").value;
+    const date = document.getElementById("dateSelect").value;
+
+    localStorage.setItem("dispo_table", table);
+    localStorage.setItem("dispo_note", note);
+    localStorage.setItem("dispo_date", date);
+
+    alert("Données sauvegardées !");
+  }
+
+  window.onload = function() {
+    if (localStorage.getItem("dispo_table")) {
+      document.getElementById("dispoTable").innerHTML = localStorage.getItem("dispo_table");
+      document.getElementById("note").value = localStorage.getItem("dispo_note") || "";
+      document.getElementById("dateSelect").value = localStorage.getItem("dispo_date") || "";
     }
-  </script>
+  };
+
+  function resetForm(e) {
+    e.preventDefault();
+    document.getElementById("note").value = "";
+    document.getElementById("dateSelect").value = "";
+    const rows = document.querySelectorAll("#dispoTable tbody tr");
+    rows.forEach(row => {
+      row.querySelectorAll("td").forEach((cell, i) => {
+        if (i !== 1) cell.textContent = "";
+      });
+      const checkbox = row.querySelector("input[type='checkbox']");
+      if (checkbox) checkbox.checked = false;
+    });
+  }
+</script>
+
 </body>
 </html>

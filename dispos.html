@@ -489,26 +489,23 @@
         table: document.getElementById("dispoTable").outerHTML
       };
 
-fetch("https://script.google.com/macros/s/AKfycbyl_BWTyDPlyBIZPLtmWQnIi9JdUp8kv9zCUwWAWH2bJWLvWZia-6iKHgm9IA0_ShHLDg/exec", {
+fetch("https://script.google.com/macros/s/TON_URL/exec", {
   method: "POST",
-  mode: "no-cors",  // ← Essentiel pour contourner CORS
+  mode: "no-cors", // ← Nécessaire pour contourner l'erreur CORS
+  body: JSON.stringify(data),
   headers: {
     "Content-Type": "application/json"
-  },
-  body: JSON.stringify(data)
+  }
 })
-.then(() => alert("Email envoyé avec succès !"))
-.catch(err => console.error("Erreur d'envoi :", err));
+.then(() => {
+  alert("Email envoyé avec succès !");
+  document.getElementById("dispoForm").reset();
+})
+.catch(err => {
+  alert("Erreur lors de l'envoi.");
+  console.error("Erreur d'envoi :", err);
+});
 
-      .then(res => {
-        alert("Email envoyé avec succès !");
-        this.reset();
-      })
-      .catch(err => {
-        alert("Erreur lors de l'envoi.");
-        console.error(err);
-      });
-    });
 
     function saveData() {
       const table = document.getElementById("dispoTable").innerHTML;

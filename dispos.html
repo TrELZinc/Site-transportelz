@@ -489,22 +489,23 @@
       table: document.getElementById("dispoTable").outerHTML
     };
     
-console.log("Données envoyées :", data);
+    console.log("Données envoyées :", data);
 
     fetch("https://script.google.com/macros/s/AKfycbyjo9af2j_ydVolCluAPDSW_gQ88RWbI3qiAuX5Cv9oq6slqDBSVVL4a7S-BJ73Cuu_/exec", {
       method: "POST",
-      mode: "no-cors", // ← Nécessaire pour contourner l'erreur CORS
       body: JSON.stringify(data),
       headers: {
         "Content-Type": "application/json"
       }
     })
-// En mode no-cors, on ne peut pas savoir si ça a marché
-setTimeout(() => {
-  alert("Email potentiellement envoyé !");
-  document.getElementById("dispoForm").reset();
-}, 1000); // Attente de 1 seconde simulée
-
+    .then(() => {
+      alert("Email envoyé avec succès !");
+      document.getElementById("dispoForm").reset();
+    })
+    .catch(err => {
+      alert("Erreur lors de l'envoi.");
+      console.error("Erreur d'envoi :", err);
+    });
   });
 
   function saveData() {

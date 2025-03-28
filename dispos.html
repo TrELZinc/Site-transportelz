@@ -48,11 +48,12 @@
     }
 
     .top-bar input[type="date"] {
-      padding: 10px 16px;
-      font-size: 14px;
+      padding: 16px;
+      font-size: 18px;
       border-radius: 8px;
       border: 1px solid #ccc;
-      width: 200px;
+      width: 100%;
+      max-width: 300px;
       background-color: #eaeaea;
       text-align: center;
     }
@@ -155,14 +156,17 @@
           </tr>
         </thead>
         <tbody>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
+          <!-- 8 lignes -->
+          ${[...Array(8)].map(() => `
+            <tr>
+              <td contenteditable></td>
+              <td><input type="checkbox" onchange="this.setAttribute('data-checked', this.checked)"></td>
+              <td contenteditable inputmode="numeric"></td>
+              <td contenteditable inputmode="numeric"></td>
+              <td contenteditable></td>
+              <td contenteditable></td>
+            </tr>
+          `).join('')}
         </tbody>
       </table>
     </div>
@@ -182,7 +186,7 @@
       rows.forEach(row => {
         const cells = row.querySelectorAll("td");
         const checkbox = cells[1].querySelector("input[type='checkbox']");
-        cells[1].innerText = checkbox && checkbox.checked ? 'OUI' : '';
+        cells[1].innerText = checkbox?.dataset.checked === "true" ? "✔" : "";
       });
 
       const data = {
@@ -211,13 +215,15 @@
         });
         const checkbox = row.querySelector("input[type='checkbox']");
         if (checkbox) checkbox.checked = false;
+        checkbox?.removeAttribute('data-checked');
       });
     }
 
     function saveData() {
+      const tableHTML = document.getElementById("dispoTable").outerHTML;
       localStorage.setItem("dispo_note", document.getElementById("note").value);
       localStorage.setItem("dispo_date", document.getElementById("dateSelect").value);
-      localStorage.setItem("dispo_table", document.getElementById("dispoTable").innerHTML);
+      localStorage.setItem("dispo_table", tableHTML);
       alert("Données sauvegardées !");
     }
 
@@ -225,7 +231,7 @@
       if (localStorage.getItem("dispo_note")) {
         document.getElementById("note").value = localStorage.getItem("dispo_note");
         document.getElementById("dateSelect").value = localStorage.getItem("dispo_date");
-        document.getElementById("dispoTable").innerHTML = localStorage.getItem("dispo_table");
+        document.getElementById("dispoTable").outerHTML = localStorage.getItem("dispo_table");
       }
     }
   </script>

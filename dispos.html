@@ -22,15 +22,6 @@
     header img {
       height: 40px;
     }
-    .menu-toggle {
-      font-size: 18px;
-      background-color: #333;
-      color: white;
-      border: none;
-      padding: 10px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
     .container {
       padding: 20px;
       max-width: 1000px;
@@ -68,6 +59,9 @@
     .table-wrapper {
       overflow-x: auto;
       margin-top: 20px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
     table {
       min-width: 700px;
@@ -92,6 +86,10 @@
     td:nth-child(6), th:nth-child(6) {
       width: 240px;
     }
+    td[contenteditable] {
+      outline: none;
+      text-transform: uppercase;
+    }
     .buttons {
       margin-top: 20px;
       display: flex;
@@ -111,24 +109,18 @@
     .reset-btn { background-color: #e74c3c; }
     .save-btn { background-color: #2ecc71; }
     .send-btn { background-color: black; }
-    td[contenteditable] {
-      outline: none;
-    }
   </style>
 </head>
 <body>
   <header>
     <img src="assets/logo.jpeg" alt="Logo Transport ELZ">
-    <button class="menu-toggle">☰ Menu</button>
   </header>
-
   <div class="container">
     <div class="top-bar">
       <input type="date" id="dateSelect" />
     </div>
     <label for="note">Note:</label>
     <textarea id="note" rows="2"></textarea>
-
     <div class="table-wrapper">
       <table id="dispoTable">
         <thead>
@@ -148,14 +140,12 @@
         </tbody>
       </table>
     </div>
-
     <div class="buttons">
       <button class="reset-btn" onclick="resetForm()">Reset</button>
       <button class="save-btn" onclick="saveData()">Save</button>
       <button class="send-btn" onclick="sendForm()">Send</button>
     </div>
   </div>
-
   <script>
     function sendForm() {
       const tableClone = document.getElementById("dispoTable").cloneNode(true);
@@ -165,23 +155,19 @@
         const checkbox = cells[1].querySelector("input[type='checkbox']");
         cells[1].innerText = checkbox && checkbox.checked ? '✔' : '';
       });
-
       const data = {
         note: document.getElementById("note").value,
         date: document.getElementById("dateSelect").value,
         table: tableClone.outerHTML
       };
-
       fetch("https://script.google.com/macros/s/AKfycbzk_y7NIfa4eksIvVbYcXHaI3Bzh5BG3gqpH8Z82k4OdUCrK_thMeSOQuw_is-d9S8DMA/exec", {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
       });
-
       alert("Disponibilités envoyées !");
     }
-
     function resetForm() {
       document.getElementById("note").value = "";
       document.getElementById("dateSelect").value = "";
@@ -195,7 +181,6 @@
         if (checkbox) checkbox.checked = false;
       });
     }
-
     function saveData() {
       const tableHTML = document.getElementById("dispoTable").outerHTML;
       localStorage.setItem("dispo_note", document.getElementById("note").value);
@@ -203,7 +188,6 @@
       localStorage.setItem("dispo_table", tableHTML);
       alert("Données sauvegardées !");
     }
-
     window.onload = function () {
       const savedNote = localStorage.getItem("dispo_note");
       const savedDate = localStorage.getItem("dispo_date");

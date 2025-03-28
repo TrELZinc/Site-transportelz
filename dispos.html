@@ -1,23 +1,53 @@
 <!DOCTYPE html>
-<html>
-  <body>
-    <button onclick="send()">ENVOYER TEST</button>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Disponibilités</title>
+</head>
+<body>
+  <h1>Formulaire de disponibilités</h1>
+  <input type="date" id="dateSelect" />
+  <br>
+  <textarea id="note" placeholder="Note..." rows="3" cols="50"></textarea>
+  <br><br>
+  <table id="dispoTable" border="1">
+    <thead>
+      <tr>
+        <th>CHAUFFEUR</th>
+        <th>US</th>
+        <th>CAMION</th>
+        <th>REMORQUE</th>
+        <th>DÉPART</th>
+        <th>NOTE</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+      <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+      <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+    </tbody>
+  </table>
+  <br>
+  <button onclick="sendForm()">Envoyer</button>
 
-    <script>
-      function send() {
-        fetch("https://script.google.com/macros/s/AKfycbwaDUMMIrpBe_N3M7O_-3yZD0yqr_9mel8ahy4oTKg-kLtjZLm4a6udeHMU5U-aZ879fA/exec", {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            note: "Test",
-            date: "2025-03-28",
-            table: "<table><tr><td>Grimoire</td><td><input type='checkbox' checked></td></tr></table>"
-          })
-        });
+  <script>
+    function sendForm() {
+      const data = {
+        note: document.getElementById("note").value,
+        date: document.getElementById("dateSelect").value,
+        table: document.getElementById("dispoTable").outerHTML
+      };
 
-        alert("Test envoyé");
-      }
-    </script>
-  </body>
+      fetch("https://script.google.com/macros/s/AKfycbzk_y7NIfa4eksIvVbYcXHaI3Bzh5BG3gqpH8Z82k4OdUCrK_thMeSOQuw_is-d9S8DMA/exec", {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      alert("Disponibilités envoyées !");
+    }
+  </script>
+</body>
 </html>

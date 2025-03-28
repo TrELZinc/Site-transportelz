@@ -1,125 +1,23 @@
 <!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Disponibilités</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      background-color: #f4f4f4;
-    }
-    header {
-      background: black;
-      color: white;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 20px;
-    }
-    .container { max-width: 900px; margin: auto; padding: 20px; }
-    textarea, input[type="date"] {
-      width: 100%; padding: 10px; margin: 10px 0; font-size: 16px;
-    }
-    table {
-      width: 100%; border-collapse: collapse;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 10px; text-align: center;
-    }
-    th { background: #ef6d6d; color: white; }
-    .buttons { display: flex; gap: 10px; margin-top: 20px; justify-content: center; }
-    .buttons button {
-      padding: 10px 20px; font-size: 16px; border: none; border-radius: 6px; cursor: pointer; color: white;
-    }
-    .reset-btn { background: #e74c3c; }
-    .save-btn { background: #2ecc71; }
-    .send-btn { background: black; }
-  </style>
-</head>
-<body>
-  <header>
-    <img src="assets/logo.jpeg" alt="Logo" height="40" />
-    <span>Menu</span>
-  </header>
+<html>
+  <body>
+    <button onclick="send()">ENVOYER TEST</button>
 
-  <div class="container">
-    <input type="date" id="dateSelect" />
-    <textarea id="note" rows="2" placeholder="Note"></textarea>
-    <div class="table-wrapper">
-      <table id="dispoTable">
-        <thead>
-          <tr><th>CHAUFFEUR</th><th>US</th><th>CAMION</th><th>REMORQUE</th><th>DÉPART</th><th>NOTE</th></tr>
-        </thead>
-        <tbody>
-          <!-- 8 lignes -->
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-        </tbody>
-      </table>
-    </div>
+    <script>
+      function send() {
+        fetch("https://script.google.com/macros/s/TON_ID/exec", {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            note: "Test",
+            date: "2025-03-28",
+            table: "<table><tr><td>Grimoire</td><td><input type='checkbox' checked></td></tr></table>"
+          })
+        });
 
-    <div class="buttons">
-      <button class="reset-btn" onclick="resetForm()">Reset</button>
-      <button class="save-btn" onclick="saveData()">Save</button>
-      <button class="send-btn" onclick="sendForm()">Send</button>
-    </div>
-  </div>
-
-<script>
-  function sendForm() {
-    const data = {
-      note: document.getElementById("note").value,
-      date: document.getElementById("dateSelect").value,
-      table: document.getElementById("dispoTable").outerHTML
-    };
-
-    fetch("https://script.google.com/macros/s/AKfycbwaDUMMIrpBe_N3M7O_-3yZD0yqr_9mel8ahy4oTKg-kLtjZLm4a6udeHMU5U-aZ879fA/exec", {
-      method: "POST",
-      mode: "no-cors", // 🔒 obligatoire à cause des restrictions CORS Google
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
-
-    alert("Disponibilités envoyées ! (même si on ne reçoit pas de réponse du serveur)");
-  }
-
-  function resetForm() {
-    document.getElementById("note").value = "";
-    document.getElementById("dateSelect").value = "";
-    const rows = document.querySelectorAll("#dispoTable tbody tr");
-    rows.forEach(row => {
-      row.querySelectorAll("td").forEach((cell, i) => {
-        if (i !== 1) cell.textContent = "";
-      });
-      const checkbox = row.querySelector("input[type='checkbox']");
-      if (checkbox) checkbox.checked = false;
-    });
-  }
-
-  function saveData() {
-    localStorage.setItem("dispo_note", document.getElementById("note").value);
-    localStorage.setItem("dispo_date", document.getElementById("dateSelect").value);
-    localStorage.setItem("dispo_table", document.getElementById("dispoTable").innerHTML);
-    alert("Données sauvegardées !");
-  }
-
-  window.onload = function () {
-    if (localStorage.getItem("dispo_note")) {
-      document.getElementById("note").value = localStorage.getItem("dispo_note");
-      document.getElementById("dateSelect").value = localStorage.getItem("dispo_date");
-      document.getElementById("dispoTable").innerHTML = localStorage.getItem("dispo_table");
-    }
-  };
-</script>
-
-</body>
+        alert("Test envoyé");
+      }
+    </script>
+  </body>
 </html>

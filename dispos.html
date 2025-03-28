@@ -73,10 +73,15 @@
       font-size: 15px;
     }
 
+    .table-wrapper {
+      overflow-x: auto;
+      margin-top: 20px;
+    }
+
     table {
+      min-width: 700px;
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
     }
 
     th, td {
@@ -128,23 +133,25 @@
     <label for="note">Note:</label>
     <textarea id="note" rows="2"></textarea>
 
-    <table id="dispoTable">
-      <thead>
-        <tr>
-          <th>CHAUFFEUR</th><th>US</th><th>CAMION</th><th>REMORQUE</th><th>DÉPART</th><th>NOTE</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-        <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-        <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-        <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-        <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-        <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-        <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-        <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-      </tbody>
-    </table>
+    <div class="table-wrapper">
+      <table id="dispoTable">
+        <thead>
+          <tr>
+            <th>CHAUFFEUR</th><th>US</th><th>CAMION</th><th>REMORQUE</th><th>DÉPART</th><th>NOTE</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+        </tbody>
+      </table>
+    </div>
 
     <div class="buttons">
       <button class="reset-btn" onclick="resetForm()">Reset</button>
@@ -155,10 +162,20 @@
 
   <script>
     function sendForm() {
+      const tableClone = document.getElementById("dispoTable").cloneNode(true);
+
+      // transforme les checkbox cochés en ✔️, les autres en vide
+      const rows = tableClone.querySelectorAll("tbody tr");
+      rows.forEach(row => {
+        const checkboxCell = row.cells[1];
+        const checkbox = checkboxCell.querySelector("input[type='checkbox']");
+        checkboxCell.innerText = checkbox.checked ? '✔️' : '';
+      });
+
       const data = {
         note: document.getElementById("note").value,
         date: document.getElementById("dateSelect").value,
-        table: document.getElementById("dispoTable").outerHTML
+        table: tableClone.outerHTML
       };
 
       fetch("https://script.google.com/macros/s/AKfycbzk_y7NIfa4eksIvVbYcXHaI3Bzh5BG3gqpH8Z82k4OdUCrK_thMeSOQuw_is-d9S8DMA/exec", {

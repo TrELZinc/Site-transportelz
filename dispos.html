@@ -488,6 +488,8 @@
       date: document.getElementById("dateSelect").value,
       table: document.getElementById("dispoTable").outerHTML
     };
+    
+console.log("Données envoyées :", data);
 
     fetch("https://script.google.com/macros/s/AKfycbyjo9af2j_ydVolCluAPDSW_gQ88RWbI3qiAuX5Cv9oq6slqDBSVVL4a7S-BJ73Cuu_/exec", {
       method: "POST",

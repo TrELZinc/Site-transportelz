@@ -497,14 +497,12 @@
         "Content-Type": "application/json"
       }
     })
-    .then(() => {
-      alert("Email envoyé avec succès !");
-      document.getElementById("dispoForm").reset();
-    })
-    .catch(err => {
-      alert("Erreur lors de l'envoi.");
-      console.error("Erreur d'envoi :", err);
-    });
+// En mode no-cors, on ne peut pas savoir si ça a marché
+setTimeout(() => {
+  alert("Email potentiellement envoyé !");
+  document.getElementById("dispoForm").reset();
+}, 1000); // Attente de 1 seconde simulée
+
   });
 
   function saveData() {

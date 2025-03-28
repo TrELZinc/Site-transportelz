@@ -15,37 +15,61 @@
     header {
       background-color: #141414;
       color: white;
-      padding: 20px;
-      text-align: center;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-    header img {
-      height: 60px;
-      display: block;
-      margin: 0 auto 10px;
+    .logo {
+      height: 40px;
     }
-    h1 {
-      margin: 0;
-      font-size: 24px;
+    nav {
+      display: flex;
+      gap: 20px;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-size: 16px;
+    }
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 28px;
+      cursor: pointer;
+    }
+    .menu-mobile {
+      display: none;
+      flex-direction: column;
+      background-color: #141414;
+      position: absolute;
+      top: 64px;
+      right: 0;
+      width: 100%;
+      text-align: right;
+    }
+    .menu-mobile a {
+      padding: 10px 20px;
+      border-top: 1px solid #333;
     }
     .form-container {
-      max-width: 1000px;
+      max-width: 1200px;
       margin: 30px auto;
       padding: 0 16px;
-      box-sizing: border-box;
     }
     form {
-      width: 100%;
-      padding: 32px 24px;
       background-color: white;
+      padding: 20px;
       border-radius: 12px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      box-sizing: border-box;
       overflow-x: auto;
     }
     label {
       font-weight: bold;
       display: block;
-      margin-bottom: 8px;
+      margin-top: 15px;
     }
     textarea, input[type="date"] {
       width: 100%;
@@ -55,9 +79,9 @@
       font-family: 'Comfortaa', cursive;
     }
     table {
-      width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
+      min-width: 1000px;
     }
     th, td {
       border: 1px solid #ccc;
@@ -86,32 +110,38 @@
     .reset-btn { background-color: #e74c3c; color: white; }
     .save-btn { background-color: #2ecc71; color: white; }
     .send-btn { background-color: black; color: white; }
-    .confirmation-popup {
-      position: fixed;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      background-color: #141414;
-      color: white;
-      padding: 20px 30px;
-      border-radius: 16px;
-      box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
-      font-size: 18px;
-      z-index: 9999;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
-    .confirmation-popup.show {
-      opacity: 1;
-      pointer-events: auto;
+    @media screen and (max-width: 768px) {
+      nav {
+        display: none;
+      }
+      .menu-toggle {
+        display: block;
+      }
+      .menu-mobile.show {
+        display: flex;
+      }
     }
   </style>
 </head>
 <body>
   <header>
-    <img src="assets/logo.jpeg" alt="Logo ELZ"/>
-    <h1>Disponibilités - Envoi par courriel</h1>
+    <img src="assets/logo.jpeg" alt="Logo" class="logo" />
+    <nav class="menu-desktop">
+      <a href="#">Application 1</a>
+      <a href="#">Application 2</a>
+      <a href="#">Application 3</a>
+      <a href="#">Application 4</a>
+      <a href="#">Application 5</a>
+    </nav>
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
   </header>
+  <div class="menu-mobile" id="mobileMenu">
+    <a href="#">Application 1</a>
+    <a href="#">Application 2</a>
+    <a href="#">Application 3</a>
+    <a href="#">Application 4</a>
+    <a href="#">Application 5</a>
+  </div>
 
   <div class="form-container">
     <form id="dispos-form">
@@ -121,23 +151,25 @@
       <label for="note">Note</label>
       <textarea id="note" rows="3"></textarea>
 
-      <table id="dispo-table">
-        <thead>
-          <tr>
-            <th>CHAUFFEUR</th><th>US</th><th>CAMION</th><th>REMORQUE</th><th>DÉPART</th><th>NOTE</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td><input type="text" /></td><td><input type="checkbox" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td></tr>
-          <tr><td><input type="text" /></td><td><input type="checkbox" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td></tr>
-          <tr><td><input type="text" /></td><td><input type="checkbox" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td></tr>
-          <tr><td><input type="text" /></td><td><input type="checkbox" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td></tr>
-          <tr><td><input type="text" /></td><td><input type="checkbox" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td></tr>
-          <tr><td><input type="text" /></td><td><input type="checkbox" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td></tr>
-          <tr><td><input type="text" /></td><td><input type="checkbox" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td></tr>
-          <tr><td><input type="text" /></td><td><input type="checkbox" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td></tr>
-        </tbody>
-      </table>
+      <div style="overflow-x: auto">
+        <table id="dispo-table">
+          <thead>
+            <tr>
+              <th>CHAUFFEUR</th><th>US</th><th>CAMION</th><th>REMORQUE</th><th>DÉPART</th><th>NOTE</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><input type="text" /></td><td><input type="checkbox" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td></tr>
+            <tr><td><input type="text" /></td><td><input type="checkbox" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td></tr>
+            <tr><td><input type="text" /></td><td><input type="checkbox" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td></tr>
+            <tr><td><input type="text" /></td><td><input type="checkbox" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td></tr>
+            <tr><td><input type="text" /></td><td><input type="checkbox" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td></tr>
+            <tr><td><input type="text" /></td><td><input type="checkbox" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td></tr>
+            <tr><td><input type="text" /></td><td><input type="checkbox" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td></tr>
+            <tr><td><input type="text" /></td><td><input type="checkbox" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td></tr>
+          </tbody>
+        </table>
+      </div>
 
       <div class="buttons">
         <button type="button" class="reset-btn" onclick="resetForm()">Reset</button>
@@ -147,64 +179,16 @@
     </form>
   </div>
 
-  <div id="confirmation" class="confirmation-popup">✅ Disponibilités envoyées !</div>
-
   <script>
-    const form = document.getElementById("dispos-form");
-    const confirmation = document.getElementById("confirmation");
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const date = document.getElementById("date").value;
-      const note = document.getElementById("note").value;
-
-      const rows = Array.from(document.querySelectorAll("#dispo-table tbody tr"));
-      const table = rows.map(row => {
-        const inputs = row.querySelectorAll("input");
-        return [
-          inputs[0].value,
-          inputs[1].checked,
-          inputs[2].value,
-          inputs[3].value,
-          inputs[4].value,
-          inputs[5].value
-        ];
-      });
-
-      const data = { date, note, table };
-
-      await fetch("https://script.google.com/macros/s/AKfycbwYI2gjmzwMFn6Q0L5-5ZkiYLkj952gyMiblnEsoI8jnjzVEXp8I6doT357mzrKRPosfA/exec", {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      });
-
-      confirmation.classList.add("show");
-      setTimeout(() => confirmation.classList.remove("show"), 4000);
-    });
-
-    function resetForm() {
-      form.reset();
+    function toggleMenu() {
+      document.getElementById('mobileMenu').classList.toggle('show');
     }
-
+    function resetForm() {
+      document.getElementById("dispos-form").reset();
+    }
     function saveForm() {
       localStorage.setItem("disposDate", document.getElementById("date").value);
       localStorage.setItem("disposNote", document.getElementById("note").value);
-      const rows = Array.from(document.querySelectorAll("#dispo-table tbody tr"));
-      const data = rows.map(row => {
-        const inputs = row.querySelectorAll("input");
-        return [
-          inputs[0].value,
-          inputs[1].checked,
-          inputs[2].value,
-          inputs[3].value,
-          inputs[4].value,
-          inputs[5].value
-        ];
-      });
-      localStorage.setItem("disposTable", JSON.stringify(data));
     }
   </script>
 </body>

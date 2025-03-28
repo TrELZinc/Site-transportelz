@@ -1,194 +1,541 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Disponibilités</title>
-  <link rel="icon" href="assets/favicon.png">
-  <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet"/>
   <style>
-    body {
-      font-family: 'Comfortaa', cursive;
-      margin: 0;
-      background-color: #fefefe;
+  html, body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f4f4f4;
+    font-size: 16px;
+  }
+
+  header {
+    background-color: #000;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding: 10px 20px;
+    position: relative;
+  }
+
+  header img {
+    height: 40px;
+  }
+
+  nav.menu-items {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+
+  nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+
+  .menu-toggle {
+    display: none;
+    font-size: 18px;
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .container {
+    padding: 20px;
+    max-width: 1000px;
+    margin: auto;
+  }
+
+  .top-bar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+  }
+
+  .top-bar input[type="date"] {
+    padding: 6px 10px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    width: 160px;
+  }
+
+  .form-section {
+    width: 100%;
+  }
+
+  .form-group {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+
+  label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    resize: vertical;
+    box-sizing: border-box;
+    font-size: 15px;
+  }
+
+  .table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  th, td {
+    border: 1px solid #ddd;
+    padding: 12px 8px;
+    text-align: center;
+    word-wrap: break-word;
+  }
+
+  th {
+    background-color: #ef6d6d;
+    color: white;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  td {
+    background-color: #fff;
+    font-size: 14px;
+  }
+
+  tr:hover td {
+    background-color: #f9f9f9;
+  }
+
+  td input[type="checkbox"] {
+    transform: scale(1.2);
+  }
+
+  th:nth-child(5),
+  td:nth-child(5) {
+    width: 80px;
+  }
+
+  th:nth-child(6),
+  td:nth-child(6) {
+    width: 240px;
+  }
+
+  .buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .buttons button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .reset-btn { background-color: #e74c3c; }
+  .save-btn { background-color: #2ecc71; }
+  .send-btn { background-color: black; }
+
+  /* MOBILE */
+  @media screen and (max-width: 768px) {
+    .menu-toggle {
+      display: block;
+      position: absolute;
+      right: 15px;
+      top: 10px;
+      z-index: 100;
     }
-    header {
-      background-color: #141414;
+
+    nav.menu-items {
+      display: none;
+      flex-direction: column;
+      position: absolute;
+      top: 55px;
+      right: 15px;
+      background-color: #000;
+      border-radius: 8px;
+      padding: 10px;
+      z-index: 99;
+    }
+
+    nav.menu-items a {
       color: white;
-      padding: 16px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      text-decoration: none;
+      padding: 8px 12px;
+      white-space: nowrap;
     }
-    .logo {
+
+    nav.menu-items.show {
+      display: flex;
+    }
+
+    .top-bar {
+      justify-content: center;
+    }
+
+    .top-bar input[type="date"] {
+      font-size: 16px;
+      padding: 10px;
+      width: 180px;
+    }
+
+    .buttons {
+      flex-direction: row !important;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .buttons button {
+      flex: 1 0 auto;
+      min-width: 100px;
+    }
+  }
+</style>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+  <title>Disponibilités</title>
+  <style>
+    html, body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f4f4;
+      font-size: 16px;
+    }
+
+    header {
+      background-color: #000;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      padding: 10px 20px;
+    }
+
+    header img {
       height: 40px;
     }
+
     nav {
       display: flex;
-      gap: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-top: 10px;
     }
+
     nav a {
       color: white;
       text-decoration: none;
-      font-size: 16px;
+      font-weight: bold;
+      white-space: nowrap;
     }
-    .menu-toggle {
-      display: none;
-      background: none;
-      border: none;
-      color: white;
-      font-size: 28px;
-      cursor: pointer;
-    }
-    .menu-mobile {
-      display: none;
-      flex-direction: column;
-      background-color: #141414;
-      position: absolute;
-      top: 64px;
-      right: 0;
-      width: 100%;
-      text-align: right;
-    }
-    .menu-mobile a {
-      padding: 10px 20px;
-      border-top: 1px solid #333;
-    }
-    .form-container {
-      max-width: 1200px;
-      margin: 30px auto;
-      padding: 0 16px;
-    }
-    form {
-      background-color: white;
+
+    .container {
       padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      overflow-x: auto;
+      max-width: 1000px;
+      margin: auto;
     }
+
+    .top-bar {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 10px;
+    }
+
+    .top-bar input[type="date"] {
+      padding: 6px 10px;
+      font-size: 14px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      width: 160px;
+    }
+
+    .form-section {
+      width: 100%;
+    }
+
+    .form-group {
+      width: 100%;
+      margin-bottom: 16px;
+    }
+
     label {
       font-weight: bold;
       display: block;
-      margin-top: 15px;
+      margin-bottom: 5px;
     }
-    textarea, input[type="date"] {
+
+    textarea {
       width: 100%;
       padding: 10px;
-      border-radius: 6px;
+      border-radius: 8px;
       border: 1px solid #ccc;
-      font-family: 'Comfortaa', cursive;
+      resize: vertical;
+      box-sizing: border-box;
+      font-size: 15px;
     }
+
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
     table {
+      width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
-      min-width: 1000px;
+      min-width: 700px;
+      border-radius: 10px;
+      overflow: hidden;
     }
+
     th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
+      border: 1px solid #ddd;
+      padding: 12px 8px;
       text-align: center;
     }
+
     th {
       background-color: #ef6d6d;
       color: white;
+      font-weight: 600;
+      white-space: nowrap;
     }
+
+    td {
+      background-color: #fff;
+      font-size: 14px;
+    }
+
+    tr:hover td {
+      background-color: #f9f9f9;
+    }
+
+    td input[type="checkbox"] {
+      transform: scale(1.2);
+    }
+
+    th:nth-child(5),
+    td:nth-child(5) {
+      width: 80px;
+    }
+
+    th:nth-child(6),
+    td:nth-child(6) {
+      width: 240px;
+    }
+
     .buttons {
       margin-top: 20px;
       display: flex;
-      gap: 10px;
       justify-content: center;
+      gap: 10px;
       flex-wrap: wrap;
     }
-    button {
-      padding: 10px 20px;
+
+    .buttons button {
+      padding: 12px 24px;
       border: none;
-      border-radius: 8px;
-      font-family: 'Comfortaa', cursive;
-      cursor: pointer;
+      border-radius: 6px;
+      color: white;
+      font-weight: bold;
       font-size: 16px;
+      cursor: pointer;
     }
-    .reset-btn { background-color: #e74c3c; color: white; }
-    .save-btn { background-color: #2ecc71; color: white; }
-    .send-btn { background-color: black; color: white; }
-    @media screen and (max-width: 768px) {
-      nav {
-        display: none;
-      }
-      .menu-toggle {
-        display: block;
-      }
-      .menu-mobile.show {
-        display: flex;
-      }
+
+    .reset-btn { background-color: #e74c3c; }
+    .save-btn { background-color: #2ecc71; }
+    .send-btn { background-color: black; }
+
+@media screen and (max-width: 768px) {
+  nav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    width: 100%;
+  }
+
+  nav a {
+    flex-shrink: 0;
+  }
+
+  .top-bar {
+    justify-content: center;
+  }
+
+  .top-bar input[type="date"] {
+    font-size: 16px;
+    padding: 10px;
+    width: 180px;
+  }
+
+  .buttons {
+    flex-direction: row !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .buttons button {
+    flex: 1 0 auto;
+    min-width: 100px;
+  }
+}
+
     }
   </style>
 </head>
 <body>
-  <header>
-    <img src="assets/logo.jpeg" alt="Logo" class="logo" />
-    <nav class="menu-desktop">
-      <a href="#">Application 1</a>
-      <a href="#">Application 2</a>
-      <a href="#">Application 3</a>
-      <a href="#">Application 4</a>
-      <a href="#">Application 5</a>
-    </nav>
-    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-  </header>
-  <div class="menu-mobile" id="mobileMenu">
+
+<header>
+  <img src="assets/logo.jpeg" alt="Logo">
+  <button class="menu-toggle" onclick="toggleMenu()">☰ Menu</button>
+  <nav id="mainMenu" class="menu-items">
     <a href="#">Application 1</a>
     <a href="#">Application 2</a>
     <a href="#">Application 3</a>
     <a href="#">Application 4</a>
     <a href="#">Application 5</a>
-  </div>
+  </nav>
+</header>
 
-  <div class="form-container">
-    <form id="dispos-form">
-      <label for="date">Date</label>
-      <input type="date" id="date" required />
 
-      <label for="note">Note</label>
-      <textarea id="note" rows="3"></textarea>
+  <div class="container">
+    <div class="top-bar">
+      <input type="date" id="dateSelect" />
+    </div>
 
-      <div style="overflow-x: auto">
-        <table id="dispo-table">
+    <form id="dispoForm" class="form-section">
+      <div class="form-group">
+        <label for="note">Note:</label>
+        <textarea name="note" id="note" rows="2"></textarea>
+      </div>
+
+      <div class="table-wrapper">
+        <table id="dispoTable">
           <thead>
             <tr>
-              <th>CHAUFFEUR</th><th>US</th><th>CAMION</th><th>REMORQUE</th><th>DÉPART</th><th>NOTE</th>
+              <th>CHAUFFEUR</th>
+              <th>US</th>
+              <th>CAMION</th>
+              <th>REMORQUE</th>
+              <th>DÉPART</th>
+              <th>NOTE</th>
             </tr>
           </thead>
           <tbody>
-            <tr><td><input type="text" /></td><td><input type="checkbox" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td></tr>
-            <tr><td><input type="text" /></td><td><input type="checkbox" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td></tr>
-            <tr><td><input type="text" /></td><td><input type="checkbox" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td></tr>
-            <tr><td><input type="text" /></td><td><input type="checkbox" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td></tr>
-            <tr><td><input type="text" /></td><td><input type="checkbox" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td></tr>
-            <tr><td><input type="text" /></td><td><input type="checkbox" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td></tr>
-            <tr><td><input type="text" /></td><td><input type="checkbox" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td></tr>
-            <tr><td><input type="text" /></td><td><input type="checkbox" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td></tr>
+            <!-- 8 lignes -->
+            <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+            <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+            <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+            <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+            <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+            <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+            <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+            <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
           </tbody>
         </table>
       </div>
 
       <div class="buttons">
-        <button type="button" class="reset-btn" onclick="resetForm()">Reset</button>
-        <button type="button" class="save-btn" onclick="saveForm()">Save</button>
+        <button type="reset" class="reset-btn" onclick="resetForm(event)">Reset</button>
+        <button type="button" class="save-btn" onclick="saveData()">Save</button>
         <button type="submit" class="send-btn">Send</button>
       </div>
     </form>
   </div>
 
   <script>
-    function toggleMenu() {
-      document.getElementById('mobileMenu').classList.toggle('show');
+    document.getElementById('dispoForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const data = {
+        note: document.getElementById("note").value,
+        date: document.getElementById("dateSelect").value,
+        table: document.getElementById("dispoTable").outerHTML
+      };
+
+      fetch("TON_URL_WEB_APP_GOOGLE_SCRIPT", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" }
+      })
+      .then(res => {
+        alert("Email envoyé avec succès !");
+        this.reset();
+      })
+      .catch(err => {
+        alert("Erreur lors de l'envoi.");
+        console.error(err);
+      });
+    });
+
+    function saveData() {
+      const table = document.getElementById("dispoTable").innerHTML;
+      const note = document.getElementById("note").value;
+      const date = document.getElementById("dateSelect").value;
+
+      localStorage.setItem("dispo_table", table);
+      localStorage.setItem("dispo_note", note);
+      localStorage.setItem("dispo_date", date);
+
+      alert("Données sauvegardées !");
     }
-    function resetForm() {
-      document.getElementById("dispos-form").reset();
-    }
-    function saveForm() {
-      localStorage.setItem("disposDate", document.getElementById("date").value);
-      localStorage.setItem("disposNote", document.getElementById("note").value);
+
+    window.onload = function() {
+      if (localStorage.getItem("dispo_table")) {
+        document.getElementById("dispoTable").innerHTML = localStorage.getItem("dispo_table");
+        document.getElementById("note").value = localStorage.getItem("dispo_note") || "";
+        document.getElementById("dateSelect").value = localStorage.getItem("dispo_date") || "";
+      }
+    };
+
+    function resetForm(e) {
+      e.preventDefault();
+      document.getElementById("note").value = "";
+      document.getElementById("dateSelect").value = "";
+      const rows = document.querySelectorAll("#dispoTable tbody tr");
+      rows.forEach(row => {
+        row.querySelectorAll("td").forEach((cell, i) => {
+          if (i !== 1) cell.textContent = "";
+        });
+        const checkbox = row.querySelector("input[type='checkbox']");
+        if (checkbox) checkbox.checked = false;
+      });
     }
   </script>
 </body>

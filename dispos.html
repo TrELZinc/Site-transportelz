@@ -118,12 +118,8 @@
     .save-btn { background-color: #2ecc71; }
     .send-btn { background-color: black; }
 
-    td input[type='number'] {
-      width: 100%;
-      border: none;
-      text-align: center;
-      font-size: 14px;
-      background: transparent;
+    td[contenteditable] {
+      outline: none;
     }
   </style>
 </head>
@@ -149,14 +145,14 @@
           </tr>
         </thead>
         <tbody>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td><input type="number"></td><td><input type="number"></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td><input type="number"></td><td><input type="number"></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td><input type="number"></td><td><input type="number"></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td><input type="number"></td><td><input type="number"></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td><input type="number"></td><td><input type="number"></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td><input type="number"></td><td><input type="number"></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td><input type="number"></td><td><input type="number"></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td><input type="number"></td><td><input type="number"></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
+          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
         </tbody>
       </table>
     </div>
@@ -176,13 +172,7 @@
       rows.forEach(row => {
         const cells = row.querySelectorAll("td");
         const checkbox = cells[1].querySelector("input[type='checkbox']");
-        cells[1].innerText = checkbox.checked ? '✔️' : '';
-
-        // Replace inputs in CAMION/REMORQUE with their values
-        [2, 3].forEach(i => {
-          const input = cells[i].querySelector("input[type='number']");
-          cells[i].innerText = input ? input.value : '';
-        });
+        cells[1].innerText = checkbox && checkbox.checked ? '✔️' : '';
       });
 
       const data = {
@@ -206,18 +196,11 @@
       document.getElementById("dateSelect").value = "";
       const rows = document.querySelectorAll("#dispoTable tbody tr");
       rows.forEach(row => {
-        const cells = row.querySelectorAll("td");
-        cells.forEach((cell, i) => {
-          if (i === 1) {
-            const checkbox = cell.querySelector("input[type='checkbox']");
-            if (checkbox) checkbox.checked = false;
-          } else if (i === 2 || i === 3) {
-            const input = cell.querySelector("input[type='number']");
-            if (input) input.value = "";
-          } else {
-            cell.textContent = "";
-          }
+        row.querySelectorAll("td").forEach((cell, i) => {
+          if (i !== 1) cell.textContent = "";
         });
+        const checkbox = row.querySelector("input[type='checkbox']");
+        if (checkbox) checkbox.checked = false;
       });
     }
 

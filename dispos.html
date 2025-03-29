@@ -1,44 +1,75 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Disponibilités</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formulaire de disponibilités</title>
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   <style>
+    * { box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', sans-serif;
       background: #f4f4f4;
+      margin: 0;
       padding: 20px;
     }
     h1 {
       text-align: center;
+      margin-bottom: 20px;
+    }
+    textarea, input[type="date"] {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    .table-wrapper {
+      overflow-x: auto;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
+      min-width: 800px;
     }
     th, td {
       border: 1px solid #ccc;
-      padding: 8px;
+      padding: 10px;
       text-align: center;
     }
     th {
-      background-color: #d32f2f;
+      background: #d32f2f;
       color: white;
+      font-weight: 600;
+    }
+    td input[type="checkbox"] {
+      transform: scale(1.2);
+    }
+    td[contenteditable] {
+      text-transform: uppercase;
+    }
+    .drag-handle {
+      cursor: grab;
+      font-size: 18px;
+      color: #999;
     }
     .buttons {
-      margin-top: 20px;
       display: flex;
-      gap: 10px;
       justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
     }
     .buttons button {
       padding: 10px 20px;
+      font-size: 16px;
+      font-weight: bold;
       border: none;
       border-radius: 5px;
-      font-weight: bold;
       cursor: pointer;
     }
     .reset-btn { background: #e74c3c; color: white; }
@@ -48,98 +79,36 @@
 </head>
 <body>
   <h1>Formulaire de disponibilités</h1>
-
   <input type="date" id="dateSelect">
-  <br><br>
-  <label for="note">Note:</label><br>
-  <textarea id="note" rows="3" style="width:100%;"></textarea>
+  <label for="note"><strong>Note:</strong></label>
+  <textarea id="note" rows="3" placeholder="Note..."></textarea>
 
-  <table id="dispoTable">
-    <thead>
-      <tr>
-        <th>CHAUFFEUR</th>
-        <th>US</th>
-        <th>CAMION</th>
-        <th>REMORQUE</th>
-        <th>DÉPART</th>
-        <th>NOTE</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td contenteditable style="text-transform: uppercase;"></td>
-        <td contenteditable style="cursor:pointer;" onclick="toggleUS(this)">❌</td>
-        <td contenteditable inputmode="numeric"></td>
-        <td contenteditable inputmode="numeric"></td>
-        <td contenteditable></td>
-        <td contenteditable></td>
-      </tr>
-<tr>
-        <td contenteditable style="text-transform: uppercase;"></td>
-        <td contenteditable style="cursor:pointer;" onclick="toggleUS(this)">❌</td>
-        <td contenteditable inputmode="numeric"></td>
-        <td contenteditable inputmode="numeric"></td>
-        <td contenteditable></td>
-        <td contenteditable></td>
-      </tr>
-<tr>
-        <td contenteditable style="text-transform: uppercase;"></td>
-        <td contenteditable style="cursor:pointer;" onclick="toggleUS(this)">❌</td>
-        <td contenteditable inputmode="numeric"></td>
-        <td contenteditable inputmode="numeric"></td>
-        <td contenteditable></td>
-        <td contenteditable></td>
-      </tr>
-<tr>
-        <td contenteditable style="text-transform: uppercase;"></td>
-        <td contenteditable style="cursor:pointer;" onclick="toggleUS(this)">❌</td>
-        <td contenteditable inputmode="numeric"></td>
-        <td contenteditable inputmode="numeric"></td>
-        <td contenteditable></td>
-        <td contenteditable></td>
-      </tr>
-<tr>
-        <td contenteditable style="text-transform: uppercase;"></td>
-        <td contenteditable style="cursor:pointer;" onclick="toggleUS(this)">❌</td>
-        <td contenteditable inputmode="numeric"></td>
-        <td contenteditable inputmode="numeric"></td>
-        <td contenteditable></td>
-        <td contenteditable></td>
-      </tr>
-<tr>
-        <td contenteditable style="text-transform: uppercase;"></td>
-        <td contenteditable style="cursor:pointer;" onclick="toggleUS(this)">❌</td>
-        <td contenteditable inputmode="numeric"></td>
-        <td contenteditable inputmode="numeric"></td>
-        <td contenteditable></td>
-        <td contenteditable></td>
-      </tr>
-<tr>
-        <td contenteditable style="text-transform: uppercase;"></td>
-        <td contenteditable style="cursor:pointer;" onclick="toggleUS(this)">❌</td>
-        <td contenteditable inputmode="numeric"></td>
-        <td contenteditable inputmode="numeric"></td>
-        <td contenteditable></td>
-        <td contenteditable></td>
-      </tr>
-<tr>
-        <td contenteditable style="text-transform: uppercase;"></td>
-        <td contenteditable style="cursor:pointer;" onclick="toggleUS(this)">❌</td>
-        <td contenteditable inputmode="numeric"></td>
-        <td contenteditable inputmode="numeric"></td>
-        <td contenteditable></td>
-        <td contenteditable></td>
-      </tr>
-<tr>
-        <td contenteditable style="text-transform: uppercase;"></td>
-        <td contenteditable style="cursor:pointer;" onclick="toggleUS(this)">❌</td>
-        <td contenteditable inputmode="numeric"></td>
-        <td contenteditable inputmode="numeric"></td>
-        <td contenteditable></td>
-        <td contenteditable></td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="table-wrapper">
+    <table id="dispoTable">
+      <thead>
+        <tr>
+          <th></th>
+          <th>CHAUFFEUR</th>
+          <th>US</th>
+          <th>CAMION</th>
+          <th>REMORQUE</th>
+          <th>DÉPART</th>
+          <th>NOTE</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="drag-handle">☰</td><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
+        <tr><td class="drag-handle">☰</td><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
+        <tr><td class="drag-handle">☰</td><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
+        <tr><td class="drag-handle">☰</td><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
+        <tr><td class="drag-handle">☰</td><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
+        <tr><td class="drag-handle">☰</td><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
+        <tr><td class="drag-handle">☰</td><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
+        <tr><td class="drag-handle">☰</td><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
+        <tr><td class="drag-handle">☰</td><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
+      </tbody>
+    </table>
+  </div>
 
   <div class="buttons">
     <button class="reset-btn" onclick="customReset()">Reset</button>
@@ -148,18 +117,16 @@
   </div>
 
   <script>
-    const tableBody = document.querySelector("#dispoTable tbody");
-    new Sortable(tableBody, { animation: 150 });
-
-    function toggleUS(cell) {
-      cell.textContent = cell.textContent === "✅" ? "❌" : "✅";
-    }
+    new Sortable(document.querySelector("#dispoTable tbody"), {
+      animation: 150,
+      handle: '.drag-handle',
+    });
 
     function customReset() {
       document.querySelectorAll("#dispoTable tbody tr").forEach(row => {
-        row.cells[3].textContent = "";
         row.cells[4].textContent = "";
         row.cells[5].textContent = "";
+        row.cells[6].textContent = "";
       });
     }
 
@@ -167,11 +134,9 @@
       const tableHTML = document.getElementById("dispoTable").innerHTML;
       const note = document.getElementById("note").value;
       const date = document.getElementById("dateSelect").value;
-
       localStorage.setItem("dispo_table", tableHTML);
       localStorage.setItem("dispo_note", note);
       localStorage.setItem("dispo_date", date);
-
       alert("Données sauvegardées !");
     }
 
@@ -181,14 +146,12 @@
         date: document.getElementById("dateSelect").value,
         table: document.getElementById("dispoTable").outerHTML
       };
-
       fetch("https://script.google.com/macros/s/AKfycbyh4KpQJTR6tdPZyVeNimUVMpMNXQQ2QPTJmDKPs4Y5cVYUUO6NLjBR1YvLD3N-rQALwg/exec", {
         method: "POST",
         mode: "no-cors",
         body: JSON.stringify(data),
         headers: { "Content-Type": "application/json" }
       });
-
       alert("Formulaire envoyé");
     }
 
@@ -197,7 +160,10 @@
         document.getElementById("dispoTable").innerHTML = localStorage.getItem("dispo_table");
         document.getElementById("note").value = localStorage.getItem("dispo_note") || "";
         document.getElementById("dateSelect").value = localStorage.getItem("dispo_date") || "";
-        new Sortable(document.querySelector("#dispoTable tbody"), { animation: 150 });
+        new Sortable(document.querySelector("#dispoTable tbody"), {
+          animation: 150,
+          handle: '.drag-handle'
+        });
       }
     }
   </script>

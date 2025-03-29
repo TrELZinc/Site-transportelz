@@ -86,11 +86,6 @@
     th:nth-child(6), td:nth-child(6) {
       width: 240px;
     }
-    input[type="checkbox"].us-checkbox {
-      transform: scale(1.4);
-      accent-color: #c62828;
-      cursor: pointer;
-    }
     .buttons {
       margin-top: 20px;
       display: flex;
@@ -110,6 +105,23 @@
     .reset-btn { background-color: #e74c3c; }
     .save-btn { background-color: #2ecc71; }
     .send-btn { background-color: black; }
+
+    /* Mobile responsive tweaks */
+    @media (max-width: 600px) {
+      table {
+        font-size: 13px;
+      }
+      th, td {
+        padding: 6px;
+      }
+      .buttons button {
+        font-size: 14px;
+        padding: 10px 16px;
+      }
+      textarea {
+        font-size: 14px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -144,13 +156,19 @@
       const row = document.createElement("tr");
       row.innerHTML = `
         <td contenteditable></td>
-        <td><input type="checkbox" class="us-checkbox" data-col="1"></td>
+        <td class="us-cell" onclick="toggleUS(this)" style="cursor:pointer;">❌</td>
         <td contenteditable inputmode="numeric"></td>
         <td contenteditable inputmode="numeric"></td>
         <td contenteditable></td>
         <td contenteditable></td>
       `;
       return row;
+    }
+
+    function toggleUS(cell) {
+      cell.innerHTML = cell.innerHTML.includes("✔️")
+        ? "❌"
+        : '<span style="color:#c62828; font-size:18px;">✔️</span>';
     }
 
     function generateDefaultRows(n = 9) {
@@ -167,11 +185,6 @@
 
       rows.forEach(row => {
         const cells = row.querySelectorAll("td");
-        const checkbox = cells[1].querySelector("input[type='checkbox']");
-        if (checkbox) {
-          const isChecked = checkbox.checked;
-          cells[1].innerHTML = isChecked ? '<span style="color:#c62828; font-size:18px;">✔️</span>' : '';
-        }
         for (let i = 0; i < cells.length; i++) {
           if (i !== 1 && cells[i].hasAttribute("contenteditable")) {
             cells[i].innerText = cells[i].innerText.trim().toUpperCase();
@@ -199,7 +212,14 @@
       document.getElementById("note").value = "";
       document.getElementById("dateSelect").value = "";
       localStorage.clear();
-      generateDefaultRows(9);
+
+      const rows = document.querySelectorAll("#tableBody tr");
+      rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        if (cells[3]) cells[3].textContent = "";
+        if (cells[4]) cells[4].textContent = "";
+        if (cells[5]) cells[5].textContent = "";
+      });
     }
 
     function saveData() {

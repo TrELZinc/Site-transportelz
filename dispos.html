@@ -157,7 +157,6 @@
         const cells = row.querySelectorAll("td");
         for (let i = 0; i < cells.length; i++) {
           if (i === 1) {
-            // conserver ✔️ ou —
             cells[i].innerHTML = cells[i].innerText.includes('✔️') ? '✔️' : '';
           } else {
             const text = cells[i].innerText.trim().toUpperCase();
@@ -195,7 +194,17 @@
       });
     }
     function saveData() {
-      const tableHTML = document.getElementById("dispoTable").outerHTML;
+      const table = document.getElementById("dispoTable");
+      const rows = table.querySelectorAll("tbody tr");
+      rows.forEach(row => {
+        const usCell = row.children[1];
+        if (usCell.innerText.trim() === '✔️') {
+          usCell.dataset.checked = "true";
+        } else {
+          usCell.dataset.checked = "false";
+        }
+      });
+      const tableHTML = table.outerHTML;
       localStorage.setItem("dispo_note", document.getElementById("note").value);
       localStorage.setItem("dispo_date", document.getElementById("dateSelect").value);
       localStorage.setItem("dispo_table", tableHTML);

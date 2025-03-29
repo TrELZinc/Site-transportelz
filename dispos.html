@@ -125,7 +125,17 @@
           </tr>
         </thead>
         <tbody>
-                  </tbody>
+          ${[...Array(8)].map(() => `
+            <tr>
+              <td contenteditable></td>
+              <td onclick="toggleUS(this)" data-checked="false">❌<span style="display:none">NON</span></td>
+              <td contenteditable inputmode="numeric"></td>
+              <td contenteditable inputmode="numeric"></td>
+              <td contenteditable></td>
+              <td contenteditable></td>
+            </tr>
+          `).join('')}
+        </tbody>
       </table>
     </div>
     <div class="buttons">
@@ -135,10 +145,10 @@
     </div>
   </div>
   <script>
-    function toggleCheck(cell) {
-      const checked = cell.dataset.checked === "true";
-      cell.dataset.checked = !checked;
-      cell.innerText = !checked ? '✔️' : '—';
+    function toggleUS(cell) {
+      const isChecked = cell.dataset.checked === "true";
+      cell.dataset.checked = (!isChecked).toString();
+      cell.innerHTML = !isChecked ? '✅<span style="display:none">OUI</span>' : '❌<span style="display:none">NON</span>';
     }
     function sendForm() {
       const tableClone = document.getElementById("dispoTable").cloneNode(true);
@@ -147,7 +157,8 @@
         const cells = row.querySelectorAll("td");
         for (let i = 0; i < cells.length; i++) {
           if (i === 1) {
-            cells[i].innerHTML = cells[i].innerText.includes('✔️') ? '✔️' : '';
+            const checked = cells[i].dataset.checked === "true";
+            cells[i].innerHTML = checked ? '✅' : '';
           } else {
             const text = cells[i].innerText.trim().toUpperCase();
             cells[i].innerText = text;
@@ -176,7 +187,7 @@
         cells.forEach((cell, i) => {
           if (i === 1) {
             cell.dataset.checked = "false";
-            cell.innerText = "—";
+            cell.innerHTML = "❌<span style='display:none'>NON</span>";
           } else {
             cell.textContent = "";
           }
@@ -188,11 +199,8 @@
       const rows = table.querySelectorAll("tbody tr");
       rows.forEach(row => {
         const usCell = row.children[1];
-        if (usCell.innerText.trim() === '✔️') {
-          usCell.dataset.checked = "true";
-        } else {
-          usCell.dataset.checked = "false";
-        }
+        const isChecked = usCell.innerText.trim() === '✅';
+        usCell.dataset.checked = isChecked ? "true" : "false";
       });
       const tableHTML = table.outerHTML;
       localStorage.setItem("dispo_note", document.getElementById("note").value);

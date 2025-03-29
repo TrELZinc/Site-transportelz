@@ -1,177 +1,210 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Disponibilités</title>
   <link href="https://fonts.googleapis.com/css2?family=Segoe+UI&display=swap" rel="stylesheet">
   <style>
     body {
-      margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background-color: #f4f4f4;
-    }
-    header {
-      background-color: #000;
-      color: white;
-      display: flex;
-      align-items: center;
-      padding: 10px 20px;
-    }
-    header img {
-      height: 40px;
-      margin-right: 15px;
-    }
-    header h1 {
-      font-size: 24px;
-      font-weight: normal;
       margin: 0;
+      background: #f5f5f5;
+      padding: 1rem;
     }
-    .container {
-      padding: 20px;
-      max-width: 1000px;
-      margin: auto;
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      margin: 1rem 0;
     }
-    .top-bar {
-      margin-bottom: 10px;
+
+    .date-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1rem;
     }
-    input[type="date"] {
-      font-size: 16px;
-      padding: 6px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    textarea {
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
+
+    #date {
+      font-size: 1.3rem;
+      padding: 0.5rem;
       border-radius: 8px;
       border: 1px solid #ccc;
-      margin-top: 10px;
+      width: 220px;
     }
-    .table-wrapper {
+
+    #note {
+      width: 100%;
+      min-height: 4rem;
+      font-size: 1rem;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .table-container {
       overflow-x: auto;
-      margin-top: 20px;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
+      background: white;
       min-width: 700px;
-      background-color: white;
     }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 10px;
+
+    th {
+      background: #c62828;
+      color: white;
+      padding: 0.75rem;
       text-align: center;
     }
-    th {
-      background-color: #202020;
-      color: white;
+
+    td {
+      border: 1px solid #ddd;
+      text-align: center;
+      padding: 0.5rem;
     }
-    .buttons {
-      margin-top: 20px;
+
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 0.3rem;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+    }
+
+    input[type="checkbox"] {
+      transform: scale(1.2);
+    }
+
+    .button-group {
       display: flex;
       justify-content: center;
-      gap: 10px;
+      gap: 1rem;
+      margin-top: 1rem;
     }
-    .buttons button {
-      padding: 12px 24px;
-      border: none;
-      border-radius: 6px;
-      color: white;
+
+    .button-group button {
+      padding: 0.7rem 1.5rem;
+      font-size: 1rem;
       font-weight: bold;
-      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      color: white;
       cursor: pointer;
     }
-    .reset-btn { background-color: #e74c3c; }
-    .save-btn { background-color: #2ecc71; }
+
+    .reset-btn { background-color: #ef5350; }
+    .save-btn { background-color: #4caf50; }
     .send-btn { background-color: black; }
+
+    @media (max-width: 768px) {
+      .date-wrapper {
+        justify-content: center;
+      }
+
+      #date {
+        width: 80%;
+        font-size: 1.5rem;
+      }
+    }
   </style>
 </head>
 <body>
-  <header>
-    <img src="assets/logo.jpeg" alt="Logo">
-    <h1>Disponibilités</h1>
-  </header>
+  <h1>Disponibilités</h1>
 
-  <div class="container">
-    <div class="top-bar">
-      <input type="date" id="dateSelect">
-    </div>
-
-    <textarea id="note" placeholder="Note..."></textarea>
-
-    <div class="table-wrapper">
-      <table id="dispoTable">
-        <thead>
-          <tr>
-            <th>CHAUFFEUR</th>
-            <th>US</th>
-            <th>CAMION</th>
-            <th>REMORQUE</th>
-            <th>DÉPART</th>
-            <th>NOTE</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
-          <tr><td contenteditable></td><td><input type="checkbox"></td><td contenteditable inputmode="numeric"></td><td contenteditable inputmode="numeric"></td><td contenteditable></td><td contenteditable></td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="buttons">
-      <button type="reset" class="reset-btn" onclick="resetForm(event)">Reset</button>
-      <button type="button" class="save-btn" onclick="saveData()">Save</button>
-      <button type="submit" class="send-btn">Send</button>
-    </div>
+  <div class="date-wrapper">
+    <input type="date" id="date" />
   </div>
 
-<script>
-  document.querySelector(".send-btn").addEventListener("click", function () {
-    const data = {
-      note: document.getElementById("note").value,
-      date: document.getElementById("dateSelect").value,
-      table: document.getElementById("dispoTable").outerHTML
-    };
-    fetch("https://script.google.com/macros/s/AKfycbyh4KpQJTR6tdPZyVeNimUVMpMNXQQ2QPTJmDKPs4Y5cVYUUO6NLjBR1YvLD3N-rQALwg/exec", {
-      method: "POST",
-      mode: "no-cors",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(data)
-    });
-  });
+  <textarea id="note" placeholder="Note..."></textarea>
 
-  function saveData() {
-    localStorage.setItem("dispo_table", document.getElementById("dispoTable").innerHTML);
-    localStorage.setItem("dispo_note", document.getElementById("note").value);
-    localStorage.setItem("dispo_date", document.getElementById("dateSelect").value);
-  }
+  <div class="table-container">
+    <table id="dispoTable">
+      <thead>
+        <tr>
+          <th>CHAUFFEUR</th>
+          <th>US</th>
+          <th>CAMION</th>
+          <th>REMORQUE</th>
+          <th>DÉPART</th>
+          <th>NOTE</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+        <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+        <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+        <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+        <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+        <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+        <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+        <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+        <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+        <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+      </tbody>
+    </table>
+  </div>
 
-  function resetForm(e) {
-    e.preventDefault();
-    const rows = document.querySelectorAll("#dispoTable tbody tr");
-    rows.forEach(row => {
-      row.querySelectorAll("td").forEach((cell, i) => {
-        if (i >= 3) cell.textContent = "";
-      });
-    });
-  }
+  <div class="button-group">
+    <button class="reset-btn" onclick="resetForm()">Reset</button>
+    <button class="save-btn" onclick="saveForm()">Save</button>
+    <button class="send-btn" onclick="sendForm()">Send</button>
+  </div>
 
-  window.onload = function () {
-    if (localStorage.getItem("dispo_table")) {
-      document.getElementById("dispoTable").innerHTML = localStorage.getItem("dispo_table");
-      document.getElementById("note").value = localStorage.getItem("dispo_note") || "";
-      document.getElementById("dateSelect").value = localStorage.getItem("dispo_date") || "";
+  <script>
+    const ENDPOINT = "https://script.google.com/macros/s/AKfycbyh4KpQJTR6tdPZyVeNimUVMpMNXQQ2QPTJmDKPs4Y5cVYUUO6NLjBR1YvLD3N-rQALwg/exec";
+
+    function saveForm() {
+      const data = getFormData();
+      localStorage.setItem("formData", JSON.stringify(data));
     }
-  };
-</script>
+
+    function loadForm() {
+      const saved = localStorage.getItem("formData");
+      if (!saved) return;
+      const { date, note } = JSON.parse(saved);
+      document.getElementById("date").value = date;
+      document.getElementById("note").value = note;
+    }
+
+    function resetForm() {
+      document.querySelectorAll("td[contenteditable]").forEach(td => td.textContent = "");
+      document.querySelectorAll("input[type='checkbox']").forEach(cb => cb.checked = false);
+      document.getElementById("note").value = "";
+      document.getElementById("date").value = "";
+    }
+
+    function getFormData() {
+      const date = document.getElementById("date").value;
+      const note = document.getElementById("note").value;
+      const rows = Array.from(document.querySelectorAll("#dispoTable tbody tr")).map(row =>
+        Array.from(row.children).map(cell => {
+          const input = cell.querySelector("input");
+          return input ? (input.type === "checkbox" ? input.checked : input.value) : cell.textContent.trim();
+        })
+      );
+      return { date, note, rows };
+    }
+
+    async function sendForm() {
+      const formData = getFormData();
+      try {
+        await fetch(ENDPOINT, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
+        alert("Envoyé !");
+      } catch (err) {
+        alert("Erreur d'envoi");
+        console.error(err);
+      }
+    }
+
+    window.onload = loadForm;
+  </script>
 </body>
 </html>

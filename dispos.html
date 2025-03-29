@@ -32,6 +32,11 @@
       justify-content: center;
       margin-bottom: 10px;
     }
+    td .check-icon {
+  color: #c62828;
+  font-size: 18px;
+}
+
     .top-bar input[type="date"] {
       padding: 8px 12px;
       font-size: 16px;
@@ -152,35 +157,48 @@
     </div>
   </div>
   <script>
-    function sendForm() {
-      const tableClone = document.getElementById("dispoTable").cloneNode(true);
-      const rows = tableClone.querySelectorAll("tbody tr");
-      rows.forEach(row => {
-        const cells = row.querySelectorAll("td");
-        const checkbox = cells[1].querySelector("input[type='checkbox']");
-        if (checkbox) {
-          const checked = checkbox.checked;
-          cells[1].innerHTML = checked ? '<span style="color:#c62828;font-size:18px">✔️</span>' : '';
-        }
-        for (let i = 0; i < cells.length; i++) {
-          if (i !== 1 && cells[i].hasAttribute("contenteditable")) {
-            cells[i].innerText = cells[i].innerText.trim().toUpperCase();
-          }
-        }
-      });
-      const data = {
-        note: document.getElementById("note").value,
-        date: document.getElementById("dateSelect").value,
-        table: tableClone.outerHTML
-      };
-      fetch("https://script.google.com/macros/s/AKfycbwR9UWGOJtqf3QRvwGCcvbobAnVri_5gzHam5zgktBaNcjwUcxkNoTRDT-ORZkIQ6E4ng/exec", {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      });
-      alert("Disponibilités envoyées !");
+function sendForm() {
+  const tableClone = document.getElementById("dispoTable").cloneNode(true);
+  const rows = tableClone.querySelectorAll("tbody tr");
+
+  rows.forEach(row => {
+    const cells = row.querySelectorAll("td");
+
+    const checkbox = cells[1].querySelector("input[type='checkbox']");
+    if (checkbox) {
+      const isChecked = checkbox.checked;
+      // Remplacer la cellule par une version visuelle directement dans l'HTML
+      cells[1].innerHTML = isChecked
+        ? '<span style="color:#c62828; font-size:18px;">✔️</span>'
+        : '';
     }
+
+    // Rendre toutes les autres cellules textuelles en majuscules
+    for (let i = 0; i < cells.length; i++) {
+      if (i !== 1 && cells[i].hasAttribute("contenteditable")) {
+        const text = cells[i].innerText.trim().toUpperCase();
+        cells[i].innerText = text;
+      }
+    }
+  });
+
+  const data = {
+    note: document.getElementById("note").value,
+    date: document.getElementById("dateSelect").value,
+    table: tableClone.outerHTML
+  };
+
+  fetch("https://script.google.com/macros/s/AKfycbwR9UWGOJtqf3QRvwGCcvbobAnVri_5gzHam5zgktBaNcjwUcxkNoTRDT-ORZkIQ6E4ng/exec", {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+
+  alert("Disponibilités envoyées !");
+}
+cells[1].innerHTML = isChecked ? '<span class="check-icon">✔️</span>' : '';
+
     function resetForm() {
       document.querySelectorAll("#dispoTable tbody tr").forEach(row => {
         const cells = row.querySelectorAll("td");

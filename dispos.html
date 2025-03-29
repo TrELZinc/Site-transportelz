@@ -4,222 +4,214 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Disponibilités</title>
-  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
+    html, body {
       margin: 0;
-      background: #f5f5f5;
-      padding: 1rem;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f4f4;
+      font-size: 16px;
     }
-
-    h1 {
-      text-align: center;
-      font-size: 2rem;
-      margin: 1rem 0;
+    header {
+      background-color: #000;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
     }
-
-    .date-wrapper {
+    header img {
+      height: 40px;
+    }
+    .container {
+      padding: 20px;
+      max-width: 1000px;
+      margin: auto;
+    }
+    .top-bar {
       display: flex;
       justify-content: center;
-      margin-bottom: 1rem;
+      margin-bottom: 10px;
     }
-
-    #date {
-      font-size: 1.3rem;
-      padding: 0.5rem;
-      border-radius: 8px;
+    .top-bar input[type="date"] {
+      padding: 8px 12px;
+      font-size: 16px;
+      border-radius: 4px;
       border: 1px solid #ccc;
-      width: 220px;
     }
-
-    #note {
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
+    textarea {
       width: 100%;
-      min-height: 4rem;
-      font-size: 1rem;
-      padding: 0.5rem;
-      margin-bottom: 1rem;
+      padding: 10px;
       border-radius: 8px;
       border: 1px solid #ccc;
+      resize: vertical;
       box-sizing: border-box;
+      font-size: 15px;
     }
-
-    .table-container {
+    .table-wrapper {
       overflow-x: auto;
+      margin-top: 20px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
-
     table {
+      min-width: 700px;
       width: 100%;
       border-collapse: collapse;
-      background: white;
-      min-width: 700px;
     }
-
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
     th {
-      background: #c62828;
+      background-color: #d32f2f;
       color: white;
-      padding: 0.75rem;
-      text-align: center;
+      font-weight: bold;
     }
-
-    td {
-      border: 1px solid #ddd;
-      text-align: center;
-      padding: 0.5rem;
-    }
-
-    input[type="text"], input[type="number"] {
-      width: 100%;
-      padding: 0.3rem;
-      font-size: 0.9rem;
+    td[contenteditable] {
+      outline: none;
       text-transform: uppercase;
-      box-sizing: border-box;
     }
-
-    input[type="number"] {
-      -moz-appearance: textfield;
+    th:nth-child(1), td:nth-child(1),
+    th:nth-child(3), td:nth-child(3),
+    th:nth-child(4), td:nth-child(4) {
+      width: 100px;
     }
-
-    input[type="checkbox"] {
-      transform: scale(1.2);
+    th:nth-child(6), td:nth-child(6) {
+      width: 240px;
     }
-
-    .button-group {
+    .buttons {
+      margin-top: 20px;
       display: flex;
       justify-content: center;
-      gap: 1rem;
-      margin-top: 1rem;
+      gap: 10px;
+      flex-wrap: wrap;
     }
-
-    .button-group button {
-      padding: 0.7rem 1.5rem;
-      font-size: 1rem;
-      font-weight: bold;
-      border-radius: 8px;
+    .buttons button {
+      padding: 12px 24px;
       border: none;
+      border-radius: 6px;
       color: white;
+      font-weight: bold;
+      font-size: 16px;
       cursor: pointer;
     }
-
-    .reset-btn { background-color: #ef5350; }
-    .save-btn { background-color: #4caf50; }
+    .reset-btn { background-color: #e74c3c; }
+    .save-btn { background-color: #2ecc71; }
     .send-btn { background-color: black; }
-
-    @media (max-width: 768px) {
-      .date-wrapper {
-        justify-content: center;
-      }
-
-      #date {
-        width: 80%;
-        font-size: 1.5rem;
-      }
-    }
   </style>
 </head>
 <body>
-  <h1>Disponibilités</h1>
-
-  <div class="date-wrapper">
-    <input type="date" id="date" />
+  <header>
+    <img src="assets/logo.jpeg" alt="Logo Transport ELZ">
+  </header>
+  <div class="container">
+    <div class="top-bar">
+      <input type="date" id="dateSelect" />
+    </div>
+    <label for="note">Note:</label>
+    <textarea id="note" rows="2"></textarea>
+    <div class="table-wrapper">
+      <table id="dispoTable">
+        <thead>
+          <tr>
+            <th>CHAUFFEUR</th><th>US</th><th>CAMION</th><th>REMORQUE</th><th>DÉPART</th><th>NOTE</th>
+          </tr>
+        </thead>
+        <tbody>
+                  </tbody>
+      </table>
+    </div>
+    <div class="buttons">
+      <button class="reset-btn" onclick="resetForm()">Reset</button>
+      <button class="save-btn" onclick="saveData()">Save</button>
+      <button class="send-btn" onclick="sendForm()">Send</button>
+    </div>
   </div>
-
-  <textarea id="note" placeholder="Note..."></textarea>
-
-  <div class="table-container">
-    <table id="dispoTable">
-      <thead>
-        <tr>
-          <th>CHAUFFEUR</th>
-          <th>US</th>
-          <th>CAMION</th>
-          <th>REMORQUE</th>
-          <th>DÉPART</th>
-          <th>NOTE</th>
-        </tr>
-      </thead>
-      <tbody>
-        " + [...Array(9)].map((_, i) => `
-        <tr>
-          <td><input type="text" class="form-input" style="text-transform:uppercase;" data-row="${i}" data-col="0" /></td>
-          <td><input type="checkbox" class="form-input" data-row="${i}" data-col="1" /></td>
-          <td><input type="number" class="form-input" inputmode="numeric" data-row="${i}" data-col="2" /></td>
-          <td><input type="number" class="form-input" inputmode="numeric" data-row="${i}" data-col="3" /></td>
-          <td><input type="text" class="form-input" style="text-transform:uppercase;" data-row="${i}" data-col="4" /></td>
-          <td><input type="text" class="form-input" style="text-transform:uppercase;" data-row="${i}" data-col="5" /></td>
-        </tr>`).join("") + "
-      </tbody>
-    </table>
-  </div>
-
-  <div class="button-group">
-    <button class="reset-btn" onclick="resetForm()">Reset</button>
-    <button class="save-btn" onclick="saveForm()">Save</button>
-    <button class="send-btn" onclick="sendForm()">Send</button>
-  </div>
-
   <script>
-    const ENDPOINT = "https://script.google.com/macros/s/AKfycbzk_y7NIfa4eksIvVbYcXHaI3Bzh5BG3gqpH8Z82k4OdUCrK_thMeSOQuw_is-d9S8DMA/exec";
-
-    function saveForm() {
-      const data = getFormData();
-      localStorage.setItem("formData", JSON.stringify(data));
+    function toggleUS(cell) {
+      const isChecked = cell.dataset.checked === "true";
+      cell.dataset.checked = (!isChecked).toString();
+      cell.innerHTML = !isChecked ? '✅<span style="display:none">OUI</span>' : '❌<span style="display:none">NON</span>';
     }
-
-    function loadForm() {
-      const saved = localStorage.getItem("formData");
-      if (!saved) return;
-      const { date, note, rows } = JSON.parse(saved);
-      document.getElementById("date").value = date;
-      document.getElementById("note").value = note;
-      rows.forEach((row, i) => {
-        row.forEach((val, j) => {
-          const input = document.querySelector(`[data-row="${i}"][data-col="${j}"]`);
-          if (!input) return;
-          if (input.type === "checkbox") input.checked = val;
-          else input.value = val;
-        });
-      });
-    }
-
-    function resetForm() {
-      document.querySelectorAll(".form-input").forEach(input => {
-        if (["3","4","5"].includes(input.dataset.col)) input.value = "";
-      });
-    }
-
-    function getFormData() {
-      const date = document.getElementById("date").value;
-      const note = document.getElementById("note").value;
-      const rows = [];
-      for (let i = 0; i < 9; i++) {
-        const row = [];
-        for (let j = 0; j < 6; j++) {
-          const input = document.querySelector(`[data-row="${i}"][data-col="${j}"]`);
-          row.push(input?.type === "checkbox" ? input.checked : input?.value.toUpperCase() || "");
+    function sendForm() {
+      const tableClone = document.getElementById("dispoTable").cloneNode(true);
+      const rows = tableClone.querySelectorAll("tbody tr");
+      rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        for (let i = 0; i < cells.length; i++) {
+          if (i === 1) {
+            const checked = cells[i].dataset.checked === "true";
+            cells[i].innerHTML = checked ? '✅' : '';
+          } else {
+            const text = cells[i].innerText.trim().toUpperCase();
+            cells[i].innerText = text;
+          }
         }
-        rows.push(row);
-      }
-      return { date, note, rows };
+      });
+      const data = {
+        note: document.getElementById("note").value,
+        date: document.getElementById("dateSelect").value,
+        table: tableClone.outerHTML
+      };
+      fetch("https://script.google.com/macros/s/AKfycbzk_y7NIfa4eksIvVbYcXHaI3Bzh5BG3gqpH8Z82k4OdUCrK_thMeSOQuw_is-d9S8DMA/exec", {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+      alert("Disponibilités envoyées !");
     }
-
-    async function sendForm() {
-      const formData = getFormData();
-      try {
-        await fetch(ENDPOINT, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
+    function resetForm() {
+      document.getElementById("note").value = "";
+      document.getElementById("dateSelect").value = "";
+      const rows = document.querySelectorAll("#dispoTable tbody tr");
+      rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        cells.forEach((cell, i) => {
+          if (i === 1) {
+            cell.dataset.checked = "false";
+            cell.innerHTML = "❌<span style='display:none'>NON</span>";
+          } else {
+            cell.textContent = "";
+          }
         });
-        alert("Envoyé !");
-      } catch (err) {
-        alert("Erreur d'envoi");
-        console.error(err);
+      });
+    }
+    function saveData() {
+      const table = document.getElementById("dispoTable");
+      const rows = table.querySelectorAll("tbody tr");
+      rows.forEach(row => {
+        const usCell = row.children[1];
+        const isChecked = usCell.innerText.trim() === '✅';
+        usCell.dataset.checked = isChecked ? "true" : "false";
+      });
+      const tableHTML = table.outerHTML;
+      localStorage.setItem("dispo_note", document.getElementById("note").value);
+      localStorage.setItem("dispo_date", document.getElementById("dateSelect").value);
+      localStorage.setItem("dispo_table", tableHTML);
+      alert("Données sauvegardées !");
+    }
+    window.onload = function () {
+      const savedNote = localStorage.getItem("dispo_note");
+      const savedDate = localStorage.getItem("dispo_date");
+      const savedTable = localStorage.getItem("dispo_table");
+      if (savedNote) document.getElementById("note").value = savedNote;
+      if (savedDate) document.getElementById("dateSelect").value = savedDate;
+      try {
+        if (savedTable && savedTable.includes("<table") && savedTable.includes("<td")) {
+          document.getElementById("dispoTable").outerHTML = savedTable;
+        }
+      } catch (e) {
+        console.warn("Échec du chargement localStorage, contenu ignoré.");
       }
     }
-
-    window.onload = loadForm;
   </script>
 </body>
 </html>

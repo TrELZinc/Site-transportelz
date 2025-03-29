@@ -68,6 +68,8 @@
       border: 1px solid #ccc;
       padding: 10px;
       text-align: center;
+      vertical-align: middle;
+      height: 48px; /* Hauteur uniforme */
     }
     th {
       background-color: #d32f2f;
@@ -77,6 +79,18 @@
     td[contenteditable] {
       outline: none;
       text-transform: uppercase;
+    }
+    .us-cell {
+      font-size: 20px;
+      vertical-align: middle;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .us-cell span {
+      font-size: 20px;
+      display: inline-block;
+      line-height: 1;
+      vertical-align: middle;
     }
     th:nth-child(1), td:nth-child(1),
     th:nth-child(3), td:nth-child(3),
@@ -106,7 +120,7 @@
     .save-btn { background-color: #2ecc71; }
     .send-btn { background-color: black; }
 
-    /* Mobile responsive tweaks */
+    /* Mobile tweaks */
     @media (max-width: 600px) {
       table {
         font-size: 13px;
@@ -156,7 +170,7 @@
       const row = document.createElement("tr");
       row.innerHTML = `
         <td contenteditable></td>
-        <td class="us-cell" onclick="toggleUS(this)" style="cursor:pointer;">❌</td>
+        <td class="us-cell" onclick="toggleUS(this)">❌</td>
         <td contenteditable inputmode="numeric"></td>
         <td contenteditable inputmode="numeric"></td>
         <td contenteditable></td>
@@ -168,7 +182,7 @@
     function toggleUS(cell) {
       cell.innerHTML = cell.innerHTML.includes("✔️")
         ? "❌"
-        : '<span style="color:#c62828; font-size:18px;">✔️</span>';
+        : '<span style="color:#c62828;">✔️</span>';
     }
 
     function generateDefaultRows(n = 9) {
@@ -198,7 +212,7 @@
         table: tableClone.outerHTML
       };
 
-      fetch("https://script.google.com/macros/s/AKfycbwR9UWGOJtqf3QRvwGCcvbobAnVri_5gzHam5zgktBaNcjwUcxkNoTRDT-ORZkIQ6E4ng/exec", {
+      fetch("https://script.google.com/macros/s/AKfycbzj3QhdqZOeLsP3Rhk0Hq4H5s7avwsKk6sDoDCFD_84ihHqIh8EpvNmmMyz1oZt2fPLTg/exec", {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/json" },

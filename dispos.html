@@ -41,6 +41,7 @@
       margin-bottom: 1rem;
       border-radius: 8px;
       border: 1px solid #ccc;
+      box-sizing: border-box;
     }
 
     .table-container {
@@ -72,6 +73,11 @@
       padding: 0.3rem;
       font-size: 0.9rem;
       text-transform: uppercase;
+      box-sizing: border-box;
+    }
+
+    input[type="number"] {
+      -moz-appearance: textfield;
     }
 
     input[type="checkbox"] {
@@ -133,16 +139,15 @@
         </tr>
       </thead>
       <tbody>
-        <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-        <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-        <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-        <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-        <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-        <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-        <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-        <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-        <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
-        <tr><td contenteditable></td><td><input type="checkbox" /></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td></tr>
+        " + [...Array(9)].map((_, i) => `
+        <tr>
+          <td><input type="text" class="form-input" style="text-transform:uppercase;" data-row="${i}" data-col="0" /></td>
+          <td><input type="checkbox" class="form-input" data-row="${i}" data-col="1" /></td>
+          <td><input type="number" class="form-input" inputmode="numeric" data-row="${i}" data-col="2" /></td>
+          <td><input type="number" class="form-input" inputmode="numeric" data-row="${i}" data-col="3" /></td>
+          <td><input type="text" class="form-input" style="text-transform:uppercase;" data-row="${i}" data-col="4" /></td>
+          <td><input type="text" class="form-input" style="text-transform:uppercase;" data-row="${i}" data-col="5" /></td>
+        </tr>`).join("") + "
       </tbody>
     </table>
   </div>
@@ -154,7 +159,7 @@
   </div>
 
   <script>
-    const ENDPOINT = "https://script.google.com/macros/s/AKfycbyh4KpQJTR6tdPZyVeNimUVMpMNXQQ2QPTJmDKPs4Y5cVYUUO6NLjBR1YvLD3N-rQALwg/exec";
+    const ENDPOINT = "https://script.google.com/macros/s/AKfycbzk_y7NIfa4eksIvVbYcXHaI3Bzh5BG3gqpH8Z82k4OdUCrK_thMeSOQuw_is-d9S8DMA/exec";
 
     function saveForm() {
       const data = getFormData();
@@ -164,27 +169,37 @@
     function loadForm() {
       const saved = localStorage.getItem("formData");
       if (!saved) return;
-      const { date, note } = JSON.parse(saved);
+      const { date, note, rows } = JSON.parse(saved);
       document.getElementById("date").value = date;
       document.getElementById("note").value = note;
+      rows.forEach((row, i) => {
+        row.forEach((val, j) => {
+          const input = document.querySelector(`[data-row="${i}"][data-col="${j}"]`);
+          if (!input) return;
+          if (input.type === "checkbox") input.checked = val;
+          else input.value = val;
+        });
+      });
     }
 
     function resetForm() {
-      document.querySelectorAll("td[contenteditable]").forEach(td => td.textContent = "");
-      document.querySelectorAll("input[type='checkbox']").forEach(cb => cb.checked = false);
-      document.getElementById("note").value = "";
-      document.getElementById("date").value = "";
+      document.querySelectorAll(".form-input").forEach(input => {
+        if (["3","4","5"].includes(input.dataset.col)) input.value = "";
+      });
     }
 
     function getFormData() {
       const date = document.getElementById("date").value;
       const note = document.getElementById("note").value;
-      const rows = Array.from(document.querySelectorAll("#dispoTable tbody tr")).map(row =>
-        Array.from(row.children).map(cell => {
-          const input = cell.querySelector("input");
-          return input ? (input.type === "checkbox" ? input.checked : input.value) : cell.textContent.trim();
-        })
-      );
+      const rows = [];
+      for (let i = 0; i < 9; i++) {
+        const row = [];
+        for (let j = 0; j < 6; j++) {
+          const input = document.querySelector(`[data-row="${i}"][data-col="${j}"]`);
+          row.push(input?.type === "checkbox" ? input.checked : input?.value.toUpperCase() || "");
+        }
+        rows.push(row);
+      }
       return { date, note, rows };
     }
 

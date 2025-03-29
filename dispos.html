@@ -32,11 +32,6 @@
       justify-content: center;
       margin-bottom: 10px;
     }
-    td .check-icon {
-  color: #c62828;
-  font-size: 18px;
-}
-
     .top-bar input[type="date"] {
       padding: 8px 12px;
       font-size: 16px;
@@ -76,11 +71,8 @@
     }
     th {
       background-color: #d32f2f;
-      color: #333;
+      color: white;
       font-weight: bold;
-    }
-    td {
-      
     }
     td[contenteditable] {
       outline: none;
@@ -137,17 +129,7 @@
             <th>CHAUFFEUR</th><th>US</th><th>CAMION</th><th>REMORQUE</th><th>DÉPART</th><th>NOTE</th>
           </tr>
         </thead>
-        <tbody>
-        
-          <tr>
-            <td contenteditable></td>
-            <td><input type="checkbox" class="us-checkbox" data-col="1"></td>
-            <td contenteditable inputmode="numeric"></td>
-            <td contenteditable inputmode="numeric"></td>
-            <td contenteditable></td>
-            <td contenteditable></td>
-          </tr>
-        </tbody>
+        <tbody id="tableBody"></tbody>
       </table>
     </div>
     <div class="buttons">
@@ -156,70 +138,90 @@
       <button class="send-btn" onclick="sendForm()">Send</button>
     </div>
   </div>
+
   <script>
-function sendForm() {
-  const tableClone = document.getElementById("dispoTable").cloneNode(true);
-  const rows = tableClone.querySelectorAll("tbody tr");
-
-  rows.forEach(row => {
-    const cells = row.querySelectorAll("td");
-
-    const checkbox = cells[1].querySelector("input[type='checkbox']");
-    if (checkbox) {
-      const isChecked = checkbox.checked;
-      // Remplacer la cellule par une version visuelle directement dans l'HTML
-      cells[1].innerHTML = isChecked
-        ? '<span style="color:#c62828; font-size:18px;">✔️</span>'
-        : '';
+    function createRow() {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td contenteditable></td>
+        <td><input type="checkbox" class="us-checkbox" data-col="1"></td>
+        <td contenteditable inputmode="numeric"></td>
+        <td contenteditable inputmode="numeric"></td>
+        <td contenteditable></td>
+        <td contenteditable></td>
+      `;
+      return row;
     }
 
-    // Rendre toutes les autres cellules textuelles en majuscules
-    for (let i = 0; i < cells.length; i++) {
-      if (i !== 1 && cells[i].hasAttribute("contenteditable")) {
-        const text = cells[i].innerText.trim().toUpperCase();
-        cells[i].innerText = text;
+    function generateDefaultRows(n = 9) {
+      const tbody = document.getElementById("tableBody");
+      tbody.innerHTML = "";
+      for (let i = 0; i < n; i++) {
+        tbody.appendChild(createRow());
       }
     }
-  });
 
-  const data = {
-    note: document.getElementById("note").value,
-    date: document.getElementById("dateSelect").value,
-    table: tableClone.outerHTML
-  };
+    function sendForm() {
+      const tableClone = document.getElementById("dispoTable").cloneNode(true);
+      const rows = tableClone.querySelectorAll("tbody tr");
 
-  fetch("https://script.google.com/macros/s/AKfycbwR9UWGOJtqf3QRvwGCcvbobAnVri_5gzHam5zgktBaNcjwUcxkNoTRDT-ORZkIQ6E4ng/exec", {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  });
+      rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        const checkbox = cells[1].querySelector("input[type='checkbox']");
+        if (checkbox) {
+          const isChecked = checkbox.checked;
+          cells[1].innerHTML = isChecked ? '<span style="color:#c62828; font-size:18px;">✔️</span>' : '';
+        }
+        for (let i = 0; i < cells.length; i++) {
+          if (i !== 1 && cells[i].hasAttribute("contenteditable")) {
+            cells[i].innerText = cells[i].innerText.trim().toUpperCase();
+          }
+        }
+      });
 
-  alert("Disponibilités envoyées !");
-}
-cells[1].innerHTML = isChecked ? '<span class="check-icon">✔️</span>' : '';
+      const data = {
+        note: document.getElementById("note").value,
+        date: document.getElementById("dateSelect").value,
+        table: tableClone.outerHTML
+      };
+
+      fetch("https://script.google.com/macros/s/AKfycbwR9UWGOJtqf3QRvwGCcvbobAnVri_5gzHam5zgktBaNcjwUcxkNoTRDT-ORZkIQ6E4ng/exec", {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      alert("Disponibilités envoyées !");
+    }
 
     function resetForm() {
-      document.querySelectorAll("#dispoTable tbody tr").forEach(row => {
-        const cells = row.querySelectorAll("td");
-        if (cells[3]) cells[3].textContent = "";
-        if (cells[4]) cells[4].textContent = "";
-        if (cells[5]) cells[5].textContent = "";
-      });
+      document.getElementById("note").value = "";
+      document.getElementById("dateSelect").value = "";
+      localStorage.clear();
+      generateDefaultRows(9);
     }
+
     function saveData() {
       localStorage.setItem("dispo_note", document.getElementById("note").value);
       localStorage.setItem("dispo_date", document.getElementById("dateSelect").value);
       localStorage.setItem("dispo_table", document.getElementById("dispoTable").outerHTML);
       alert("Données sauvegardées !");
     }
+
     window.onload = function () {
       const note = localStorage.getItem("dispo_note");
       const date = localStorage.getItem("dispo_date");
       const table = localStorage.getItem("dispo_table");
+
       if (note) document.getElementById("note").value = note;
       if (date) document.getElementById("dateSelect").value = date;
-      if (table) document.getElementById("dispoTable").outerHTML = table;
+
+      if (table) {
+        document.getElementById("dispoTable").outerHTML = table;
+      } else {
+        generateDefaultRows(9);
+      }
     }
   </script>
 </body>

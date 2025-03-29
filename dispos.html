@@ -152,7 +152,8 @@
       rows.forEach(row => {
         const cells = row.querySelectorAll("td");
         const checkbox = cells[1].querySelector("input[type='checkbox']");
-        cells[1].innerText = checkbox && checkbox.checked ? '✔' : '';
+        const checked = checkbox && checkbox.checked;
+        cells[1].innerHTML = checked ? '✔️' : '';
       });
       const data = {
         note: document.getElementById("note").value,
@@ -191,10 +192,8 @@
       const savedNote = localStorage.getItem("dispo_note");
       const savedDate = localStorage.getItem("dispo_date");
       const savedTable = localStorage.getItem("dispo_table");
-
       if (savedNote) document.getElementById("note").value = savedNote;
       if (savedDate) document.getElementById("dateSelect").value = savedDate;
-
       try {
         if (savedTable && savedTable.includes("<table") && savedTable.includes("<td")) {
           document.getElementById("dispoTable").outerHTML = savedTable;

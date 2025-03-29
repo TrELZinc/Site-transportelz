@@ -125,7 +125,16 @@
           </tr>
         </thead>
         <tbody>
-                  </tbody>
+          " + [...Array(9)].map((_, i) => `
+          <tr>
+            <td contenteditable></td>
+            <td><input type="checkbox" data-col="1" class="us-checkbox"></td>
+            <td contenteditable inputmode="numeric"></td>
+            <td contenteditable inputmode="numeric"></td>
+            <td contenteditable></td>
+            <td contenteditable></td>
+          </tr>`).join("") + "
+        </tbody>
       </table>
     </div>
     <div class="buttons">
@@ -135,23 +144,18 @@
     </div>
   </div>
   <script>
-    function toggleUS(cell) {
-      const isChecked = cell.dataset.checked === "true";
-      cell.dataset.checked = (!isChecked).toString();
-      cell.innerHTML = !isChecked ? '✅<span style="display:none">OUI</span>' : '❌<span style="display:none">NON</span>';
-    }
     function sendForm() {
       const tableClone = document.getElementById("dispoTable").cloneNode(true);
       const rows = tableClone.querySelectorAll("tbody tr");
       rows.forEach(row => {
         const cells = row.querySelectorAll("td");
+        const checkbox = cells[1].querySelector("input[type='checkbox']");
+        if (checkbox) {
+          cells[1].innerHTML = checkbox.checked ? '<span style="color:#c62828;font-size:18px">✔️</span>' : '';
+        }
         for (let i = 0; i < cells.length; i++) {
-          if (i === 1) {
-            const checked = cells[i].dataset.checked === "true";
-            cells[i].innerHTML = checked ? '✅' : '';
-          } else {
-            const text = cells[i].innerText.trim().toUpperCase();
-            cells[i].innerText = text;
+          if (i !== 1 && cells[i].hasAttribute("contenteditable")) {
+            cells[i].innerText = cells[i].innerText.trim().toUpperCase();
           }
         }
       });
@@ -160,7 +164,7 @@
         date: document.getElementById("dateSelect").value,
         table: tableClone.outerHTML
       };
-      fetch("https://script.google.com/macros/s/AKfycbzk_y7NIfa4eksIvVbYcXHaI3Bzh5BG3gqpH8Z82k4OdUCrK_thMeSOQuw_is-d9S8DMA/exec", {
+      fetch("https://script.google.com/macros/s/AKfycbyKgJ9_7bQ__BTi_Qs2CqVQb7RriTkRfG5IqzhWUMgcq-951lD2QIFDqyHazO1aMJ1fRQ/exec", {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/json" },
@@ -169,48 +173,26 @@
       alert("Disponibilités envoyées !");
     }
     function resetForm() {
-      document.getElementById("note").value = "";
-      document.getElementById("dateSelect").value = "";
-      const rows = document.querySelectorAll("#dispoTable tbody tr");
-      rows.forEach(row => {
+      document.querySelectorAll("#dispoTable tbody tr").forEach(row => {
         const cells = row.querySelectorAll("td");
-        cells.forEach((cell, i) => {
-          if (i === 1) {
-            cell.dataset.checked = "false";
-            cell.innerHTML = "❌<span style='display:none'>NON</span>";
-          } else {
-            cell.textContent = "";
-          }
-        });
+        if (cells[3]) cells[3].textContent = "";
+        if (cells[4]) cells[4].textContent = "";
+        if (cells[5]) cells[5].textContent = "";
       });
     }
     function saveData() {
-      const table = document.getElementById("dispoTable");
-      const rows = table.querySelectorAll("tbody tr");
-      rows.forEach(row => {
-        const usCell = row.children[1];
-        const isChecked = usCell.innerText.trim() === '✅';
-        usCell.dataset.checked = isChecked ? "true" : "false";
-      });
-      const tableHTML = table.outerHTML;
       localStorage.setItem("dispo_note", document.getElementById("note").value);
       localStorage.setItem("dispo_date", document.getElementById("dateSelect").value);
-      localStorage.setItem("dispo_table", tableHTML);
+      localStorage.setItem("dispo_table", document.getElementById("dispoTable").outerHTML);
       alert("Données sauvegardées !");
     }
     window.onload = function () {
-      const savedNote = localStorage.getItem("dispo_note");
-      const savedDate = localStorage.getItem("dispo_date");
-      const savedTable = localStorage.getItem("dispo_table");
-      if (savedNote) document.getElementById("note").value = savedNote;
-      if (savedDate) document.getElementById("dateSelect").value = savedDate;
-      try {
-        if (savedTable && savedTable.includes("<table") && savedTable.includes("<td")) {
-          document.getElementById("dispoTable").outerHTML = savedTable;
-        }
-      } catch (e) {
-        console.warn("Échec du chargement localStorage, contenu ignoré.");
-      }
+      const note = localStorage.getItem("dispo_note");
+      const date = localStorage.getItem("dispo_date");
+      const table = localStorage.getItem("dispo_table");
+      if (note) document.getElementById("note").value = note;
+      if (date) document.getElementById("dateSelect").value = date;
+      if (table) document.getElementById("dispoTable").outerHTML = table;
     }
   </script>
 </body>

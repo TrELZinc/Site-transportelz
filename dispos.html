@@ -183,34 +183,47 @@
       }
     }
 
-    function sendForm() {
-      const tableClone = document.getElementById("dispoTable").cloneNode(true);
-      const rows = tableClone.querySelectorAll("tbody tr");
+function sendForm() {
+  const tableClone = document.getElementById("dispoTable").cloneNode(true);
+  const rows = tableClone.querySelectorAll("tbody tr");
 
-      rows.forEach(row => {
-        const cells = row.querySelectorAll("td");
-        for (let i = 0; i < cells.length; i++) {
-          if (i !== 1 && cells[i].hasAttribute("contenteditable")) {
-            cells[i].innerText = cells[i].innerText.trim().toUpperCase();
-          }
+  rows.forEach(row => {
+    const cells = row.querySelectorAll("td");
+
+    // Boucle sur toutes les colonnes
+    for (let i = 0; i < cells.length; i++) {
+      const cell = cells[i];
+
+      // Si c’est une cellule US (colonne index 1)
+      if (i === 1) {
+        const isChecked = cell.querySelector("input[type='checkbox']")?.checked;
+        cell.innerHTML = isChecked
+          ? '<span style="font-size:16px;">✔️</span>'
+          : '<span style="font-size:16px;">❌</span>';
+      } else {
+        if (cell.hasAttribute("contenteditable")) {
+          cell.innerText = cell.innerText.trim().toUpperCase();
         }
-      });
-
-      const data = {
-        note: document.getElementById("note").value,
-        date: document.getElementById("dateSelect").value,
-        table: tableClone.outerHTML
-      };
-
-      fetch("https://script.google.com/macros/s/AKfycbyl9Qu_Znz4h3DgHCwaqwpxfM6N1c-YfErZCtt6KmulSoZgPpfy2Wa-ElVJxJiFamSGSw/exec", {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      });
-
-      alert("Disponibilités envoyées !");
+      }
     }
+  });
+
+  const data = {
+    note: document.getElementById("note").value,
+    date: document.getElementById("dateSelect").value,
+    table: tableClone.outerHTML
+  };
+
+  fetch("https://script.google.com/macros/s/AKfycbyl9Qu_Znz4h3DgHCwaqwpxfM6N1c-YfErZCtt6KmulSoZgPpfy2Wa-ElVJxJiFamSGSw/exec", {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+
+  alert("Disponibilités envoyées !");
+}
+
 
     function resetForm() {
       document.getElementById("note").value = "";

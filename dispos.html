@@ -71,8 +71,11 @@
     }
     th {
       background-color: #d32f2f;
-      color: white;
+      color: #333;
       font-weight: bold;
+    }
+    td {
+      
     }
     td[contenteditable] {
       outline: none;
@@ -85,6 +88,11 @@
     }
     th:nth-child(6), td:nth-child(6) {
       width: 240px;
+    }
+    input[type="checkbox"].us-checkbox {
+      transform: scale(1.4);
+      accent-color: #c62828;
+      cursor: pointer;
     }
     .buttons {
       margin-top: 20px;
@@ -128,7 +136,7 @@
         
           <tr>
             <td contenteditable></td>
-            <td><input type="checkbox" data-col="1" class="us-checkbox"></td>
+            <td><input type="checkbox" class="us-checkbox" data-col="1"></td>
             <td contenteditable inputmode="numeric"></td>
             <td contenteditable inputmode="numeric"></td>
             <td contenteditable></td>
@@ -151,7 +159,8 @@
         const cells = row.querySelectorAll("td");
         const checkbox = cells[1].querySelector("input[type='checkbox']");
         if (checkbox) {
-          cells[1].innerHTML = checkbox.checked ? '<span style="color:#c62828;font-size:18px">✔️</span>' : '';
+          const checked = checkbox.checked;
+          cells[1].innerHTML = checked ? '<span style="color:#c62828;font-size:18px">✔️</span>' : '';
         }
         for (let i = 0; i < cells.length; i++) {
           if (i !== 1 && cells[i].hasAttribute("contenteditable")) {
@@ -164,7 +173,7 @@
         date: document.getElementById("dateSelect").value,
         table: tableClone.outerHTML
       };
-      fetch("https://script.google.com/macros/s/AKfycbyKgJ9_7bQ__BTi_Qs2CqVQb7RriTkRfG5IqzhWUMgcq-951lD2QIFDqyHazO1aMJ1fRQ/exec", {
+      fetch("https://script.google.com/macros/s/AKfycbwR9UWGOJtqf3QRvwGCcvbobAnVri_5gzHam5zgktBaNcjwUcxkNoTRDT-ORZkIQ6E4ng/exec", {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/json" },

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Disponibilités</title>
   <style>
-    body {
+    html, body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
       background-color: #f4f4f4;
@@ -191,9 +191,17 @@
       const savedNote = localStorage.getItem("dispo_note");
       const savedDate = localStorage.getItem("dispo_date");
       const savedTable = localStorage.getItem("dispo_table");
+
       if (savedNote) document.getElementById("note").value = savedNote;
       if (savedDate) document.getElementById("dateSelect").value = savedDate;
-      if (savedTable) document.getElementById("dispoTable").outerHTML = savedTable;
+
+      try {
+        if (savedTable && savedTable.includes("<table") && savedTable.includes("<td")) {
+          document.getElementById("dispoTable").outerHTML = savedTable;
+        }
+      } catch (e) {
+        console.warn("Échec du chargement localStorage, contenu ignoré.");
+      }
     }
   </script>
 </body>

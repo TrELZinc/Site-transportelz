@@ -189,21 +189,30 @@ function sendForm() {
 
   rows.forEach(row => {
     const cells = row.querySelectorAll("td");
+    let isRowEmpty = true;
 
-    // Boucle sur toutes les colonnes
+    // Analyse si ligne vide sauf colonne US
+    for (let i = 0; i < cells.length; i++) {
+      if (i === 1) continue; // skip colonne US
+      const text = cells[i]?.innerText?.trim();
+      if (text) {
+        isRowEmpty = false;
+        break;
+      }
+    }
+
     for (let i = 0; i < cells.length; i++) {
       const cell = cells[i];
 
-      // Si c’est une cellule US (colonne index 1)
       if (i === 1) {
         const isChecked = cell.querySelector("input[type='checkbox']")?.checked;
-        cell.innerHTML = isChecked
-          ? '<span style="font-size:16px;">✔️</span>'
-          : '<span style="font-size:16px;">❌</span>';
-      } else {
-        if (cell.hasAttribute("contenteditable")) {
-          cell.innerText = cell.innerText.trim().toUpperCase();
+        if (isChecked) {
+          cell.innerHTML = '<span style="font-size:16px;">✔️</span>';
+        } else {
+          cell.innerHTML = isRowEmpty ? '' : '<span style="font-size:16px;">❌</span>';
         }
+      } else if (cell.hasAttribute("contenteditable")) {
+        cell.innerText = cell.innerText.trim().toUpperCase();
       }
     }
   });
@@ -223,7 +232,6 @@ function sendForm() {
 
   alert("Disponibilités envoyées !");
 }
-
 
     function resetForm() {
       document.getElementById("note").value = "";

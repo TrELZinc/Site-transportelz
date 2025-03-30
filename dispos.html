@@ -375,6 +375,99 @@ window.onload = function () {
 });
 
 </script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const table = document.getElementById("dispoTable");
+
+  const arrowBtn = document.createElement("button");
+  arrowBtn.textContent = "➡️";
+  arrowBtn.className = "arrow-next";
+  arrowBtn.style.position = "absolute";
+  arrowBtn.style.zIndex = 1000;
+  arrowBtn.style.display = "none";
+  arrowBtn.style.padding = "2px 6px";
+  arrowBtn.style.fontSize = "14px";
+  arrowBtn.style.borderRadius = "6px";
+  arrowBtn.style.background = "#111";
+  arrowBtn.style.color = "#fff";
+  arrowBtn.style.border = "none";
+  arrowBtn.style.boxShadow = "0 2px 4px rgba(0,0,0,0.3)";
+  document.body.appendChild(arrowBtn);
+
+  let currentCell = null;
+
+  table.addEventListener("focusin", (e) => {
+    if (e.target.tagName === "TD" && e.target.hasAttribute("contenteditable")) {
+      currentCell = e.target;
+      const rect = currentCell.getBoundingClientRect();
+      arrowBtn.style.top = `${window.scrollY + rect.top + 5}px`;
+      arrowBtn.style.left = `${window.scrollX + rect.right + 5}px`;
+      arrowBtn.style.display = "inline-block";
+    }
+  });
+
+  document.addEventListener("scroll", () => {
+    if (!currentCell) return;
+    const rect = currentCell.getBoundingClientRect();
+    arrowBtn.style.top = `${window.scrollY + rect.top + 5}px`;
+    arrowBtn.style.left = `${window.scrollX + rect.right + 5}px`;
+  });
+
+  arrowBtn.addEventListener("click", () => {
+  if (!currentCell) return;
+  const row = currentCell.closest("tr");
+  const cells = Array.from(row.querySelectorAll("td[contenteditable]"));
+  const idx = cells.indexOf(currentCell);
+
+  let next = null;
+
+  if (idx < cells.length - 1) {
+    next = cells[idx + 1];
+  } else {
+    const nextRow = row.nextElementSibling;
+    if (nextRow) {
+      const nextCells = Array.from(nextRow.querySelectorAll("td[contenteditable]"));
+      if (nextCells.length) next = nextCells[0];
+    }
+  }
+
+  if (next) {
+    next.focus();
+    currentCell = next;
+
+    // ⏱ attendre le rendu avant scroll
+    setTimeout(() => {
+      next.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center"
+      });
+
+      const rect = next.getBoundingClientRect();
+      arrowBtn.style.top = `${window.scrollY + rect.top + 5}px`;
+      arrowBtn.style.left = `${window.scrollX + rect.right + 5}px`;
+    }, 50);
+  }
+});
+
+
+    // update position of the arrow
+    const rect = next.getBoundingClientRect();
+    arrowBtn.style.top = `${window.scrollY + rect.top + 5}px`;
+    arrowBtn.style.left = `${window.scrollX + rect.right + 5}px`;
+
+    currentCell = next;
+  }
+});
+
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest("td") && e.target !== arrowBtn) {
+      arrowBtn.style.display = "none";
+      currentCell = null;
+    }
+  });
+});
+</script>
 
 </body>
 </html>

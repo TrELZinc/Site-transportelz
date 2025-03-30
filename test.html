@@ -14,15 +14,8 @@
     header {
       background-color: #111;
       padding: 10px 20px;
-      margin: 0;
       width: 100vw;
       box-sizing: border-box;
-      overflow: hidden;
-      position: relative;
-      left: 50%;
-      right: 50%;
-      margin-left: -50vw;
-      margin-right: -50vw;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -104,7 +97,7 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
     table {
-      min-width: 700px;
+      min-width: 900px;
       width: 100%;
       border-collapse: collapse;
     }
@@ -123,18 +116,6 @@
     td[contenteditable] {
       outline: none;
       text-transform: uppercase;
-    }
-    .us-cell {
-      font-size: 16px;
-      vertical-align: middle;
-      line-height: 1;
-      cursor: pointer;
-    }
-    .us-cell span {
-      font-size: 16px;
-      display: inline-block;
-      line-height: 1;
-      vertical-align: middle;
     }
     .buttons {
       margin-top: 20px;
@@ -175,16 +156,13 @@
         height: 32px;
         font-size: 14px;
       }
-      .us-cell {
-        font-size: 14px !important;
-      }
     }
   </style>
 </head>
 <body>
   <header>
     <img src="assets/logo.jpeg" alt="Logo Transport ELZ">
-    <div class="menu-toggle" id="hamburger">
+    <div class="menu-toggle" onclick="document.getElementById('menuDropdown').classList.toggle('show')">
       <span></span>
       <span></span>
       <span></span>
@@ -204,7 +182,7 @@
       <table id="dispoTable">
         <thead>
           <tr>
-            <th>CHAUFFEUR</th><th>US</th><th>CAMION</th><th>REMORQUE</th><th>DÉPART</th><th>NOTE</th>
+            <th>RANG</th><th>CLIENT</th><th>TYPE</th><th>DÉPART</th><th>LIVRAISON</th><th>CHAUFFEUR</th><th>CAMION</th><th>REMORQUE</th><th>COPIE</th>
           </tr>
         </thead>
         <tbody id="tableBody"></tbody>
@@ -217,34 +195,146 @@
     </div>
   </div>
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const toggle = document.getElementById("hamburger");
-      const menu = document.getElementById("menuDropdown");
+function createRow() {
+  const row = document.createElement("tr");
+  row.innerHTML = `
+    <td contenteditable></td>
+    <td class="us-cell" onclick="toggleUS(this)" style="font-size:16px;">❌</td>
+    <td contenteditable inputmode="numeric"></td>
+    <td contenteditable inputmode="numeric"></td>
+    <td contenteditable></td>
+    <td contenteditable></td>
+  `;
+  return row;
+}
 
-      toggle.addEventListener("click", function () {
-        menu.classList.toggle("show");
-      });
+function generateDefaultRows(n = 9) {
+  const tbody = document.getElementById("tableBody");
+  tbody.innerHTML = "";
+  for (let i = 0; i < n; i++) {
+    tbody.appendChild(createRow());
+  }
+}
 
-      const tableBody = document.getElementById("tableBody");
-      for (let i = 0; i < 9; i++) {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td contenteditable></td>
-          <td class="us-cell" onclick="toggleUS(this)" style="font-size:16px;">❌</td>
-          <td contenteditable inputmode="numeric"></td>
-          <td contenteditable inputmode="numeric"></td>
-          <td contenteditable></td>
-          <td contenteditable></td>
-        `;
-        tableBody.appendChild(row);
+function toggleUS(cell) {
+  cell.innerHTML = cell.innerHTML.includes("✔️")
+    ? "❌"
+    : '<span style="color:#c62828; font-size:16px;">✔️</span>';
+}
+
+function sendForm() {
+  const tableClone = document.getElementById("dispoTable").cloneNode(true);
+  const rows = tableClone.querySelectorAll("tbody tr");
+
+  rows.forEach(row => {
+    const cells = row.querySelectorAll("td");
+    let isRowEmpty = true;
+
+    for (let i = 0; i < cells.length; i++) {
+      if (i === 1) continue;
+      const text = cells[i]?.innerText?.trim();
+      if (text) {
+        isRowEmpty = false;
+        break;
       }
+    }
+
+    for (let i = 0; i < cells.length; i++) {
+      const cell = cells[i];
+
+      if (i === 1) {
+        const content = cell.textContent.trim();
+        const isChecked =
+          content.includes("✔️") || content.includes("✅") ||
+          cell.querySelector("input[type='checkbox']")?.checked;
+
+        if (isChecked) {
+          cell.innerHTML = '<span style="font-size:16px;">✔️</span>';
+        } else {
+          cell.innerHTML = isRowEmpty ? '' : '<span style="font-size:16px;">❌</span>';
+        }
+      } else if (cell.hasAttribute("contenteditable")) {
+        cell.innerText = cell.innerText.trim().toUpperCase();
+      }
+    }
+  });
+
+  const data = {
+    note: document.getElementById("note").value,
+    date: document.getElementById("dateSelect").value,
+    table: tableClone.outerHTML
+  };
+
+  fetch("https://script.google.com/macros/s/AKfycbyYx7yTmj4bnKtr6EvLf0qGSObYt0t6rs9xUEZ1q2ANniFoRDW-wP4etQ7kOMZSVgA_Xw/exec", {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+
+  alert("Disponibilités envoyées !");
+}
+
+function resetForm() {
+  document.getElementById("note").value = "";
+  document.getElementById("dateSelect").value = "";
+  localStorage.clear();
+
+  const rows = document.querySelectorAll("#tableBody tr");
+  rows.forEach(row => {
+    const cells = row.querySelectorAll("td");
+    if (cells[3]) cells[3].textContent = "";
+    if (cells[4]) cells[4].textContent = "";
+    if (cells[5]) cells[5].textContent = "";
+  });
+}
+
+function saveData() {
+  try {
+    const table = document.getElementById("dispoTable");
+    if (!table) throw new Error("Table introuvable");
+
+    localStorage.setItem("dispo_note", document.getElementById("note").value);
+    localStorage.setItem("dispo_date", document.getElementById("dateSelect").value);
+    localStorage.setItem("dispo_table", table.outerHTML);
+    alert("Données sauvegardées !");
+  } catch (err) {
+    alert("Erreur lors de la sauvegarde : " + err.message);
+  }
+}
+
+window.onload = function () {
+  const note = localStorage.getItem("dispo_note");
+  const date = localStorage.getItem("dispo_date");
+  const table = localStorage.getItem("dispo_table");
+
+  if (note) document.getElementById("note").value = note;
+  if (date) document.getElementById("dateSelect").value = date;
+
+  if (table) {
+    document.getElementById("dispoTable").outerHTML = table;
+  } else {
+    generateDefaultRows(9);
+  }
+};
+       
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const toggle = document.getElementById("hamburger");
+    const menu = document.getElementById("menuDropdown");
+
+    toggle.addEventListener("click", function () {
+      menu.classList.toggle("show");
     });
 
-    function toggleUS(cell) {
-      cell.innerHTML = cell.innerHTML.includes("✔️")
-        ? "❌"
-        : '<span style="color:#c62828; font-size:16px;">✔️</span>';
-    }
-  </script>
+    document.addEventListener("click", function (e) {
+      if (!toggle.contains(e.target) && !menu.contains(e.target)) {
+        menu.classList.remove("show");
+      }
+    });
+  });
+</script>
+
 </body>
 </html>

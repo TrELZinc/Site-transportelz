@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Disponibilités</title>
+  <title>Sommaire</title>
   <style>
     html, body {
       margin: 0;
@@ -203,191 +203,136 @@
     </div>
   </div>
   <script>
-    function createRow() {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td contenteditable></td>
-        <td contenteditable></td>
-        <td contenteditable></td>
-        <td contenteditable></td>
-        <td contenteditable></td>
-        <td contenteditable></td>
-        <td contenteditable></td>
-        <td contenteditable></td>
-        <td><button class="copy-btn" onclick="copyRow(this)">Copier</button></td>
-      `;
-      return row;
-    }
-
-    function generateDefaultRows(n = 9) {
-      const tbody = document.getElementById("tableBody");
-      tbody.innerHTML = "";
-      for (let i = 0; i < n; i++) {
-        tbody.appendChild(createRow());
-      }
-    }
-
-    function copyRow(button) {
-      const row = button.closest("tr");
-      const cells = Array.from(row.querySelectorAll("td")).slice(0, 8);
-      const text = cells.map(cell => cell.textContent.trim()).join("\t");
-      navigator.clipboard.writeText(text).then(() => alert("Ligne copiée !"));
-    }
-
-    window.onload = function () {
-      const note = localStorage.getItem("dispo_note");
-      const date = localStorage.getItem("dispo_date");
-      const table = localStorage.getItem("dispo_table");
-
-      if (note) document.getElementById("note").value = note;
-      if (date) document.getElementById("dateSelect").value = date;
-
-      if (table) {
-        document.getElementById("dispoTable").outerHTML = table;
-      } else {
-        generateDefaultRows(9);
-      }
-    }
-function createRow() {
-  const row = document.createElement("tr");
-  row.innerHTML = `
-    <td contenteditable></td>
-    <td class="us-cell" onclick="toggleUS(this)" style="font-size:16px;">❌</td>
-    <td contenteditable inputmode="numeric"></td>
-    <td contenteditable inputmode="numeric"></td>
-    <td contenteditable></td>
-    <td contenteditable></td>
-  `;
-  return row;
-}
-
-function generateDefaultRows(n = 9) {
-  const tbody = document.getElementById("tableBody");
-  tbody.innerHTML = "";
-  for (let i = 0; i < n; i++) {
-    tbody.appendChild(createRow());
+  function createRow() {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td contenteditable></td>
+      <td contenteditable></td>
+      <td contenteditable></td>
+      <td contenteditable></td>
+      <td contenteditable></td>
+      <td contenteditable></td>
+      <td contenteditable></td>
+      <td contenteditable></td>
+      <td><button class="copy-btn" onclick="copyRow(this)">Copier</button></td>
+    `;
+    return row;
   }
-}
 
-function toggleUS(cell) {
-  cell.innerHTML = cell.innerHTML.includes("✔️")
-    ? "❌"
-    : '<span style="color:#c62828; font-size:16px;">✔️</span>';
-}
-
-function sendForm() {
-  const tableClone = document.getElementById("dispoTable").cloneNode(true);
-  const rows = tableClone.querySelectorAll("tbody tr");
-
-  rows.forEach(row => {
-    const cells = row.querySelectorAll("td");
-    let isRowEmpty = true;
-
-    for (let i = 0; i < cells.length; i++) {
-      if (i === 1) continue;
-      const text = cells[i]?.innerText?.trim();
-      if (text) {
-        isRowEmpty = false;
-        break;
-      }
+  function generateDefaultRows(n = 9) {
+    const tbody = document.getElementById("tableBody");
+    tbody.innerHTML = "";
+    for (let i = 0; i < n; i++) {
+      tbody.appendChild(createRow());
     }
+  }
 
-    for (let i = 0; i < cells.length; i++) {
-      const cell = cells[i];
+  function copyRow(button) {
+    const row = button.closest("tr");
+    const cells = Array.from(row.querySelectorAll("td")).slice(0, 8);
+    const text = cells.map(cell => cell.textContent.trim()).join("\t");
+    navigator.clipboard.writeText(text).then(() => alert("Ligne copiée !"));
+  }
 
-      if (i === 1) {
-        const content = cell.textContent.trim();
-        const isChecked =
-          content.includes("✔️") || content.includes("✅") ||
-          cell.querySelector("input[type='checkbox']")?.checked;
+  function sendForm() {
+    const tableClone = document.getElementById("dispoTable").cloneNode(true);
+    const rows = tableClone.querySelectorAll("tbody tr");
 
-        if (isChecked) {
-          cell.innerHTML = '<span style="font-size:16px;">✔️</span>';
-        } else {
-          cell.innerHTML = isRowEmpty ? '' : '<span style="font-size:16px;">❌</span>';
+    rows.forEach(row => {
+      const cells = row.querySelectorAll("td");
+      let isRowEmpty = true;
+
+      for (let i = 0; i < 8; i++) {
+        const text = cells[i]?.innerText?.trim();
+        if (text) {
+          isRowEmpty = false;
+          break;
         }
-      } else if (cell.hasAttribute("contenteditable")) {
-        cell.innerText = cell.innerText.trim().toUpperCase();
       }
-    }
-  });
 
-  const data = {
-    note: document.getElementById("note").value,
-    date: document.getElementById("dateSelect").value,
-    table: tableClone.outerHTML
-  };
+      for (let i = 0; i < 8; i++) {
+        const cell = cells[i];
+        if (cell.hasAttribute("contenteditable")) {
+          cell.innerText = cell.innerText.trim().toUpperCase();
+        }
+      }
 
-  fetch("https://script.google.com/macros/s/AKfycbyYx7yTmj4bnKtr6EvLf0qGSObYt0t6rs9xUEZ1q2ANniFoRDW-wP4etQ7kOMZSVgA_Xw/exec", {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  });
+      // Enlève le bouton "Copier" avant l'envoi
+      const copyCell = cells[8];
+      if (copyCell) copyCell.innerHTML = "";
+    });
 
-  alert("Disponibilités envoyées !");
-}
+    const data = {
+      note: document.getElementById("note").value,
+      date: document.getElementById("dateSelect").value,
+      table: tableClone.outerHTML
+    };
 
-function resetForm() {
-  document.getElementById("note").value = "";
-  document.getElementById("dateSelect").value = "";
-  localStorage.clear();
+    fetch("https://script.google.com/macros/s/AKfycbyYx7yTmj4bnKtr6EvLf0qGSObYt0t6rs9xUEZ1q2ANniFoRDW-wP4etQ7kOMZSVgA_Xw/exec", {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
 
-  const rows = document.querySelectorAll("#tableBody tr");
-  rows.forEach(row => {
-    const cells = row.querySelectorAll("td");
-    if (cells[3]) cells[3].textContent = "";
-    if (cells[4]) cells[4].textContent = "";
-    if (cells[5]) cells[5].textContent = "";
-  });
-}
-
-function saveData() {
-  try {
-    const table = document.getElementById("dispoTable");
-    if (!table) throw new Error("Table introuvable");
-
-    localStorage.setItem("dispo_note", document.getElementById("note").value);
-    localStorage.setItem("dispo_date", document.getElementById("dateSelect").value);
-    localStorage.setItem("dispo_table", table.outerHTML);
-    alert("Données sauvegardées !");
-  } catch (err) {
-    alert("Erreur lors de la sauvegarde : " + err.message);
+    alert("Disponibilités envoyées !");
   }
-}
 
-window.onload = function () {
-  const note = localStorage.getItem("dispo_note");
-  const date = localStorage.getItem("dispo_date");
-  const table = localStorage.getItem("dispo_table");
-
-  if (note) document.getElementById("note").value = note;
-  if (date) document.getElementById("dateSelect").value = date;
-
-  if (table) {
-    document.getElementById("dispoTable").outerHTML = table;
-  } else {
+  function resetForm() {
+    document.getElementById("note").value = "";
+    document.getElementById("dateSelect").value = "";
+    localStorage.clear();
     generateDefaultRows(9);
   }
-};
-       
-</script>
-<script>
+
+  function saveData() {
+    try {
+      const table = document.getElementById("dispoTable");
+      if (!table) throw new Error("Table introuvable");
+
+      localStorage.setItem("dispo_note", document.getElementById("note").value);
+      localStorage.setItem("dispo_date", document.getElementById("dateSelect").value);
+      localStorage.setItem("dispo_table", table.outerHTML);
+      alert("Données sauvegardées !");
+    } catch (err) {
+      alert("Erreur lors de la sauvegarde : " + err.message);
+    }
+  }
+
+  window.onload = function () {
+    const note = localStorage.getItem("dispo_note");
+    const date = localStorage.getItem("dispo_date");
+    const table = localStorage.getItem("dispo_table");
+
+    if (note) document.getElementById("note").value = note;
+    if (date) document.getElementById("dateSelect").value = date;
+
+    if (table) {
+      document.getElementById("dispoTable").outerHTML = table;
+    } else {
+      generateDefaultRows(9);
+    }
+  };
+
+  // Menu hamburger
   document.addEventListener("DOMContentLoaded", function () {
     const toggle = document.getElementById("hamburger");
     const menu = document.getElementById("menuDropdown");
 
-    toggle.addEventListener("click", function () {
-      menu.classList.toggle("show");
-    });
+    if (toggle && menu) {
+      toggle.addEventListener("click", function () {
+        menu.classList.toggle("show");
+      });
 
-    document.addEventListener("click", function (e) {
-      if (!toggle.contains(e.target) && !menu.contains(e.target)) {
-        menu.classList.remove("show");
-      }
-    });
+      document.addEventListener("click", function (e) {
+        if (!toggle.contains(e.target) && !menu.contains(e.target)) {
+          menu.classList.remove("show");
+        }
+      });
+    }
   });
 </script>
+
 
 </body>
 </html>

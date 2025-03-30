@@ -35,6 +35,19 @@
       margin: 4px 0;
       transition: 0.3s;
     }
+    .copy-btn {
+  font-size: 12px;
+  padding: 3px 6px;
+  background-color: #555;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.copy-btn:hover {
+  background-color: #333;
+}
+
     .menu {
       display: none;
       position: absolute;
@@ -102,16 +115,25 @@
       border-collapse: collapse;
     }
     th, td {
-      border: 1px solid #000;
-      padding: 8px;
-      text-align: center;
-      vertical-align: middle;
-      height: 36px;
-    }
-    th {
-      background-color: #d32f2f;
-      color: white;
-      font-weight: bold;
+  border: 1px solid #999;
+  text-align: center;
+  vertical-align: middle;
+  padding: 6px;
+  background-color: #fcfcfc;
+}
+th {
+  background-color: #d32f2f;
+  color: white;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+tr:nth-child(even) td {
+  background-color: #f7f7f7;
+}
+tr:nth-child(odd) td {
+  background-color: #ffffff;
+}
+
     }
     td[contenteditable] {
       outline: none;
@@ -188,13 +210,22 @@
     <textarea id="note" rows="2"></textarea>
     <div class="table-wrapper">
       <table id="dispoTable">
-        <thead>
-          <tr>
-            <th>RANG</th><th>CLIENT</th><th>TYPE</th><th>DÉPART</th><th>LIVRAISON</th><th>CHAUFFEUR</th><th>CAMION</th><th>REMORQUE</th><th>COPIE</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-      </table>
+  <thead>
+    <tr>
+      <th style="width:70px;">RANG</th>
+      <th style="width:200px;">CLIENT</th>
+      <th style="width:80px;">TYPE</th>
+      <th style="width:80px;">DÉPART</th>
+      <th style="width:80px;">LIVRAISON</th>
+      <th style="width:100px;">CHAUFFEUR</th>
+      <th style="width:90px;">CAMION</th>
+      <th style="width:100px;">REMORQUE</th>
+      <th style="width:60px;">COPIE</th>
+    </tr>
+  </thead>
+  <tbody id="tableBody"></tbody>
+</table>
+
     </div>
     <div class="buttons">
       <button class="reset-btn" onclick="resetForm()">Reset</button>
@@ -204,20 +235,27 @@
   </div>
   <script>
   function createRow() {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td contenteditable></td>
-      <td contenteditable></td>
-      <td contenteditable></td>
-      <td contenteditable></td>
-      <td contenteditable></td>
-      <td contenteditable></td>
-      <td contenteditable></td>
-      <td contenteditable></td>
-      <td><button class="copy-btn" onclick="copyRow(this)">Copier</button></td>
-    `;
-    return row;
-  }
+  const row = document.createElement("tr");
+  row.innerHTML = `
+    <td contenteditable></td>
+    <td contenteditable></td>
+    <td contenteditable></td>
+    <td contenteditable></td>
+    <td contenteditable></td>
+    <td contenteditable></td>
+    <td contenteditable></td>
+    <td contenteditable></td>
+    <td><button class="copy-btn" onclick="copyRow(this)">📋</button></td>
+  `;
+  return row;
+}
+
+function copyRow(button) {
+  const row = button.closest("tr");
+  const cells = Array.from(row.querySelectorAll("td")).slice(0, 8);
+  const text = cells.map(cell => cell.textContent.trim()).join("\t");
+  navigator.clipboard.writeText(text).then(() => alert("Ligne copiée !"));
+}
 
   function generateDefaultRows(n = 9) {
     const tbody = document.getElementById("tableBody");

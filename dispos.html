@@ -342,24 +342,6 @@ window.onload = function () {
        
 </script>
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const toggle = document.getElementById("hamburger");
-    const menu = document.getElementById("menuDropdown");
-
-    toggle.addEventListener("click", function () {
-      menu.classList.toggle("show");
-    });
-
-    document.addEventListener("click", function (e) {
-      if (!toggle.contains(e.target) && !menu.contains(e.target)) {
-        menu.classList.remove("show");
-      }
-    });
-  });
-
-
-</script>
-<script>
 document.addEventListener("DOMContentLoaded", () => {
   const table = document.getElementById("dispoTable");
 
@@ -381,23 +363,20 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentCell = null;
 
   table.addEventListener("focusin", (e) => {
-  if (e.target.tagName === "TD" && e.target.hasAttribute("contenteditable")) {
-    currentCell = e.target;
+    if (e.target.tagName === "TD" && e.target.hasAttribute("contenteditable")) {
+      currentCell = e.target;
 
-    currentCell.scrollIntoView({
-      behavior: "smooth",
-      block: "nearest",
-      inline: "center"
-    });
+      currentCell.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center"
+      });
 
-    const rect = currentCell.getBoundingClientRect();
-    arrowBtn.style.top = `${window.scrollY + rect.top + 5}px`;
-    arrowBtn.style.left = `${window.scrollX + rect.right + 5}px`;
-    arrowBtn.style.display = "inline-block";
-  }
-});
-
-
+      const rect = currentCell.getBoundingClientRect();
+      arrowBtn.style.top = `${window.scrollY + rect.top + 5}px`;
+      arrowBtn.style.left = `${window.scrollX + rect.right + 5}px`;
+      arrowBtn.style.display = "inline-block";
+    }
   });
 
   document.addEventListener("scroll", () => {
@@ -439,12 +418,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  document.addEventListener("click", (e) => {
-    if (!e.target.closest("td") && e.target !== arrowBtn) {
-      arrowBtn.style.display = "none";
-      currentCell = null;
-    }
-  });
 });
 </script>
 

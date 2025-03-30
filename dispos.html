@@ -183,6 +183,7 @@
       }
     }
 
+<script>
 function sendForm() {
   const tableClone = document.getElementById("dispoTable").cloneNode(true);
   const rows = tableClone.querySelectorAll("tbody tr");
@@ -191,9 +192,9 @@ function sendForm() {
     const cells = row.querySelectorAll("td");
     let isRowEmpty = true;
 
-    // Analyse si ligne vide sauf colonne US
+    // Vérifie si la ligne est vide (hors colonne US)
     for (let i = 0; i < cells.length; i++) {
-      if (i === 1) continue; // skip colonne US
+      if (i === 1) continue; // ignore colonne US
       const text = cells[i]?.innerText?.trim();
       if (text) {
         isRowEmpty = false;
@@ -205,7 +206,12 @@ function sendForm() {
       const cell = cells[i];
 
       if (i === 1) {
-        const isChecked = cell.querySelector("input[type='checkbox']")?.checked;
+        // Colonne US — détecte ✔️/❌ pour web et mobile
+        const content = cell.textContent.trim();
+        const isChecked =
+          content.includes("✔️") || content.includes("✅") ||
+          cell.querySelector("input[type='checkbox']")?.checked;
+
         if (isChecked) {
           cell.innerHTML = '<span style="font-size:16px;">✔️</span>';
         } else {
@@ -223,7 +229,7 @@ function sendForm() {
     table: tableClone.outerHTML
   };
 
-  fetch("https://script.google.com/macros/s/AKfycbyl9Qu_Znz4h3DgHCwaqwpxfM6N1c-YfErZCtt6KmulSoZgPpfy2Wa-ElVJxJiFamSGSw/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbwxYsDu93JIVTj-cPy4BMuo-2q6h1KsSH6XEiv-u8KLeHsOJXJKlIX5NZJzgvkuDE3pdw/exec", {
     method: "POST",
     mode: "no-cors",
     headers: { "Content-Type": "application/json" },
@@ -232,6 +238,7 @@ function sendForm() {
 
   alert("Disponibilités envoyées !");
 }
+
 
     function resetForm() {
       document.getElementById("note").value = "";

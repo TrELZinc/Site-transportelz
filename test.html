@@ -263,12 +263,21 @@ tr:nth-child(odd) td {
     sms += `${labels[idx]}: ${text}\n`;
   });
 
-  // Encodage spécial pour ouverture SMS
-  const smsEncoded = encodeURIComponent(sms);
+  const chauffeur = (cells[5]?.textContent || "").trim().toUpperCase();
+  let phone = "";
 
-  // Génère un lien SMS cliquable
+  switch (chauffeur) {
+    case "SIR": phone = "4188737539"; break;
+    case "JF":  phone = "4389876543"; break;
+    case "MD":  phone = "4183264730"; break;
+    default:    phone = ""; break; // Si aucun match, ne préremplit pas
+  }
+
+  const smsEncoded = encodeURIComponent(sms);
+  const href = phone ? `sms:${phone}?body=${smsEncoded}` : `sms:?body=${smsEncoded}`;
+
   const link = document.createElement("a");
-  link.href = `sms:?body=${smsEncoded}`;
+  link.href = href;
   link.style.display = "none";
   document.body.appendChild(link);
   link.click();

@@ -505,22 +505,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (next) {
     next.focus();
-
-    // 🎯 Auto scroll to center
-    next.scrollIntoView({
-      behavior: "smooth",
-      block: "nearest",
-      inline: "center"
-    });
-
-    // update position of the arrow
-    const rect = next.getBoundingClientRect();
-    arrowBtn.style.top = `${window.scrollY + rect.top + 5}px`;
-    arrowBtn.style.left = `${window.scrollX + rect.right + 5}px`;
-
     currentCell = next;
+
+    // ⏱ attendre le rendu avant scroll
+    setTimeout(() => {
+      next.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center"
+      });
+
+      const rect = next.getBoundingClientRect();
+      arrowBtn.style.top = `${window.scrollY + rect.top + 5}px`;
+      arrowBtn.style.left = `${window.scrollX + rect.right + 5}px`;
+    }, 50);
   }
 });
+
 
 
   document.addEventListener("click", (e) => {

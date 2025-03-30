@@ -53,7 +53,7 @@
       padding: 10px;
       z-index: 999;
     }
-    .menu.active {
+    .menu.show {
       display: block;
     }
     .menu a {
@@ -184,7 +184,7 @@
 <body>
   <header>
     <img src="assets/logo.jpeg" alt="Logo Transport ELZ">
-    <div class="menu-toggle" id="menuToggle">
+    <div class="menu-toggle" onclick="document.getElementById('menuDropdown').classList.toggle('show')">
       <span></span>
       <span></span>
       <span></span>
@@ -216,25 +216,17 @@
       <button class="send-btn" onclick="sendForm()">Send</button>
     </div>
   </div>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const toggle = document.getElementById("menuToggle");
-      const menu = document.getElementById("menuDropdown");
-
-      toggle.addEventListener("click", function () {
-        menu.classList.toggle("active");
-      });
-    });
+  <script>
 function createRow() {
   const row = document.createElement("tr");
-  row.innerHTML = 
+  row.innerHTML = `
     <td contenteditable></td>
     <td class="us-cell" onclick="toggleUS(this)" style="font-size:16px;">❌</td>
     <td contenteditable inputmode="numeric"></td>
     <td contenteditable inputmode="numeric"></td>
     <td contenteditable></td>
     <td contenteditable></td>
-  ;
+  `;
   return row;
 }
 
@@ -365,7 +357,6 @@ window.onload = function () {
     });
   });
 </script>
-
 
 </body>
 </html>

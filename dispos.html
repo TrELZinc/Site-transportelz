@@ -53,7 +53,7 @@
       padding: 10px;
       z-index: 999;
     }
-    .menu.show {
+    .menu.active {
       display: block;
     }
     .menu a {
@@ -184,7 +184,7 @@
 <body>
   <header>
     <img src="assets/logo.jpeg" alt="Logo Transport ELZ">
-    <div class="menu-toggle" onclick="document.getElementById('menuDropdown').classList.toggle('show')">
+    <div class="menu-toggle" id="menuToggle">
       <span></span>
       <span></span>
       <span></span>
@@ -217,6 +217,14 @@
     </div>
   </div>
   <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const toggle = document.getElementById("menuToggle");
+      const menu = document.getElementById("menuDropdown");
+
+      toggle.addEventListener("click", function () {
+        menu.classList.toggle("active");
+      });
+    });
 function createRow() {
   const row = document.createElement("tr");
   row.innerHTML = `

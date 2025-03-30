@@ -12,15 +12,59 @@
       font-size: 16px;
     }
     header {
-      background-color: #000;
-      color: white;
+      background-color: #111;
+      padding: 10px 20px;
+      margin: 0;
+      width: 100vw;
+      box-sizing: border-box;
+      overflow: hidden;
+      position: relative;
+      left: 50%;
+      right: 50%;
+      margin-left: -50vw;
+      margin-right: -50vw;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 10px 20px;
     }
     header img {
       height: 40px;
+    }
+    .menu-toggle {
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+    }
+    .menu-toggle span {
+      height: 3px;
+      width: 25px;
+      background: white;
+      margin: 4px 0;
+      transition: 0.3s;
+    }
+    .menu {
+      display: none;
+      position: absolute;
+      top: 60px;
+      right: 20px;
+      background-color: #111;
+      border: 1px solid #444;
+      border-radius: 6px;
+      padding: 10px;
+      z-index: 999;
+    }
+    .menu.show {
+      display: block;
+    }
+    .menu a {
+      display: block;
+      color: white;
+      padding: 8px 12px;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .menu a:hover {
+      background-color: #333;
     }
     .container {
       padding: 20px;
@@ -112,75 +156,25 @@
     .save-btn { background-color: #2ecc71; }
     .send-btn { background-color: black; }
 
-    .elz-signature {
-      margin-top: 50px;
-      text-align: center;
-      color: #555;
-      font-size: 14px;
-      font-style: italic;
-      opacity: 0.8;
-      animation: fadein 1.2s ease-out forwards;
-    }
-
-    .elz-line {
-      width: 0;
-      height: 2px;
-      background-color: #d32f2f;
-      margin: 0 auto 8px;
-      animation: expandLine 1s ease-out forwards;
-    }
-
-    .elz-brand {
-      letter-spacing: 1px;
-      animation: popIn 0.5s ease-out 0.6s forwards;
-      opacity: 0;
-    }
-
-    @keyframes expandLine {
-      from { width: 0; opacity: 0; }
-      to { width: 60px; opacity: 1; }
-    }
-
-    @keyframes fadein {
-      from { opacity: 0; transform: translateY(10px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes popIn {
-      from { opacity: 0; transform: scale(0.95); }
-      to   { opacity: 1; transform: scale(1); }
-    }
-
     @media (max-width: 600px) {
       body {
-        padding: 0 0 40px 0;
+        padding: 0 12px 40px 12px;
       }
-
       .container {
-        padding: 0 25px 40px 25px !important;
+        padding-left: 12px;
+        padding-right: 12px;
       }
-
       .buttons {
-        margin-bottom: 30px;
+        margin-bottom: 40px;
       }
-
-      header {
-        position: relative;
-        left: -25px;
-        right: -25px;
-        width: calc(100% + 50px);
-      }
-
       table {
         font-size: 13px;
       }
-
       th, td {
         padding: 6px;
         height: 32px;
         font-size: 14px;
       }
-
       .us-cell {
         font-size: 14px !important;
       }
@@ -190,6 +184,15 @@
 <body>
   <header>
     <img src="assets/logo.jpeg" alt="Logo Transport ELZ">
+    <div class="menu-toggle" id="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <div class="menu" id="menuDropdown">
+      <a href="test.html">Sommaire</a>
+      <a href="linktree.html">Menu</a>
+    </div>
   </header>
   <div class="container">
     <div class="top-bar">
@@ -212,10 +215,36 @@
       <button class="save-btn" onclick="saveData()">Save</button>
       <button class="send-btn" onclick="sendForm()">Send</button>
     </div>
-    <footer class="elz-signature">
-      <div class="elz-line"></div>
-      <div class="elz-brand">🚛 Transport <strong>ELZ</strong></div>
-    </footer>
   </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const toggle = document.getElementById("hamburger");
+      const menu = document.getElementById("menuDropdown");
+
+      toggle.addEventListener("click", function () {
+        menu.classList.toggle("show");
+      });
+
+      const tableBody = document.getElementById("tableBody");
+      for (let i = 0; i < 9; i++) {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td contenteditable></td>
+          <td class="us-cell" onclick="toggleUS(this)" style="font-size:16px;">❌</td>
+          <td contenteditable inputmode="numeric"></td>
+          <td contenteditable inputmode="numeric"></td>
+          <td contenteditable></td>
+          <td contenteditable></td>
+        `;
+        tableBody.appendChild(row);
+      }
+    });
+
+    function toggleUS(cell) {
+      cell.innerHTML = cell.innerHTML.includes("✔️")
+        ? "❌"
+        : '<span style="color:#c62828; font-size:16px;">✔️</span>';
+    }
+  </script>
 </body>
 </html>

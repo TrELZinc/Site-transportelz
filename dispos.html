@@ -226,7 +226,7 @@ function sendForm() {
     table: tableClone.outerHTML
   };
 
-  fetch("https://script.google.com/macros/s/AKfycbwxYsDu93JIVTj-cPy4BMuo-2q6h1KsSH6XEiv-u8KLeHsOJXJKlIX5NZJzgvkuDE3pdw/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbzYwaC1Zy8xOM6QCkckrFFpFIuMCLFQUBIceGffH5PqHaJqznAvG9eDJiDvU_3VgHMe8g/exec", {
     method: "POST",
     mode: "no-cors",
     headers: { "Content-Type": "application/json" },
@@ -251,10 +251,17 @@ function resetForm() {
 }
 
 function saveData() {
-  localStorage.setItem("dispo_note", document.getElementById("note").value);
-  localStorage.setItem("dispo_date", document.getElementById("dateSelect").value);
-  localStorage.setItem("dispo_table", document.getElementById("dispoTable").outerHTML);
-  alert("Données sauvegardées !");
+  try {
+    const table = document.getElementById("dispoTable");
+    if (!table) throw new Error("Table introuvable");
+
+    localStorage.setItem("dispo_note", document.getElementById("note").value);
+    localStorage.setItem("dispo_date", document.getElementById("dateSelect").value);
+    localStorage.setItem("dispo_table", table.outerHTML);
+    alert("Données sauvegardées !");
+  } catch (err) {
+    alert("Erreur lors de la sauvegarde : " + err.message);
+  }
 }
 
 window.onload = function () {

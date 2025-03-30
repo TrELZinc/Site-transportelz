@@ -114,11 +114,23 @@
 
     /* Mobile tweaks */
 @media (max-width: 600px) {
-.container {
-  padding-left: 25px;
-  padding-right: 25px;
-  padding-bottom: 40px;
-}
+  body {
+    padding: 0 0 40px 0; /* uniquement bas, pas de bordure gauche/droite ici */
+  }
+
+  .container {
+    padding: 0 25px 40px 25px !important;
+  }
+
+  .buttons {
+    margin-bottom: 30px;
+  }
+
+  header {
+    width: 100vw;
+    margin-left: calc(-1 * 25px); /* annule le padding horizontal */
+    margin-right: calc(-1 * 25px);
+  }
 
   table {
     font-size: 13px;
@@ -134,6 +146,7 @@
     font-size: 14px !important;
   }
 }
+
 
     }
   </style>

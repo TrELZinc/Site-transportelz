@@ -255,27 +255,30 @@ tr:nth-child(odd) td {
   const cells = row.querySelectorAll("td");
 
   const labels = [
-    "Rang",        // 0
-    "Type",        // 1
-    "Départ",      // 2
-    "Livraison",   // 3
-    "Chauffeur",   // 4
-    "Camion",      // 5
-    "Remorque",    // 6
-    "Client"       // 7
+    "Chauffeur",   // Index 5
+    "Client",      // Index 1
+    "Type",        // Index 2
+    "Départ",      // Index 3
+    "Livraison",   // Index 4
+    "Camion",      // Index 6
+    "Remorque"     // Index 7
   ];
 
+  const indexes = [5, 1, 2, 3, 4, 6, 7];
+
   let message = "";
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < indexes.length; i++) {
+    const idx = indexes[i];
     const label = labels[i];
-    const value = cells[i]?.textContent?.trim() || "";
+    const value = cells[idx]?.textContent?.trim() || "";
     message += `${label}: ${value}\n`;
   }
 
   navigator.clipboard.writeText(message).then(() =>
-    alert("Ligne copiée (format SMS) !")
+    alert("Ligne copiée dans l'ordre formaté !")
   );
 }
+
 
 
   function generateDefaultRows(n = 9) {

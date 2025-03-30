@@ -254,29 +254,27 @@ tr:nth-child(odd) td {
   const row = button.closest("tr");
   const cells = row.querySelectorAll("td");
 
-  const labels = [
-    "Chauffeur",   // index 5
-    "Client",      // index 1
-    "Type",        // index 2
-    "Départ",      // index 3
-    "Livraison",   // index 4
-    "Camion",      // index 6
-    "Remorque"     // index 7
-  ];
-
   const indexes = [5, 1, 2, 3, 4, 6, 7];
+  const labels = ["Chauffeur", "Client", "Type", "Départ", "Livraison", "Camion", "Remorque"];
 
   let sms = "";
   indexes.forEach((i, idx) => {
-    const value = cells[i]?.textContent?.trim() || "";
-    sms += `${labels[idx]}: ${value}\n`;
+    const text = (cells[i]?.textContent || "").trim();
+    sms += `${labels[idx]}: ${text}\n`;
   });
 
-  // Coller le texte brut sans encodage
-  navigator.clipboard.writeText(sms)
-    .then(() => alert("Données copiées dans le format SMS 📋"))
-    .catch(err => alert("Erreur lors de la copie: " + err));
+  // Encodage spécial pour ouverture SMS
+  const smsEncoded = encodeURIComponent(sms);
+
+  // Génère un lien SMS cliquable
+  const link = document.createElement("a");
+  link.href = `sms:?body=${smsEncoded}`;
+  link.style.display = "none";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
+
 
 
   function generateDefaultRows(n = 9) {

@@ -102,7 +102,7 @@
       border-collapse: collapse;
     }
     th, td {
-      border: 1px solid #ccc;
+      border: 1px solid #000;
       padding: 8px;
       text-align: center;
       vertical-align: middle;
@@ -136,7 +136,15 @@
     .reset-btn { background-color: #e74c3c; }
     .save-btn { background-color: #2ecc71; }
     .send-btn { background-color: black; }
-
+    .copy-btn {
+      background-color: #555;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+    }
     @media (max-width: 600px) {
       body {
         padding: 0 12px 40px 12px;
@@ -195,6 +203,51 @@
     </div>
   </div>
   <script>
+    function createRow() {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td contenteditable></td>
+        <td contenteditable></td>
+        <td contenteditable></td>
+        <td contenteditable></td>
+        <td contenteditable></td>
+        <td contenteditable></td>
+        <td contenteditable></td>
+        <td contenteditable></td>
+        <td><button class="copy-btn" onclick="copyRow(this)">Copier</button></td>
+      `;
+      return row;
+    }
+
+    function generateDefaultRows(n = 9) {
+      const tbody = document.getElementById("tableBody");
+      tbody.innerHTML = "";
+      for (let i = 0; i < n; i++) {
+        tbody.appendChild(createRow());
+      }
+    }
+
+    function copyRow(button) {
+      const row = button.closest("tr");
+      const cells = Array.from(row.querySelectorAll("td")).slice(0, 8);
+      const text = cells.map(cell => cell.textContent.trim()).join("\t");
+      navigator.clipboard.writeText(text).then(() => alert("Ligne copiée !"));
+    }
+
+    window.onload = function () {
+      const note = localStorage.getItem("dispo_note");
+      const date = localStorage.getItem("dispo_date");
+      const table = localStorage.getItem("dispo_table");
+
+      if (note) document.getElementById("note").value = note;
+      if (date) document.getElementById("dateSelect").value = date;
+
+      if (table) {
+        document.getElementById("dispoTable").outerHTML = table;
+      } else {
+        generateDefaultRows(9);
+      }
+    }
 function createRow() {
   const row = document.createElement("tr");
   row.innerHTML = `

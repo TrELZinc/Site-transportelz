@@ -251,11 +251,32 @@ tr:nth-child(odd) td {
   }
 
   function copyRow(button) {
-    const row = button.closest("tr");
-    const cells = Array.from(row.querySelectorAll("td")).slice(0, 8);
-    const text = cells.map(cell => cell.textContent.trim()).join("\t");
-    navigator.clipboard.writeText(text).then(() => alert("Ligne copiée !"));
+  const row = button.closest("tr");
+  const cells = row.querySelectorAll("td");
+
+  const labels = [
+    "Rang",        // 0
+    "Type",        // 1
+    "Départ",      // 2
+    "Livraison",   // 3
+    "Chauffeur",   // 4
+    "Camion",      // 5
+    "Remorque",    // 6
+    "Client"       // 7
+  ];
+
+  let message = "";
+  for (let i = 0; i < 8; i++) {
+    const label = labels[i];
+    const value = cells[i]?.textContent?.trim() || "";
+    message += `${label}: ${value}\n`;
   }
+
+  navigator.clipboard.writeText(message).then(() =>
+    alert("Ligne copiée (format SMS) !")
+  );
+}
+
 
   function generateDefaultRows(n = 9) {
     const tbody = document.getElementById("tableBody");

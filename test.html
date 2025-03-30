@@ -262,12 +262,10 @@ tr:nth-child(odd) td {
   const row = button.closest("tr");
   const cells = row.querySelectorAll("td");
 
-  // 🎯 Mapping chauffeur → nom affiché + téléphone
   const chauffeurMap = {
     "AP": { nom: "Audrey", tel: "4188737539" },
-    "MD":  { nom: "Mathieu", tel: "4183264730" },
-    "RPE": { nom: "Raymond", tel: "4185550001" },
-    // Ajoute ici au besoin
+    "MD": { nom: "Mathieu", tel: "4183264730" },
+    "RPE": { nom: "Raymond", tel: "4185550001" }
   };
 
   const rawCode = (cells[5]?.textContent || "").trim().toUpperCase();
@@ -285,7 +283,23 @@ tr:nth-child(odd) td {
 
   const labels = ["Chauffeur", "Client", "Type", "Départ", "Livraison", "Camion", "Remorque"];
 
-  let sms = labels.map((label, idx) => `${label}: ${values[idx]}`).join("\n");
+  const dateStr = document.getElementById("dateSelect")?.value;
+  let dayFormatted = "";
+
+  if (dateStr) {
+    const daysFr = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+    const monthsFr = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+
+    const dateObj = new Date(dateStr + "T00:00:00");
+    const dayName = daysFr[dateObj.getDay()];
+    const dayNum = dateObj.getDate();
+    const monthName = monthsFr[dateObj.getMonth()];
+    dayFormatted = `${dayName} le ${dayNum} ${monthName}`;
+  }
+
+  let sms = `Salut,\nVoici ton voyage pour ${dayFormatted}\n\n`;
+  sms += labels.map((label, idx) => `${label}: ${values[idx]}`).join("\n");
+  sms += `\n\nMerci !`;
 
   const smsEncoded = encodeURIComponent(sms);
   const href = chauffeur.tel ? `sms:${chauffeur.tel}?body=${smsEncoded}` : `sms:?body=${smsEncoded}`;
@@ -297,6 +311,7 @@ tr:nth-child(odd) td {
   link.click();
   document.body.removeChild(link);
 }
+
 
 
 

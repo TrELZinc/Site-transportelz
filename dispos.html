@@ -297,7 +297,10 @@ function sendForm() {
 
   alert("Disponibilités envoyées !");
 }
-
+function toggleMenu() {
+      const menu = document.getElementById("dropdownMenu");
+      menu.classList.toggle("show-menu");
+    }
 function resetForm() {
   document.getElementById("note").value = "";
   document.getElementById("dateSelect").value = "";
@@ -340,10 +343,7 @@ window.onload = function () {
     generateDefaultRows(9);
   }
 };
-       function toggleMenu() {
-      const menu = document.getElementById("dropdownMenu");
-      menu.classList.toggle("show-menu");
-    }
+       
 </script>
 
 </body>

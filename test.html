@@ -259,7 +259,7 @@ tr:nth-child(odd) td {
 
   let sms = "";
   indexes.forEach((i, idx) => {
-    const text = (cells[i]?.textContent || "").trim();
+    const text = (cells[i]?.textContent || "").trim().toUpperCase();
     sms += `${labels[idx]}: ${text}\n`;
   });
 
@@ -403,6 +403,23 @@ tr:nth-child(odd) td {
       });
     }
   });
+    document.addEventListener("input", function (e) {
+  if (e.target.matches("td[contenteditable]")) {
+    const selection = window.getSelection();
+    const range = selection.getRangeAt(0);
+    const cursorPos = range.startOffset;
+
+    const upper = e.target.textContent.toUpperCase();
+    e.target.textContent = upper;
+
+    // Remet le curseur à la bonne place
+    range.setStart(e.target.firstChild || e.target, cursorPos);
+    range.setEnd(e.target.firstChild || e.target, cursorPos);
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
+});
+
 </script>
 
 

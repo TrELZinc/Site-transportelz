@@ -420,6 +420,23 @@ tr:nth-child(odd) td {
     selection.addRange(range);
   }
 });
+document.addEventListener("focusin", function (e) {
+  if (e.target.matches("td[contenteditable]")) {
+    const cell = e.target;
+    const container = document.querySelector(".table-wrapper");
+
+    const cellRect = cell.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+
+    const offsetLeft = cell.offsetLeft;
+    const scrollLeft = offsetLeft - (containerRect.width / 3); // scroll un peu avant
+
+    container.scrollTo({
+      left: scrollLeft,
+      behavior: "smooth"
+    });
+  }
+});
 
 </script>
 

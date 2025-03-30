@@ -113,18 +113,35 @@
     .send-btn { background-color: black; }
 
     /* Mobile tweaks */
-    @media (max-width: 600px) {
-      table {
-        font-size: 13px;
-      }
-      th, td {
-        padding: 6px;
-        height: 32px;
-        font-size: 14px;
-      }
-      .us-cell {
-        font-size: 14px !important;
-      }
+@media (max-width: 600px) {
+  body {
+    padding: 0 12px 40px 12px; /* haut, droite, bas, gauche */
+  }
+
+  .container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .buttons {
+    margin-bottom: 40px;
+  }
+
+  table {
+    font-size: 13px;
+  }
+
+  th, td {
+    padding: 6px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .us-cell {
+    font-size: 14px !important;
+  }
+}
+
     }
   </style>
 </head>
@@ -226,7 +243,7 @@ function sendForm() {
     table: tableClone.outerHTML
   };
 
-  fetch("https://script.google.com/macros/s/AKfycbzYwaC1Zy8xOM6QCkckrFFpFIuMCLFQUBIceGffH5PqHaJqznAvG9eDJiDvU_3VgHMe8g/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbyYx7yTmj4bnKtr6EvLf0qGSObYt0t6rs9xUEZ1q2ANniFoRDW-wP4etQ7kOMZSVgA_Xw/exec", {
     method: "POST",
     mode: "no-cors",
     headers: { "Content-Type": "application/json" },

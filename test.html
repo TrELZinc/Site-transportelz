@@ -235,20 +235,21 @@ tr:nth-child(odd) td {
   </div>
   <script>
   function createRow() {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td contenteditable></td>
-      <td contenteditable></td>
-      <td contenteditable></td>
-      <td contenteditable></td>
-      <td contenteditable></td>
-      <td contenteditable></td>
-      <td contenteditable></td>
-      <td contenteditable></td>
-      <td><button class="copy-btn" onclick="copyRow(this)">📋</button></td>
-    `;
-    return row;
-  }
+  const row = document.createElement("tr");
+  row.innerHTML = `
+    <td contenteditable inputmode="numeric"></td>     <!-- RANG -->
+    <td contenteditable></td>                         <!-- CLIENT -->
+    <td contenteditable></td>                         <!-- TYPE -->
+    <td contenteditable></td>                         <!-- DÉPART -->
+    <td contenteditable></td>                         <!-- LIVRAISON -->
+    <td contenteditable></td>                         <!-- CHAUFFEUR -->
+    <td contenteditable inputmode="numeric"></td>     <!-- CAMION -->
+    <td contenteditable inputmode="numeric"></td>     <!-- REMORQUE -->
+    <td><button class="copy-btn" onclick="copyRow(this)">📋</button></td>
+  `;
+  return row;
+}
+
 
   function copyRow(button) {
   const row = button.closest("tr");

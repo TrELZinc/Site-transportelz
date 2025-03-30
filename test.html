@@ -427,23 +427,24 @@ tr:nth-child(odd) td {
     selection.addRange(range);
   }
 });
-document.addEventListener("focusin", function (e) {
-  if (e.target.matches("td[contenteditable]")) {
-    const cell = e.target;
-    const container = document.querySelector(".table-wrapper");
+table.addEventListener("focusin", (e) => {
+  if (e.target.tagName === "TD" && e.target.hasAttribute("contenteditable")) {
+    currentCell = e.target;
 
-    const cellRect = cell.getBoundingClientRect();
-    const containerRect = container.getBoundingClientRect();
-
-    const offsetLeft = cell.offsetLeft;
-    const scrollLeft = offsetLeft - (containerRect.width / 3); // scroll un peu avant
-
-    container.scrollTo({
-      left: scrollLeft,
-      behavior: "smooth"
+    // 👇 MAGIE : Assure que la cellule est visible
+    currentCell.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "center"
     });
+
+    const rect = currentCell.getBoundingClientRect();
+    arrowBtn.style.top = `${window.scrollY + rect.top + 5}px`;
+    arrowBtn.style.left = `${window.scrollX + rect.right + 5}px`;
+    arrowBtn.style.display = "inline-block";
   }
 });
+
 
 </script>
 <script>

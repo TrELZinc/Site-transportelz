@@ -127,10 +127,12 @@
   }
 
   header {
-    width: 100vw;
-    margin-left: calc(-1 * 25px); /* annule le padding horizontal */
-    margin-right: calc(-1 * 25px);
-  }
+  position: relative;
+  left: -25px;
+  right: -25px;
+  width: calc(100% + 50px); /* réajuste la largeur étendue */
+}
+
 
   table {
     font-size: 13px;

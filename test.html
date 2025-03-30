@@ -353,11 +353,20 @@ tr:nth-child(odd) td {
   }
 
   function resetForm() {
-    document.getElementById("note").value = "";
-    document.getElementById("dateSelect").value = "";
-    localStorage.clear();
-    generateDefaultRows(9);
-  }
+  document.getElementById("note").value = "";
+  document.getElementById("dateSelect").value = "";
+  localStorage.clear();
+
+  const rows = document.querySelectorAll("#tableBody tr");
+
+  rows.forEach(row => {
+    const cells = row.querySelectorAll("td");
+    for (let i = 1; i <= 7; i++) {
+      if (cells[i]) cells[i].textContent = "";
+    }
+  });
+}
+
 
   function saveData() {
     try {

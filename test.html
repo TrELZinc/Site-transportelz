@@ -486,21 +486,42 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   arrowBtn.addEventListener("click", () => {
-    if (!currentCell) return;
-    const row = currentCell.closest("tr");
-    const cells = Array.from(row.querySelectorAll("td[contenteditable]"));
-    const idx = cells.indexOf(currentCell);
+  if (!currentCell) return;
+  const row = currentCell.closest("tr");
+  const cells = Array.from(row.querySelectorAll("td[contenteditable]"));
+  const idx = cells.indexOf(currentCell);
 
-    if (idx < cells.length - 1) {
-      cells[idx + 1].focus();
-    } else {
-      const nextRow = row.nextElementSibling;
-      if (nextRow) {
-        const nextCells = Array.from(nextRow.querySelectorAll("td[contenteditable]"));
-        if (nextCells.length) nextCells[0].focus();
-      }
+  let next = null;
+
+  if (idx < cells.length - 1) {
+    next = cells[idx + 1];
+  } else {
+    const nextRow = row.nextElementSibling;
+    if (nextRow) {
+      const nextCells = Array.from(nextRow.querySelectorAll("td[contenteditable]"));
+      if (nextCells.length) next = nextCells[0];
     }
-  });
+  }
+
+  if (next) {
+    next.focus();
+
+    // 🎯 Auto scroll to center
+    next.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "center"
+    });
+
+    // update position of the arrow
+    const rect = next.getBoundingClientRect();
+    arrowBtn.style.top = `${window.scrollY + rect.top + 5}px`;
+    arrowBtn.style.left = `${window.scrollX + rect.right + 5}px`;
+
+    currentCell = next;
+  }
+});
+
 
   document.addEventListener("click", (e) => {
     if (!e.target.closest("td") && e.target !== arrowBtn) {

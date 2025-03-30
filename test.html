@@ -198,7 +198,7 @@ tr:nth-child(odd) td {
       <span></span>
     </div>
     <div class="menu" id="menuDropdown">
-      <a href="dispos.html">Sommaire</a>
+      <a href="dispos.html">Disponibilités</a>
       <a href="linktree.html">Menu</a>
     </div>
   </header>
@@ -266,20 +266,15 @@ tr:nth-child(odd) td {
 
   const indexes = [5, 1, 2, 3, 4, 6, 7];
 
-  let message = "";
-  for (let i = 0; i < indexes.length; i++) {
-    const idx = indexes[i];
-    const label = labels[i];
+  const message = indexes.map((idx, i) => {
     const value = cells[idx]?.textContent?.trim() || "";
-    message += `${label}: ${value}\n`;
-  }
+    return `${labels[i]}: ${value}`;
+  }).join("\n");
 
   navigator.clipboard.writeText(message).then(() =>
-    alert("Ligne copiée dans l'ordre formaté !")
+    alert("Format SMS copié !")
   );
 }
-
-
 
   function generateDefaultRows(n = 9) {
     const tbody = document.getElementById("tableBody");

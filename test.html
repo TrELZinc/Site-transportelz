@@ -255,26 +255,29 @@ tr:nth-child(odd) td {
   const cells = row.querySelectorAll("td");
 
   const labels = [
-    "Chauffeur",   // Index 5
-    "Client",      // Index 1
-    "Type",        // Index 2
-    "Départ",      // Index 3
-    "Livraison",   // Index 4
-    "Camion",      // Index 6
-    "Remorque"     // Index 7
+    "Chauffeur",   // index 5
+    "Client",      // index 1
+    "Type",        // index 2
+    "Départ",      // index 3
+    "Livraison",   // index 4
+    "Camion",      // index 6
+    "Remorque"     // index 7
   ];
 
   const indexes = [5, 1, 2, 3, 4, 6, 7];
 
-  const message = indexes.map((idx, i) => {
-    const value = cells[idx]?.textContent?.trim() || "";
-    return `${labels[i]}: ${value}`;
-  }).join("\n");
+  let sms = "";
+  indexes.forEach((i, idx) => {
+    const value = cells[i]?.textContent?.trim() || "";
+    sms += `${labels[idx]}: ${value}\n`;
+  });
 
-  navigator.clipboard.writeText(message).then(() =>
-    alert("Format SMS copié !")
-  );
+  // Coller le texte brut sans encodage
+  navigator.clipboard.writeText(sms)
+    .then(() => alert("Données copiées dans le format SMS 📋"))
+    .catch(err => alert("Erreur lors de la copie: " + err));
 }
+
 
   function generateDefaultRows(n = 9) {
     const tbody = document.getElementById("tableBody");

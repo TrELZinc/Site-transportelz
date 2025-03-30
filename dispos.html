@@ -381,13 +381,23 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentCell = null;
 
   table.addEventListener("focusin", (e) => {
-    if (e.target.tagName === "TD" && e.target.hasAttribute("contenteditable")) {
-      currentCell = e.target;
-      const rect = currentCell.getBoundingClientRect();
-      arrowBtn.style.top = `${window.scrollY + rect.top + 5}px`;
-      arrowBtn.style.left = `${window.scrollX + rect.right + 5}px`;
-      arrowBtn.style.display = "inline-block";
-    }
+  if (e.target.tagName === "TD" && e.target.hasAttribute("contenteditable")) {
+    currentCell = e.target;
+
+    currentCell.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "center"
+    });
+
+    const rect = currentCell.getBoundingClientRect();
+    arrowBtn.style.top = `${window.scrollY + rect.top + 5}px`;
+    arrowBtn.style.left = `${window.scrollX + rect.right + 5}px`;
+    arrowBtn.style.display = "inline-block";
+  }
+});
+
+
   });
 
   document.addEventListener("scroll", () => {

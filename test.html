@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Disponibilités</title>
+  <style>
+    html, body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f4f4;
+      font-size: 16px;
+    }
+    header {
+      background-color: #000;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+    }
+    header img {
+      height: 40px;
+    }
+    .container {
+      padding: 20px;
+      max-width: 1000px;
+      margin: auto;
+    }
+    .top-bar {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    .top-bar input[type="date"] {
+      padding: 8px 12px;
+      font-size: 16px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      resize: vertical;
+      box-sizing: border-box;
+      font-size: 15px;
+    }
+    .table-wrapper {
+      overflow-x: auto;
+      margin-top: 20px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    table {
+      min-width: 700px;
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+      vertical-align: middle;
+      height: 36px;
+    }
+    th {
+      background-color: #d32f2f;
+      color: white;
+      font-weight: bold;
+    }
+    td[contenteditable] {
+      outline: none;
+      text-transform: uppercase;
+    }
+    .us-cell {
+      font-size: 16px;
+      vertical-align: middle;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .us-cell span {
+      font-size: 16px;
+      display: inline-block;
+      line-height: 1;
+      vertical-align: middle;
+    }
+    .buttons {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .buttons button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .reset-btn { background-color: #e74c3c; }
+    .save-btn { background-color: #2ecc71; }
+    .send-btn { background-color: black; }
+
+    .elz-signature {
+      margin-top: 50px;
+      text-align: center;
+      color: #555;
+      font-size: 14px;
+      font-style: italic;
+      opacity: 0.8;
+      animation: fadein 1.2s ease-out forwards;
+    }
+
+    .elz-line {
+      width: 0;
+      height: 2px;
+      background-color: #d32f2f;
+      margin: 0 auto 8px;
+      animation: expandLine 1s ease-out forwards;
+    }
+
+    .elz-brand {
+      letter-spacing: 1px;
+      animation: popIn 0.5s ease-out 0.6s forwards;
+      opacity: 0;
+    }
+
+    @keyframes expandLine {
+      from { width: 0; opacity: 0; }
+      to { width: 60px; opacity: 1; }
+    }
+
+    @keyframes fadein {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 0 0 40px 0;
+      }
+
+      .container {
+        padding: 0 25px 40px 25px !important;
+      }
+
+      .buttons {
+        margin-bottom: 30px;
+      }
+
+      header {
+        position: relative;
+        left: -25px;
+        right: -25px;
+        width: calc(100% + 50px);
+      }
+
+      table {
+        font-size: 13px;
+      }
+
+      th, td {
+        padding: 6px;
+        height: 32px;
+        font-size: 14px;
+      }
+
+      .us-cell {
+        font-size: 14px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="assets/logo.jpeg" alt="Logo Transport ELZ">
+  </header>
+  <div class="container">
+    <div class="top-bar">
+      <input type="date" id="dateSelect" />
+    </div>
+    <label for="note">Note:</label>
+    <textarea id="note" rows="2"></textarea>
+    <div class="table-wrapper">
+      <table id="dispoTable">
+        <thead>
+          <tr>
+            <th>CHAUFFEUR</th><th>US</th><th>CAMION</th><th>REMORQUE</th><th>DÉPART</th><th>NOTE</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+    <div class="buttons">
+      <button class="reset-btn" onclick="resetForm()">Reset</button>
+      <button class="save-btn" onclick="saveData()">Save</button>
+      <button class="send-btn" onclick="sendForm()">Send</button>
+    </div>
+    <footer class="elz-signature">
+      <div class="elz-line"></div>
+      <div class="elz-brand">🚛 Transport <strong>ELZ</strong></div>
+    </footer>
+  </div>
+</body>
+</html>

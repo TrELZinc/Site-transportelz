@@ -1,120 +1,141 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Équipements</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Équipements Disponibles</title>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Comfortaa', cursive;
       margin: 0;
-      background-color: #f9f9f9;
-      padding: 20px;
+      font-family: 'Comfortaa', cursive;
+      background: #f5f5f5;
+      padding: 0;
     }
-    h1 {
+
+    header {
+      background-color: #e0e0e0;
       text-align: center;
-      color: #111;
+      padding: 20px 10px 10px;
     }
+
+    header h1 {
+      margin: 0;
+      font-size: 22px;
+      color: #333;
+      letter-spacing: 1px;
+    }
+
+    .date-select {
+      text-align: center;
+      margin: 10px 0 20px;
+    }
+
+    .date-select input {
+      padding: 10px 18px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 18px;
+      font-family: 'Comfortaa', cursive;
+      text-align: center;
+    }
+
     .section {
       max-width: 800px;
-      margin: 30px auto;
+      margin: 20px auto;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.05);
     }
-    .equip-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-    }
-    .equip {
-      border: 2px solid #ccc;
-      padding: 12px 18px;
-      border-radius: 8px;
+
+    .section-title {
+      background: #fff9c4;
+      padding: 12px 16px;
+      font-weight: bold;
       font-size: 16px;
-      cursor: pointer;
-      background-color: #fff;
-      transition: 0.3s;
+      text-transform: uppercase;
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #ddd;
     }
-    .equip.used {
-      background-color: #d32f2f;
-      color: white;
-      border-color: #a00;
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid #eee;
+      font-size: 16px;
     }
-    .equip.free {
-      background-color: #2ecc71;
-      color: white;
-      border-color: #27ae60;
+
+    .status {
+      font-weight: bold;
     }
-    button {
-      padding: 10px 16px;
-      background: #111;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 14px;
-      margin-top: 20px;
-      cursor: pointer;
+
+    .planifie {
+      color: #d32f2f;
+    }
+
+    .disponible {
+      color: #2ecc71;
+    }
+
+    @media (max-width: 600px) {
+      .row {
+        flex-direction: column;
+        gap: 6px;
+        align-items: flex-start;
+      }
+      .section-title {
+        flex-direction: column;
+        gap: 6px;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Disponibilité des équipements</h1>
-  <div class="section">
-    <h2>Camions</h2>
-    <div class="equip-list" id="camions"></div>
+  <header>
+    <h1>CITERNES</h1>
+  </header>
+
+  <div class="date-select">
+    <input type="date" value="2025-03-26" />
   </div>
+
   <div class="section">
-    <h2>Remorques</h2>
-    <div class="equip-list" id="remorques"></div>
+    <div class="section-title">
+      <span>3 ESSIEUX</span>
+      <span>STATUS</span>
+    </div>
+    <div class="row"><span>1906</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row"><span>2006</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row"><span>2506</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row"><span>2706</span><span class="status planifie">PLANIFIÉ</span></div>
   </div>
-  <script>
-    const camionsAll = ["1103","1202","1303","1404","1502","1602","1603","1703","1803"];
-    const remorquesAll = ["1505","1605","1805","1905","1906","2006","2205","2405","2506","2706"];
 
-    const customStates = JSON.parse(localStorage.getItem("custom_equip_state") || "{}");
+  <div class="section">
+    <div class="section-title">
+      <span>4 ESSIEUX</span>
+      <span>STATUS</span>
+    </div>
+    <div class="row"><span>1505</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row"><span>1605</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row"><span>1805</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row"><span>1905</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row"><span>2205</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row"><span>2405</span><span class="status disponible">DISPONIBLE</span></div>
+  </div>
 
-    function getUsedEquipments() {
-      const rows = JSON.parse(localStorage.getItem("dispo_rows") || "[]");
-      const usedCamions = new Set();
-      const usedRemorques = new Set();
-
-      rows.forEach(row => {
-        if (row[6]) usedCamions.add(row[6].toUpperCase());
-        if (row[7]) usedRemorques.add(row[7].toUpperCase());
-      });
-
-      return { usedCamions, usedRemorques };
-    }
-
-    function renderEquipList(containerId, list, usedSet, type) {
-      const container = document.getElementById(containerId);
-      container.innerHTML = "";
-
-      list.forEach(id => {
-        const key = `${type}_${id}`;
-        const isOverridden = key in customStates;
-        const isUsed = isOverridden ? customStates[key] : usedSet.has(id);
-
-        const div = document.createElement("div");
-        div.className = `equip ${isUsed ? "used" : "free"}`;
-        div.textContent = `${type.toUpperCase()} ${id}`;
-        div.onclick = () => {
-          customStates[key] = !isUsed;
-          localStorage.setItem("custom_equip_state", JSON.stringify(customStates));
-          render();
-        };
-        container.appendChild(div);
-      });
-    }
-
-    function render() {
-      const { usedCamions, usedRemorques } = getUsedEquipments();
-      renderEquipList("camions", camionsAll, usedCamions, "CAMION");
-      renderEquipList("remorques", remorquesAll, usedRemorques, "REMORQUE");
-    }
-
-    render();
-    setInterval(render, 5000);
-  </script>
+  <div class="section">
+    <div class="section-title">
+      <span>CAMIONS</span>
+      <span>STATUS</span>
+    </div>
+    <div class="row"><span>1103</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row"><span>1303</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row"><span>1404</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row"><span>1502</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row"><span>1602</span><span class="status disponible">DISPONIBLE</span></div>
+  </div>
 </body>
 </html>

@@ -147,6 +147,11 @@
       width: 100%;
       border-collapse: collapse;
     }
+    td select {
+  width: 100%;
+  box-sizing: border-box;
+}
+
     th, td {
   border: 1px solid #999;
   text-align: center;
@@ -524,9 +529,20 @@ tr:nth-child(odd) td {
   }
 });
 table.addEventListener("focusin", (e) => {
-  if (e.target.tagName === "TD" && e.target.hasAttribute("contenteditable")) {
-    currentCell = e.target;
+  let target = e.target;
 
+  // Si on est dans un select ou contenteditable
+  if (
+    (target.tagName === "TD" && target.hasAttribute("contenteditable")) ||
+    (target.tagName === "SELECT" && target.closest("td"))
+  ) {
+    currentCell = target.tagName === "SELECT" ? target.closest("td") : target;
+
+    const rect = currentCell.getBoundingClientRect();
+    arrowBtn.style.top = `${window.scrollY + rect.top + 5}px`;
+    arrowBtn.style.left = `${window.scrollX + rect.right + 5}px`;
+    arrowBtn.style.display = "inline-block";
+  }
     // 👇 MAGIE : Assure que la cellule est visible
     currentCell.scrollIntoView({
       behavior: "smooth",
@@ -572,6 +588,8 @@ document.addEventListener("DOMContentLoaded", () => {
       arrowBtn.style.left = `${window.scrollX + rect.right + 5}px`;
       arrowBtn.style.display = "inline-block";
     }
+    const cells = Array.from(row.querySelectorAll("td[contenteditable], td select"));
+
   });
 
   document.addEventListener("scroll", () => {

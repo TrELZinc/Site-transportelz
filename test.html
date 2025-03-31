@@ -243,6 +243,15 @@ tr:nth-child(odd) td {
   <script>
   function createRow() {
   const row = document.createElement("tr");
+
+  const camionOptions = [
+    "", "1103", "1202", "1303", "1404", "1502", "1602", "1603", "1703", "1803"
+  ].map(opt => `<option value="${opt}">${opt}</option>`).join("");
+
+  const remorqueOptions = [
+    "", "1505", "1605", "1805", "1905", "1906", "2006", "2205", "2405", "2506", "2706"
+  ].map(opt => `<option value="${opt}">${opt}</option>`).join("");
+
   row.innerHTML = `
     <td contenteditable inputmode="numeric"></td>     <!-- RANG -->
     <td contenteditable></td>                         <!-- CLIENT -->
@@ -250,12 +259,13 @@ tr:nth-child(odd) td {
     <td contenteditable></td>                         <!-- DÉPART -->
     <td contenteditable></td>                         <!-- LIVRAISON -->
     <td contenteditable></td>                         <!-- CHAUFFEUR -->
-    <td contenteditable inputmode="numeric"></td>     <!-- CAMION -->
-    <td contenteditable inputmode="numeric"></td>     <!-- REMORQUE -->
+    <td><select class="camion-select">${camionOptions}</select></td>
+    <td><select class="remorque-select">${remorqueOptions}</select></td>
     <td><button class="copy-btn" onclick="copyRow(this)">📋</button></td>
   `;
   return row;
 }
+
 
 
   function copyRow(button) {
@@ -272,14 +282,15 @@ tr:nth-child(odd) td {
   const chauffeur = chauffeurMap[rawCode] || { nom: rawCode, tel: "" };
 
   const values = [
-    chauffeur.nom,
-    (cells[1]?.textContent || "").trim().toUpperCase(),
-    (cells[2]?.textContent || "").trim().toUpperCase(),
-    (cells[3]?.textContent || "").trim().toUpperCase(),
-    (cells[4]?.textContent || "").trim().toUpperCase(),
-    (cells[6]?.textContent || "").trim().toUpperCase(),
-    (cells[7]?.textContent || "").trim().toUpperCase()
-  ];
+  chauffeur.nom,
+  (cells[1]?.textContent || "").trim().toUpperCase(),
+  (cells[2]?.textContent || "").trim().toUpperCase(),
+  (cells[3]?.textContent || "").trim().toUpperCase(),
+  (cells[4]?.textContent || "").trim().toUpperCase(),
+  cells[6]?.querySelector("select")?.value || "",
+  cells[7]?.querySelector("select")?.value || ""
+];
+
 
   const labels = ["Chauffeur", "Client", "Type", "Départ", "Livraison", "Camion", "Remorque"];
 

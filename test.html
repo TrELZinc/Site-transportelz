@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sommaire</title>
   <style>
+    
     html, body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
@@ -69,6 +70,31 @@
     .menu.show {
       display: block;
     }
+    .equip-select {
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+  font-family: 'Segoe UI', sans-serif;
+  border: 2px solid #999;
+  border-radius: 6px;
+  background-color: #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  appearance: none;
+}
+
+.equip-select:focus {
+  outline: none;
+  border-color: #d32f2f;
+  box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.2);
+}
+
+@media (max-width: 600px) {
+  .equip-select {
+    font-size: 18px;
+    padding: 10px;
+  }
+}
+
     .menu a {
       display: block;
       color: white;
@@ -259,8 +285,36 @@ tr:nth-child(odd) td {
     <td contenteditable></td>                         <!-- DÉPART -->
     <td contenteditable></td>                         <!-- LIVRAISON -->
     <td contenteditable></td>                         <!-- CHAUFFEUR -->
-    <td><select class="camion-select">${camionOptions}</select></td>
-    <td><select class="remorque-select">${remorqueOptions}</select></td>
+<td>
+  <select class="equip-select camion">
+    <option value="">--</option>
+    <option>1103</option>
+    <option>1202</option>
+    <option>1303</option>
+    <option>1404</option>
+    <option>1502</option>
+    <option>1602</option>
+    <option>1603</option>
+    <option>1703</option>
+    <option>1803</option>
+  </select>
+</td>
+<td>
+  <select class="equip-select remorque">
+    <option value="">--</option>
+    <option>1505</option>
+    <option>1605</option>
+    <option>1805</option>
+    <option>1905</option>
+    <option>1906</option>
+    <option>2006</option>
+    <option>2205</option>
+    <option>2405</option>
+    <option>2506</option>
+    <option>2706</option>
+  </select>
+</td>
+
     <td><button class="copy-btn" onclick="copyRow(this)">📋</button></td>
   `;
   return row;

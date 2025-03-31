@@ -179,10 +179,6 @@
         font-size: 14px !important;
       }
     }
-    body {
-  overflow-x: hidden;
-}
-
   </style>
 </head>
 <body>
@@ -346,92 +342,38 @@ window.onload = function () {
        
 </script>
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-  const table = document.getElementById("dispoTable");
+  document.addEventListener("DOMContentLoaded", function () {
+    const toggle = document.getElementById("hamburger");
+    const menu = document.getElementById("menuDropdown");
 
-  const arrowBtn = document.createElement("button");
-arrowBtn.textContent = "➡️";
-arrowBtn.className = "arrow-next";
-arrowBtn.style.maxWidth = "100%";           // ✅ Ajout ligne 1
-arrowBtn.style.whiteSpace = "nowrap";       // ✅ Ajout ligne 2
-  arrowBtn.style.boxSizing = "border-box";
-arrowBtn.style.position = "absolute";
-arrowBtn.style.zIndex = 1000;
-arrowBtn.style.display = "none";
-arrowBtn.style.padding = "2px 6px";
-arrowBtn.style.fontSize = "14px";
-arrowBtn.style.borderRadius = "6px";
-arrowBtn.style.background = "#111";
-arrowBtn.style.color = "#fff";
-arrowBtn.style.border = "none";
-arrowBtn.style.boxShadow = "0 2px 4px rgba(0,0,0,0.3)";
+    toggle.addEventListener("click", function () {
+      menu.classList.toggle("show");
+    });
 
-  document.body.appendChild(arrowBtn);
-
-  let currentCell = null;
-
-  table.addEventListener("focusin", (e) => {
-    if (e.target.tagName === "TD" && e.target.hasAttribute("contenteditable")) {
-      currentCell = e.target;
-
-      currentCell.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-        inline: "center"
-      });
-
-      const rect = currentCell.getBoundingClientRect();
-      arrowBtn.style.top = `${window.scrollY + rect.top + 5}px`;
-      arrowBtn.style.left = `${window.scrollX + rect.right + 5}px`;
-      arrowBtn.style.display = "inline-block";
-    }
-  });
-
-  document.addEventListener("scroll", () => {
-    if (!currentCell) return;
-    const rect = currentCell.getBoundingClientRect();
-    arrowBtn.style.top = `${window.scrollY + rect.top + 5}px`;
-    arrowBtn.style.left = `${window.scrollX + rect.right + 5}px`;
-  });
-
-  arrowBtn.addEventListener("click", () => {
-    if (!currentCell) return;
-
-    const row = currentCell.closest("tr");
-    const cells = Array.from(row.querySelectorAll("td[contenteditable]"));
-    const idx = cells.indexOf(currentCell);
-    let next = null;
-
-    if (idx < cells.length - 1) {
-      next = cells[idx + 1];
-    } else {
-      const nextRow = row.nextElementSibling;
-      if (nextRow) {
-        const nextCells = Array.from(nextRow.querySelectorAll("td[contenteditable]"));
-        if (nextCells.length) next = nextCells[0];
+    document.addEventListener("click", function (e) {
+      if (!toggle.contains(e.target) && !menu.contains(e.target)) {
+        menu.classList.remove("show");
       }
-    }
-
-    if (next) {
-      next.focus();
-      currentCell = next;
-
-      setTimeout(() => {
-        next.scrollIntoView({
-  behavior: "smooth",
-  block: "nearest",
-  inline: "nearest"
-});
-
-
-        const rect = next.getBoundingClientRect();
-        arrowBtn.style.top = `${window.scrollY + rect.top + 5}px`;
-        arrowBtn.style.left = `${window.scrollX + rect.right + 5}px`;
-      }, 50);
-    }
+    });
   });
+  document.addEventListener("focusin", function (e) {
+  if (e.target.matches("td[contenteditable]")) {
+    const cell = e.target;
+    const container = document.querySelector(".table-wrapper");
 
+    const cellRect = cell.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+
+    const offsetLeft = cell.offsetLeft;
+    const scrollLeft = offsetLeft - (containerRect.width / 3); // scroll un peu avant
+
+    container.scrollTo({
+      left: scrollLeft,
+      behavior: "smooth"
+    });
+  }
 });
+
 </script>
 
 </body>

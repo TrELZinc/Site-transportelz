@@ -184,7 +184,8 @@
 <body>
   <header>
     <img src="assets/logo.jpeg" alt="Logo Transport ELZ">
-    <div class="menu-toggle" id="hamburger">
+    <!-- Removed ID to simplify and use direct onclick -->
+    <div class="menu-toggle" onclick="toggleMenu()">
       <span></span>
       <span></span>
       <span></span>
@@ -216,7 +217,24 @@
       <button class="send-btn" onclick="sendForm()">Send</button>
     </div>
   </div>
+  
   <script>
+    // Toggle menu function - simple direct approach
+    function toggleMenu() {
+      const menu = document.getElementById("menuDropdown");
+      menu.classList.toggle("show");
+    }
+    
+    // Close menu when clicking outside
+    document.addEventListener("click", function(e) {
+      const menu = document.getElementById("menuDropdown");
+      const toggle = document.querySelector(".menu-toggle");
+      
+      if (!toggle.contains(e.target) && !menu.contains(e.target)) {
+        menu.classList.remove("show");
+      }
+    });
+    
     function createRow() {
       const row = document.createElement("tr");
       row.innerHTML = `
@@ -301,18 +319,7 @@
       document.getElementById("note").value = "";
       document.getElementById("dateSelect").value = "";
       localStorage.clear();
-
-      const rows = document.querySelectorAll("#tableBody tr");
-      rows.forEach(row => {
-        const cells = row.querySelectorAll("td");
-        cells.forEach((cell, index) => {
-          if (index !== 1) {
-            cell.textContent = "";
-          } else {
-            cell.innerHTML = "❌";
-          }
-        });
-      });
+      generateDefaultRows(9); // Use the existing function to reset rows
     }
 
     function saveData() {
@@ -329,7 +336,27 @@
       }
     }
 
-    window.onload = function () {
+    // Cell focus behavior
+    document.addEventListener("focusin", function(e) {
+      if (e.target.matches("td[contenteditable]")) {
+        const cell = e.target;
+        const container = document.querySelector(".table-wrapper");
+        
+        if (container) {
+          const offsetLeft = cell.offsetLeft;
+          const containerRect = container.getBoundingClientRect();
+          const scrollLeft = offsetLeft - (containerRect.width / 3);
+          
+          container.scrollTo({
+            left: scrollLeft,
+            behavior: "smooth"
+          });
+        }
+      }
+    });
+
+    // Initialize on load
+    window.onload = function() {
       const note = localStorage.getItem("dispo_note");
       const date = localStorage.getItem("dispo_date");
       const table = localStorage.getItem("dispo_table");
@@ -343,39 +370,6 @@
         generateDefaultRows(9);
       }
     };
-    
-    document.addEventListener("DOMContentLoaded", function() {
-      const toggle = document.getElementById("hamburger");
-      const menu = document.getElementById("menuDropdown");
-
-      toggle.addEventListener("click", function() {
-        menu.classList.toggle("show");
-      });
-
-      document.addEventListener("click", function(e) {
-        if (!toggle.contains(e.target) && !menu.contains(e.target)) {
-          menu.classList.remove("show");
-        }
-      });
-      
-      document.addEventListener("focusin", function(e) {
-        if (e.target.matches("td[contenteditable]")) {
-          const cell = e.target;
-          const container = document.querySelector(".table-wrapper");
-
-          const cellRect = cell.getBoundingClientRect();
-          const containerRect = container.getBoundingClientRect();
-
-          const offsetLeft = cell.offsetLeft;
-          const scrollLeft = offsetLeft - (containerRect.width / 3);
-
-          container.scrollTo({
-            left: scrollLeft,
-            behavior: "smooth"
-          });
-        }
-      });
-    });
   </script>
 </body>
 </html>

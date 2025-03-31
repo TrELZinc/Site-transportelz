@@ -5,31 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sommaire</title>
   <style>
+    /* Styles de base */
     html, body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
       background-color: #f4f4f4;
       font-size: 16px;
     }
-    header {
-  background-color: #111;
-  width: 100vw;
-  position: relative;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
-  padding: 10px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-sizing: border-box;
-  z-index: 1000;
-}
 
+    /* En-tête */
+    header {
+      background-color: #111;
+      width: 100%;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-sizing: border-box;
+      z-index: 1000;
+    }
     header img {
       height: 40px;
     }
+
+    /* Menu hamburger */
     .menu-toggle {
       display: flex;
       flex-direction: column;
@@ -42,19 +41,6 @@
       margin: 4px 0;
       transition: 0.3s;
     }
-    .copy-btn {
-  font-size: 12px;
-  padding: 3px 6px;
-  background-color: #555;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.copy-btn:hover {
-  background-color: #333;
-}
-
     .menu {
       display: none;
       position: absolute;
@@ -79,6 +65,8 @@
     .menu a:hover {
       background-color: #333;
     }
+
+    /* Container et tableau */
     .container {
       padding: 20px;
       max-width: 1000px;
@@ -122,30 +110,29 @@
       border-collapse: collapse;
     }
     th, td {
-  border: 1px solid #999;
-  text-align: center;
-  vertical-align: middle;
-  padding: 6px;
-  background-color: #fcfcfc;
-}
-th {
-  background-color: #d32f2f;
-  color: white;
-  font-weight: bold;
-  text-transform: uppercase;
-}
-tr:nth-child(even) td {
-  background-color: #f7f7f7;
-}
-tr:nth-child(odd) td {
-  background-color: #ffffff;
-}
-
+      border: 1px solid #999;
+      text-align: center;
+      vertical-align: middle;
+      padding: 6px;
+    }
+    th {
+      background-color: #d32f2f;
+      color: white;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    tr:nth-child(even) td {
+      background-color: #f7f7f7;
+    }
+    tr:nth-child(odd) td {
+      background-color: #ffffff;
     }
     td[contenteditable] {
       outline: none;
       text-transform: uppercase;
     }
+
+    /* Boutons */
     .buttons {
       margin-top: 20px;
       display: flex;
@@ -166,21 +153,34 @@ tr:nth-child(odd) td {
     .save-btn { background-color: #2ecc71; }
     .send-btn { background-color: black; }
     .copy-btn {
+      font-size: 12px;
+      padding: 3px 6px;
       background-color: #555;
       color: white;
       border: none;
-      padding: 6px 12px;
       border-radius: 4px;
-      font-size: 14px;
       cursor: pointer;
     }
+    .copy-btn:hover {
+      background-color: #333;
+    }
+    .arrow-next {
+      position: absolute;
+      z-index: 1000;
+      display: none;
+      padding: 2px 6px;
+      font-size: 14px;
+      border-radius: 6px;
+      background: #111;
+      color: #fff;
+      border: none;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    /* Responsive */
     @media (max-width: 600px) {
-      body {
-        padding: 0 12px 40px 12px;
-      }
       .container {
-        padding-left: 12px;
-        padding-right: 12px;
+        padding: 12px;
       }
       .buttons {
         margin-bottom: 40px;
@@ -199,7 +199,7 @@ tr:nth-child(odd) td {
 <body>
   <header>
     <img src="assets/logo.jpeg" alt="Logo Transport ELZ">
-    <div class="menu-toggle" onclick="document.getElementById('menuDropdown').classList.toggle('show')">
+    <div class="menu-toggle" id="menuToggle">
       <span></span>
       <span></span>
       <span></span>
@@ -217,354 +217,349 @@ tr:nth-child(odd) td {
     <textarea id="note" rows="2"></textarea>
     <div class="table-wrapper">
       <table id="dispoTable">
-  <thead>
-    <tr>
-      <th style="width:70px;">RANG</th>
-      <th style="width:200px;">CLIENT</th>
-      <th style="width:80px;">TYPE</th>
-      <th style="width:80px;">DÉPART</th>
-      <th style="width:80px;">LIVRAISON</th>
-      <th style="width:100px;">CHAUFFEUR</th>
-      <th style="width:90px;">CAMION</th>
-      <th style="width:100px;">REMORQUE</th>
-      <th style="width:60px;">COPIE</th>
-    </tr>
-  </thead>
-  <tbody id="tableBody"></tbody>
-</table>
-
+        <thead>
+          <tr>
+            <th style="width:70px;">RANG</th>
+            <th style="width:200px;">CLIENT</th>
+            <th style="width:80px;">TYPE</th>
+            <th style="width:80px;">DÉPART</th>
+            <th style="width:80px;">LIVRAISON</th>
+            <th style="width:100px;">CHAUFFEUR</th>
+            <th style="width:90px;">CAMION</th>
+            <th style="width:100px;">REMORQUE</th>
+            <th style="width:60px;">COPIE</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
     </div>
     <div class="buttons">
-      <button class="reset-btn" onclick="resetForm()">Reset</button>
-      <button class="save-btn" onclick="saveData()">Save</button>
-      <button class="send-btn" onclick="sendForm()">Send</button>
+      <button class="reset-btn" id="resetBtn">Reset</button>
+      <button class="save-btn" id="saveBtn">Save</button>
+      <button class="send-btn" id="sendBtn">Send</button>
     </div>
   </div>
+
   <script>
-  function createRow() {
-  const row = document.createElement("tr");
-  row.innerHTML = `
-    <td contenteditable inputmode="numeric"></td>     <!-- RANG -->
-    <td contenteditable></td>                         <!-- CLIENT -->
-    <td contenteditable></td>                         <!-- TYPE -->
-    <td contenteditable></td>                         <!-- DÉPART -->
-    <td contenteditable></td>                         <!-- LIVRAISON -->
-    <td contenteditable></td>                         <!-- CHAUFFEUR -->
-    <td contenteditable inputmode="numeric"></td>     <!-- CAMION -->
-    <td contenteditable inputmode="numeric"></td>     <!-- REMORQUE -->
-    <td><button class="copy-btn" onclick="copyRow(this)">📋</button></td>
-  `;
-  return row;
-}
-
-
-  function copyRow(button) {
-  const row = button.closest("tr");
-  const cells = row.querySelectorAll("td");
-
-  const chauffeurMap = {
-    "AP": { nom: "Audrey", tel: "4188737539" },
-    "MD": { nom: "Mathieu", tel: "4183264730" },
-    "RPE": { nom: "Raymond", tel: "4185550001" }
-  };
-
-  const rawCode = (cells[5]?.textContent || "").trim().toUpperCase();
-  const chauffeur = chauffeurMap[rawCode] || { nom: rawCode, tel: "" };
-
-  const values = [
-    chauffeur.nom,
-    (cells[1]?.textContent || "").trim().toUpperCase(),
-    (cells[2]?.textContent || "").trim().toUpperCase(),
-    (cells[3]?.textContent || "").trim().toUpperCase(),
-    (cells[4]?.textContent || "").trim().toUpperCase(),
-    (cells[6]?.textContent || "").trim().toUpperCase(),
-    (cells[7]?.textContent || "").trim().toUpperCase()
-  ];
-
-  const labels = ["Chauffeur", "Client", "Type", "Départ", "Livraison", "Camion", "Remorque"];
-
-  const dateStr = document.getElementById("dateSelect")?.value;
-  let dayFormatted = "";
-
-  if (dateStr) {
-    const daysFr = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
-    const monthsFr = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
-
-    const dateObj = new Date(dateStr + "T00:00:00");
-    const dayName = daysFr[dateObj.getDay()];
-    const dayNum = dateObj.getDate();
-    const monthName = monthsFr[dateObj.getMonth()];
-    dayFormatted = `${dayName} le ${dayNum} ${monthName}`;
-  }
-
-  let sms = `Salut,\nVoici ton voyage pour ${dayFormatted}\n\n`;
-  sms += labels.map((label, idx) => `${label}: ${values[idx]}`).join("\n");
-  sms += `\n\nMerci !`;
-
-  const smsEncoded = encodeURIComponent(sms);
-  const href = chauffeur.tel ? `sms:${chauffeur.tel}?body=${smsEncoded}` : `sms:?body=${smsEncoded}`;
-
-  const link = document.createElement("a");
-  link.href = href;
-  link.style.display = "none";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-
-
-
-
-
-  function generateDefaultRows(n = 9) {
-    const tbody = document.getElementById("tableBody");
-    tbody.innerHTML = "";
-    for (let i = 0; i < n; i++) {
-      tbody.appendChild(createRow());
-    }
-  }
-
-  function sendForm() {
-    const tableClone = document.getElementById("dispoTable").cloneNode(true);
-    const rows = tableClone.querySelectorAll("tbody tr");
-
-    rows.forEach(row => {
-      const cells = row.querySelectorAll("td");
-      let isRowEmpty = true;
-
-      for (let i = 0; i < 8; i++) {
-        const text = cells[i]?.innerText?.trim();
-        if (text) {
-          isRowEmpty = false;
-          break;
-        }
-      }
-
-      for (let i = 0; i < 8; i++) {
-        const cell = cells[i];
-        if (cell.hasAttribute("contenteditable")) {
-          cell.innerText = cell.innerText.trim().toUpperCase();
-        }
-      }
-
-      const copyCell = cells[8];
-      if (copyCell) copyCell.innerHTML = "";
-    });
-
-    const data = {
-      note: document.getElementById("note").value,
-      date: document.getElementById("dateSelect").value,
-      table: tableClone.outerHTML
+    // Configuration et constantes
+    const API_URL = "https://script.google.com/macros/s/AKfycbyYx7yTmj4bnKtr6EvLf0qGSObYt0t6rs9xUEZ1q2ANniFoRDW-wP4etQ7kOMZSVgA_Xw/exec";
+    const CHAUFFEUR_MAP = {
+      "AP": { nom: "Audrey", tel: "4188737539" },
+      "MD": { nom: "Mathieu", tel: "4183264730" },
+      "RPE": { nom: "Raymond", tel: "4185550001" }
     };
+    const STORAGE_KEYS = {
+      note: "dispo_note",
+      date: "dispo_date",
+      rows: "dispo_rows"
+    };
+    const DAYS_FR = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+    const MONTHS_FR = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
 
-    fetch("https://script.google.com/macros/s/AKfycbyYx7yTmj4bnKtr6EvLf0qGSObYt0t6rs9xUEZ1q2ANniFoRDW-wP4etQ7kOMZSVgA_Xw/exec", {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
-
-    alert("Disponibilités envoyées !");
-  }
-
-  function resetForm() {
-  document.getElementById("note").value = "";
-  document.getElementById("dateSelect").value = "";
-  localStorage.clear();
-
-  const rows = document.querySelectorAll("#tableBody tr");
-
-  rows.forEach(row => {
-    const cells = row.querySelectorAll("td");
-    for (let i = 1; i <= 7; i++) {
-      if (cells[i]) cells[i].textContent = "";
+    // Éléments DOM
+    const elements = {
+      dateSelect: document.getElementById("dateSelect"),
+      noteField: document.getElementById("note"),
+      tableBody: document.getElementById("tableBody"),
+      dispoTable: document.getElementById("dispoTable"),
+      resetBtn: document.getElementById("resetBtn"),
+      saveBtn: document.getElementById("saveBtn"),
+      sendBtn: document.getElementById("sendBtn"),
+      menuToggle: document.getElementById("menuToggle"),
+      menuDropdown: document.getElementById("menuDropdown")
+    };
+    
+    // Fonctions pour la gestion des lignes du tableau
+    function createRow() {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td contenteditable inputmode="numeric"></td>
+        <td contenteditable></td>
+        <td contenteditable></td>
+        <td contenteditable></td>
+        <td contenteditable></td>
+        <td contenteditable></td>
+        <td contenteditable inputmode="numeric"></td>
+        <td contenteditable inputmode="numeric"></td>
+        <td><button class="copy-btn">📋</button></td>
+      `;
+      // Attacher l'événement directement lors de la création
+      const copyBtn = row.querySelector(".copy-btn");
+      copyBtn.addEventListener("click", () => copyRow(row));
+      return row;
     }
-  });
-}
 
-
-  function saveData() {
-    try {
-      const table = document.getElementById("dispoTable");
-      if (!table) throw new Error("Table introuvable");
-
-      localStorage.setItem("dispo_note", document.getElementById("note").value);
-      localStorage.setItem("dispo_date", document.getElementById("dateSelect").value);
-
-      const rows = Array.from(document.querySelectorAll("#dispoTable tbody tr")).map(tr =>
-        Array.from(tr.querySelectorAll("td")).slice(0, 8).map(td => td.textContent.trim())
-      );
-      localStorage.setItem("dispo_rows", JSON.stringify(rows));
-
-      alert("Données sauvegardées !");
-    } catch (err) {
-      alert("Erreur lors de la sauvegarde : " + err.message);
+    function generateDefaultRows(n = 9) {
+      elements.tableBody.innerHTML = "";
+      for (let i = 0; i < n; i++) {
+        elements.tableBody.appendChild(createRow());
+      }
     }
-  }
+    
+    // Fonctions pour les opérations principales
+    function formatDate(dateStr) {
+      if (!dateStr) return "";
+      
+      const dateObj = new Date(dateStr + "T00:00:00");
+      const dayName = DAYS_FR[dateObj.getDay()];
+      const dayNum = dateObj.getDate();
+      const monthName = MONTHS_FR[dateObj.getMonth()];
+      return `${dayName} le ${dayNum} ${monthName}`;
+    }
 
-  window.onload = function () {
-    const note = localStorage.getItem("dispo_note");
-    const date = localStorage.getItem("dispo_date");
-    const savedRows = JSON.parse(localStorage.getItem("dispo_rows") || "[]");
-    const tbody = document.getElementById("tableBody");
-    tbody.innerHTML = "";
-
-    savedRows.forEach(data => {
-      const row = createRow();
+    function copyRow(row) {
       const cells = row.querySelectorAll("td");
-      data.forEach((val, idx) => {
-        cells[idx].textContent = val;
-      });
-      tbody.appendChild(row);
-    });
-
-    if (savedRows.length === 0) {
-      generateDefaultRows(9);
+      
+      const rawCode = (cells[5]?.textContent || "").trim().toUpperCase();
+      const chauffeur = CHAUFFEUR_MAP[rawCode] || { nom: rawCode, tel: "" };
+      
+      const values = [
+        chauffeur.nom,
+        (cells[1]?.textContent || "").trim().toUpperCase(),
+        (cells[2]?.textContent || "").trim().toUpperCase(),
+        (cells[3]?.textContent || "").trim().toUpperCase(),
+        (cells[4]?.textContent || "").trim().toUpperCase(),
+        (cells[6]?.textContent || "").trim().toUpperCase(),
+        (cells[7]?.textContent || "").trim().toUpperCase()
+      ];
+      
+      const labels = ["Chauffeur", "Client", "Type", "Départ", "Livraison", "Camion", "Remorque"];
+      const dayFormatted = formatDate(elements.dateSelect.value);
+      
+      let sms = `Salut,\nVoici ton voyage pour ${dayFormatted}\n\n`;
+      sms += labels.map((label, idx) => `${label}: ${values[idx]}`).join("\n");
+      sms += `\n\nMerci !`;
+      
+      const smsEncoded = encodeURIComponent(sms);
+      const href = chauffeur.tel ? `sms:${chauffeur.tel}?body=${smsEncoded}` : `sms:?body=${smsEncoded}`;
+      
+      // Création et clic du lien
+      const link = document.createElement("a");
+      link.href = href;
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
 
-    if (note) document.getElementById("note").value = note;
-    if (date) document.getElementById("dateSelect").value = date;
-  };
-
-  document.addEventListener("DOMContentLoaded", function () {
-    const toggle = document.getElementById("hamburger");
-    const menu = document.getElementById("menuDropdown");
-
-    if (toggle && menu) {
-      toggle.addEventListener("click", function () {
-        menu.classList.toggle("show");
-      });
-
-      document.addEventListener("click", function (e) {
-        if (!toggle.contains(e.target) && !menu.contains(e.target)) {
-          menu.classList.remove("show");
+    function resetForm() {
+      elements.noteField.value = "";
+      elements.dateSelect.value = "";
+      localStorage.clear();
+      
+      const rows = document.querySelectorAll("#tableBody tr");
+      rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        for (let i = 0; i < 8; i++) {
+          if (cells[i]) cells[i].textContent = "";
         }
       });
     }
-  });
-    document.addEventListener("input", function (e) {
-  if (e.target.matches("td[contenteditable]")) {
-    const selection = window.getSelection();
-    const range = selection.getRangeAt(0);
-    const cursorPos = range.startOffset;
 
-    const upper = e.target.textContent.toUpperCase();
-    e.target.textContent = upper;
-
-    // Remet le curseur à la bonne place
-    range.setStart(e.target.firstChild || e.target, cursorPos);
-    range.setEnd(e.target.firstChild || e.target, cursorPos);
-    selection.removeAllRanges();
-    selection.addRange(range);
-  }
-});
-table.addEventListener("focusin", (e) => {
-  if (e.target.tagName === "TD" && e.target.hasAttribute("contenteditable")) {
-    currentCell = e.target;
-
-    // 👇 MAGIE : Assure que la cellule est visible
-    currentCell.scrollIntoView({
-      behavior: "smooth",
-      block: "nearest",
-      inline: "center"
-    });
-
-    const rect = currentCell.getBoundingClientRect();
-    arrowBtn.style.top = `${window.scrollY + rect.top + 5}px`;
-    arrowBtn.style.left = `${window.scrollX + rect.right + 5}px`;
-    arrowBtn.style.display = "inline-block";
-  }
-});
-
-
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const table = document.getElementById("dispoTable");
-
-  const arrowBtn = document.createElement("button");
-  arrowBtn.textContent = "➡️";
-  arrowBtn.className = "arrow-next";
-  arrowBtn.style.position = "absolute";
-  arrowBtn.style.zIndex = 1000;
-  arrowBtn.style.display = "none";
-  arrowBtn.style.padding = "2px 6px";
-  arrowBtn.style.fontSize = "14px";
-  arrowBtn.style.borderRadius = "6px";
-  arrowBtn.style.background = "#111";
-  arrowBtn.style.color = "#fff";
-  arrowBtn.style.border = "none";
-  arrowBtn.style.boxShadow = "0 2px 4px rgba(0,0,0,0.3)";
-  document.body.appendChild(arrowBtn);
-
-  let currentCell = null;
-
-  table.addEventListener("focusin", (e) => {
-    if (e.target.tagName === "TD" && e.target.hasAttribute("contenteditable")) {
-      currentCell = e.target;
-      const rect = currentCell.getBoundingClientRect();
-      arrowBtn.style.top = `${window.scrollY + rect.top + 5}px`;
-      arrowBtn.style.left = `${window.scrollX + rect.right + 5}px`;
-      arrowBtn.style.display = "inline-block";
+    function saveData() {
+      try {
+        localStorage.setItem(STORAGE_KEYS.note, elements.noteField.value);
+        localStorage.setItem(STORAGE_KEYS.date, elements.dateSelect.value);
+        
+        const rows = Array.from(document.querySelectorAll("#dispoTable tbody tr")).map(tr =>
+          Array.from(tr.querySelectorAll("td")).slice(0, 8).map(td => td.textContent.trim())
+        );
+        localStorage.setItem(STORAGE_KEYS.rows, JSON.stringify(rows));
+        
+        alert("Données sauvegardées !");
+      } catch (err) {
+        alert("Erreur lors de la sauvegarde : " + err.message);
+      }
     }
-  });
 
-  document.addEventListener("scroll", () => {
-    if (!currentCell) return;
-    const rect = currentCell.getBoundingClientRect();
-    arrowBtn.style.top = `${window.scrollY + rect.top + 5}px`;
-    arrowBtn.style.left = `${window.scrollX + rect.right + 5}px`;
-  });
-
-  arrowBtn.addEventListener("click", () => {
-  if (!currentCell) return;
-  const row = currentCell.closest("tr");
-  const cells = Array.from(row.querySelectorAll("td[contenteditable]"));
-  const idx = cells.indexOf(currentCell);
-
-  let next = null;
-
-  if (idx < cells.length - 1) {
-    next = cells[idx + 1];
-  } else {
-    const nextRow = row.nextElementSibling;
-    if (nextRow) {
-      const nextCells = Array.from(nextRow.querySelectorAll("td[contenteditable]"));
-      if (nextCells.length) next = nextCells[0];
-    }
-  }
-
-  if (next) {
-    next.focus();
-    currentCell = next;
-
-    // ⏱ attendre le rendu avant scroll
-    setTimeout(() => {
-      next.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-        inline: "center"
+    function sendForm() {
+      const tableClone = elements.dispoTable.cloneNode(true);
+      const rows = tableClone.querySelectorAll("tbody tr");
+      
+      rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        
+        // Transformation en majuscules
+        for (let i = 0; i < 8; i++) {
+          const cell = cells[i];
+          if (cell.hasAttribute("contenteditable")) {
+            cell.innerText = cell.innerText.trim().toUpperCase();
+          }
+        }
+        
+        // Suppression des boutons de copie
+        const copyCell = cells[8];
+        if (copyCell) copyCell.innerHTML = "";
       });
-
-      const rect = next.getBoundingClientRect();
-      arrowBtn.style.top = `${window.scrollY + rect.top + 5}px`;
-      arrowBtn.style.left = `${window.scrollX + rect.right + 5}px`;
-    }, 50);
-  }
-});
-
-
-
-  document.addEventListener("click", (e) => {
-    if (!e.target.closest("td") && e.target !== arrowBtn) {
-      arrowBtn.style.display = "none";
-      currentCell = null;
+      
+      const data = {
+        note: elements.noteField.value,
+        date: elements.dateSelect.value,
+        table: tableClone.outerHTML
+      };
+      
+      fetch(API_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+      
+      alert("Disponibilités envoyées !");
     }
-  });
-});
-</script>
-
-
-
+    
+    // Gestion de la navigation avec flèche
+    function setupArrowNavigation() {
+      const arrowBtn = document.createElement("button");
+      arrowBtn.textContent = "➡️";
+      arrowBtn.className = "arrow-next";
+      document.body.appendChild(arrowBtn);
+      
+      let currentCell = null;
+      
+      // Fonction pour mettre à jour la position du bouton flèche
+      function updateArrowPosition() {
+        if (!currentCell) return;
+        const rect = currentCell.getBoundingClientRect();
+        arrowBtn.style.top = `${window.scrollY + rect.top + 5}px`;
+        arrowBtn.style.left = `${window.scrollX + rect.right + 5}px`;
+        arrowBtn.style.display = "inline-block";
+      }
+      
+      // Déplacement vers la cellule suivante
+      function moveToNextCell() {
+        if (!currentCell) return;
+        const row = currentCell.closest("tr");
+        const cells = Array.from(row.querySelectorAll("td[contenteditable]"));
+        const idx = cells.indexOf(currentCell);
+        
+        let next = null;
+        
+        if (idx < cells.length - 1) {
+          next = cells[idx + 1];
+        } else {
+          const nextRow = row.nextElementSibling;
+          if (nextRow) {
+            const nextCells = Array.from(nextRow.querySelectorAll("td[contenteditable]"));
+            if (nextCells.length) next = nextCells[0];
+          }
+        }
+        
+        if (next) {
+          next.focus();
+          currentCell = next;
+          
+          // Attendre le rendu avant scroll
+          setTimeout(() => {
+            next.scrollIntoView({
+              behavior: "smooth",
+              block: "nearest",
+              inline: "center"
+            });
+            updateArrowPosition();
+          }, 50);
+        }
+      }
+      
+      // Événements
+      elements.dispoTable.addEventListener("focusin", (e) => {
+        if (e.target.tagName === "TD" && e.target.hasAttribute("contenteditable")) {
+          currentCell = e.target;
+          updateArrowPosition();
+          
+          // Assurer que la cellule est visible
+          currentCell.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest",
+            inline: "center"
+          });
+        }
+      });
+      
+      document.addEventListener("scroll", updateArrowPosition);
+      
+      arrowBtn.addEventListener("click", moveToNextCell);
+      
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest("td") && e.target !== arrowBtn) {
+          arrowBtn.style.display = "none";
+          currentCell = null;
+        }
+      });
+    }
+    
+    // Événement pour convertir le texte en majuscules pendant la saisie
+    document.addEventListener("input", (e) => {
+      if (e.target.matches("td[contenteditable]")) {
+        const selection = window.getSelection();
+        const range = selection.getRangeAt(0);
+        const cursorPos = range.startOffset;
+        
+        const upper = e.target.textContent.toUpperCase();
+        e.target.textContent = upper;
+        
+        // Remet le curseur à la bonne place
+        if (e.target.firstChild) {
+          range.setStart(e.target.firstChild, Math.min(cursorPos, e.target.textContent.length));
+          range.setEnd(e.target.firstChild, Math.min(cursorPos, e.target.textContent.length));
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+      }
+    });
+    
+    // Gestion du menu
+    function setupMenu() {
+      if (elements.menuToggle && elements.menuDropdown) {
+        elements.menuToggle.addEventListener("click", () => {
+          elements.menuDropdown.classList.toggle("show");
+        });
+        
+        document.addEventListener("click", (e) => {
+          if (!elements.menuToggle.contains(e.target) && !elements.menuDropdown.contains(e.target)) {
+            elements.menuDropdown.classList.remove("show");
+          }
+        });
+      }
+    }
+    
+    // Initialisation
+    function init() {
+      // Attacher les gestionnaires d'événements
+      elements.resetBtn.addEventListener("click", resetForm);
+      elements.saveBtn.addEventListener("click", saveData);
+      elements.sendBtn.addEventListener("click", sendForm);
+      
+      // Charger les données sauvegardées
+      const note = localStorage.getItem(STORAGE_KEYS.note);
+      const date = localStorage.getItem(STORAGE_KEYS.date);
+      const savedRows = JSON.parse(localStorage.getItem(STORAGE_KEYS.rows) || "[]");
+      
+      elements.tableBody.innerHTML = "";
+      
+      if (savedRows.length > 0) {
+        savedRows.forEach(data => {
+          const row = createRow();
+          const cells = row.querySelectorAll("td");
+          data.forEach((val, idx) => {
+            cells[idx].textContent = val;
+          });
+          elements.tableBody.appendChild(row);
+        });
+      } else {
+        generateDefaultRows(9);
+      }
+      
+      if (note) elements.noteField.value = note;
+      if (date) elements.dateSelect.value = date;
+      
+      // Configurer les fonctionnalités
+      setupArrowNavigation();
+      setupMenu();
+    }
+    
+    // Démarrer l'application quand la page est chargée
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
 </body>
 </html>

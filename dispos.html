@@ -219,16 +219,28 @@
   <script>
 function createRow() {
   const row = document.createElement("tr");
+
+  const camions = [
+    "", "1103", "1202", "1303", "1404", "1502", "1602", "1603", "1703", "1803"
+  ];
+  const remorques = [
+    "", "1505", "1605", "1805", "1905", "1906", "2006", "2205", "2405", "2506", "2706"
+  ];
+
+  const camionOptions = camions.map(c => `<option value="${c}">${c ? "Camion " + c : ""}</option>`).join("");
+  const remorqueOptions = remorques.map(r => `<option value="${r}">${r ? "Remorque " + r : ""}</option>`).join("");
+
   row.innerHTML = `
     <td contenteditable></td>
     <td class="us-cell" onclick="toggleUS(this)" style="font-size:16px;">❌</td>
-    <td contenteditable inputmode="numeric"></td>
-    <td contenteditable inputmode="numeric"></td>
+    <td><select>${camionOptions}</select></td>
+    <td><select>${remorqueOptions}</select></td>
     <td contenteditable></td>
     <td contenteditable></td>
   `;
   return row;
 }
+
 
 function generateDefaultRows(n = 9) {
   const tbody = document.getElementById("tableBody");

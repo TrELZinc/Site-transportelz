@@ -486,12 +486,13 @@ tr:nth-child(odd) td {
         cells[idx].textContent = val;
       });
       tbody.appendChild(row);
+      
+      if (savedRows.length === 0) {
+  generateDefaultRows(9); // tu l'avais oublié !
+}
+
     });
-
-    if (savedRows.length === 0) {
-      generateDefaultRows(9);
-    }
-
+    
     if (note) document.getElementById("note").value = note;
     if (date) document.getElementById("dateSelect").value = date;
   };
@@ -528,9 +529,6 @@ tr:nth-child(odd) td {
     selection.addRange(range);
   }
 });
-table.addEventListener("focusin", (e) => {
-  let target = e.target;
-
   // Si on est dans un select ou contenteditable
   if (
     (target.tagName === "TD" && target.hasAttribute("contenteditable")) ||
@@ -562,7 +560,6 @@ table.addEventListener("focusin", (e) => {
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const table = document.getElementById("dispoTable");
-
   const arrowBtn = document.createElement("button");
   arrowBtn.textContent = "➡️";
   arrowBtn.className = "arrow-next";
@@ -588,8 +585,6 @@ document.addEventListener("DOMContentLoaded", () => {
       arrowBtn.style.left = `${window.scrollX + rect.right + 5}px`;
       arrowBtn.style.display = "inline-block";
     }
-    const cells = Array.from(row.querySelectorAll("td[contenteditable], td select"));
-
   });
 
   document.addEventListener("scroll", () => {

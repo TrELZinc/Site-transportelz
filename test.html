@@ -131,77 +131,6 @@
       outline: none;
       text-transform: uppercase;
     }
-    
-    /* Style pour les sélecteurs de camion/remorque */
-    .vehicle-select {
-      width: 100%;
-      background-color: transparent;
-      border: none;
-      text-align: center;
-      padding: 5px;
-      font-family: 'Segoe UI', sans-serif;
-      font-size: 15px;
-      text-transform: uppercase;
-      appearance: none;
-      cursor: pointer;
-    }
-    
-    .vehicle-select:focus {
-      outline: 1px dashed #999;
-    }
-    
-    .vehicle-select option {
-      background-color: white;
-    }
-    
-    td.booked {
-      background-color: #ffebee !important;
-      position: relative;
-    }
-    
-    td.booked::after {
-      content: "✓";
-      position: absolute;
-      top: 0;
-      right: 0;
-      font-size: 10px;
-      background-color: #d32f2f;
-      color: white;
-      width: 14px;
-      height: 14px;
-      line-height: 14px;
-      text-align: center;
-      border-bottom-left-radius: 4px;
-    }
-
-    /* Notification style */
-    .notification {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      padding: 15px 20px;
-      background-color: #333;
-      color: white;
-      border-radius: 6px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-      z-index: 1100;
-      transform: translateY(100px);
-      opacity: 0;
-      transition: transform 0.3s, opacity 0.3s;
-    }
-    
-    .notification.show {
-      transform: translateY(0);
-      opacity: 1;
-    }
-    
-    .notification.success {
-      background-color: #2ecc71;
-    }
-    
-    .notification.error {
-      background-color: #e74c3c;
-    }
 
     /* Boutons */
     .buttons {
@@ -278,8 +207,6 @@
     <div class="menu" id="menuDropdown">
       <a href="dispos.html">Disponibilités</a>
       <a href="linktree.html">Menu</a>
-      <a href="camions.html">Camions</a>
-      <a href="remorques.html">Remorques</a>
     </div>
   </header>
   <div class="container">
@@ -312,8 +239,6 @@
       <button class="send-btn" id="sendBtn">Send</button>
     </div>
   </div>
-  
-  <div id="notification" class="notification"></div>
 
   <script>
     // Configuration et constantes
@@ -326,16 +251,10 @@
     const STORAGE_KEYS = {
       note: "dispo_note",
       date: "dispo_date",
-      rows: "dispo_rows",
-      camions: "dispo_camions",
-      remorques: "dispo_remorques"
+      rows: "dispo_rows"
     };
     const DAYS_FR = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
     const MONTHS_FR = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
-
-    // Données pour les listes déroulantes (habituellement, elles seraient chargées depuis un autre fichier)
-    let CAMIONS = [];
-    let REMORQUES = [];
 
     // Éléments DOM
     const elements = {
@@ -347,88 +266,12 @@
       saveBtn: document.getElementById("saveBtn"),
       sendBtn: document.getElementById("sendBtn"),
       menuToggle: document.getElementById("menuToggle"),
-      menuDropdown: document.getElementById("menuDropdown"),
-      notification: document.getElementById("notification")
+      menuDropdown: document.getElementById("menuDropdown")
     };
-    
-    // Chargement des données des véhicules depuis une autre page
-    async function loadVehicleData() {
-      try {
-        // Dans un contexte réel, on pourrait charger depuis un fichier JSON ou une API
-        // Pour cet exemple, on va simuler des données
-        const camionsData = localStorage.getItem(STORAGE_KEYS.camions);
-        const remorquesData = localStorage.getItem(STORAGE_KEYS.remorques);
-        
-        // Si aucune donnée n'existe encore, on crée des exemples
-        if (!camionsData) {
-          CAMIONS = [
-            { id: "1103", disponible: true },
-            { id: "1202", disponible: true },
-            { id: "1303", disponible: true },
-            { id: "1404", disponible: true },
-            { id: "1502", disponible: true },
-            { id: "1603", disponible: true },
-            { id: "1703", disponible: true },
-            { id: "1803", disponible: true }
-          
-          ];
-          localStorage.setItem(STORAGE_KEYS.camions, JSON.stringify(CAMIONS));
-        } else {
-          CAMIONS = JSON.parse(camionsData);
-        }
-        
-        if (!remorquesData) {
-          REMORQUES = [
-            { id: "1505", disponible: true },
-            { id: "1605", disponible: true },
-            { id: "1805", disponible: true },
-            { id: "1905", disponible: true },
-            { id: "1906", disponible: true },
-            { id: "2006", disponible: true },
-            { id: "2205", disponible: true },
-            { id: "2405", disponible: true },
-            { id: "2506", disponible: true },
-            { id: "2706", disponible: true }
-            
-          ];
-          localStorage.setItem(STORAGE_KEYS.remorques, JSON.stringify(REMORQUES));
-        } else {
-          REMORQUES = JSON.parse(remorquesData);
-        }
-      } catch (error) {
-        showNotification("Erreur lors du chargement des véhicules", "error");
-        console.error("Erreur lors du chargement des véhicules:", error);
-      }
-    }
-    
-    // Fonction pour mettre à jour le statut des véhicules
-    function updateVehicleStatus(type, id, isBooked) {
-      if (type === 'camion') {
-        const index = CAMIONS.findIndex(c => c.id === id);
-        if (index !== -1) {
-          CAMIONS[index].disponible = !isBooked;
-          localStorage.setItem(STORAGE_KEYS.camions, JSON.stringify(CAMIONS));
-        }
-      } else if (type === 'remorque') {
-        const index = REMORQUES.findIndex(r => r.id === id);
-        if (index !== -1) {
-          REMORQUES[index].disponible = !isBooked;
-          localStorage.setItem(STORAGE_KEYS.remorques, JSON.stringify(REMORQUES));
-        }
-      }
-    }
-    
-    // Fonction pour obtenir des véhicules disponibles
-    function getAvailableVehicles(type) {
-      const vehicles = type === 'camion' ? CAMIONS : REMORQUES;
-      return vehicles.filter(v => v.disponible);
-    }
     
     // Fonctions pour la gestion des lignes du tableau
     function createRow() {
       const row = document.createElement("tr");
-      
-      // Créer les cellules de base
       row.innerHTML = `
         <td contenteditable inputmode="numeric"></td>
         <td contenteditable></td>
@@ -436,87 +279,13 @@
         <td contenteditable></td>
         <td contenteditable></td>
         <td contenteditable></td>
-        <td></td>
-        <td></td>
+        <td contenteditable inputmode="numeric"></td>
+        <td contenteditable inputmode="numeric"></td>
         <td><button class="copy-btn">📋</button></td>
       `;
-      
-      // Créer les sélecteurs pour camion et remorque
-      const camionCell = row.cells[6];
-      const remorqueCell = row.cells[7];
-      
-      // Sélecteur de camion
-      const camionSelect = document.createElement("select");
-      camionSelect.className = "vehicle-select";
-      camionSelect.innerHTML = '<option value="">-</option>';
-      
-      CAMIONS.forEach(camion => {
-        const option = document.createElement("option");
-        option.value = camion.id;
-        option.textContent = camion.id;
-        option.disabled = !camion.disponible;
-        camionSelect.appendChild(option);
-      });
-      
-      camionSelect.addEventListener("change", () => {
-        const selectedId = camionSelect.value;
-        const previousId = camionCell.dataset.previousValue;
-        
-        // Mettre à jour le statut des camions
-        if (previousId) {
-          updateVehicleStatus('camion', previousId, false);
-        }
-        
-        if (selectedId) {
-          updateVehicleStatus('camion', selectedId, true);
-          camionCell.classList.add("booked");
-        } else {
-          camionCell.classList.remove("booked");
-        }
-        
-        camionCell.dataset.previousValue = selectedId;
-      });
-      
-      camionCell.appendChild(camionSelect);
-      
-      // Sélecteur de remorque
-      const remorqueSelect = document.createElement("select");
-      remorqueSelect.className = "vehicle-select";
-      remorqueSelect.innerHTML = '<option value="">-</option>';
-      
-      REMORQUES.forEach(remorque => {
-        const option = document.createElement("option");
-        option.value = remorque.id;
-        option.textContent = remorque.id;
-        option.disabled = !remorque.disponible;
-        remorqueSelect.appendChild(option);
-      });
-      
-      remorqueSelect.addEventListener("change", () => {
-        const selectedId = remorqueSelect.value;
-        const previousId = remorqueCell.dataset.previousValue;
-        
-        // Mettre à jour le statut des remorques
-        if (previousId) {
-          updateVehicleStatus('remorque', previousId, false);
-        }
-        
-        if (selectedId) {
-          updateVehicleStatus('remorque', selectedId, true);
-          remorqueCell.classList.add("booked");
-        } else {
-          remorqueCell.classList.remove("booked");
-        }
-        
-        remorqueCell.dataset.previousValue = selectedId;
-      });
-      
-      remorqueCell.appendChild(remorqueSelect);
-      
-      // Attacher l'événement de copie
+      // Attacher l'événement directement lors de la création
       const copyBtn = row.querySelector(".copy-btn");
       copyBtn.addEventListener("click", () => copyRow(row));
-      
       return row;
     }
 
@@ -525,18 +294,6 @@
       for (let i = 0; i < n; i++) {
         elements.tableBody.appendChild(createRow());
       }
-    }
-    
-    // Fonctions pour les notifications
-    function showNotification(message, type = "success") {
-      const notification = elements.notification;
-      notification.textContent = message;
-      notification.className = "notification " + type;
-      notification.classList.add("show");
-      
-      setTimeout(() => {
-        notification.classList.remove("show");
-      }, 3000);
     }
     
     // Fonctions pour les opérations principales
@@ -552,8 +309,6 @@
 
     function copyRow(row) {
       const cells = row.querySelectorAll("td");
-      const camionSelect = cells[6].querySelector("select");
-      const remorqueSelect = cells[7].querySelector("select");
       
       const rawCode = (cells[5]?.textContent || "").trim().toUpperCase();
       const chauffeur = CHAUFFEUR_MAP[rawCode] || { nom: rawCode, tel: "" };
@@ -564,8 +319,8 @@
         (cells[2]?.textContent || "").trim().toUpperCase(),
         (cells[3]?.textContent || "").trim().toUpperCase(),
         (cells[4]?.textContent || "").trim().toUpperCase(),
-        camionSelect ? camionSelect.value : "",
-        remorqueSelect ? remorqueSelect.value : ""
+        (cells[6]?.textContent || "").trim().toUpperCase(),
+        (cells[7]?.textContent || "").trim().toUpperCase()
       ];
       
       const labels = ["Chauffeur", "Client", "Type", "Départ", "Livraison", "Camion", "Remorque"];
@@ -585,39 +340,20 @@
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
-      showNotification("SMS préparé pour " + chauffeur.nom);
     }
 
     function resetForm() {
-      if (!confirm("Êtes-vous sûr de vouloir réinitialiser le formulaire ?")) {
-        return;
-      }
-      
       elements.noteField.value = "";
       elements.dateSelect.value = "";
-      
-      // On ne supprime pas les données des véhicules
-      const camionsData = localStorage.getItem(STORAGE_KEYS.camions);
-      const remorquesData = localStorage.getItem(STORAGE_KEYS.remorques);
-      
       localStorage.clear();
       
-      // On remet les données des véhicules
-      if (camionsData) localStorage.setItem(STORAGE_KEYS.camions, camionsData);
-      if (remorquesData) localStorage.setItem(STORAGE_KEYS.remorques, remorquesData);
-      
-      // Réinitialiser les camions et remorques comme disponibles
-      CAMIONS.forEach(c => c.disponible = true);
-      REMORQUES.forEach(r => r.disponible = true);
-      
-      localStorage.setItem(STORAGE_KEYS.camions, JSON.stringify(CAMIONS));
-      localStorage.setItem(STORAGE_KEYS.remorques, JSON.stringify(REMORQUES));
-      
-      // Générer à nouveau les lignes
-      generateDefaultRows(9);
-      
-      showNotification("Formulaire réinitialisé");
+      const rows = document.querySelectorAll("#tableBody tr");
+      rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        for (let i = 0; i < 8; i++) {
+          if (cells[i]) cells[i].textContent = "";
+        }
+      });
     }
 
     function saveData() {
@@ -625,39 +361,18 @@
         localStorage.setItem(STORAGE_KEYS.note, elements.noteField.value);
         localStorage.setItem(STORAGE_KEYS.date, elements.dateSelect.value);
         
-        // Sauvegarder les lignes avec les véhicules sélectionnés
-        const rows = Array.from(document.querySelectorAll("#dispoTable tbody tr")).map(tr => {
-          const cells = Array.from(tr.querySelectorAll("td"));
-          const values = cells.slice(0, 6).map(td => td.textContent.trim());
-          
-          // Ajouter les valeurs des sélecteurs
-          const camionSelect = cells[6].querySelector("select");
-          const remorqueSelect = cells[7].querySelector("select");
-          
-          values.push(camionSelect ? camionSelect.value : "");
-          values.push(remorqueSelect ? remorqueSelect.value : "");
-          
-          return values;
-        });
-        
+        const rows = Array.from(document.querySelectorAll("#dispoTable tbody tr")).map(tr =>
+          Array.from(tr.querySelectorAll("td")).slice(0, 8).map(td => td.textContent.trim())
+        );
         localStorage.setItem(STORAGE_KEYS.rows, JSON.stringify(rows));
         
-        // Sauvegarder l'état des véhicules
-        localStorage.setItem(STORAGE_KEYS.camions, JSON.stringify(CAMIONS));
-        localStorage.setItem(STORAGE_KEYS.remorques, JSON.stringify(REMORQUES));
-        
-        showNotification("Données sauvegardées avec succès");
+        alert("Données sauvegardées !");
       } catch (err) {
-        showNotification("Erreur lors de la sauvegarde : " + err.message, "error");
-        console.error("Erreur lors de la sauvegarde:", err);
+        alert("Erreur lors de la sauvegarde : " + err.message);
       }
     }
 
     function sendForm() {
-      if (!confirm("Êtes-vous sûr de vouloir envoyer ces disponibilités ?")) {
-        return;
-      }
-      
       const tableClone = elements.dispoTable.cloneNode(true);
       const rows = tableClone.querySelectorAll("tbody tr");
       
@@ -665,25 +380,11 @@
         const cells = row.querySelectorAll("td");
         
         // Transformation en majuscules
-        for (let i = 0; i < 6; i++) {
+        for (let i = 0; i < 8; i++) {
           const cell = cells[i];
           if (cell.hasAttribute("contenteditable")) {
             cell.innerText = cell.innerText.trim().toUpperCase();
           }
-        }
-        
-        // Remplacer les selects par leur valeur textuelle
-        const camionCell = cells[6];
-        const remorqueCell = cells[7];
-        
-        const camionSelect = camionCell.querySelector("select");
-        if (camionSelect) {
-          camionCell.innerText = camionSelect.value;
-        }
-        
-        const remorqueSelect = remorqueCell.querySelector("select");
-        if (remorqueSelect) {
-          remorqueCell.innerText = remorqueSelect.value;
         }
         
         // Suppression des boutons de copie
@@ -697,22 +398,14 @@
         table: tableClone.outerHTML
       };
       
-      // Afficher un indicateur de chargement
-      showNotification("Envoi en cours...");
-      
       fetch(API_URL, {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
-      })
-      .then(() => {
-        showNotification("Disponibilités envoyées avec succès !");
-      })
-      .catch(error => {
-        console.error("Erreur lors de l'envoi:", error);
-        showNotification("Erreur lors de l'envoi. Veuillez réessayer.", "error");
       });
+      
+      alert("Disponibilités envoyées !");
     }
     
     // Gestion de la navigation avec flèche
@@ -737,9 +430,7 @@
       function moveToNextCell() {
         if (!currentCell) return;
         const row = currentCell.closest("tr");
-        const cells = Array.from(row.querySelectorAll("td")).filter(
-          td => td.hasAttribute("contenteditable") || td.querySelector("select")
-        );
+        const cells = Array.from(row.querySelectorAll("td[contenteditable]"));
         const idx = cells.indexOf(currentCell);
         
         let next = null;
@@ -749,22 +440,13 @@
         } else {
           const nextRow = row.nextElementSibling;
           if (nextRow) {
-            const nextCells = Array.from(nextRow.querySelectorAll("td")).filter(
-              td => td.hasAttribute("contenteditable") || td.querySelector("select")
-            );
+            const nextCells = Array.from(nextRow.querySelectorAll("td[contenteditable]"));
             if (nextCells.length) next = nextCells[0];
           }
         }
         
         if (next) {
-          // Focus sur la cellule ou le select à l'intérieur
-          const select = next.querySelector("select");
-          if (select) {
-            select.focus();
-          } else {
-            next.focus();
-          }
-          
+          next.focus();
           currentCell = next;
           
           // Attendre le rendu avant scroll
@@ -784,13 +466,8 @@
         if (e.target.tagName === "TD" && e.target.hasAttribute("contenteditable")) {
           currentCell = e.target;
           updateArrowPosition();
-        } else if (e.target.tagName === "SELECT" && e.target.classList.contains("vehicle-select")) {
-          currentCell = e.target.closest("td");
-          updateArrowPosition();
-        }
-        
-        // Assurer que la cellule est visible
-        if (currentCell) {
+          
+          // Assurer que la cellule est visible
           currentCell.scrollIntoView({
             behavior: "smooth",
             block: "nearest",

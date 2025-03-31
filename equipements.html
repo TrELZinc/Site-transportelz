@@ -2,100 +2,126 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Équipements Disponibles</title>
-  <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Disponibilité des Équipements</title>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    body {
+    :root {
+      --primary: #111;
+      --secondary: #d32f2f;
+      --bg: #fafafa;
+      --card: #fff;
+      --text: #333;
+      --available: #27ae60;
+      --planned: var(--secondary);
+    }
+
+    * {
+      box-sizing: border-box;
       margin: 0;
-      font-family: 'Comfortaa', cursive;
-      background: #f5f5f5;
       padding: 0;
     }
 
+    body {
+      font-family: 'Comfortaa', cursive;
+      background: var(--bg);
+      color: var(--text);
+      padding-bottom: 60px;
+    }
+
     header {
-      background-color: #e0e0e0;
+      background: var(--primary);
+      color: white;
+      padding: 24px 20px;
       text-align: center;
-      padding: 20px 10px 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
 
     header h1 {
-      margin: 0;
       font-size: 22px;
-      color: #333;
       letter-spacing: 1px;
     }
 
     .date-select {
       text-align: center;
-      margin: 10px 0 20px;
+      margin: 20px 0 30px;
     }
 
     .date-select input {
-      padding: 10px 18px;
+      padding: 12px 20px;
       border-radius: 10px;
-      border: 1px solid #ccc;
-      font-size: 18px;
-      font-family: 'Comfortaa', cursive;
+      border: 1.5px solid #ccc;
+      font-size: 16px;
+      font-family: inherit;
       text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
 
     .section {
-      max-width: 800px;
-      margin: 20px auto;
-      background: white;
-      border-radius: 10px;
+      margin: 0 auto 24px;
+      max-width: 600px;
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
       overflow: hidden;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+      transition: transform 0.3s ease;
+    }
+
+    .section:hover {
+      transform: translateY(-3px);
     }
 
     .section-title {
-      background: #fff9c4;
-      padding: 12px 16px;
-      font-weight: bold;
-      font-size: 16px;
+      background: var(--secondary);
+      color: white;
+      padding: 16px;
+      font-weight: 700;
+      font-size: 15px;
       text-transform: uppercase;
       display: flex;
       justify-content: space-between;
-      border-bottom: 1px solid #ddd;
+      align-items: center;
     }
 
     .row {
       display: flex;
       justify-content: space-between;
-      padding: 12px 16px;
-      border-bottom: 1px solid #eee;
-      font-size: 16px;
+      padding: 14px 18px;
+      border-top: 1px solid #eee;
+      font-size: 15px;
     }
 
     .status {
-      font-weight: bold;
-    }
-
-    .planifie {
-      color: #d32f2f;
+      font-weight: 700;
     }
 
     .disponible {
-      color: #2ecc71;
+      color: var(--available);
     }
 
-    @media (max-width: 600px) {
-      .row {
+    .planifie {
+      color: var(--planned);
+    }
+
+    @media (max-width: 500px) {
+      .section-title, .row {
         flex-direction: column;
-        gap: 6px;
         align-items: flex-start;
+        gap: 6px;
       }
       .section-title {
-        flex-direction: column;
-        gap: 6px;
+        font-size: 14px;
+      }
+      .row {
+        font-size: 14px;
+        padding: 12px 16px;
       }
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Disponibilité des équipements</h1>
+    <h1>Disponibilité des Équipements</h1>
   </header>
 
   <div class="date-select">
@@ -105,7 +131,7 @@
   <div class="section">
     <div class="section-title">
       <span>3 ESSIEUX</span>
-      <span>STATUS</span>
+      <span>STATUT</span>
     </div>
     <div class="row"><span>1906</span><span class="status planifie">PLANIFIÉ</span></div>
     <div class="row"><span>2006</span><span class="status disponible">DISPONIBLE</span></div>
@@ -116,7 +142,7 @@
   <div class="section">
     <div class="section-title">
       <span>4 ESSIEUX</span>
-      <span>STATUS</span>
+      <span>STATUT</span>
     </div>
     <div class="row"><span>1505</span><span class="status disponible">DISPONIBLE</span></div>
     <div class="row"><span>1605</span><span class="status disponible">DISPONIBLE</span></div>
@@ -129,7 +155,7 @@
   <div class="section">
     <div class="section-title">
       <span>CAMIONS</span>
-      <span>STATUS</span>
+      <span>STATUT</span>
     </div>
     <div class="row"><span>1103</span><span class="status disponible">DISPONIBLE</span></div>
     <div class="row"><span>1303</span><span class="status planifie">PLANIFIÉ</span></div>

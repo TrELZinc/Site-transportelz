@@ -38,6 +38,24 @@
       margin-top: 20px;
     }
 
+    .selectors {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .selectors label {
+      margin: 5px;
+    }
+
+    .selectors select {
+      padding: 10px;
+      font-size: 16px;
+      margin: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -114,6 +132,10 @@
         font-size: 20px;
       }
 
+      .selectors {
+        flex-direction: column;
+      }
+
       table {
         font-size: 12px;
         min-width: unset;
@@ -129,37 +151,53 @@
   <div class="container">
     <h1>Tableau des poids par type de véhicule</h1>
 
-    <table>
+    <div class="selectors">
+      <div>
+        <label for="variable1">Citerne :</label>
+        <select id="variable1">
+          <option value="B.45">4 ESSIEUX</option>
+          <option value="B.32">3 ESSIEUX</option>
+          <option value="B.31">3 ESSIEUX CITERNE 2006</option>
+        </select>
+      </div>
+      <div>
+        <label for="variable2">Condition :</label>
+        <select id="variable2">
+          <option value="REGULIER">RÉGULIER</option>
+          <option value="DEGEL">DÉGEL</option>
+        </select>
+      </div>
+      <div>
+        <label for="variable3">Endroit :</label>
+        <select id="variable3">
+          <option value="QUEBEC">QUEBEC</option>
+          <option value="MONTREAL">MONTREAL</option>
+          <option value="ONTARIO">ONTARIO</option>
+          <option value="MARITIMES">MARITIMES</option>
+          <option value="NOUVELLE-ECOSSE">NOUVELLE-ECOSSE</option>
+          <option value="MAINE_JACKMAN">MAINE VIA JACKMAN</option>
+          <option value="NEW_HAMPSHIRE_JACKMAN">NEW HAMPSHIRE VIA JACKMAN</option>
+          <option value="MAINE_STANSTEAD">MAINE VIA STANSTEAD</option>
+          <option value="NEW_HAMPSHIRE_STANSTEAD">NEW HAMPSHIRE VIA STANSTEAD</option>
+          <option value="VERMONT">VERMONT</option>
+          <option value="MASSACHUSETTS">MASSACHUSETTS</option>
+        </select>
+      </div>
+    </div>
+
+    <table id="resultTable">
       <thead>
         <tr>
           <th>ENDROIT</th>
-          <th>(B.45) 4 ESSIEUX - RÉGULIER</th>
-          <th class="degel">(B.45) 4 ESSIEUX - DÉGEL</th>
-          <th>(B.32) 3 ESSIEUX - RÉGULIER</th>
-          <th class="degel">(B.32) 3 ESSIEUX - DÉGEL</th>
-          <th>(B.31) 3 ESSIEUX CITERNE 2006 - RÉGULIER</th>
-          <th class="degel">(B.31) 3 ESSIEUX CITERNE 2006 - DÉGEL</th>
+          <th>POIDS</th>
         </tr>
       </thead>
       <tbody>
-        <tr><td>QUEBEC</td><td>57 500 KG</td><td class="degel">50 500 KG</td><td>49 500 KG</td><td class="degel">43 000 KG</td><td>47 500 KG</td><td class="degel">42 000 KG</td></tr>
-        <tr><td>MONTREAL</td><td>57 500 KG</td><td class="degel">50 500 KG</td><td>49 500 KG</td><td class="degel">43 000 KG</td><td>47 500 KG</td><td class="degel">42 000 KG</td></tr>
-        <tr><td>ONTARIO</td><td>57 500 KG</td><td class="degel">50 500 KG</td><td>49 500 KG</td><td class="degel">43 000 KG</td><td>47 500 KG</td><td class="degel">42 000 KG</td></tr>
-        <tr><td>MARITIMES</td><td>55 500 KG</td><td class="degel">50 500 KG</td><td>44 000 KG</td><td class="degel">43 000 KG</td><td>42 000 KG</td><td class="degel">42 000 KG</td></tr>
-        <tr><td>NOUVELLE-ECOSSE</td><td>55 500 KG</td><td class="degel">50 500 KG</td><td>44 000 KG</td><td class="degel">43 000 KG</td><td>42 000 KG</td><td class="degel">42 000 KG</td></tr>
-        <tr class="section-title"><td colspan="7">USA VIA JACKMAN</td></tr>
-        <tr><td>MAINE</td><td>45 300 KG</td><td class="degel">45 300 KG *</td><td>45 300 KG</td><td class="degel">43 000 KG</td><td>45 300 KG</td><td class="degel">42 000 KG</td></tr>
-        <tr><td>NEW HAMPSHIRE</td><td>45 300 KG</td><td class="degel">45 300 KG *</td><td>45 300 KG</td><td class="degel">43 000 KG</td><td>45 300 KG</td><td class="degel">42 000 KG</td></tr>
-        <tr class="section-title"><td colspan="7">USA VIA STANSTEAD</td></tr>
-        <tr><td>MAINE</td><td>44 800 KG</td><td class="degel">44 800 KG *</td><td>44 900 KG</td><td class="degel">43 000 KG</td><td>44 900 KG</td><td class="degel">42 000 KG</td></tr>
-        <tr><td>NEW HAMPSHIRE</td><td>44 800 KG</td><td class="degel">44 800 KG *</td><td>44 900 KG</td><td class="degel">43 000 KG</td><td>44 900 KG</td><td class="degel">42 000 KG</td></tr>
-        <tr><td>VERMONT</td><td>44 800 KG</td><td class="degel">44 800 KG *</td><td>44 900 KG</td><td class="degel">43 000 KG</td><td>44 900 KG</td><td class="degel">42 000 KG</td></tr>
-        <tr><td>MASSACHUSETTS</td><td>44 800 KG</td><td class="degel">44 800 KG *</td><td>44 900 KG</td><td class="degel">43 000 KG</td><td>44 900 KG</td><td class="degel">42 000 KG</td></tr>
+        <!-- Les résultats seront affichés ici -->
       </tbody>
     </table>
 
     <div class="notes">
-      <p><strong>*</strong> IMPORTANT D'AVOIR LES 4 ESSIEUX À TERRE AU QUÉBEC</p>
       <p>MAINE MAX 100 000 LBS / 45 300 KG</p>
       <p>VERMONT MAX 99 000 LBS / 44 900 KG</p>
       <p>NEW HAMPSHIRE MAX 120 000 LBS / 54 400 KG</p>
@@ -169,5 +207,43 @@
       <a href="linktree.html" class="btn-retour">Retour au menu principal</a>
     </div>
   </div>
+
+  <script>
+    const data = {
+      "QUEBEC": { "B.45": { "REGULIER": "57 500 KG", "DEGEL": "50 500 KG" }, "B.32": { "REGULIER": "49 500 KG", "DEGEL": "43 000 KG" }, "B.31": { "REGULIER": "47 500 KG", "DEGEL": "42 000 KG" } },
+      "MONTREAL": { "B.45": { "REGULIER": "57 500 KG", "DEGEL": "50 500 KG" }, "B.32": { "REGULIER": "49 500 KG", "DEGEL": "43 000 KG" }, "B.31": { "REGULIER": "47 500 KG", "DEGEL": "42 000 KG" } },
+      "ONTARIO": { "B.45": { "REGULIER": "57 500 KG", "DEGEL": "50 500 KG" }, "B.32": { "REGULIER": "49 500 KG", "DEGEL": "43 000 KG" }, "B.31": { "REGULIER": "47 500 KG", "DEGEL": "42 000 KG" } },
+      "MARITIMES": { "B.45": { "REGULIER": "55 500 KG", "DEGEL": "50 500 KG" }, "B.32": { "REGULIER": "44 000 KG", "DEGEL": "43 000 KG" }, "B.31": { "REGULIER": "42 000 KG", "DEGEL": "42 000 KG" } },
+      "NOUVELLE-ECOSSE": { "B.45": { "REGULIER": "55 500 KG", "DEGEL": "50 500 KG" }, "B.32": { "REGULIER": "44 000 KG", "DEGEL": "43 000 KG" }, "B.31": { "REGULIER": "42 000 KG", "DEGEL": "42 000 KG" } },
+      "MAINE_JACKMAN": { "B.45": { "REGULIER": "45 300 KG", "DEGEL": "45 300 KG" }, "B.32": { "REGULIER": "45 300 KG", "DEGEL": "43 000 KG" }, "B.31": { "REGULIER": "45 300 KG", "DEGEL": "42 000 KG" } },
+      "NEW_HAMPSHIRE_JACKMAN": { "B.45": { "REGULIER": "45 300 KG", "DEGEL": "45 300 KG" }, "B.32": { "REGULIER": "45 300 KG", "DEGEL": "43 000 KG" }, "B.31": { "REGULIER": "45 300 KG", "DEGEL": "42 000 KG" } },
+      "MAINE_STANSTEAD": { "B.45": { "REGULIER": "44 800 KG", "DEGEL": "44 800 KG" }, "B.32": { "REGULIER": "44 900 KG", "DEGEL": "43 000 KG" }, "B.31": { "REGULIER": "44 900 KG", "DEGEL": "42 000 KG" } },
+      "NEW_HAMPSHIRE_STANSTEAD": { "B.45": { "REGULIER": "44 800 KG", "DEGEL": "44 800 KG" }, "B.32": { "REGULIER": "44 900 KG", "DEGEL": "43 000 KG" }, "B.31": { "REGULIER": "44 900 KG", "DEGEL": "42 000 KG" } },
+      "VERMONT": { "B.45": { "REGULIER": "44 800 KG", "DEGEL": "44 800 KG" }, "B.32": { "REGULIER": "44 900 KG", "DEGEL": "43 000 KG" }, "B.31": { "REGULIER": "44 900 KG", "DEGEL": "42 000 KG" } },
+      "MASSACHUSETTS": { "B.45": { "REGULIER": "44 800 KG", "DEGEL": "44 800 KG" }, "B.32": { "REGULIER": "44 900 KG", "DEGEL": "43 000 KG" }, "B.31": { "REGULIER": "44 900 KG", "DEGEL": "42 000 KG" } }
+    };
+
+    document.getElementById("variable1").addEventListener("change", updateTable);
+    document.getElementById("variable2").addEventListener("change", updateTable);
+    document.getElementById("variable3").addEventListener("change", updateTable);
+
+    function updateTable() {
+      const var1 = document.getElementById("variable1").value;
+      const var2 = document.getElementById("variable2").value;
+      const var3 = document.getElementById("variable3").value;
+
+      const tbody = document.getElementById("resultTable").querySelector("tbody");
+      tbody.innerHTML = "";
+
+      if (data[var3] && data[var3][var1]) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${var3}</td><td>${data[var3][var1][var2]}</td>`;
+        tbody.appendChild(tr);
+      }
+    }
+
+    // Initial call to display the default selection
+    updateTable();
+  </script>
 </body>
 </html>

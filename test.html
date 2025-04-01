@@ -306,7 +306,7 @@
         table: tableClone.outerHTML
       };
 
-      fetch("https://script.google.com/macros/s/AKfycbzxSwRyCJFMywOB7HESl9RJmrh5t7BNWKC95m88LUknJsxhTSj210y0T5MzNKxx9Q3l/exec", {
+      fetch("https://script.google.com/macros/s/AKfycbx3QGvKpBZAbibFOtk7qJ1OuApcIBxju8HYrTXng2vkWIxxXfMp8lt69zyU3yHbsRuI/exec", {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/json" },
@@ -366,7 +366,7 @@
     mode: "save" // 👈 Indique qu'on veut "enregistrer" (pas juste envoyer un e-mail)
   };
 
-  fetch("https://script.google.com/macros/s/AKfycbzxSwRyCJFMywOB7HESl9RJmrh5t7BNWKC95m88LUknJsxhTSj210y0T5MzNKxx9Q3l/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbx3QGvKpBZAbibFOtk7qJ1OuApcIBxju8HYrTXng2vkWIxxXfMp8lt69zyU3yHbsRuI/exec", {
     method: "POST",
     mode: "no-cors",
     headers: { "Content-Type": "application/json" },
@@ -390,7 +390,7 @@
     return `${yyyy}-${mm}-${dd}`;
   }
     function loadFromSheet(dateStr) {
-  const url = `https://script.google.com/macros/s/AKfycbzxSwRyCJFMywOB7HESl9RJmrh5t7BNWKC95m88LUknJsxhTSj210y0T5MzNKxx9Q3l/exec?date=${dateStr}`;
+  const url = `https://script.google.com/macros/s/AKfycbx3QGvKpBZAbibFOtk7qJ1OuApcIBxju8HYrTXng2vkWIxxXfMp8lt69zyU3yHbsRuI/exec?date=${dateStr}`;
 
   fetch(url)
     .then(res => res.json())

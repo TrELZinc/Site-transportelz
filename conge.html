@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demande de congé</title>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Comfortaa', cursive;
+      background: #f4f4f4;
+      padding: 0;
+    }
+    header {
+      background-color: #000;
+      padding: 20px 10px;
+      text-align: center;
+    }
+    header img {
+      height: 60px;
+      margin-bottom: 10px;
+    }
+    header h1 {
+      margin: 0;
+      color: white;
+      font-size: 24px;
+    }
+    .container {
+      max-width: 500px;
+      margin: 30px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 15px;
+    }
+    input, select, button {
+      width: 100%;
+      margin-top: 5px;
+      padding: 10px;
+      font-size: 16px;
+      font-family: 'Comfortaa', cursive;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: black;
+      color: white;
+      border: none;
+      margin-top: 25px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #333;
+    }
+    .success-msg {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+      font-weight: bold;
+      color: green;
+    }
+    .back-btn {
+      margin-top: 10px;
+      background: #d32f2f;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="assets/logo.jpeg" alt="Logo Transport ELZ">
+    <h1>Demande de congé</h1>
+  </header>
+
+  <div class="container">
+    <label for="nom">Nom du chauffeur</label>
+    <input type="text" id="nom" placeholder="Entrez votre nom" required>
+
+    <label for="date">Date du congé</label>
+    <input type="date" id="date" required>
+
+    <label for="type">Type de congé</label>
+    <select id="type">
+      <option value="">-- Choisir --</option>
+      <option value="Journée complète">Journée complète</option>
+      <option value="Finir avant 14h">Finir avant 14h</option>
+      <option value="Autre">Autre</option>
+    </select>
+
+    <button onclick="envoyerSMS()">Envoyer la demande</button>
+    <a href="linktree.html"><button class="back-btn">Retour au menu principal</button></a>
+
+    <div class="success-msg" id="successMsg">Demande envoyée avec succès !</div>
+  </div>
+
+  <script>
+    function envoyerSMS() {
+      const nom = document.getElementById("nom").value.trim();
+      const date = document.getElementById("date").value;
+      const type = document.getElementById("type").value;
+
+      if (!nom || !date || !type) {
+        alert("Veuillez remplir tous les champs.");
+        return;
+      }
+
+      const dateObj = new Date(date + 'T00:00:00');
+      const jours = ["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"];
+      const mois = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+      const jourNom = jours[dateObj.getDay()];
+      const jourNum = dateObj.getDate();
+      const moisNom = mois[dateObj.getMonth()];
+      const dateFormat = `${jourNom} le ${jourNum} ${moisNom}`;
+
+      const msg = `Demande de congé\nNom: ${nom}\nDate: ${dateFormat}\nType: ${type}`;
+
+      const nums = ["+14185550001", "+14185550002"];
+      nums.forEach(num => {
+        fetch("https://textbelt.com/text", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            phone: num,
+            message: msg,
+            key: "textbelt"
+          })
+        });
+      });
+
+      document.getElementById("successMsg").style.display = "block";
+      setTimeout(() => document.getElementById("successMsg").style.display = "none", 5000);
+      document.getElementById("nom").value = "";
+      document.getElementById("date").value = "";
+      document.getElementById("type").value = "";
+    }
+  </script>
+</body>
+</html>

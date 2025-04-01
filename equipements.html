@@ -6,22 +6,17 @@
   <title>Équipements Disponibles</title>
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
       margin: 0;
       font-family: 'Comfortaa', cursive;
-      background: #f9f9f9;
-      padding: 0;
+      background: #f5f5f5;
     }
 
     header {
-      background-color: #111;
+      background-color: #d32f2f;
+      color: white;
       text-align: center;
       padding: 20px 10px 10px;
-      color: white;
     }
 
     header h1 {
@@ -50,24 +45,25 @@
       background: white;
       border-radius: 14px;
       overflow: hidden;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.08);
     }
 
     .section-title {
-      background: #d32f2f;
-      color: white;
-      padding: 16px;
+      background: #fff;
+      padding: 14px 16px;
       font-weight: bold;
       font-size: 16px;
       text-transform: uppercase;
       display: flex;
       justify-content: space-between;
+      border-bottom: 1px solid #eee;
+      color: #d32f2f;
+      text-align: center;
     }
 
     .row {
       display: flex;
       justify-content: space-between;
-      align-items: center;
       padding: 14px 16px;
       border-bottom: 1px solid #eee;
       font-size: 16px;
@@ -76,36 +72,56 @@
     }
 
     .row:hover {
-      background: #fff3f3;
+      background-color: #fce4ec;
     }
 
     .status {
       font-weight: bold;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 14px;
     }
 
     .planifie {
-      background-color: #fbe9e7;
-      color: #c62828;
+      color: #d32f2f;
     }
 
     .disponible {
-      background-color: #e8f5e9;
-      color: #2e7d32;
+      color: #2ecc71;
+    }
+
+    .action-menu {
+      position: absolute;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 999;
+      display: none;
+    }
+
+    .action-menu button {
+      border: none;
+      background: none;
+      padding: 10px 20px;
+      width: 100%;
+      font-family: 'Comfortaa', cursive;
+      font-size: 16px;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .action-menu button:hover {
+      background: #eee;
     }
 
     @media (max-width: 600px) {
       .row {
         flex-direction: column;
-        align-items: flex-start;
         gap: 6px;
+        align-items: flex-start;
       }
-
       .section-title {
         flex-direction: column;
-        gap: 6px;
+        gap: 4px;
+        align-items: center;
       }
     }
   </style>
@@ -122,53 +138,72 @@
   <div class="section">
     <div class="section-title">
       <span>3 ESSIEUX</span>
-      <span>STATUS</span>
+      <span>STATUT</span>
     </div>
-    <div class="row" onclick="useEquipement(this)"><span>1906</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row" onclick="useEquipement(this)"><span>2006</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="useEquipement(this)"><span>2506</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row" onclick="useEquipement(this)"><span>2706</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" data-status="planifie"><span>1906</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" data-status="disponible"><span>2006</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" data-status="planifie"><span>2506</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" data-status="planifie"><span>2706</span><span class="status planifie">PLANIFIÉ</span></div>
   </div>
 
   <div class="section">
     <div class="section-title">
       <span>4 ESSIEUX</span>
-      <span>STATUS</span>
+      <span>STATUT</span>
     </div>
-    <div class="row" onclick="useEquipement(this)"><span>1505</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="useEquipement(this)"><span>1605</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="useEquipement(this)"><span>1805</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row" onclick="useEquipement(this)"><span>1905</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row" onclick="useEquipement(this)"><span>2205</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="useEquipement(this)"><span>2405</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" data-status="disponible"><span>1505</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" data-status="disponible"><span>1605</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" data-status="planifie"><span>1805</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" data-status="planifie"><span>1905</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" data-status="disponible"><span>2205</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" data-status="disponible"><span>2405</span><span class="status disponible">DISPONIBLE</span></div>
   </div>
 
   <div class="section">
     <div class="section-title">
       <span>CAMIONS</span>
-      <span>STATUS</span>
+      <span>STATUT</span>
     </div>
-    <div class="row" onclick="useEquipement(this)"><span>1103</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="useEquipement(this)"><span>1303</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row" onclick="useEquipement(this)"><span>1404</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="useEquipement(this)"><span>1502</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row" onclick="useEquipement(this)"><span>1602</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" data-status="disponible"><span>1103</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" data-status="planifie"><span>1303</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" data-status="disponible"><span>1404</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" data-status="planifie"><span>1502</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" data-status="disponible"><span>1602</span><span class="status disponible">DISPONIBLE</span></div>
+  </div>
+
+  <div class="action-menu" id="actionMenu">
+    <button onclick="toggleStatus('disponible')">↩️ Réinitialiser</button>
+    <button onclick="toggleStatus('planifie')">✔️ Utiliser</button>
   </div>
 
   <script>
-    function useEquipement(row) {
-      const statusEl = row.querySelector(".status");
-      const isDisponible = statusEl.classList.contains("disponible");
+    let currentRow = null;
 
-      if (!isDisponible) return;
+    document.querySelectorAll('.row').forEach(row => {
+      row.addEventListener('click', e => {
+        currentRow = row;
+        const menu = document.getElementById('actionMenu');
+        menu.style.display = 'block';
+        const rect = row.getBoundingClientRect();
+        menu.style.top = `${window.scrollY + rect.bottom + 5}px`;
+        menu.style.left = `${rect.left + 20}px`;
+      });
+    });
 
-      const confirmed = confirm("Utiliser cet équipement ?");
-
-      if (confirmed) {
-        statusEl.classList.remove("disponible");
-        statusEl.classList.add("planifie");
-        statusEl.textContent = "PLANIFIÉ";
+    document.addEventListener('click', e => {
+      const menu = document.getElementById('actionMenu');
+      if (!menu.contains(e.target) && !e.target.closest('.row')) {
+        menu.style.display = 'none';
       }
+    });
+
+    function toggleStatus(newStatus) {
+      if (!currentRow) return;
+      const span = currentRow.querySelector('.status');
+      span.textContent = newStatus === 'planifie' ? 'PLANIFIÉ' : 'DISPONIBLE';
+      span.className = 'status ' + newStatus;
+      currentRow.setAttribute('data-status', newStatus);
+      document.getElementById('actionMenu').style.display = 'none';
     }
   </script>
 </body>

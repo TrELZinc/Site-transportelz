@@ -382,7 +382,13 @@
   document.getElementById("dateSelect").value = today;
   loadFromSheet(today);
 };
-
+  function formatDate(dateStr) {
+    const d = new Date(dateStr);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
     function loadFromSheet(dateStr) {
   const url = `https://script.google.com/macros/s/AKfycbzxSwRyCJFMywOB7HESl9RJmrh5t7BNWKC95m88LUknJsxhTSj210y0T5MzNKxx9Q3l/exec?date=${dateStr}`;
 

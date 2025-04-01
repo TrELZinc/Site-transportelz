@@ -206,7 +206,15 @@
       const weekStart = getStartOfWeek(clickedDate);
       const weekKey = formatDate(weekStart);
 
-      if (takenWeeks.includes(weekKey)) return;
+      if (takenWeeks.includes(weekKey)) {
+        alert("Cette semaine est déjà prise.");
+        return;
+      }
+
+      if (selectedWeeks.length >= 2 && !selectedWeeks.includes(weekKey)) {
+        alert("Vous ne pouvez sélectionner que deux semaines maximum.");
+        return;
+      }
 
       const index = selectedWeeks.indexOf(weekKey);
       if (index > -1) {

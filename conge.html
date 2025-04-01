@@ -2,9 +2,11 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Demande de congé</title>
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet">
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
   <style>
     body {
       font-family: 'Comfortaa', cursive;
@@ -12,24 +14,20 @@
       background: #f9f9f9;
       padding: 0;
     }
-
     header {
       background-color: #000;
       color: white;
       text-align: center;
       padding: 20px 10px 10px;
     }
-
     header img {
       height: 60px;
       margin-bottom: 8px;
     }
-
     h1 {
       margin: 0;
       font-size: 20px;
     }
-
     form {
       max-width: 500px;
       margin: 30px auto;
@@ -38,14 +36,12 @@
       border-radius: 12px;
       box-shadow: 0 2px 12px rgba(0,0,0,0.05);
     }
-
     label {
       display: block;
       margin-top: 15px;
       font-weight: bold;
       font-size: 15px;
     }
-
     input, textarea, button {
       width: 100%;
       box-sizing: border-box;
@@ -56,12 +52,10 @@
       border-radius: 8px;
       border: 1px solid #ccc;
     }
-
     textarea {
       resize: vertical;
       min-height: 80px;
     }
-
     button {
       background-color: #d32f2f;
       color: white;
@@ -70,11 +64,9 @@
       margin-top: 20px;
       cursor: pointer;
     }
-
     button:hover {
       background-color: #b71c1c;
     }
-
     .success {
       text-align: center;
       color: green;
@@ -82,16 +74,15 @@
       margin-top: 15px;
       display: none;
     }
-
     .link-btn {
       display: block;
       text-align: center;
       margin-top: 20px;
       text-decoration: none;
     }
-
     .link-btn button {
       background: black;
+      color: white;
     }
   </style>
 </head>
@@ -111,12 +102,12 @@
     <label for="type">Détails / Type de congé</label>
     <textarea id="type" placeholder="Ex: congé complet, finir à 14h, rdv médical..."></textarea>
 
-    <button type="submit">Envoyer la demande</button>
+    <button type="submit"><i class="fas fa-paper-plane"></i> Envoyer la demande</button>
     <div class="success" id="successMsg">✅ Demande envoyée avec succès !</div>
   </form>
 
   <a href="linktree.html" class="link-btn">
-    <button>Retour au menu principal</button>
+    <button><i class="fas fa-arrow-left"></i> Retour au menu principal</button>
   </a>
 
   <script>

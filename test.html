@@ -383,10 +383,8 @@
   loadFromSheet(today);
 };
 
-
-    };
     function loadFromSheet(dateStr) {
-  const url = `https://script.google.com/macros/s/TON_DEPLOIEMENT/exec?date=${dateStr}`;
+  const url = `https://script.google.com/macros/s/AKfycbzxSwRyCJFMywOB7HESl9RJmrh5t7BNWKC95m88LUknJsxhTSj210y0T5MzNKxx9Q3l/exec?date=${dateStr}`;
 
   fetch(url)
     .then(res => res.json())

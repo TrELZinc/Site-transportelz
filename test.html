@@ -123,14 +123,52 @@
 
   <script>
     const apiUrl = 'https://script.google.com/macros/s/AKfycbxOlc8H2lw4e3pF0FViso7ds1LTYjW_Z8jdEbeLh634fE-fV4LGRvgp-CAe2M7mQCPQ/exec';
-    const categories = [
-        "ST-BASILE TRANSPORT",
-        "QUÉBEC CENTRE",
-        "ABITIBI",
-        "USA (MAINE/VERMONT/NH)",
-        "QUÉBEC BAS DU FLEUVE",
-        "MARITIMES VERS FREDERICTON"
-    ];
+    const categories = {
+      'CATÉGORIE 1': [
+        'ST-BASILE TRANSPORT',
+        'IRVING ST-AUGUSTIN',
+        'PETRO PASS STE-FOY',
+        'ESSO DESCHAMBAULT',
+        'PETRO PASS TROIS-RIVIÈRES'
+      ],
+      'CATÉGORIE 2': [
+        'IRVING YAMACHICHE SORTIE 174',
+        'PETRO CANADA L\'ASSOMPTION',
+        'IRVING ST-CYRILLE*',
+        'IRVING ST-LIBOIRE',
+        'ESSO DRUMMONDVILLE',
+        'ESSO STANSTEAD'
+      ],
+      'CATÉGORIE 3': [
+        'PETRO CANADA MATAGAMI',
+        'ESSO MATAGAMI',
+        'PETRO CANADA MONT-LAURIER',
+        'ESSO MONT-LAURIER',
+        'PETRO CANADA ROUYN-NORANDA',
+        'PETRO CANADA VAL D\'OR',
+        'PETRO CANADA AMOS'
+      ],
+      'CATÉGORIE 4': [
+        'ESSO STANSTEAD',
+        'IRVING BOW / GORHAM / NEW HAMPTON',
+        'IRVING HOULTON ME',
+        'IRVING FAIRFIELD / AUGUSTA  ME',
+        'IRVING NEWPORT ME'
+      ],
+      'CATÉGORIE 5': [
+        'PETRO CANADA MONT-JOLI',
+        'ESSO MONT JOLI',
+        'PETRO CANADA ST-JEAN-PORT-JOLI',
+        'ESSO AMQUI'
+      ],
+      'CATÉGORIE 6': [
+        'IRVING ST-ANTONIN',
+        'ESSO CABANO',
+        'IRVING DÉGELIS',
+        'IRVING WOODSTOCK',
+        'IRVING FREDERICTON'
+      ]
+    };
 
     function formatPrix(valeur) {
       const num = parseFloat(valeur);
@@ -168,13 +206,15 @@
           `;
 
           if (!isSubSection && !isFirstDateLine) {
-            categories.forEach(category => {
-              if (endroit.toUpperCase().includes(category.toUpperCase())) {
-                if (!categoryRows[category]) {
-                  categoryRows[category] = [];
+            Object.keys(categories).forEach(category => {
+              categories[category].forEach(location => {
+                if (endroit.toUpperCase().includes(location.toUpperCase())) {
+                  if (!categoryRows[category]) {
+                    categoryRows[category] = [];
+                  }
+                  categoryRows[category].push({ tr, prix: parseFloat(prix.replace(',', '.')) });
                 }
-                categoryRows[category].push({ tr, prix: parseFloat(prix.replace(',', '.')) });
-              }
+              });
             });
           }
 

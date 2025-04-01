@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Vacances Chauffeurs</title>
   <style>
     body {
       font-family: Arial, sans-serif;
+      background: #f4f4f4;
       margin: 0;
       padding: 0;
-      background: #f5f5f5;
     }
 
     header {
@@ -17,14 +17,27 @@
       color: white;
       text-align: center;
       padding: 1rem;
-      font-size: 1.5rem;
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    .controls {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    select, input, button {
+      padding: 8px;
+      margin: 5px;
+      font-size: 1rem;
     }
 
     #calendar {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       gap: 5px;
-      padding: 10px;
     }
 
     .day, .week-label {
@@ -50,14 +63,18 @@
       font-weight: bold;
     }
 
-    button {
-      display: block;
-      margin: 20px auto;
-      padding: 10px 20px;
-      font-size: 1rem;
-      background: #000;
+    .month-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .month-nav button {
+      background-color: #000;
       color: white;
       border: none;
+      padding: 5px 10px;
       border-radius: 5px;
     }
 
@@ -72,15 +89,31 @@
 
   <header>Planification des Vacances</header>
 
-  <div id="calendar"></div>
+  <div class="container">
 
-  <button onclick="submitVacation()">Demander cette semaine</button>
+    <div class="controls">
+      <input type="text" id="chauffeur" placeholder="Nom du chauffeur">
+    </div>
+
+    <div class="month-nav">
+      <button onclick="changeMonth(-1)">← Mois précédent</button>
+      <div id="month-year"></div>
+      <button onclick="changeMonth(1)">Mois suivant →</button>
+    </div>
+
+    <div id="calendar"></div>
+
+    <button onclick="submitVacation()">Demander cette semaine</button>
+  </div>
 
   <script>
-    const takenWeeks = ['2025-07-01', '2025-07-08']; // début des semaines prises (à personnaliser)
+    const takenWeeks = ['2025-07-01', '2025-07-08']; // À remplacer par des données de Sheets plus tard
+    let selectedWeeks = [];
+    let currentMonth = new Date().getMonth();
+    let currentYear = new Date().getFullYear();
+
     const calendarEl = document.getElementById('calendar');
-    const today = new Date();
-    const selectedWeeks = [];
+    const monthYearEl = document.getElementById('month-year');
 
     function getStartOfWeek(date) {
       const d = new Date(date);
@@ -89,19 +122,33 @@
       return new Date(d.setDate(diff));
     }
 
+    function changeMonth(delta) {
+      currentMonth += delta;
+      if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+      } else if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      }
+      generateCalendar(currentMonth, currentYear);
+    }
+
     function generateCalendar(month, year) {
       calendarEl.innerHTML = '';
+      const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+      monthYearEl.textContent = `${monthNames[month]} ${year}`;
 
       const firstDay = new Date(year, month, 1);
       const lastDay = new Date(year, month + 1, 0);
-
-      let date = new Date(firstDay);
-      let currentWeekStart = getStartOfWeek(date);
+      let currentWeekStart = getStartOfWeek(firstDay);
 
       while (currentWeekStart <= lastDay) {
         const weekLabel = document.createElement('div');
+        const weekKey = currentWeekStart.toISOString().slice(0, 10);
         weekLabel.className = 'week-label';
         weekLabel.textContent = `Semaine du ${currentWeekStart.toLocaleDateString('fr-CA')}`;
+        if (selectedWeeks.includes(weekKey)) weekLabel.classList.add('selected');
         calendarEl.appendChild(weekLabel);
 
         for (let i = 0; i < 7; i++) {
@@ -112,11 +159,13 @@
           dayDiv.className = 'day';
           dayDiv.textContent = day.getDate();
 
-          const weekKey = currentWeekStart.toISOString().slice(0, 10);
           if (takenWeeks.includes(weekKey)) {
             dayDiv.classList.add('taken');
           } else {
-            dayDiv.onclick = () => selectWeek(weekKey);
+            dayDiv.onclick = () => toggleWeek(weekKey);
+            if (selectedWeeks.includes(weekKey)) {
+              dayDiv.classList.add('selected');
+            }
           }
 
           calendarEl.appendChild(dayDiv);
@@ -126,35 +175,38 @@
       }
     }
 
-    function selectWeek(weekStart) {
-      if (takenWeeks.includes(weekStart)) return;
+    function toggleWeek(weekKey) {
+      if (takenWeeks.includes(weekKey)) return;
 
-      const alreadySelected = selectedWeeks.includes(weekStart);
-      if (alreadySelected) {
-        selectedWeeks.splice(selectedWeeks.indexOf(weekStart), 1);
+      const index = selectedWeeks.indexOf(weekKey);
+      if (index > -1) {
+        selectedWeeks.splice(index, 1);
       } else {
-        selectedWeeks.push(weekStart);
+        selectedWeeks.push(weekKey);
       }
 
-      generateCalendar(today.getMonth(), today.getFullYear());
-      selectedWeeks.forEach(week => {
-        const elems = [...document.querySelectorAll('.week-label')]
-          .filter(el => el.textContent.includes(week));
-        elems.forEach(el => el.classList.add('selected'));
-      });
+      generateCalendar(currentMonth, currentYear);
     }
 
     function submitVacation() {
-      if (selectedWeeks.length === 0) {
-        alert("Veuillez sélectionner une semaine.");
+      const chauffeur = document.getElementById('chauffeur').value.trim();
+      if (!chauffeur) {
+        alert("Veuillez entrer le nom du chauffeur.");
         return;
       }
 
-      // Ici, on pourrait envoyer les semaines sélectionnées avec fetch()
-      alert("Semaine demandée : " + selectedWeeks.join(', '));
+      if (selectedWeeks.length === 0) {
+        alert("Aucune semaine sélectionnée.");
+        return;
+      }
+
+      // Envoi futur vers Apps Script :
+      // fetch(URL, { method: 'POST', body: JSON.stringify({ chauffeur, semaines: selectedWeeks }) });
+
+      alert(`Demande envoyée pour ${chauffeur} :\n${selectedWeeks.join(', ')}`);
     }
 
-    generateCalendar(today.getMonth(), today.getFullYear());
+    generateCalendar(currentMonth, currentYear);
   </script>
 
 </body>

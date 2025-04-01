@@ -215,22 +215,22 @@
       <button class="send-btn" onclick="sendForm()">Send</button>
     </div>
   </div>
-  
+
   <script>
     function toggleMenu() {
       const menu = document.getElementById("menuDropdown");
       menu.classList.toggle("show");
     }
-    
+
     document.addEventListener("click", function(e) {
       const menu = document.getElementById("menuDropdown");
       const toggle = document.querySelector(".menu-toggle");
-      
+
       if (!toggle.contains(e.target) && !menu.contains(e.target)) {
         menu.classList.remove("show");
       }
     });
-    
+
     function createRow() {
       const row = document.createElement("tr");
       row.innerHTML = `
@@ -301,14 +301,17 @@
         table: tableClone.outerHTML
       };
 
-      fetch("https://script.google.com/macros/s/AKfycbyL41eZb4kui5TESIyRfNX-h3f7um9_A_AFDV8DzLESqS984jdHcdVl-lFnPttXD4RBoQ/exec", {
+      fetch("YOUR_GOOGLE_APPS_SCRIPT_URL", {
         method: "POST",
-        mode: "no-cors",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
+      }).then(response => {
+        if (response.ok) {
+          alert("Disponibilités envoyées !");
+        } else {
+          alert("Erreur lors de l'envoi des disponibilités.");
+        }
       });
-
-      alert("Disponibilités envoyées !");
     }
 
     function resetForm() {
@@ -336,12 +339,12 @@
       if (e.target.matches("td[contenteditable]")) {
         const cell = e.target;
         const container = document.querySelector(".table-wrapper");
-        
+
         if (container) {
           const offsetLeft = cell.offsetLeft;
           const containerRect = container.getBoundingClientRect();
           const scrollLeft = offsetLeft - (containerRect.width / 3);
-          
+
           container.scrollTo({
             left: scrollLeft,
             behavior: "smooth"

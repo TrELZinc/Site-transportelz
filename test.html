@@ -373,19 +373,29 @@
     });
 
     // Initialize on load
-    window.onload = function() {
-      const note = localStorage.getItem("dispo_note");
-      const date = localStorage.getItem("dispo_date");
-      const table = localStorage.getItem("dispo_table");
+    window.onload = function () {
+  const note = localStorage.getItem("dispo_note");
+  const date = localStorage.getItem("dispo_date");
+  const table = localStorage.getItem("dispo_table");
 
-      if (note) document.getElementById("note").value = note;
-      if (date) document.getElementById("dateSelect").value = date;
+  if (note) document.getElementById("note").value = note;
+  if (date) document.getElementById("dateSelect").value = date;
 
-      if (table) {
-        document.getElementById("dispoTable").outerHTML = table;
-      } else {
-        generateDefaultRows(9);
-      }
+  if (table) {
+    // insère en tant que contenu HTML
+    document.querySelector(".table-wrapper").innerHTML = table;
+
+    // 🔁 Rebrancher les événements si besoin
+    const rows = document.querySelectorAll("#tableBody tr");
+    if (rows.length === 0) {
+      generateDefaultRows(9);
+    }
+  } else {
+    generateDefaultRows(9);
+  }
+};
+
+
     };
   </script>
 </body>

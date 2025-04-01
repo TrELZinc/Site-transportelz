@@ -1,250 +1,161 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <link rel="icon" type="image/png" href="assets/favicon.png">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tableau des poids - Transport ELZ</title>
-  <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet">
+  <title>Vacances Chauffeurs</title>
   <style>
     body {
-      font-family: 'Comfortaa', sans-serif;
-      background-color: #fdfdfd;
+      font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-      color: #333;
+      background: #f5f5f5;
     }
 
     header {
-      background-color: #111;
-      padding: 20px;
+      background: #000;
+      color: white;
       text-align: center;
+      padding: 1rem;
+      font-size: 1.5rem;
     }
 
-    header img {
-      height: 60px;
-    }
-
-    .container {
-      padding: 20px;
-      max-width: 100%;
-      overflow-x: auto;
-    }
-
-    h1 {
-      color: #000000;
-      font-size: 24px;
-      text-align: center;
-      margin-top: 20px;
-    }
-
-    .selectors {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 20px;
-    }
-
-    .selectors label {
-      margin: 5px;
-    }
-
-    .selectors select {
+    #calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
       padding: 10px;
-      font-size: 16px;
-      margin: 5px;
+    }
+
+    .day, .week-label {
+      text-align: center;
+      padding: 10px;
+      background: white;
       border-radius: 5px;
-      border: 1px solid #ccc;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      min-width: 800px;
-    }
-
-    th, td {
-      border: 1px solid #ccc;
-      padding: 10px;
-      text-align: center;
-      font-size: 14px;
-    }
-
-    th {
-      background-color: #c60000;
+    .taken {
+      background-color: #ff4d4d;
       color: white;
     }
 
-    th:first-child {
-      background-color: #000;
-    }
-
-    th.degel {
-      background-color: #ffe5e5;
-      color: #333;
-    }
-
-    td.degel {
-      background-color: #fff2f2;
-    }
-
-    td:first-child {
-      font-weight: bold;
-      background-color: #f9f9f9;
-      color: #000;
-      text-align: left;
-    }
-
-    tr.section-title td {
-      background-color: #000;
-      font-weight: bold;
-      text-align: left;
-      font-style: italic;
-      color: #fff;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .notes {
-      margin-top: 30px;
-      font-size: 14px;
-      padding: 0 20px;
-    }
-
-    .btn-retour {
-      display: inline-block;
-      margin: 40px auto 0;
-      background-color: #000;
+    .selected {
+      background-color: #4da6ff;
       color: white;
-      padding: 12px 24px;
+    }
+
+    .week-label {
+      grid-column: span 7;
+      background: #ddd;
+      font-weight: bold;
+    }
+
+    button {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      font-size: 1rem;
+      background: #000;
+      color: white;
       border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-      font-family: 'Comfortaa', sans-serif;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      text-decoration: none;
-      text-align: center;
+      border-radius: 5px;
     }
 
-    @media (max-width: 768px) {
-      h1 {
-        font-size: 20px;
-      }
-
-      .selectors {
-        flex-direction: column;
-      }
-
-      table {
-        font-size: 12px;
-        min-width: unset;
+    @media (max-width: 600px) {
+      #calendar {
+        grid-template-columns: repeat(7, 1fr);
       }
     }
   </style>
 </head>
 <body>
-  <header>
-    <img src="assets/logo.jpeg" alt="Logo Transport ELZ">
-  </header>
 
-  <div class="container">
-    <h1>Tableau des poids par type de véhicule</h1>
+  <header>Planification des Vacances</header>
 
-    <div class="selectors">
-      <div>
-        <label for="variable1">Citerne :</label>
-        <select id="variable1">
-          <option value="B.45">4 ESSIEUX</option>
-          <option value="B.32">3 ESSIEUX</option>
-          <option value="B.31">3 ESSIEUX CITERNE 2006</option>
-        </select>
-      </div>
-      <div>
-        <label for="variable2">Condition :</label>
-        <select id="variable2">
-          <option value="REGULIER">RÉGULIER</option>
-          <option value="DEGEL">DÉGEL</option>
-        </select>
-      </div>
-      <div>
-        <label for="variable3">Endroit :</label>
-        <select id="variable3">
-          <option value="QUEBEC">QUEBEC</option>
-          <option value="MONTREAL">MONTREAL</option>
-          <option value="ONTARIO">ONTARIO</option>
-          <option value="MARITIMES">MARITIMES</option>
-          <option value="NOUVELLE-ECOSSE">NOUVELLE-ECOSSE</option>
-          <option value="MAINE_JACKMAN">MAINE VIA JACKMAN</option>
-          <option value="NEW_HAMPSHIRE_JACKMAN">NEW HAMPSHIRE VIA JACKMAN</option>
-          <option value="MAINE_STANSTEAD">MAINE VIA STANSTEAD</option>
-          <option value="NEW_HAMPSHIRE_STANSTEAD">NEW HAMPSHIRE VIA STANSTEAD</option>
-          <option value="VERMONT">VERMONT</option>
-          <option value="MASSACHUSETTS">MASSACHUSETTS</option>
-        </select>
-      </div>
-    </div>
+  <div id="calendar"></div>
 
-    <table id="resultTable">
-      <thead>
-        <tr>
-          <th>ENDROIT</th>
-          <th>POIDS</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Les résultats seront affichés ici -->
-      </tbody>
-    </table>
-
-    <div class="notes">
-      <p><strong>*</strong> IMPORTANT D'AVOIR LES 4 ESSIEUX À TERRE AU QUÉBEC</p>
-      <p>MAINE MAX 100 000 LBS / 45 300 KG</p>
-      <p>VERMONT MAX 99 000 LBS / 44 900 KG</p>
-      <p>NEW HAMPSHIRE MAX 120 000 LBS / 54 400 KG</p>
-    </div>
-
-    <div style="text-align: center; margin-top: 40px;">
-      <a href="linktree.html" class="btn-retour">Retour au menu principal</a>
-    </div>
-  </div>
+  <button onclick="submitVacation()">Demander cette semaine</button>
 
   <script>
-    const data = {
-      "QUEBEC": { "B.45": { "REGULIER": "57 500 KG", "DEGEL": "50 500 KG" }, "B.32": { "REGULIER": "49 500 KG", "DEGEL": "43 000 KG" }, "B.31": { "REGULIER": "47 500 KG", "DEGEL": "42 000 KG" } },
-      "MONTREAL": { "B.45": { "REGULIER": "57 500 KG", "DEGEL": "50 500 KG" }, "B.32": { "REGULIER": "49 500 KG", "DEGEL": "43 000 KG" }, "B.31": { "REGULIER": "47 500 KG", "DEGEL": "42 000 KG" } },
-      "ONTARIO": { "B.45": { "REGULIER": "57 500 KG", "DEGEL": "50 500 KG" }, "B.32": { "REGULIER": "49 500 KG", "DEGEL": "43 000 KG" }, "B.31": { "REGULIER": "47 500 KG", "DEGEL": "42 000 KG" } },
-      "MARITIMES": { "B.45": { "REGULIER": "55 500 KG", "DEGEL": "50 500 KG" }, "B.32": { "REGULIER": "44 000 KG", "DEGEL": "43 000 KG" }, "B.31": { "REGULIER": "42 000 KG", "DEGEL": "42 000 KG" } },
-      "NOUVELLE-ECOSSE": { "B.45": { "REGULIER": "55 500 KG", "DEGEL": "50 500 KG" }, "B.32": { "REGULIER": "44 000 KG", "DEGEL": "43 000 KG" }, "B.31": { "REGULIER": "42 000 KG", "DEGEL": "42 000 KG" } },
-      "MAINE_JACKMAN": { "B.45": { "REGULIER": "45 300 KG", "DEGEL": "45 300 KG" }, "B.32": { "REGULIER": "45 300 KG", "DEGEL": "43 000 KG" }, "B.31": { "REGULIER": "45 300 KG", "DEGEL": "42 000 KG" } },
-      "NEW_HAMPSHIRE_JACKMAN": { "B.45": { "REGULIER": "45 300 KG", "DEGEL": "45 300 KG" }, "B.32": { "REGULIER": "45 300 KG", "DEGEL": "43 000 KG" }, "B.31": { "REGULIER": "45 300 KG", "DEGEL": "42 000 KG" } },
-      "MAINE_STANSTEAD": { "B.45": { "REGULIER": "44 800 KG", "DEGEL": "44 800 KG" }, "B.32": { "REGULIER": "44 900 KG", "DEGEL": "43 000 KG" }, "B.31": { "REGULIER": "44 900 KG", "DEGEL": "42 000 KG" } },
-      "NEW_HAMPSHIRE_STANSTEAD": { "B.45": { "REGULIER": "44 800 KG", "DEGEL": "44 800 KG" }, "B.32": { "REGULIER": "44 900 KG", "DEGEL": "43 000 KG" }, "B.31": { "REGULIER": "44 900 KG", "DEGEL": "42 000 KG" } },
-      "VERMONT": { "B.45": { "REGULIER": "44 800 KG", "DEGEL": "44 800 KG" }, "B.32": { "REGULIER": "44 900 KG", "DEGEL": "43 000 KG" }, "B.31": { "REGULIER": "44 900 KG", "DEGEL": "42 000 KG" } },
-      "MASSACHUSETTS": { "B.45": { "REGULIER": "44 800 KG", "DEGEL": "44 800 KG" }, "B.32": { "REGULIER": "44 900 KG", "DEGEL": "43 000 KG" }, "B.31": { "REGULIER": "44 900 KG", "DEGEL": "42 000 KG" } }
-    };
+    const takenWeeks = ['2025-07-01', '2025-07-08']; // début des semaines prises (à personnaliser)
+    const calendarEl = document.getElementById('calendar');
+    const today = new Date();
+    const selectedWeeks = [];
 
-    document.getElementById("variable1").addEventListener("change", updateTable);
-    document.getElementById("variable2").addEventListener("change", updateTable);
-    document.getElementById("variable3").addEventListener("change", updateTable);
+    function getStartOfWeek(date) {
+      const d = new Date(date);
+      const day = d.getDay();
+      const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+      return new Date(d.setDate(diff));
+    }
 
-    function updateTable() {
-      const var1 = document.getElementById("variable1").value;
-      const var2 = document.getElementById("variable2").value;
-      const var3 = document.getElementById("variable3").value;
+    function generateCalendar(month, year) {
+      calendarEl.innerHTML = '';
 
-      const tbody = document.getElementById("resultTable").querySelector("tbody");
-      tbody.innerHTML = "";
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
 
-      if (data[var3] && data[var3][var1]) {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `<td>${var3}</td><td>${data[var3][var1][var2]}</td>`;
-        tbody.appendChild(tr);
+      let date = new Date(firstDay);
+      let currentWeekStart = getStartOfWeek(date);
+
+      while (currentWeekStart <= lastDay) {
+        const weekLabel = document.createElement('div');
+        weekLabel.className = 'week-label';
+        weekLabel.textContent = `Semaine du ${currentWeekStart.toLocaleDateString('fr-CA')}`;
+        calendarEl.appendChild(weekLabel);
+
+        for (let i = 0; i < 7; i++) {
+          const day = new Date(currentWeekStart);
+          day.setDate(currentWeekStart.getDate() + i);
+
+          const dayDiv = document.createElement('div');
+          dayDiv.className = 'day';
+          dayDiv.textContent = day.getDate();
+
+          const weekKey = currentWeekStart.toISOString().slice(0, 10);
+          if (takenWeeks.includes(weekKey)) {
+            dayDiv.classList.add('taken');
+          } else {
+            dayDiv.onclick = () => selectWeek(weekKey);
+          }
+
+          calendarEl.appendChild(dayDiv);
+        }
+
+        currentWeekStart.setDate(currentWeekStart.getDate() + 7);
       }
     }
 
-    // Initial call to display the default selection
-    updateTable();
+    function selectWeek(weekStart) {
+      if (takenWeeks.includes(weekStart)) return;
+
+      const alreadySelected = selectedWeeks.includes(weekStart);
+      if (alreadySelected) {
+        selectedWeeks.splice(selectedWeeks.indexOf(weekStart), 1);
+      } else {
+        selectedWeeks.push(weekStart);
+      }
+
+      generateCalendar(today.getMonth(), today.getFullYear());
+      selectedWeeks.forEach(week => {
+        const elems = [...document.querySelectorAll('.week-label')]
+          .filter(el => el.textContent.includes(week));
+        elems.forEach(el => el.classList.add('selected'));
+      });
+    }
+
+    function submitVacation() {
+      if (selectedWeeks.length === 0) {
+        alert("Veuillez sélectionner une semaine.");
+        return;
+      }
+
+      // Ici, on pourrait envoyer les semaines sélectionnées avec fetch()
+      alert("Semaine demandée : " + selectedWeeks.join(', '));
+    }
+
+    generateCalendar(today.getMonth(), today.getFullYear());
   </script>
+
 </body>
 </html>

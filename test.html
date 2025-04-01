@@ -42,14 +42,13 @@
       margin-bottom: 10px;
     }
 
-    select#chauffeur, input#motdepasse {
+    select#chauffeur {
       font-size: 1.2rem;
       padding: 12px;
       width: 80%;
       max-width: 400px;
       border: 1px solid #ccc;
       border-radius: 5px;
-      margin-top: 10px;
     }
 
     .turn-box {
@@ -146,6 +145,45 @@
       border: none;
       border-radius: 5px;
     }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.4);
+    }
+
+    .modal-content {
+      background-color: #fff;
+      margin: 15% auto;
+      padding: 20px;
+      max-width: 400px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .modal-content input {
+      padding: 10px;
+      font-size: 1rem;
+      width: 80%;
+      margin: 10px auto;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .modal-content button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -167,9 +205,6 @@
         <option value="Luc Tremblay">Luc Tremblay</option>
         <option value="Marie Duval">Marie Duval</option>
       </select>
-      <div id="passwordBox" style="display:none;">
-        <input type="password" id="motdepasse" placeholder="Mot de passe">
-      </div>
     </div>
 
     <div id="rangMessage"></div>
@@ -182,7 +217,17 @@
 
     <div id="calendar" class="disabled"></div>
 
-    <button id="submit" onclick="submitVacation()" disabled>Demander cette semaine</button>
+    <button id="submit" onclick="openPasswordPopup()" disabled>Demander cette semaine</button>
+  </div>
+
+  <!-- Mot de passe popup -->
+  <div class="modal" id="passwordModal">
+    <div class="modal-content">
+      <h3>Entrez votre mot de passe</h3>
+      <input type="password" id="motdepasse" placeholder="Mot de passe" />
+      <br>
+      <button onclick="validerMotDePasse()">Valider</button>
+    </div>
   </div>
 
   <script>
@@ -204,10 +249,8 @@
       const div = document.getElementById("rangMessage");
       const calendrier = document.getElementById("calendar");
       const bouton = document.getElementById("submit");
-      const passwordBox = document.getElementById("passwordBox");
 
       if (classement[nom]) {
-        passwordBox.style.display = "block";
         const rang = classement[nom].rang;
         if (rang === 1) {
           autorise = true;
@@ -221,13 +264,13 @@
           div.innerHTML = `<div class="turn-box waiting">Tu es actuellement <strong>#${rang}</strong> dans la liste. Merci de patienter.</div>`;
         }
       } else {
-        passwordBox.style.display = "none";
         div.innerHTML = "";
         calendrier.classList.add("disabled");
         bouton.disabled = true;
       }
 
       selectedWeeks = [];
+      updateButtonText();
       generateCalendar(currentMonth, currentYear);
     }
 
@@ -271,7 +314,13 @@
       } else {
         selectedWeeks.push(weekKey);
       }
+      updateButtonText();
       generateCalendar(currentMonth, currentYear);
+    }
+
+    function updateButtonText() {
+      const btn = document.getElementById("submit");
+      btn.textContent = selectedWeeks.length > 1 ? "Demander ces semaines" : "Demander cette semaine";
     }
 
     function generateCalendar(month, year) {
@@ -324,29 +373,37 @@
       }
     }
 
-    function submitVacation() {
-      const chauffeur = document.getElementById('chauffeur').value;
-      const motdepasse = document.getElementById('motdepasse').value.trim();
-
-      if (!chauffeur || !motdepasse) {
-        alert("Veuillez sélectionner votre nom et entrer votre mot de passe.");
-        return;
-      }
-
+    function openPasswordPopup() {
       if (selectedWeeks.length === 0) {
-        alert("Aucune semaine sélectionnée.");
+        alert("Veuillez sélectionner au moins une semaine.");
         return;
       }
+      document.getElementById("passwordModal").style.display = "block";
+      document.getElementById("motdepasse").value = "";
+    }
 
-      // Affichage temporaire pour test. On vérifiera plus tard côté serveur.
-      const confirmation = `
-        Chauffeur : ${chauffeur}
-        Mot de passe : ${motdepasse}
-        Semaines choisies :
-        ${selectedWeeks.join('\n')}
-      `;
+    function validerMotDePasse() {
+      const nom = document.getElementById("chauffeur").value;
+      const motdepasse = document.getElementById("motdepasse").value.trim();
+      if (!motdepasse) {
+        alert("Veuillez entrer votre mot de passe.");
+        return;
+      }
+      document.getElementById("passwordModal").style.display = "none";
 
+      // Simule une confirmation finale
+      const confirmation = `Chauffeur : ${nom}
+Mot de passe : ${motdepasse}
+Semaines choisies :\n${selectedWeeks.join('\n')}`;
       alert(confirmation);
+    }
+
+    // Ferme la popup si on clique à l’extérieur
+    window.onclick = function(event) {
+      const modal = document.getElementById("passwordModal");
+      if (event.target === modal) {
+        modal.style.display = "none";
+      }
     }
 
     generateCalendar(currentMonth, currentYear);

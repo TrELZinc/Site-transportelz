@@ -2,125 +2,142 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Demande de congé</title>
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet">
   <style>
     body {
-      margin: 0;
       font-family: 'Comfortaa', cursive;
-      background: #f4f4f4;
+      margin: 0;
+      background: #f9f9f9;
       padding: 0;
     }
+
     header {
       background-color: #000;
-      padding: 20px 10px;
+      color: white;
       text-align: center;
+      padding: 20px 10px 10px;
     }
+
     header img {
       height: 60px;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
-    header h1 {
+
+    h1 {
       margin: 0;
-      color: white;
-      font-size: 24px;
+      font-size: 20px;
     }
-    .container {
+
+    form {
       max-width: 500px;
       margin: 30px auto;
+      padding: 24px;
       background: white;
-      padding: 20px;
       border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.05);
     }
+
     label {
-      font-weight: bold;
       display: block;
       margin-top: 15px;
+      font-weight: bold;
+      font-size: 15px;
     }
-    input, select, button {
+
+    input, textarea, button {
       width: 100%;
-      margin-top: 5px;
-      padding: 10px;
-      font-size: 16px;
-      font-family: 'Comfortaa', cursive;
-      border-radius: 6px;
-      border: 1px solid #ccc;
       box-sizing: border-box;
+      padding: 12px;
+      font-family: 'Comfortaa', cursive;
+      font-size: 16px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
     }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
     button {
-      background-color: black;
+      background-color: #d32f2f;
       color: white;
+      font-weight: bold;
       border: none;
-      margin-top: 25px;
+      margin-top: 20px;
       cursor: pointer;
     }
+
     button:hover {
-      background-color: #333;
+      background-color: #b71c1c;
     }
-    .success-msg {
+
+    .success {
+      text-align: center;
+      color: green;
+      font-weight: bold;
+      margin-top: 15px;
       display: none;
+    }
+
+    .link-btn {
+      display: block;
       text-align: center;
       margin-top: 20px;
-      font-weight: bold;
-      color: green;
+      text-decoration: none;
     }
-    .back-btn {
-      margin-top: 10px;
-      background: #d32f2f;
+
+    .link-btn button {
+      background: black;
     }
   </style>
 </head>
 <body>
   <header>
-    <img src="assets/logo.jpeg" alt="Logo Transport ELZ">
+    <img src="assets/logo.jpeg" alt="Logo ELZ">
     <h1>Demande de congé</h1>
   </header>
 
-  <div class="container">
+  <form id="form">
     <label for="nom">Nom du chauffeur</label>
-    <input type="text" id="nom" placeholder="Entrez votre nom" required>
+    <input type="text" id="nom" required>
 
-    <label for="date">Date du congé</label>
+    <label for="date">Date souhaitée</label>
     <input type="date" id="date" required>
 
-    <label for="type">Type de congé</label>
-    <select id="type">
-      <option value="">-- Choisir --</option>
-      <option value="Journée complète">Journée complète</option>
-      <option value="Finir avant 14h">Finir avant 14h</option>
-      <option value="Autre">Autre</option>
-    </select>
+    <label for="type">Détails / Type de congé</label>
+    <textarea id="type" placeholder="Ex: congé complet, finir à 14h, rdv médical..."></textarea>
 
-    <button onclick="envoyerSMS()">Envoyer la demande</button>
-    <a href="linktree.html"><button class="back-btn">Retour au menu principal</button></a>
+    <button type="submit">Envoyer la demande</button>
+    <div class="success" id="successMsg">✅ Demande envoyée avec succès !</div>
+  </form>
 
-    <div class="success-msg" id="successMsg">Demande envoyée avec succès !</div>
-  </div>
+  <a href="linktree.html" class="link-btn">
+    <button>Retour au menu principal</button>
+  </a>
 
   <script>
-    function envoyerSMS() {
+    document.getElementById("form").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
       const nom = document.getElementById("nom").value.trim();
       const date = document.getElementById("date").value;
-      const type = document.getElementById("type").value;
+      const type = document.getElementById("type").value.trim();
 
-      if (!nom || !date || !type) {
-        alert("Veuillez remplir tous les champs.");
-        return;
-      }
-
-      const dateObj = new Date(date + 'T00:00:00');
-      const jours = ["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"];
-      const mois = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+      const dateObj = new Date(date + "T00:00:00");
+      const jours = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+      const mois = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
       const jourNom = jours[dateObj.getDay()];
       const jourNum = dateObj.getDate();
       const moisNom = mois[dateObj.getMonth()];
       const dateFormat = `${jourNom} le ${jourNum} ${moisNom}`;
 
-      const msg = `Demande de congé\nNom: ${nom}\nDate: ${dateFormat}\nType: ${type}`;
-
+      const msg = `Demande de congé\nNom: ${nom}\nDate: ${dateFormat}\nType: ${type || "non spécifié"}`;
       const nums = ["+14185550001", "+14185550002"];
+
       nums.forEach(num => {
         fetch("https://textbelt.com/text", {
           method: "POST",
@@ -133,12 +150,14 @@
         });
       });
 
-      document.getElementById("successMsg").style.display = "block";
-      setTimeout(() => document.getElementById("successMsg").style.display = "none", 5000);
+      const success = document.getElementById("successMsg");
+      success.style.display = "block";
+      setTimeout(() => success.style.display = "none", 4000);
+
       document.getElementById("nom").value = "";
       document.getElementById("date").value = "";
       document.getElementById("type").value = "";
-    }
+    });
   </script>
 </body>
 </html>

@@ -135,6 +135,8 @@
   </header>
 
   <div class="container">
+    <label for="workDate">Date de disponibilité :</label>
+<input type="date" id="workDate" style="margin-bottom: 10px;" />
     <label for="note">Note:</label>
     <textarea id="note" rows="2"></textarea>
 
@@ -157,7 +159,7 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyADhyd-YMOT5uePrNKfRp00F-WXZEB2wlbBkNX1BfbIbEE3rrvRjOnDjkaTL3LUqTY/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby679oo4AlmmlqsvYefuklKLUsoyhgABxe5H5khHmp-Ej9ApmEkhn3u-z6lfOTbPVb0/exec";
 
     function toggleMenu() {
       document.getElementById("menuDropdown").classList.toggle("show");
@@ -197,28 +199,31 @@
     }
 
     function saveToSheet() {
-      const rows = [];
-      const trs = document.querySelectorAll("#tableBody tr");
+  const rows = [];
+  const trs = document.querySelectorAll("#tableBody tr");
 
-      trs.forEach(tr => {
-        const cells = tr.querySelectorAll("td");
-        const row = Array.from(cells).map((cell, i) =>
-          i === 1 ? (cell.textContent.includes("✔️") ? "✔️" : "❌") : cell.innerText.trim().toUpperCase()
-        );
-        rows.push(row);
-      });
+  trs.forEach(tr => {
+    const cells = tr.querySelectorAll("td");
+    const row = Array.from(cells).map((cell, i) =>
+      i === 1 ? (cell.textContent.includes("✔️") ? "✔️" : "❌") : cell.innerText.trim().toUpperCase()
+    );
+    rows.push(row);
+  });
 
-      fetch(SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          rows,
-          note: document.getElementById("note").value,
-          mode: "save"
-        })
-      }).then(() => alert("Données enregistrées !"));
-    }
+  const data = {
+    rows,
+    note: document.getElementById("note").value,
+    date: document.getElementById("workDate").value, // 🔸 ajout ici
+    mode: "save"
+  };
+
+  fetch(SCRIPT_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  }).then(() => alert("Données enregistrées !"));
+}
 
     function sendForm() {
       const tableClone = document.getElementById("dispoTable").cloneNode(true);
@@ -251,18 +256,32 @@
     }
 
     function loadFromSheet() {
-      fetch(SCRIPT_URL)
-        .then(res => res.json())
-        .then(data => {
-          document.getElementById("note").value = data.note || "";
-          const tbody = document.getElementById("tableBody");
-          tbody.innerHTML = "";
+  fetch(SCRIPT_URL)
+    .then(res => res.json())
+    .then(data => {
+      const tbody = document.getElementById("tableBody");
+      tbody.innerHTML = "";
 
-          const rows = data.rows && data.rows.length ? data.rows : Array(9).fill(["", "❌", "", "", "", ""]);
-          rows.forEach(r => tbody.appendChild(createRow(r)));
-        })
-        .catch(() => generateDefaultRows(9));
-    }
+      if (!data || !data.rows || data.rows.length === 0) {
+        document.getElementById("note").value = "";
+        document.getElementById("workDate").value = "";
+        generateDefaultRows(9);
+        return;
+      }
+
+      document.getElementById("note").value = data.note || "";
+      document.getElementById("workDate").value = data.date || "";
+
+      data.rows.forEach(row => {
+        tbody.appendChild(createRow(row));
+      });
+    })
+    .catch(() => {
+      document.getElementById("workDate").value = "";
+      generateDefaultRows(9);
+    });
+}
+
 
     window.onload = loadFromSheet;
   </script>

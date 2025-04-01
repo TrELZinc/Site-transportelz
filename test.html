@@ -306,7 +306,7 @@
         table: tableClone.outerHTML
       };
 
-      fetch("https://script.google.com/macros/s/AKfycbx3QGvKpBZAbibFOtk7qJ1OuApcIBxju8HYrTXng2vkWIxxXfMp8lt69zyU3yHbsRuI/exec", {
+      fetch("https://script.google.com/macros/s/AKfycbyi6-uqszxBO4I5eUt3Pno_cOuIaINlzXJluPqknR3Se7XeeSKj9UffdmjMs7HkntPW/exec", {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/json" },
@@ -342,21 +342,31 @@
       }
     });
   function saveToSheet() {
-  const table = document.getElementById("dispoTable").cloneNode(true);
-  const rows = table.querySelectorAll("tbody tr");
+  const rows = [];
+  const trs = document.querySelectorAll("#tableBody tr");
 
-  rows.forEach(row => {
-    const cells = row.querySelectorAll("td");
-    for (let i = 0; i < cells.length; i++) {
-      const cell = cells[i];
-      if (i === 1) {
-        const content = cell.textContent.trim();
-        const isChecked = content.includes("✔️") || cell.innerHTML.includes("✔️");
-        cell.innerHTML = isChecked ? "✔️" : "❌";
-      } else if (cell.hasAttribute("contenteditable")) {
-        cell.innerText = cell.innerText.trim().toUpperCase();
+  trs.forEach(tr => {
+    const cells = tr.querySelectorAll("td");
+    const row = Array.from(cells).map((cell, index) => {
+      if (index === 1) {
+        return cell.textContent.includes("✔️") ? "✔️" : "❌";
+      } else {
+        return cell.innerText.trim().toUpperCase();
       }
-    }
+    });
+    rows.push(row);
+  });
+
+  const data = { rows };
+
+  fetch("https://script.google.com/macros/s/AKfycbyi6-uqszxBO4I5eUt3Pno_cOuIaINlzXJluPqknR3Se7XeeSKj9UffdmjMs7HkntPW/exec", {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  }).then(() => alert("Disponibilités enregistrées !"));
+}
+
   });
 
   const data = {
@@ -366,7 +376,7 @@
     mode: "save" // 👈 Indique qu'on veut "enregistrer" (pas juste envoyer un e-mail)
   };
 
-  fetch("https://script.google.com/macros/s/AKfycbx3QGvKpBZAbibFOtk7qJ1OuApcIBxju8HYrTXng2vkWIxxXfMp8lt69zyU3yHbsRuI/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbyi6-uqszxBO4I5eUt3Pno_cOuIaINlzXJluPqknR3Se7XeeSKj9UffdmjMs7HkntPW/exec", {
     method: "POST",
     mode: "no-cors",
     headers: { "Content-Type": "application/json" },
@@ -377,44 +387,20 @@
 }
 
     // Initialize on load
-    window.onload = function() {
-  const input = document.getElementById("dateSelect");
-
-  // Si une date est déjà dans l’URL (ex: ?date=2025-04-01), on l’utilise
-  const params = new URLSearchParams(window.location.search);
-  const dateParam = params.get("date");
-
-  const today = new Date().toISOString().split("T")[0];
-  const dateToUse = dateParam || today;
-
-  input.value = dateToUse;
-  loadFromSheet(dateToUse);
+    window.onload = function () {
+  loadFromSheet();
 };
 
-  function formatDate(dateStr) {
-    const d = new Date(dateStr);
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const dd = String(d.getDate()).padStart(2, '0');
-    return `${yyyy}-${mm}-${dd}`;
-  }
-    function loadFromSheet(dateStr) {
-  const url = `https://script.google.com/macros/s/AKfycbx3QGvKpBZAbibFOtk7qJ1OuApcIBxju8HYrTXng2vkWIxxXfMp8lt69zyU3yHbsRuI/exec?date=${dateStr}`;
-
-  fetch(url)
+function loadFromSheet() {
+  fetch("https://script.google.com/macros/s/AKfycbyi6-uqszxBO4I5eUt3Pno_cOuIaINlzXJluPqknR3Se7XeeSKj9UffdmjMs7HkntPW/exec")
     .then(res => res.json())
     .then(data => {
-      document.getElementById("note").value = data.note || "";
-
       const tbody = document.getElementById("tableBody");
       tbody.innerHTML = "";
 
-      if (data.rows.length === 0) {
-        generateDefaultRows(9);
-        return;
-      }
+      const rows = data.length > 0 ? data : Array(9).fill(["", "❌", "", "", "", ""]);
 
-      data.rows.forEach(row => {
+      rows.forEach(row => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td contenteditable>${row[0] || ""}</td>
@@ -428,10 +414,11 @@
       });
     })
     .catch(err => {
-      console.error("Erreur lors du chargement :", err);
+      console.error("Erreur de chargement :", err);
       generateDefaultRows(9);
     });
 }
+
 
   </script>
 </body>

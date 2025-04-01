@@ -378,10 +378,19 @@
 
     // Initialize on load
     window.onload = function() {
+  const input = document.getElementById("dateSelect");
+
+  // Si une date est déjà dans l’URL (ex: ?date=2025-04-01), on l’utilise
+  const params = new URLSearchParams(window.location.search);
+  const dateParam = params.get("date");
+
   const today = new Date().toISOString().split("T")[0];
-  document.getElementById("dateSelect").value = today;
-  loadFromSheet(today);
+  const dateToUse = dateParam || today;
+
+  input.value = dateToUse;
+  loadFromSheet(dateToUse);
 };
+
   function formatDate(dateStr) {
     const d = new Date(dateStr);
     const yyyy = d.getFullYear();

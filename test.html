@@ -106,12 +106,41 @@
       font-weight: bold;
       color: #333;
     }
+    .popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      border: 2px solid #000;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    .popup.active {
+      display: block;
+    }
+    .popup h2 {
+      margin-top: 0;
+    }
+    .popup button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <header>
     <img src="logo.jpeg" alt="Logo">
     <div>Planification des Vacances</div>
+    <div>Maximum 2 semaines consécutives<br>Maximum 1 personne à la fois</div>
   </header>
   <div class="container">
     <div class="controls">
@@ -125,6 +154,11 @@
     <div id="calendar"></div>
     <button id="submit" onclick="submitVacation()">Demander cette semaine</button>
     <div id="confirmation"></div>
+  </div>
+  <div id="popup" class="popup">
+    <h2>Confirmation</h2>
+    <p id="popup-content"></p>
+    <button onclick="closePopup()">Fermer</button>
   </div>
   <script>
     const takenWeeks = ['2025-07-01', '2025-07-08']; // Exemples
@@ -240,10 +274,16 @@
         return;
       }
 
-      confirmation.innerHTML = `
+      const popupContent = document.getElementById('popup-content');
+      popupContent.innerHTML = `
         <p>${chauffeur}, vous avez demandé les semaines suivantes :</p>
         <ul>${selectedWeeks.map(w => `<li>${w}</li>`).join('')}</ul>
       `;
+      document.getElementById('popup').classList.add('active');
+    }
+
+    function closePopup() {
+      document.getElementById('popup').classList.remove('active');
     }
 
     generateCalendar(currentMonth, currentYear);

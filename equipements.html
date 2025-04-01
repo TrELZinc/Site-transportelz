@@ -1,49 +1,44 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Équipements Disponibles</title>
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
       margin: 0;
       font-family: 'Comfortaa', cursive;
-      background: #f9f9f9;
-      color: #333;
+      background: #f5f5f5;
+      padding: 0;
     }
 
     header {
-      background: #111;
-      padding: 12px 16px;
+      background-color: #111;
       text-align: center;
+      padding: 20px 10px;
     }
 
     header img {
-      max-height: 50px;
+      height: 50px;
       display: block;
-      margin: 0 auto 8px;
+      margin: 0 auto 10px;
     }
 
     header h1 {
-      color: #fff;
-      font-size: 24px;
       margin: 0;
-      text-transform: uppercase;
+      font-size: 24px;
+      color: white;
       letter-spacing: 1px;
     }
 
     .date-select {
       text-align: center;
-      margin: 20px 0;
+      margin: 10px 0 20px;
     }
 
     .date-select input {
-      padding: 10px 16px;
+      padding: 10px 18px;
       border-radius: 10px;
       border: 1px solid #ccc;
       font-size: 18px;
@@ -52,48 +47,64 @@
     }
 
     .section {
-      max-width: 700px;
+      max-width: 800px;
       margin: 20px auto;
       background: white;
-      border-radius: 12px;
+      border-radius: 10px;
       overflow: hidden;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.05);
     }
 
     .section-title {
-      background: white;
-      color: #d32f2f;
-      padding: 16px;
+      background: #fff;
+      padding: 12px 16px;
       font-weight: bold;
-      font-size: 18px;
+      font-size: 16px;
+      text-transform: uppercase;
+      display: flex;
+      justify-content: center;
+      color: #d32f2f;
+      border-bottom: 1px solid #ddd;
       text-align: center;
-      border-bottom: 1px solid #eee;
     }
 
     .row {
       display: flex;
       justify-content: space-between;
-      padding: 14px 20px;
-      border-bottom: 1px solid #f0f0f0;
+      padding: 12px 16px;
+      border-bottom: 1px solid #eee;
       font-size: 16px;
       cursor: pointer;
-      transition: background 0.2s ease;
-    }
-
-    .row:hover {
-      background-color: #f9f9f9;
+      align-items: center;
     }
 
     .status {
       font-weight: bold;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 14px;
     }
 
     .planifie {
-      color: #d32f2f;
+      background: #ffd6d6;
+      color: #c62828;
     }
 
     .disponible {
-      color: #2ecc71;
+      background: #d9fdd3;
+      color: #2e7d32;
+    }
+
+    @media (max-width: 600px) {
+      .row {
+        flex-direction: column;
+        gap: 6px;
+        align-items: flex-start;
+      }
+      .section-title {
+        flex-direction: column;
+        gap: 6px;
+      }
     }
 
     .popup {
@@ -102,161 +113,114 @@
       left: 50%;
       transform: translate(-50%, -50%);
       background: white;
-      padding: 20px 30px;
-      border-radius: 16px;
-      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-      z-index: 1000;
+      border: 2px solid #d32f2f;
+      border-radius: 12px;
+      padding: 20px;
+      z-index: 9999;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
       display: none;
       text-align: center;
-    }
-
-    .popup h2 {
-      font-size: 18px;
-      margin-bottom: 16px;
     }
 
     .popup button {
-      margin: 0 8px;
-      padding: 10px 18px;
-      font-size: 16px;
+      margin: 10px;
+      padding: 8px 16px;
       border: none;
       border-radius: 8px;
+      font-weight: bold;
+      font-family: 'Comfortaa';
       cursor: pointer;
-      font-family: 'Comfortaa', cursive;
-      transition: background 0.3s;
     }
 
-    .popup .confirm-btn {
+    .popup .use-btn {
+      background: #2e7d32;
+      color: white;
+    }
+
+    .popup .free-btn {
       background: #d32f2f;
       color: white;
-    }
-
-    .popup .cancel-btn {
-      background: #ccc;
-    }
-
-    .overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.4);
-      z-index: 999;
-      display: none;
-    }
-
-    .menu-btn {
-      display: block;
-      text-align: center;
-      margin: 40px auto 20px;
-    }
-
-    .menu-btn a {
-      display: inline-block;
-      padding: 12px 24px;
-      background: #111;
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-      border-radius: 10px;
-      font-size: 16px;
-    }
-
-    @media (max-width: 600px) {
-      .row {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 4px;
-      }
     }
   </style>
 </head>
 <body>
-
   <header>
     <img src="assets/logo.jpeg" alt="Logo ELZ">
     <h1>Disponibilité des équipements</h1>
   </header>
 
   <div class="date-select">
-    <input type="date" />
+    <input type="date" value="2025-03-26" />
   </div>
 
-  <div class="section">
+  <div class="section" id="equipementList">
     <div class="section-title">3 ESSIEUX</div>
-    <div class="row" onclick="toggleStatus(this, '1906')"><span>1906</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row" onclick="toggleStatus(this, '2006')"><span>2006</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="toggleStatus(this, '2506')"><span>2506</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row" onclick="toggleStatus(this, '2706')"><span>2706</span><span class="status planifie">PLANIFIÉ</span></div>
-  </div>
+    <div class="row" onclick="toggleStatus(this)"><span>1906</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>2006</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>2506</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>2706</span><span class="status planifie">PLANIFIÉ</span></div>
 
-  <div class="section">
     <div class="section-title">4 ESSIEUX</div>
-    <div class="row" onclick="toggleStatus(this, '1505')"><span>1505</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="toggleStatus(this, '1605')"><span>1605</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="toggleStatus(this, '1805')"><span>1805</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row" onclick="toggleStatus(this, '1905')"><span>1905</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row" onclick="toggleStatus(this, '2205')"><span>2205</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="toggleStatus(this, '2405')"><span>2405</span><span class="status disponible">DISPONIBLE</span></div>
-  </div>
+    <div class="row" onclick="toggleStatus(this)"><span>1505</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>1605</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>1805</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>1905</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>2205</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>2405</span><span class="status disponible">DISPONIBLE</span></div>
 
-  <div class="section">
     <div class="section-title">CAMIONS</div>
-    <div class="row" onclick="toggleStatus(this, '1103')"><span>1103</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="toggleStatus(this, '1202')"><span>1202</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="toggleStatus(this, '1303')"><span>1303</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row" onclick="toggleStatus(this, '1404')"><span>1404</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="toggleStatus(this, '1502')"><span>1502</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row" onclick="toggleStatus(this, '1603')"><span>1603</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="toggleStatus(this, '1703')"><span>1703</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="toggleStatus(this, '1803')"><span>1803</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>1103</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>1202</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>1303</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>1404</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>1502</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>1603</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>1703</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>1803</span><span class="status disponible">DISPONIBLE</span></div>
   </div>
 
-  <div class="menu-btn">
-    <a href="linktree.html">Retour au menu principal</a>
-  </div>
-
-  <div class="overlay" id="overlay"></div>
   <div class="popup" id="popup">
-    <h2 id="popup-title">Utiliser 1906 ?</h2>
-    <button class="confirm-btn" onclick="confirmAction()">Oui</button>
-    <button class="cancel-btn" onclick="closePopup()">Annuler</button>
+    <p id="popupText"></p>
+    <button class="use-btn" onclick="confirmToggle('planifie')">Utiliser</button>
+    <button class="free-btn" onclick="confirmToggle('disponible')">Libérer</button>
+  </div>
+
+  <div style="text-align:center; margin: 40px 0;">
+    <a href="linktree.html" style="text-decoration: none;">
+      <button style="padding: 12px 24px; font-size: 16px; border-radius: 8px; background: #111; color: white; font-weight: bold; font-family: 'Comfortaa';">Retour au menu principal</button>
+    </a>
   </div>
 
   <script>
     let currentRow = null;
-    let currentStatus = "";
 
-    function toggleStatus(row, equipId) {
+    function toggleStatus(row) {
       currentRow = row;
-      const statusSpan = row.querySelector(".status");
-      currentStatus = statusSpan.classList.contains("disponible") ? "planifie" : "disponible";
+      const unit = row.querySelector('span').textContent;
+      const status = row.querySelector('.status').classList.contains('planifie') ? 'planifie' : 'disponible';
 
-      const action = currentStatus === "planifie" ? `Utiliser ${equipId}` : `Libérer ${equipId}`;
-      document.getElementById("popup-title").textContent = action + " ?";
-      document.getElementById("popup").style.display = "block";
-      document.getElementById("overlay").style.display = "block";
+      document.getElementById('popupText').textContent = status === 'planifie'
+        ? `Libérer ${unit}?`
+        : `Utiliser ${unit}?`;
+
+      document.querySelector('.use-btn').style.display = status === 'disponible' ? 'inline-block' : 'none';
+      document.querySelector('.free-btn').style.display = status === 'planifie' ? 'inline-block' : 'none';
+
+      document.getElementById('popup').style.display = 'block';
     }
 
-    function confirmAction() {
-      if (!currentRow) return;
-      const statusSpan = currentRow.querySelector(".status");
-
-      if (currentStatus === "planifie") {
-        statusSpan.textContent = "PLANIFIÉ";
-        statusSpan.classList.remove("disponible");
-        statusSpan.classList.add("planifie");
+    function confirmToggle(action) {
+      const statusEl = currentRow.querySelector('.status');
+      if (action === 'planifie') {
+        statusEl.textContent = 'PLANIFIÉ';
+        statusEl.classList.remove('disponible');
+        statusEl.classList.add('planifie');
       } else {
-        statusSpan.textContent = "DISPONIBLE";
-        statusSpan.classList.remove("planifie");
-        statusSpan.classList.add("disponible");
+        statusEl.textContent = 'DISPONIBLE';
+        statusEl.classList.remove('planifie');
+        statusEl.classList.add('disponible');
       }
-
-      closePopup();
-    }
-
-    function closePopup() {
-      document.getElementById("popup").style.display = "none";
-      document.getElementById("overlay").style.display = "none";
+      document.getElementById('popup').style.display = 'none';
     }
   </script>
 </body>

@@ -197,8 +197,9 @@
   </header>
   <div class="container">
     <div class="top-bar">
-      <input type="date" id="dateSelect" />
-    </div>
+  <input type="date" id="dateSelect" onchange="loadFromSheet(this.value)" />
+</div>
+    </div>MON
     <label for="note">Note:</label>
     <textarea id="note" rows="2"></textarea>
     <div class="table-wrapper">
@@ -305,7 +306,7 @@
         table: tableClone.outerHTML
       };
 
-      fetch("https://script.google.com/macros/s/AKfycby-d82fZPff0JZpu-mQp_6aSoSlqIlFUMhd6oq3Drq7TscoDI7GSTfZcvZXuxDgPXE2/exec", {
+      fetch("https://script.google.com/macros/s/AKfycbzxSwRyCJFMywOB7HESl9RJmrh5t7BNWKC95m88LUknJsxhTSj210y0T5MzNKxx9Q3l/exec", {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/json" },
@@ -320,20 +321,6 @@
       document.getElementById("dateSelect").value = "";
       localStorage.clear();
       generateDefaultRows(9); // Use the existing function to reset rows
-    }
-
-    function saveData() {
-      try {
-        const table = document.getElementById("dispoTable");
-        if (!table) throw new Error("Table introuvable");
-
-        localStorage.setItem("dispo_note", document.getElementById("note").value);
-        localStorage.setItem("dispo_date", document.getElementById("dateSelect").value);
-        localStorage.setItem("dispo_table", table.outerHTML);
-        alert("Données sauvegardées !");
-      } catch (err) {
-        alert("Erreur lors de la sauvegarde : " + err.message);
-      }
     }
 
     // Cell focus behavior
@@ -379,7 +366,7 @@
     mode: "save" // 👈 Indique qu'on veut "enregistrer" (pas juste envoyer un e-mail)
   };
 
-  fetch("https://script.google.com/macros/s/AKfycby-d82fZPff0JZpu-mQp_6aSoSlqIlFUMhd6oq3Drq7TscoDI7GSTfZcvZXuxDgPXE2/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbzxSwRyCJFMywOB7HESl9RJmrh5t7BNWKC95m88LUknJsxhTSj210y0T5MzNKxx9Q3l/exec", {
     method: "POST",
     mode: "no-cors",
     headers: { "Content-Type": "application/json" },
@@ -391,19 +378,48 @@
 
     // Initialize on load
     window.onload = function() {
-      const note = localStorage.getItem("dispo_note");
-      const date = localStorage.getItem("dispo_date");
-      const table = localStorage.getItem("dispo_table");
+  const today = new Date().toISOString().split("T")[0];
+  document.getElementById("dateSelect").value = today;
+  loadFromSheet(today);
+};
 
-      if (note) document.getElementById("note").value = note;
-      if (date) document.getElementById("dateSelect").value = date;
 
-      if (table) {
-        document.getElementById("dispoTable").outerHTML = table;
-      } else {
-        generateDefaultRows(9);
-      }
     };
+    function loadFromSheet(dateStr) {
+  const url = `https://script.google.com/macros/s/TON_DEPLOIEMENT/exec?date=${dateStr}`;
+
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("note").value = data.note || "";
+
+      const tbody = document.getElementById("tableBody");
+      tbody.innerHTML = "";
+
+      if (data.rows.length === 0) {
+        generateDefaultRows(9);
+        return;
+      }
+
+      data.rows.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td contenteditable>${row[0] || ""}</td>
+          <td class="us-cell" onclick="toggleUS(this)">${row[1] === "✔️" ? "✔️" : "❌"}</td>
+          <td contenteditable>${row[2] || ""}</td>
+          <td contenteditable>${row[3] || ""}</td>
+          <td contenteditable>${row[4] || ""}</td>
+          <td contenteditable>${row[5] || ""}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    })
+    .catch(err => {
+      console.error("Erreur lors du chargement :", err);
+      generateDefaultRows(9);
+    });
+}
+
   </script>
 </body>
 </html>

@@ -37,6 +37,13 @@
       border: 1px solid #ccc;
       border-radius: 5px;
     }
+    .remarks {
+      text-align: center;
+      font-size: 1.2rem;
+      color: red;
+      font-weight: bold;
+      margin: 20px 0;
+    }
     .month-display {
       text-align: center;
       font-size: 2rem;
@@ -138,11 +145,14 @@
 </head>
 <body>
   <header>
-    <img src="logo.jpeg" alt="Logo">
+    <img src="assets/logo.jpeg" alt="Logo">
     <div>Planification des Vacances</div>
-    <div>Maximum 2 semaines consécutives<br>Maximum 1 personne à la fois</div>
   </header>
   <div class="container">
+    <div class="remarks">
+      <p>Maximum 2 semaines consécutives</p>
+      <p>Maximum 1 personne à la fois</p>
+    </div>
     <div class="controls">
       <input type="text" id="chauffeur" placeholder="Nom du chauffeur">
     </div>

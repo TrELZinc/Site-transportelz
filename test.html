@@ -323,14 +323,31 @@
     }
 
     function saveData() {
-      try {
-        const table = document.getElementById("dispoTable");
-        if (!table) throw new Error("Table introuvable");
+  const table = document.getElementById("dispoTable");
+  const date = document.getElementById("dateSelect").value;
+  const note = document.getElementById("note").value;
 
-        localStorage.setItem("dispo_note", document.getElementById("note").value);
-        localStorage.setItem("dispo_date", document.getElementById("dateSelect").value);
-        localStorage.setItem("dispo_table", table.outerHTML);
-        alert("Données sauvegardées !");
+  const rows = Array.from(table.querySelectorAll("tbody tr")).map(tr =>
+    Array.from(tr.querySelectorAll("td")).map(td =>
+      td.textContent.trim()
+    )
+  );
+
+  const data = {
+    note,
+    date,
+    rows
+  };
+
+  fetch("https://script.google.com/macros/s/AKfycbyqwYRf1iOOMyQqABvchlNYjvT34qnuP6CY1RDD56Q1nFAsPPGK4aBm8uf0h39WnmE/exec", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+
+  alert("Données enregistrées !");
+}
+
       } catch (err) {
         alert("Erreur lors de la sauvegarde : " + err.message);
       }

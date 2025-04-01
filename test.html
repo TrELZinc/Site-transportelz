@@ -42,13 +42,14 @@
       margin-bottom: 10px;
     }
 
-    select#chauffeur {
+    select#chauffeur, input#motdepasse {
       font-size: 1.2rem;
       padding: 12px;
       width: 80%;
       max-width: 400px;
       border: 1px solid #ccc;
       border-radius: 5px;
+      margin-top: 10px;
     }
 
     .turn-box {
@@ -166,6 +167,9 @@
         <option value="Luc Tremblay">Luc Tremblay</option>
         <option value="Marie Duval">Marie Duval</option>
       </select>
+      <div id="passwordBox" style="display:none;">
+        <input type="password" id="motdepasse" placeholder="Mot de passe">
+      </div>
     </div>
 
     <div id="rangMessage"></div>
@@ -189,7 +193,6 @@
     let autorise = false;
     const dayNames = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
 
-    // Classement fictif pour test (sans ancienneté affichée)
     const classement = {
       "Luc Tremblay": { rang: 1 },
       "Marie Duval": { rang: 2 },
@@ -201,8 +204,10 @@
       const div = document.getElementById("rangMessage");
       const calendrier = document.getElementById("calendar");
       const bouton = document.getElementById("submit");
+      const passwordBox = document.getElementById("passwordBox");
 
       if (classement[nom]) {
+        passwordBox.style.display = "block";
         const rang = classement[nom].rang;
         if (rang === 1) {
           autorise = true;
@@ -216,6 +221,7 @@
           div.innerHTML = `<div class="turn-box waiting">Tu es actuellement <strong>#${rang}</strong> dans la liste. Merci de patienter.</div>`;
         }
       } else {
+        passwordBox.style.display = "none";
         div.innerHTML = "";
         calendrier.classList.add("disabled");
         bouton.disabled = true;
@@ -320,8 +326,10 @@
 
     function submitVacation() {
       const chauffeur = document.getElementById('chauffeur').value;
-      if (!chauffeur) {
-        alert("Veuillez sélectionner votre nom.");
+      const motdepasse = document.getElementById('motdepasse').value.trim();
+
+      if (!chauffeur || !motdepasse) {
+        alert("Veuillez sélectionner votre nom et entrer votre mot de passe.");
         return;
       }
 
@@ -330,7 +338,14 @@
         return;
       }
 
-      const confirmation = `Chauffeur : ${chauffeur}\nSemaines choisies :\n${selectedWeeks.join('\n')}`;
+      // Affichage temporaire pour test. On vérifiera plus tard côté serveur.
+      const confirmation = `
+        Chauffeur : ${chauffeur}
+        Mot de passe : ${motdepasse}
+        Semaines choisies :
+        ${selectedWeeks.join('\n')}
+      `;
+
       alert(confirmation);
     }
 

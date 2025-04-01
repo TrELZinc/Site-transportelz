@@ -256,6 +256,7 @@
           selectedEnd.setDate(selectedEnd.getDate() + 6);
           if (day >= selectedStart && day <= selectedEnd) {
             dayDiv.classList.add('selected');
+            dayDiv.style.opacity = "1"; // Ensure the selected days are not pale
           }
           dayDiv.onclick = () => toggleWeekFromDate(day);
         } else {
@@ -288,6 +289,7 @@
       popupContent.innerHTML = `
         <p>${chauffeur}, vous avez demandé les semaines suivantes :</p>
         <ul>${selectedWeeks.map(w => `<li>${w}</li>`).join('')}</ul>
+        <p>On vous revient rapidement avec l'approbation.</p>
       `;
       document.getElementById('popup').classList.add('active');
     }
@@ -295,6 +297,17 @@
     function closePopup() {
       document.getElementById('popup').classList.remove('active');
     }
+
+    function updateButtonLabel() {
+      const submitButton = document.getElementById('submit');
+      if (selectedWeeks.length === 2) {
+        submitButton.textContent = "Demander ces semaines";
+      } else {
+        submitButton.textContent = "Demander cette semaine";
+      }
+    }
+
+    document.addEventListener('click', updateButtonLabel);
 
     generateCalendar(currentMonth, currentYear);
   </script>

@@ -1,66 +1,33 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Vacances Chauffeurs</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planification Vacances Chauffeurs</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f4f4f4;
       margin: 0;
-      padding: 0;
+      background: #f5f5f5;
     }
 
     header {
-      background: #000;
+      background-color: #000;
       color: white;
       text-align: center;
       padding: 1rem;
+      font-size: 1.5rem;
     }
 
     .container {
+      max-width: 800px;
+      margin: auto;
       padding: 20px;
     }
 
     .controls {
       text-align: center;
       margin-bottom: 15px;
-    }
-
-    select, input, button {
-      padding: 8px;
-      margin: 5px;
-      font-size: 1rem;
-    }
-
-    #calendar {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 5px;
-    }
-
-    .day, .week-label {
-      text-align: center;
-      padding: 10px;
-      background: white;
-      border-radius: 5px;
-    }
-
-    .taken {
-      background-color: #ff4d4d;
-      color: white;
-    }
-
-    .selected {
-      background-color: #4da6ff;
-      color: white;
-    }
-
-    .week-label {
-      grid-column: span 7;
-      background: #ddd;
-      font-weight: bold;
     }
 
     .month-nav {
@@ -74,14 +41,69 @@
       background-color: #000;
       color: white;
       border: none;
-      padding: 5px 10px;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+
+    #month-year {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    #calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+
+    .day-name {
+      text-align: center;
+      font-weight: bold;
+      background: #ddd;
+      padding: 8px;
+      border-radius: 4px;
+    }
+
+    .day {
+      text-align: center;
+      background: white;
+      padding: 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .day:hover {
+      background: #e0e0e0;
+    }
+
+    .taken {
+      background-color: #ff4d4d !important;
+      color: white;
+      cursor: not-allowed;
+    }
+
+    .selected {
+      background-color: #4da6ff;
+      color: white;
+    }
+
+    button#submit {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      font-size: 1rem;
+      background: #000;
+      color: white;
+      border: none;
       border-radius: 5px;
     }
 
-    @media (max-width: 600px) {
-      #calendar {
-        grid-template-columns: repeat(7, 1fr);
-      }
+    #confirmation {
+      text-align: center;
+      margin-top: 15px;
+      font-weight: bold;
+      color: #333;
     }
   </style>
 </head>
@@ -103,23 +125,86 @@
 
     <div id="calendar"></div>
 
-    <button onclick="submitVacation()">Demander cette semaine</button>
+    <button id="submit" onclick="submitVacation()">Demander cette semaine</button>
+
+    <div id="confirmation"></div>
+
   </div>
 
   <script>
-    const takenWeeks = ['2025-07-01', '2025-07-08']; // À remplacer par des données de Sheets plus tard
+    const takenWeeks = ['2025-07-01', '2025-07-08']; // Début de semaines prises
     let selectedWeeks = [];
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
 
-    const calendarEl = document.getElementById('calendar');
-    const monthYearEl = document.getElementById('month-year');
+    const dayNames = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
 
     function getStartOfWeek(date) {
       const d = new Date(date);
       const day = d.getDay();
-      const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+      const diff = d.getDate() - day;
       return new Date(d.setDate(diff));
+    }
+
+    function formatDate(date) {
+      return date.toISOString().split('T')[0];
+    }
+
+    function generateCalendar(month, year) {
+      const calendar = document.getElementById('calendar');
+      const monthYear = document.getElementById('month-year');
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const startDay = new Date(firstDay);
+      startDay.setDate(1 - firstDay.getDay()); // Commencer le dimanche précédent
+
+      calendar.innerHTML = '';
+      monthYear.textContent = `${firstDay.toLocaleString('fr-FR', { month: 'long' })} ${year}`;
+
+      // Noms des jours
+      for (let i = 0; i < 7; i++) {
+        const dayName = document.createElement('div');
+        dayName.className = 'day-name';
+        dayName.textContent = dayNames[i];
+        calendar.appendChild(dayName);
+      }
+
+      // Remplir les jours
+      for (let i = 0; i < 42; i++) {
+        const day = new Date(startDay);
+        day.setDate(startDay.getDate() + i);
+        const dayDiv = document.createElement('div');
+        dayDiv.className = 'day';
+        dayDiv.textContent = day.getDate();
+
+        const weekStart = getStartOfWeek(day);
+        const weekKey = formatDate(weekStart);
+
+        if (day.getMonth() !== month) {
+          dayDiv.style.opacity = "0.3";
+          dayDiv.style.cursor = "default";
+        } else if (takenWeeks.includes(weekKey)) {
+          dayDiv.classList.add('taken');
+        } else {
+          dayDiv.onclick = () => toggleWeek(weekKey);
+          if (selectedWeeks.includes(weekKey)) {
+            dayDiv.classList.add('selected');
+          }
+        }
+
+        calendar.appendChild(dayDiv);
+      }
+    }
+
+    function toggleWeek(weekKey) {
+      if (takenWeeks.includes(weekKey)) return;
+      const index = selectedWeeks.indexOf(weekKey);
+      if (index > -1) {
+        selectedWeeks.splice(index, 1);
+      } else {
+        selectedWeeks.push(weekKey);
+      }
+      generateCalendar(currentMonth, currentYear);
     }
 
     function changeMonth(delta) {
@@ -134,62 +219,10 @@
       generateCalendar(currentMonth, currentYear);
     }
 
-    function generateCalendar(month, year) {
-      calendarEl.innerHTML = '';
-      const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
-      monthYearEl.textContent = `${monthNames[month]} ${year}`;
-
-      const firstDay = new Date(year, month, 1);
-      const lastDay = new Date(year, month + 1, 0);
-      let currentWeekStart = getStartOfWeek(firstDay);
-
-      while (currentWeekStart <= lastDay) {
-        const weekLabel = document.createElement('div');
-        const weekKey = currentWeekStart.toISOString().slice(0, 10);
-        weekLabel.className = 'week-label';
-        weekLabel.textContent = `Semaine du ${currentWeekStart.toLocaleDateString('fr-CA')}`;
-        if (selectedWeeks.includes(weekKey)) weekLabel.classList.add('selected');
-        calendarEl.appendChild(weekLabel);
-
-        for (let i = 0; i < 7; i++) {
-          const day = new Date(currentWeekStart);
-          day.setDate(currentWeekStart.getDate() + i);
-
-          const dayDiv = document.createElement('div');
-          dayDiv.className = 'day';
-          dayDiv.textContent = day.getDate();
-
-          if (takenWeeks.includes(weekKey)) {
-            dayDiv.classList.add('taken');
-          } else {
-            dayDiv.onclick = () => toggleWeek(weekKey);
-            if (selectedWeeks.includes(weekKey)) {
-              dayDiv.classList.add('selected');
-            }
-          }
-
-          calendarEl.appendChild(dayDiv);
-        }
-
-        currentWeekStart.setDate(currentWeekStart.getDate() + 7);
-      }
-    }
-
-    function toggleWeek(weekKey) {
-      if (takenWeeks.includes(weekKey)) return;
-
-      const index = selectedWeeks.indexOf(weekKey);
-      if (index > -1) {
-        selectedWeeks.splice(index, 1);
-      } else {
-        selectedWeeks.push(weekKey);
-      }
-
-      generateCalendar(currentMonth, currentYear);
-    }
-
     function submitVacation() {
       const chauffeur = document.getElementById('chauffeur').value.trim();
+      const confirmation = document.getElementById('confirmation');
+
       if (!chauffeur) {
         alert("Veuillez entrer le nom du chauffeur.");
         return;
@@ -200,10 +233,12 @@
         return;
       }
 
-      // Envoi futur vers Apps Script :
-      // fetch(URL, { method: 'POST', body: JSON.stringify({ chauffeur, semaines: selectedWeeks }) });
+      // Exemple de traitement à ajouter plus tard (fetch vers Apps Script)
 
-      alert(`Demande envoyée pour ${chauffeur} :\n${selectedWeeks.join(', ')}`);
+      confirmation.innerHTML = `
+        <p>${chauffeur}, vous avez demandé les semaines suivantes :</p>
+        <ul>${selectedWeeks.map(w => `<li>${w}</li>`).join('')}</ul>
+      `;
     }
 
     generateCalendar(currentMonth, currentYear);

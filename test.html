@@ -14,15 +14,8 @@
     header {
       background-color: #111;
       padding: 10px 20px;
-      margin: 0;
       width: 100vw;
       box-sizing: border-box;
-      overflow: hidden;
-      position: relative;
-      left: 50%;
-      right: 50%;
-      margin-left: -50vw;
-      margin-right: -50vw;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -40,7 +33,6 @@
       width: 25px;
       background: white;
       margin: 4px 0;
-      transition: 0.3s;
     }
     .menu {
       display: none;
@@ -61,26 +53,11 @@
       color: white;
       padding: 8px 12px;
       text-decoration: none;
-      font-size: 14px;
-    }
-    .menu a:hover {
-      background-color: #333;
     }
     .container {
       padding: 20px;
       max-width: 1000px;
       margin: auto;
-    }
-    .top-bar {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 10px;
-    }
-    .top-bar input[type="date"] {
-      padding: 8px 12px;
-      font-size: 16px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
     }
     label {
       font-weight: bold;
@@ -112,36 +89,24 @@
       border: 1px solid #ccc;
       padding: 8px;
       text-align: center;
-      vertical-align: middle;
       height: 36px;
     }
     th {
       background-color: #d32f2f;
       color: white;
-      font-weight: bold;
     }
     td[contenteditable] {
       outline: none;
       text-transform: uppercase;
     }
     .us-cell {
-      font-size: 16px;
-      vertical-align: middle;
-      line-height: 1;
       cursor: pointer;
-    }
-    .us-cell span {
-      font-size: 16px;
-      display: inline-block;
-      line-height: 1;
-      vertical-align: middle;
     }
     .buttons {
       margin-top: 20px;
       display: flex;
       justify-content: center;
       gap: 10px;
-      flex-wrap: wrap;
     }
     .buttons button {
       padding: 12px 24px;
@@ -155,53 +120,24 @@
     .reset-btn { background-color: #e74c3c; }
     .save-btn { background-color: #2ecc71; }
     .send-btn { background-color: black; }
-
-    @media (max-width: 600px) {
-      body {
-        padding: 0 12px 40px 12px;
-      }
-      .container {
-        padding-left: 12px;
-        padding-right: 12px;
-      }
-      .buttons {
-        margin-bottom: 40px;
-      }
-      table {
-        font-size: 13px;
-      }
-      th, td {
-        padding: 6px;
-        height: 32px;
-        font-size: 14px;
-      }
-      .us-cell {
-        font-size: 14px !important;
-      }
-    }
   </style>
 </head>
 <body>
   <header>
     <img src="assets/logo.jpeg" alt="Logo Transport ELZ">
-    <!-- Removed ID to simplify and use direct onclick -->
     <div class="menu-toggle" onclick="toggleMenu()">
-      <span></span>
-      <span></span>
-      <span></span>
+      <span></span><span></span><span></span>
     </div>
     <div class="menu" id="menuDropdown">
       <a href="test.html">Sommaire</a>
       <a href="linktree.html">Menu</a>
     </div>
   </header>
+
   <div class="container">
-    <div class="top-bar">
-  <input type="date" id="dateSelect" onchange="loadFromSheet(this.value)" />
-</div>
-    </div>
     <label for="note">Note:</label>
     <textarea id="note" rows="2"></textarea>
+
     <div class="table-wrapper">
       <table id="dispoTable">
         <thead>
@@ -212,55 +148,76 @@
         <tbody id="tableBody"></tbody>
       </table>
     </div>
+
     <div class="buttons">
       <button class="reset-btn" onclick="resetForm()">Reset</button>
       <button class="save-btn" onclick="saveToSheet()">Save</button>
       <button class="send-btn" onclick="sendForm()">Send</button>
     </div>
   </div>
-  
+
   <script>
-    // Toggle menu function - simple direct approach
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyi6-uqszxBO4I5eUt3Pno_cOuIaINlzXJluPqknR3Se7XeeSKj9UffdmjMs7HkntPW/exec";
+
     function toggleMenu() {
-      const menu = document.getElementById("menuDropdown");
-      menu.classList.toggle("show");
+      document.getElementById("menuDropdown").classList.toggle("show");
     }
-    
-    // Close menu when clicking outside
-    document.addEventListener("click", function(e) {
+
+    document.addEventListener("click", function (e) {
       const menu = document.getElementById("menuDropdown");
       const toggle = document.querySelector(".menu-toggle");
-      
-      if (!toggle.contains(e.target) && !menu.contains(e.target)) {
-        menu.classList.remove("show");
-      }
+      if (!toggle.contains(e.target) && !menu.contains(e.target)) menu.classList.remove("show");
     });
-    
-    function createRow() {
+
+    function createRow(data = ["", "❌", "", "", "", ""]) {
       const row = document.createElement("tr");
       row.innerHTML = `
-        <td contenteditable></td>
-        <td class="us-cell" onclick="toggleUS(this)" style="font-size:16px;">❌</td>
-        <td contenteditable inputmode="numeric"></td>
-        <td contenteditable inputmode="numeric"></td>
-        <td contenteditable></td>
-        <td contenteditable></td>
-      `;
+        <td contenteditable>${data[0]}</td>
+        <td class="us-cell" onclick="toggleUS(this)">${data[1] === "✔️" ? "✔️" : "❌"}</td>
+        <td contenteditable>${data[2]}</td>
+        <td contenteditable>${data[3]}</td>
+        <td contenteditable>${data[4]}</td>
+        <td contenteditable>${data[5]}</td>`;
       return row;
     }
 
     function generateDefaultRows(n = 9) {
       const tbody = document.getElementById("tableBody");
       tbody.innerHTML = "";
-      for (let i = 0; i < n; i++) {
-        tbody.appendChild(createRow());
-      }
+      for (let i = 0; i < n; i++) tbody.appendChild(createRow());
     }
 
     function toggleUS(cell) {
-      cell.innerHTML = cell.innerHTML.includes("✔️")
-        ? "❌"
-        : '<span style="color:#c62828; font-size:16px;">✔️</span>';
+      cell.innerHTML = cell.innerHTML.includes("✔️") ? "❌" : "✔️";
+    }
+
+    function resetForm() {
+      document.getElementById("note").value = "";
+      generateDefaultRows(9);
+    }
+
+    function saveToSheet() {
+      const rows = [];
+      const trs = document.querySelectorAll("#tableBody tr");
+
+      trs.forEach(tr => {
+        const cells = tr.querySelectorAll("td");
+        const row = Array.from(cells).map((cell, i) =>
+          i === 1 ? (cell.textContent.includes("✔️") ? "✔️" : "❌") : cell.innerText.trim().toUpperCase()
+        );
+        rows.push(row);
+      });
+
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          rows,
+          note: document.getElementById("note").value,
+          mode: "save"
+        })
+      }).then(() => alert("Données enregistrées !"));
     }
 
     function sendForm() {
@@ -269,157 +226,45 @@
 
       rows.forEach(row => {
         const cells = row.querySelectorAll("td");
-        let isRowEmpty = true;
-
-        for (let i = 0; i < cells.length; i++) {
-          if (i === 1) continue;
-          const text = cells[i]?.innerText?.trim();
-          if (text) {
-            isRowEmpty = false;
-            break;
-          }
-        }
-
-        for (let i = 0; i < cells.length; i++) {
-          const cell = cells[i];
-
+        cells.forEach((cell, i) => {
           if (i === 1) {
             const content = cell.textContent.trim();
-            const isChecked =
-              content.includes("✔️") || content.includes("✅") ||
-              cell.querySelector("input[type='checkbox']")?.checked;
-
-            if (isChecked) {
-              cell.innerHTML = '<span style="font-size:16px;">✔️</span>';
-            } else {
-              cell.innerHTML = isRowEmpty ? '' : '<span style="font-size:16px;">❌</span>';
-            }
-          } else if (cell.hasAttribute("contenteditable")) {
+            cell.innerHTML = content.includes("✔️") ? "✔️" : "❌";
+          } else {
             cell.innerText = cell.innerText.trim().toUpperCase();
           }
-        }
+        });
       });
 
-      const data = {
-        note: document.getElementById("note").value,
-        date: document.getElementById("dateSelect").value,
-        table: tableClone.outerHTML
-      };
-
-      fetch("https://script.google.com/macros/s/AKfycbyi6-uqszxBO4I5eUt3Pno_cOuIaINlzXJluPqknR3Se7XeeSKj9UffdmjMs7HkntPW/exec", {
+      fetch(SCRIPT_URL, {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
+        body: JSON.stringify({
+          note: document.getElementById("note").value,
+          table: tableClone.outerHTML,
+          mode: "send"
+        })
       });
 
       alert("Disponibilités envoyées !");
     }
 
-    function resetForm() {
-      document.getElementById("note").value = "";
-      document.getElementById("dateSelect").value = "";
-      localStorage.clear();
-      generateDefaultRows(9); // Use the existing function to reset rows
+    function loadFromSheet() {
+      fetch(SCRIPT_URL)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("note").value = data.note || "";
+          const tbody = document.getElementById("tableBody");
+          tbody.innerHTML = "";
+
+          const rows = data.rows && data.rows.length ? data.rows : Array(9).fill(["", "❌", "", "", "", ""]);
+          rows.forEach(r => tbody.appendChild(createRow(r)));
+        })
+        .catch(() => generateDefaultRows(9));
     }
 
-    // Cell focus behavior
-    document.addEventListener("focusin", function(e) {
-      if (e.target.matches("td[contenteditable]")) {
-        const cell = e.target;
-        const container = document.querySelector(".table-wrapper");
-        
-        if (container) {
-          const offsetLeft = cell.offsetLeft;
-          const containerRect = container.getBoundingClientRect();
-          const scrollLeft = offsetLeft - (containerRect.width / 3);
-          
-          container.scrollTo({
-            left: scrollLeft,
-            behavior: "smooth"
-          });
-        }
-      }
-    });
-  function saveToSheet() {
-  const rows = [];
-  const trs = document.querySelectorAll("#tableBody tr");
-
-  trs.forEach(tr => {
-    const cells = tr.querySelectorAll("td");
-    const row = Array.from(cells).map((cell, index) => {
-      if (index === 1) {
-        return cell.textContent.includes("✔️") ? "✔️" : "❌";
-      } else {
-        return cell.innerText.trim().toUpperCase();
-      }
-    });
-    rows.push(row);
-  });
-
-  const data = { rows };
-
-  fetch("https://script.google.com/macros/s/AKfycbyi6-uqszxBO4I5eUt3Pno_cOuIaINlzXJluPqknR3Se7XeeSKj9UffdmjMs7HkntPW/exec", {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  }).then(() => alert("Disponibilités enregistrées !"));
-}
-
-  });
-
-  const data = {
-    note: document.getElementById("note").value,
-    date: document.getElementById("dateSelect").value,
-    table: table.outerHTML,
-    mode: "save" // 👈 Indique qu'on veut "enregistrer" (pas juste envoyer un e-mail)
-  };
-
-  fetch("https://script.google.com/macros/s/AKfycbyi6-uqszxBO4I5eUt3Pno_cOuIaINlzXJluPqknR3Se7XeeSKj9UffdmjMs7HkntPW/exec", {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  })
-  .then(() => alert("Données enregistrées dans Google Sheets !"))
-  .catch(err => alert("Erreur : " + err));
-}
-
-    // Initialize on load
-    window.onload = function () {
-  loadFromSheet();
-};
-
-function loadFromSheet() {
-  fetch("https://script.google.com/macros/s/AKfycbyi6-uqszxBO4I5eUt3Pno_cOuIaINlzXJluPqknR3Se7XeeSKj9UffdmjMs7HkntPW/exec")
-    .then(res => res.json())
-    .then(data => {
-      const tbody = document.getElementById("tableBody");
-      tbody.innerHTML = "";
-
-      const rows = data.length > 0 ? data : Array(9).fill(["", "❌", "", "", "", ""]);
-
-      rows.forEach(row => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td contenteditable>${row[0] || ""}</td>
-          <td class="us-cell" onclick="toggleUS(this)">${row[1] === "✔️" ? "✔️" : "❌"}</td>
-          <td contenteditable>${row[2] || ""}</td>
-          <td contenteditable>${row[3] || ""}</td>
-          <td contenteditable>${row[4] || ""}</td>
-          <td contenteditable>${row[5] || ""}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    })
-    .catch(err => {
-      console.error("Erreur de chargement :", err);
-      generateDefaultRows(9);
-    });
-}
-
-
+    window.onload = loadFromSheet;
   </script>
 </body>
 </html>

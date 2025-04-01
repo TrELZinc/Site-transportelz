@@ -38,10 +38,20 @@
       margin-top: 20px;
     }
 
-    select {
+    .selectors {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .selectors label {
+      margin: 5px;
+    }
+
+    .selectors select {
       padding: 10px;
       font-size: 16px;
-      margin: 10px;
+      margin: 5px;
       border-radius: 5px;
       border: 1px solid #ccc;
     }
@@ -122,6 +132,10 @@
         font-size: 20px;
       }
 
+      .selectors {
+        flex-direction: column;
+      }
+
       table {
         font-size: 12px;
         min-width: unset;
@@ -137,34 +151,38 @@
   <div class="container">
     <h1>Tableau des poids par type de véhicule</h1>
 
-    <div>
-      <label for="variable1">Type de véhicule :</label>
-      <select id="variable1">
-        <option value="B.45">4 ESSIEUX</option>
-        <option value="B.32">3 ESSIEUX</option>
-        <option value="B.31">3 ESSIEUX CITERNE 2006</option>
-      </select>
-
-      <label for="variable2">Condition :</label>
-      <select id="variable2">
-        <option value="REGULIER">RÉGULIER</option>
-        <option value="DEGEL">DÉGEL</option>
-      </select>
-
-      <label for="variable3">Endroit :</label>
-      <select id="variable3">
-        <option value="QUEBEC">QUEBEC</option>
-        <option value="MONTREAL">MONTREAL</option>
-        <option value="ONTARIO">ONTARIO</option>
-        <option value="MARITIMES">MARITIMES</option>
-        <option value="NOUVELLE-ECOSSE">NOUVELLE-ECOSSE</option>
-        <option value="MAINE_JACKMAN">MAINE VIA JACKMAN</option>
-        <option value="NEW_HAMPSHIRE_JACKMAN">NEW HAMPSHIRE VIA JACKMAN</option>
-        <option value="MAINE_STANSTEAD">MAINE VIA STANSTEAD</option>
-        <option value="NEW_HAMPSHIRE_STANSTEAD">NEW HAMPSHIRE VIA STANSTEAD</option>
-        <option value="VERMONT">VERMONT</option>
-        <option value="MASSACHUSETTS">MASSACHUSETTS</option>
-      </select>
+    <div class="selectors">
+      <div>
+        <label for="variable1">Type de véhicule :</label>
+        <select id="variable1">
+          <option value="B.45">4 ESSIEUX</option>
+          <option value="B.32">3 ESSIEUX</option>
+          <option value="B.31">3 ESSIEUX CITERNE 2006</option>
+        </select>
+      </div>
+      <div>
+        <label for="variable2">Condition :</label>
+        <select id="variable2">
+          <option value="REGULIER">RÉGULIER</option>
+          <option value="DEGEL">DÉGEL</option>
+        </select>
+      </div>
+      <div>
+        <label for="variable3">Endroit :</label>
+        <select id="variable3">
+          <option value="QUEBEC">QUEBEC</option>
+          <option value="MONTREAL">MONTREAL</option>
+          <option value="ONTARIO">ONTARIO</option>
+          <option value="MARITIMES">MARITIMES</option>
+          <option value="NOUVELLE-ECOSSE">NOUVELLE-ECOSSE</option>
+          <option value="MAINE_JACKMAN">MAINE VIA JACKMAN</option>
+          <option value="NEW_HAMPSHIRE_JACKMAN">NEW HAMPSHIRE VIA JACKMAN</option>
+          <option value="MAINE_STANSTEAD">MAINE VIA STANSTEAD</option>
+          <option value="NEW_HAMPSHIRE_STANSTEAD">NEW HAMPSHIRE VIA STANSTEAD</option>
+          <option value="VERMONT">VERMONT</option>
+          <option value="MASSACHUSETTS">MASSACHUSETTS</option>
+        </select>
+      </div>
     </div>
 
     <table id="resultTable">

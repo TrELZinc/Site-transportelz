@@ -123,6 +123,13 @@
 
   <script>
     const apiUrl = 'https://script.google.com/macros/s/AKfycbxOlc8H2lw4e3pF0FViso7ds1LTYjW_Z8jdEbeLh634fE-fV4LGRvgp-CAe2M7mQCPQ/exec';
+    const categories = [
+        "ST-BASILE TRANSPORT",
+        "IRVING ST-AUGUSTIN",
+        "PETRO PASS STE-FOY",
+        "ESSO DESCHAMBAULT",
+        "PETRO PASS TROIS-RIVIÈRES"
+    ];
 
     function formatPrix(valeur) {
       const num = parseFloat(valeur);
@@ -143,7 +150,7 @@
         const data = await response.json();
         const tbody = document.querySelector('#prixTable tbody');
         const today = new Date();
-        const categories = {};
+        const categoryRows = {};
 
         data.forEach((row, index) => {
           const tr = document.createElement('tr');
@@ -160,18 +167,21 @@
           `;
 
           if (!isSubSection && !isFirstDateLine) {
-            const category = endroit.split(' ')[0]; // Assuming category is the first word of 'endroit'
-            if (!categories[category]) {
-              categories[category] = [];
-            }
-            categories[category].push({ tr, prix: parseFloat(prix.replace(',', '.')) });
+            categories.forEach(category => {
+              if (endroit.toUpperCase().includes(category.toUpperCase())) {
+                if (!categoryRows[category]) {
+                  categoryRows[category] = [];
+                }
+                categoryRows[category].push({ tr, prix: parseFloat(prix.replace(',', '.')) });
+              }
+            });
           }
 
           tbody.appendChild(tr);
         });
 
         // Highlight the row with the smallest price in each category
-        Object.values(categories).forEach(rows => {
+        Object.values(categoryRows).forEach(rows => {
           const minRow = rows.reduce((min, row) => row.prix < min.prix ? row : min, rows[0]);
           minRow.tr.classList.add('highlight');
         });

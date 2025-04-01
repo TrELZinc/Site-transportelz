@@ -3,87 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Disponibilité des Équipements</title>
+  <title>Équipements Disponibles</title>
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
       font-family: 'Comfortaa', cursive;
       background: #f5f5f5;
+      padding: 0;
     }
-.popup-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
 
-.popup-box {
-  background: white;
-  padding: 24px;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-  text-align: center;
-  max-width: 90%;
-  width: 320px;
-  font-family: 'Comfortaa', cursive;
-  animation: fadeIn 0.3s ease-out;
-}
-
-.popup-box h3 {
-  font-size: 20px;
-  margin-bottom: 18px;
-}
-
-.popup-box button {
-  padding: 10px 18px;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: bold;
-  border: none;
-  cursor: pointer;
-  margin: 5px;
-}
-
-.use-btn {
-  background-color: #d32f2f;
-  color: white;
-}
-
-.cancel-btn {
-  background-color: #eee;
-  color: #333;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
     header {
-      background-color: #000;
-      color: white;
-      padding: 20px;
+      background-color: #111;
       text-align: center;
+      padding: 24px 10px 16px;
     }
 
-    header img {
-      height: 60px;
-      display: block;
-      margin: 0 auto 10px;
-    }
-
-    h1 {
+    header h1 {
       margin: 0;
       font-size: 24px;
       color: white;
+      letter-spacing: 1px;
     }
 
     .date-select {
       text-align: center;
-      margin: 20px 0;
+      margin: 14px 0 20px;
     }
 
     .date-select input {
@@ -99,19 +44,22 @@
       max-width: 800px;
       margin: 20px auto;
       background: white;
-      border-radius: 12px;
+      border-radius: 14px;
       overflow: hidden;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
     }
 
     .section-title {
       background: #fff;
       padding: 14px 20px;
-      color: #d32f2f;
       font-weight: bold;
       font-size: 18px;
-      text-align: center;
+      text-transform: uppercase;
+      display: flex;
+      justify-content: center;
       border-bottom: 2px solid #d32f2f;
+      color: #d32f2f;
+      text-align: center;
     }
 
     .row {
@@ -119,13 +67,13 @@
       justify-content: space-between;
       padding: 14px 20px;
       border-bottom: 1px solid #eee;
-      font-size: 16px;
+      font-size: 17px;
       cursor: pointer;
       transition: background 0.2s;
     }
 
     .row:hover {
-      background-color: #f9f9f9;
+      background: #fef3f3;
     }
 
     .status {
@@ -140,25 +88,62 @@
       color: #2ecc71;
     }
 
-    .back-button {
-      display: block;
+    .popup-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .popup-box {
+      background: white;
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
       text-align: center;
-      margin: 40px auto;
-      background-color: black;
-      color: white;
-      padding: 12px 24px;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
+      max-width: 90%;
+      width: 320px;
       font-family: 'Comfortaa', cursive;
-      text-decoration: none;
-      width: fit-content;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .popup-box h3 {
+      font-size: 20px;
+      margin-bottom: 18px;
+    }
+
+    .popup-box button {
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      margin: 5px;
+    }
+
+    .use-btn {
+      background-color: #d32f2f;
+      color: white;
+    }
+
+    .cancel-btn {
+      background-color: #eee;
+      color: #333;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
     }
 
     @media (max-width: 600px) {
       .row {
         flex-direction: column;
-        gap: 8px;
+        gap: 6px;
         align-items: flex-start;
       }
     }
@@ -166,129 +151,87 @@
 </head>
 <body>
   <header>
-    <img src="assets/logo.jpeg" alt="Logo ELZ">
     <h1>Disponibilité des équipements</h1>
   </header>
 
   <div class="date-select">
-    <input type="date" id="dateInput" />
+    <input type="date" />
   </div>
 
-  <div id="content"></div>
+  <div class="section">
+    <div class="section-title">3 ESSIEUX</div>
+    <div class="row"><span>1906</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row"><span>2006</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row"><span>2506</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row"><span>2706</span><span class="status planifie">PLANIFIÉ</span></div>
+  </div>
 
-  <a class="back-button" href="linktree.html">Retour au menu principal</a>
+  <div class="section">
+    <div class="section-title">4 ESSIEUX</div>
+    <div class="row"><span>1505</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row"><span>1605</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row"><span>1805</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row"><span>1905</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row"><span>2205</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row"><span>2405</span><span class="status disponible">DISPONIBLE</span></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">CAMIONS</div>
+    <div class="row"><span>1103</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row"><span>1202</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row"><span>1303</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row"><span>1404</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row"><span>1502</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row"><span>1603</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row"><span>1703</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row"><span>1803</span><span class="status disponible">DISPONIBLE</span></div>
+  </div>
+
+  <div id="popup" class="popup-overlay">
+    <div class="popup-box">
+      <h3 id="popup-text">Action</h3>
+      <button class="use-btn" onclick="confirmAction()">OK</button>
+      <button class="cancel-btn" onclick="closePopup()">Annuler</button>
+    </div>
+  </div>
 
   <script>
-    const sections = {
-      "3 ESSIEUX": {
-        "1906": "PLANIFIÉ",
-        "2006": "DISPONIBLE",
-        "2506": "PLANIFIÉ",
-        "2706": "PLANIFIÉ"
-      },
-      "4 ESSIEUX": {
-        "1505": "DISPONIBLE",
-        "1605": "DISPONIBLE",
-        "1805": "PLANIFIÉ",
-        "1905": "PLANIFIÉ",
-        "2205": "DISPONIBLE",
-        "2405": "DISPONIBLE"
-      },
-      "CAMIONS": {
-        "1103": "DISPONIBLE",
-        "1202": "DISPONIBLE",
-        "1303": "PLANIFIÉ",
-        "1404": "DISPONIBLE",
-        "1502": "PLANIFIÉ",
-        "1603": "DISPONIBLE",
-        "1703": "DISPONIBLE",
-        "1803": "DISPONIBLE"
+    let targetStatusCell = null;
+    let currentEquipId = "";
+
+    document.querySelectorAll('.row').forEach(row => {
+      row.addEventListener('click', () => {
+        const equip = row.querySelector('span').textContent.trim();
+        const statusCell = row.querySelector('.status');
+        const status = statusCell.classList.contains('planifie') ? 'planifie' : 'disponible';
+
+        targetStatusCell = statusCell;
+        currentEquipId = equip;
+
+        const actionText = status === 'planifie'
+          ? `Libérer ${equip}`
+          : `Utiliser ${equip}`;
+
+        document.getElementById('popup-text').textContent = actionText;
+        document.getElementById('popup').style.display = 'flex';
+      });
+    });
+
+    function closePopup() {
+      document.getElementById('popup').style.display = 'none';
+    }
+
+    function confirmAction() {
+      if (targetStatusCell) {
+        const wasPlanifie = targetStatusCell.classList.contains('planifie');
+
+        targetStatusCell.textContent = wasPlanifie ? 'DISPONIBLE' : 'PLANIFIÉ';
+        targetStatusCell.classList.toggle('planifie');
+        targetStatusCell.classList.toggle('disponible');
       }
-    };
-
-    const content = document.getElementById("content");
-
-    for (const [title, items] of Object.entries(sections)) {
-      const section = document.createElement("div");
-      section.className = "section";
-
-      const sectionTitle = document.createElement("div");
-      sectionTitle.className = "section-title";
-      sectionTitle.textContent = title;
-      section.appendChild(sectionTitle);
-
-      for (const [id, status] of Object.entries(items)) {
-        const row = document.createElement("div");
-        row.className = "row";
-
-        const name = document.createElement("span");
-        name.textContent = id;
-
-        const statusSpan = document.createElement("span");
-        statusSpan.textContent = status;
-        statusSpan.className = "status " + (status === "PLANIFIÉ" ? "planifie" : "disponible");
-
-        row.appendChild(name);
-        row.appendChild(statusSpan);
-
-        row.addEventListener("click", () => {
-          const use = confirm(`Utiliser ${id} ?`);
-          if (use) {
-            const current = statusSpan.textContent;
-            const isPlanifie = current === "PLANIFIÉ";
-            statusSpan.textContent = isPlanifie ? "DISPONIBLE" : "PLANIFIÉ";
-            statusSpan.className = "status " + (isPlanifie ? "disponible" : "planifie");
-          }
-        });
-
-        section.appendChild(row);
-      }
-      content.appendChild(section);
+      closePopup();
     }
   </script>
-  <script>
-  let targetStatusCell = null;
-  let currentEquipId = "";
-
-  document.querySelectorAll('.row').forEach(row => {
-    row.addEventListener('click', () => {
-      const equip = row.querySelector('span').textContent.trim();
-      const statusCell = row.querySelector('.status');
-      const status = statusCell.classList.contains('planifie') ? 'planifie' : 'disponible';
-
-      targetStatusCell = statusCell;
-      currentEquipId = equip;
-
-      const actionText = status === 'planifie'
-        ? `Libérer ${equip}`
-        : `Utiliser ${equip}`;
-
-      document.getElementById('popup-text').textContent = actionText;
-      document.getElementById('popup').style.display = 'flex';
-    });
-  });
-
-  function closePopup() {
-    document.getElementById('popup').style.display = 'none';
-  }
-
-  function confirmAction() {
-    if (targetStatusCell) {
-      const wasPlanifie = targetStatusCell.classList.contains('planifie');
-
-      targetStatusCell.textContent = wasPlanifie ? 'DISPONIBLE' : 'PLANIFIÉ';
-      targetStatusCell.classList.toggle('planifie');
-      targetStatusCell.classList.toggle('disponible');
-    }
-    closePopup();
-  }
-</script>
-  <div id="popup" class="popup-overlay">
-  <div class="popup-box">
-    <h3 id="popup-text">Action</h3>
-    <button class="use-btn" onclick="confirmAction()">OK</button>
-    <button class="cancel-btn" onclick="closePopup()">Annuler</button>
-  </div>
-</div>
 </body>
 </html>

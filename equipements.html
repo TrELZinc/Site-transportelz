@@ -2,126 +2,117 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Disponibilité des Équipements</title>
-  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Équipements Disponibles</title>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --primary: #111;
-      --secondary: #d32f2f;
-      --bg: #fafafa;
-      --card: #fff;
-      --text: #333;
-      --available: #27ae60;
-      --planned: var(--secondary);
-    }
-
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
     }
 
     body {
+      margin: 0;
       font-family: 'Comfortaa', cursive;
-      background: var(--bg);
-      color: var(--text);
-      padding-bottom: 60px;
+      background: #f9f9f9;
+      padding: 0;
     }
 
     header {
-      background: var(--primary);
-      color: white;
-      padding: 24px 20px;
+      background-color: #111;
       text-align: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      padding: 20px 10px 10px;
+      color: white;
     }
 
     header h1 {
+      margin: 0;
       font-size: 22px;
       letter-spacing: 1px;
     }
 
     .date-select {
       text-align: center;
-      margin: 20px 0 30px;
+      margin: 10px 0 20px;
     }
 
     .date-select input {
-      padding: 12px 20px;
+      padding: 10px 18px;
       border-radius: 10px;
-      border: 1.5px solid #ccc;
-      font-size: 16px;
-      font-family: inherit;
+      border: 1px solid #ccc;
+      font-size: 18px;
+      font-family: 'Comfortaa', cursive;
       text-align: center;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
 
     .section {
-      margin: 0 auto 24px;
-      max-width: 600px;
-      background: var(--card);
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      max-width: 800px;
+      margin: 20px auto;
+      background: white;
+      border-radius: 14px;
       overflow: hidden;
-      transition: transform 0.3s ease;
-    }
-
-    .section:hover {
-      transform: translateY(-3px);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
     }
 
     .section-title {
-      background: var(--secondary);
+      background: #d32f2f;
       color: white;
       padding: 16px;
-      font-weight: 700;
-      font-size: 15px;
+      font-weight: bold;
+      font-size: 16px;
       text-transform: uppercase;
       display: flex;
       justify-content: space-between;
-      align-items: center;
     }
 
     .row {
       display: flex;
       justify-content: space-between;
-      padding: 14px 18px;
-      border-top: 1px solid #eee;
-      font-size: 15px;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid #eee;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .row:hover {
+      background: #fff3f3;
     }
 
     .status {
-      font-weight: 700;
-    }
-
-    .disponible {
-      color: var(--available);
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 14px;
     }
 
     .planifie {
-      color: var(--planned);
+      background-color: #fbe9e7;
+      color: #c62828;
     }
 
-    @media (max-width: 500px) {
-      .section-title, .row {
+    .disponible {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    @media (max-width: 600px) {
+      .row {
         flex-direction: column;
         align-items: flex-start;
         gap: 6px;
       }
+
       .section-title {
-        font-size: 14px;
-      }
-      .row {
-        font-size: 14px;
-        padding: 12px 16px;
+        flex-direction: column;
+        gap: 6px;
       }
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Disponibilité des Équipements</h1>
+    <h1>Disponibilité des équipements</h1>
   </header>
 
   <div class="date-select">
@@ -131,37 +122,54 @@
   <div class="section">
     <div class="section-title">
       <span>3 ESSIEUX</span>
-      <span>STATUT</span>
+      <span>STATUS</span>
     </div>
-    <div class="row"><span>1906</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row"><span>2006</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row"><span>2506</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row"><span>2706</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" onclick="useEquipement(this)"><span>1906</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" onclick="useEquipement(this)"><span>2006</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="useEquipement(this)"><span>2506</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" onclick="useEquipement(this)"><span>2706</span><span class="status planifie">PLANIFIÉ</span></div>
   </div>
 
   <div class="section">
     <div class="section-title">
       <span>4 ESSIEUX</span>
-      <span>STATUT</span>
+      <span>STATUS</span>
     </div>
-    <div class="row"><span>1505</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row"><span>1605</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row"><span>1805</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row"><span>1905</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row"><span>2205</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row"><span>2405</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="useEquipement(this)"><span>1505</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="useEquipement(this)"><span>1605</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="useEquipement(this)"><span>1805</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" onclick="useEquipement(this)"><span>1905</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" onclick="useEquipement(this)"><span>2205</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="useEquipement(this)"><span>2405</span><span class="status disponible">DISPONIBLE</span></div>
   </div>
 
   <div class="section">
     <div class="section-title">
       <span>CAMIONS</span>
-      <span>STATUT</span>
+      <span>STATUS</span>
     </div>
-    <div class="row"><span>1103</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row"><span>1303</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row"><span>1404</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row"><span>1502</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row"><span>1602</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="useEquipement(this)"><span>1103</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="useEquipement(this)"><span>1303</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" onclick="useEquipement(this)"><span>1404</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="useEquipement(this)"><span>1502</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" onclick="useEquipement(this)"><span>1602</span><span class="status disponible">DISPONIBLE</span></div>
   </div>
+
+  <script>
+    function useEquipement(row) {
+      const statusEl = row.querySelector(".status");
+      const isDisponible = statusEl.classList.contains("disponible");
+
+      if (!isDisponible) return;
+
+      const confirmed = confirm("Utiliser cet équipement ?");
+
+      if (confirmed) {
+        statusEl.classList.remove("disponible");
+        statusEl.classList.add("planifie");
+        statusEl.textContent = "PLANIFIÉ";
+      }
+    }
+  </script>
 </body>
 </html>

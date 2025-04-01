@@ -27,16 +27,22 @@
     }
     .controls {
       text-align: center;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
     }
-    #chauffeur {
+    select#chauffeur {
       font-size: 1.2rem;
       padding: 12px;
       width: 80%;
       max-width: 400px;
       border: 1px solid #ccc;
       border-radius: 5px;
-      letter-spacing: normal;
+    }
+    .rang-message {
+      text-align: center;
+      font-size: 1rem;
+      font-weight: bold;
+      margin-top: 10px;
+      color: #333;
     }
     .remarks {
       text-align: center;
@@ -126,25 +132,54 @@
       <p>MAXIMUM 2 SEMAINES CONSÉCUTIVES</p>
       <p>MAXIMUM 1 PERSONNE À LA FOIS</p>
     </div>
+
     <div class="controls">
-      <input type="text" id="chauffeur" placeholder="Nom complet">
+      <select id="chauffeur" onchange="afficherRang()">
+        <option value="">-- Sélectionnez votre nom --</option>
+        <option value="Kevin Roy">Kevin Roy</option>
+        <option value="Luc Tremblay">Luc Tremblay</option>
+        <option value="Marie Duval">Marie Duval</option>
+      </select>
     </div>
+    <div class="rang-message" id="rangMessage"></div>
+
     <div class="month-display" id="month-year"></div>
     <div class="month-nav">
       <button onclick="changeMonth(-1)">← Mois précédent</button>
       <button onclick="changeMonth(1)">Mois suivant →</button>
     </div>
+
     <div id="calendar"></div>
+
     <button id="submit" onclick="submitVacation()">Demander cette semaine</button>
+
     <div id="confirmation"></div>
   </div>
+
   <script>
-    const takenWeeks = ['2025-07-01', '2025-07-08']; // Exemples
+    const takenWeeks = ['2025-07-01', '2025-07-08'];
     let selectedWeeks = [];
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
     const dayNames = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
     const today = new Date();
+
+    // Données fictives de classement (à remplacer par données Sheets)
+    const classement = {
+      "Luc Tremblay": { rang: 1, anciennete: "9 ans" },
+      "Marie Duval": { rang: 2, anciennete: "5 ans" },
+      "Kevin Roy": { rang: 3, anciennete: "3 ans" }
+    };
+
+    function afficherRang() {
+      const nom = document.getElementById("chauffeur").value;
+      const div = document.getElementById("rangMessage");
+      if (classement[nom]) {
+        div.innerHTML = `Tu es actuellement <strong>#${classement[nom].rang}</strong> dans la liste (ancienneté : ${classement[nom].anciennete}).`;
+      } else {
+        div.innerHTML = "";
+      }
+    }
 
     function getStartOfWeek(date) {
       const d = new Date(date);
@@ -232,7 +267,7 @@
           selectedEnd.setDate(selectedEnd.getDate() + 6);
           if (day >= selectedStart && day <= selectedEnd) {
             dayDiv.classList.add('selected');
-            dayDiv.style.opacity = "1"; // Ensure the selected days are not pale
+            dayDiv.style.opacity = "1";
           }
           dayDiv.onclick = () => toggleWeekFromDate(day);
         } else {
@@ -248,10 +283,9 @@
     }
 
     function submitVacation() {
-      const chauffeur = document.getElementById('chauffeur').value.trim();
-
+      const chauffeur = document.getElementById('chauffeur').value;
       if (!chauffeur) {
-        alert("Veuillez entrer le nom du chauffeur.");
+        alert("Veuillez sélectionner votre nom.");
         return;
       }
 
@@ -318,17 +352,6 @@
       newWindow.document.write(confirmationPage);
       newWindow.document.close();
     }
-
-    function updateButtonLabel() {
-      const submitButton = document.getElementById('submit');
-      if (selectedWeeks.length === 2) {
-        submitButton.textContent = "Demander ces semaines";
-      } else {
-        submitButton.textContent = "Demander cette semaine";
-      }
-    }
-
-    document.addEventListener('click', updateButtonLabel);
 
     generateCalendar(currentMonth, currentYear);
   </script>

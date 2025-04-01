@@ -1,38 +1,49 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Équipements Disponibles</title>
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet">
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       font-family: 'Comfortaa', cursive;
-      background: #f5f5f5;
-      padding: 0;
+      background: #f9f9f9;
+      color: #333;
     }
 
     header {
-      background-color: #111;
+      background: #111;
+      padding: 12px 16px;
       text-align: center;
-      padding: 24px 10px 16px;
+    }
+
+    header img {
+      max-height: 50px;
+      display: block;
+      margin: 0 auto 8px;
     }
 
     header h1 {
-      margin: 0;
+      color: #fff;
       font-size: 24px;
-      color: white;
+      margin: 0;
+      text-transform: uppercase;
       letter-spacing: 1px;
     }
 
     .date-select {
       text-align: center;
-      margin: 14px 0 20px;
+      margin: 20px 0;
     }
 
     .date-select input {
-      padding: 10px 18px;
+      padding: 10px 16px;
       border-radius: 10px;
       border: 1px solid #ccc;
       font-size: 18px;
@@ -41,39 +52,36 @@
     }
 
     .section {
-      max-width: 800px;
+      max-width: 700px;
       margin: 20px auto;
       background: white;
-      border-radius: 14px;
+      border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.05);
     }
 
     .section-title {
-      background: #fff;
-      padding: 14px 20px;
+      background: white;
+      color: #d32f2f;
+      padding: 16px;
       font-weight: bold;
       font-size: 18px;
-      text-transform: uppercase;
-      display: flex;
-      justify-content: center;
-      border-bottom: 2px solid #d32f2f;
-      color: #d32f2f;
       text-align: center;
+      border-bottom: 1px solid #eee;
     }
 
     .row {
       display: flex;
       justify-content: space-between;
       padding: 14px 20px;
-      border-bottom: 1px solid #eee;
-      font-size: 17px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 16px;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.2s ease;
     }
 
     .row:hover {
-      background: #fef3f3;
+      background-color: #f9f9f9;
     }
 
     .status {
@@ -88,69 +96,84 @@
       color: #2ecc71;
     }
 
-    .popup-overlay {
+    .popup {
       position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.4);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-    }
-
-    .popup-box {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       background: white;
-      padding: 24px;
+      padding: 20px 30px;
       border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      display: none;
       text-align: center;
-      max-width: 90%;
-      width: 320px;
-      font-family: 'Comfortaa', cursive;
-      animation: fadeIn 0.3s ease-out;
     }
 
-    .popup-box h3 {
-      font-size: 20px;
-      margin-bottom: 18px;
+    .popup h2 {
+      font-size: 18px;
+      margin-bottom: 16px;
     }
 
-    .popup-box button {
+    .popup button {
+      margin: 0 8px;
       padding: 10px 18px;
-      border-radius: 8px;
       font-size: 16px;
-      font-weight: bold;
       border: none;
+      border-radius: 8px;
       cursor: pointer;
-      margin: 5px;
+      font-family: 'Comfortaa', cursive;
+      transition: background 0.3s;
     }
 
-    .use-btn {
-      background-color: #d32f2f;
+    .popup .confirm-btn {
+      background: #d32f2f;
       color: white;
     }
 
-    .cancel-btn {
-      background-color: #eee;
-      color: #333;
+    .popup .cancel-btn {
+      background: #ccc;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.95); }
-      to { opacity: 1; transform: scale(1); }
+    .overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4);
+      z-index: 999;
+      display: none;
+    }
+
+    .menu-btn {
+      display: block;
+      text-align: center;
+      margin: 40px auto 20px;
+    }
+
+    .menu-btn a {
+      display: inline-block;
+      padding: 12px 24px;
+      background: #111;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 10px;
+      font-size: 16px;
     }
 
     @media (max-width: 600px) {
       .row {
         flex-direction: column;
-        gap: 6px;
         align-items: flex-start;
+        gap: 4px;
       }
     }
   </style>
 </head>
 <body>
+
   <header>
+    <img src="assets/logo.jpeg" alt="Logo ELZ">
     <h1>Disponibilité des équipements</h1>
   </header>
 
@@ -160,77 +183,80 @@
 
   <div class="section">
     <div class="section-title">3 ESSIEUX</div>
-    <div class="row"><span>1906</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row"><span>2006</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row"><span>2506</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row"><span>2706</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" onclick="toggleStatus(this, '1906')"><span>1906</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" onclick="toggleStatus(this, '2006')"><span>2006</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this, '2506')"><span>2506</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" onclick="toggleStatus(this, '2706')"><span>2706</span><span class="status planifie">PLANIFIÉ</span></div>
   </div>
 
   <div class="section">
     <div class="section-title">4 ESSIEUX</div>
-    <div class="row"><span>1505</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row"><span>1605</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row"><span>1805</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row"><span>1905</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row"><span>2205</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row"><span>2405</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this, '1505')"><span>1505</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this, '1605')"><span>1605</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this, '1805')"><span>1805</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" onclick="toggleStatus(this, '1905')"><span>1905</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" onclick="toggleStatus(this, '2205')"><span>2205</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this, '2405')"><span>2405</span><span class="status disponible">DISPONIBLE</span></div>
   </div>
 
   <div class="section">
     <div class="section-title">CAMIONS</div>
-    <div class="row"><span>1103</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row"><span>1202</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row"><span>1303</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row"><span>1404</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row"><span>1502</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row"><span>1603</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row"><span>1703</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row"><span>1803</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this, '1103')"><span>1103</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this, '1202')"><span>1202</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this, '1303')"><span>1303</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" onclick="toggleStatus(this, '1404')"><span>1404</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this, '1502')"><span>1502</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" onclick="toggleStatus(this, '1603')"><span>1603</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this, '1703')"><span>1703</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this, '1803')"><span>1803</span><span class="status disponible">DISPONIBLE</span></div>
   </div>
 
-  <div id="popup" class="popup-overlay">
-    <div class="popup-box">
-      <h3 id="popup-text">Action</h3>
-      <button class="use-btn" onclick="confirmAction()">OK</button>
-      <button class="cancel-btn" onclick="closePopup()">Annuler</button>
-    </div>
+  <div class="menu-btn">
+    <a href="linktree.html">Retour au menu principal</a>
+  </div>
+
+  <div class="overlay" id="overlay"></div>
+  <div class="popup" id="popup">
+    <h2 id="popup-title">Utiliser 1906 ?</h2>
+    <button class="confirm-btn" onclick="confirmAction()">Oui</button>
+    <button class="cancel-btn" onclick="closePopup()">Annuler</button>
   </div>
 
   <script>
-    let targetStatusCell = null;
-    let currentEquipId = "";
+    let currentRow = null;
+    let currentStatus = "";
 
-    document.querySelectorAll('.row').forEach(row => {
-      row.addEventListener('click', () => {
-        const equip = row.querySelector('span').textContent.trim();
-        const statusCell = row.querySelector('.status');
-        const status = statusCell.classList.contains('planifie') ? 'planifie' : 'disponible';
+    function toggleStatus(row, equipId) {
+      currentRow = row;
+      const statusSpan = row.querySelector(".status");
+      currentStatus = statusSpan.classList.contains("disponible") ? "planifie" : "disponible";
 
-        targetStatusCell = statusCell;
-        currentEquipId = equip;
-
-        const actionText = status === 'planifie'
-          ? `Libérer ${equip}`
-          : `Utiliser ${equip}`;
-
-        document.getElementById('popup-text').textContent = actionText;
-        document.getElementById('popup').style.display = 'flex';
-      });
-    });
-
-    function closePopup() {
-      document.getElementById('popup').style.display = 'none';
+      const action = currentStatus === "planifie" ? `Utiliser ${equipId}` : `Libérer ${equipId}`;
+      document.getElementById("popup-title").textContent = action + " ?";
+      document.getElementById("popup").style.display = "block";
+      document.getElementById("overlay").style.display = "block";
     }
 
     function confirmAction() {
-      if (targetStatusCell) {
-        const wasPlanifie = targetStatusCell.classList.contains('planifie');
+      if (!currentRow) return;
+      const statusSpan = currentRow.querySelector(".status");
 
-        targetStatusCell.textContent = wasPlanifie ? 'DISPONIBLE' : 'PLANIFIÉ';
-        targetStatusCell.classList.toggle('planifie');
-        targetStatusCell.classList.toggle('disponible');
+      if (currentStatus === "planifie") {
+        statusSpan.textContent = "PLANIFIÉ";
+        statusSpan.classList.remove("disponible");
+        statusSpan.classList.add("planifie");
+      } else {
+        statusSpan.textContent = "DISPONIBLE";
+        statusSpan.classList.remove("planifie");
+        statusSpan.classList.add("disponible");
       }
+
       closePopup();
+    }
+
+    function closePopup() {
+      document.getElementById("popup").style.display = "none";
+      document.getElementById("overlay").style.display = "none";
     }
   </script>
 </body>

@@ -213,7 +213,7 @@
     </div>
     <div class="buttons">
       <button class="reset-btn" onclick="resetForm()">Reset</button>
-      <button class="save-btn" onclick="saveData()">Save</button>
+      <button class="save-btn" onclick="saveToSheet()">Save</button>
       <button class="send-btn" onclick="sendForm()">Send</button>
     </div>
   </div>
@@ -354,6 +354,39 @@
         }
       }
     });
+  function saveToSheet() {
+  const table = document.getElementById("dispoTable").cloneNode(true);
+  const rows = table.querySelectorAll("tbody tr");
+
+  rows.forEach(row => {
+    const cells = row.querySelectorAll("td");
+    for (let i = 0; i < cells.length; i++) {
+      const cell = cells[i];
+      if (i === 1) {
+        const content = cell.textContent.trim();
+        const isChecked = content.includes("✔️") || cell.innerHTML.includes("✔️");
+        cell.innerHTML = isChecked ? "✔️" : "❌";
+      } else if (cell.hasAttribute("contenteditable")) {
+        cell.innerText = cell.innerText.trim().toUpperCase();
+      }
+    }
+  });
+
+  const data = {
+    note: document.getElementById("note").value,
+    date: document.getElementById("dateSelect").value,
+    table: table.outerHTML,
+    mode: "save" // 👈 Indique qu'on veut "enregistrer" (pas juste envoyer un e-mail)
+  };
+
+  fetch("https://script.google.com/macros/s/AKfycbxLVBXkDC1w95LaLhffXSaJk6DOMznYT9arZ-XeSmIwpbOspLc2LjhzpMRKJP8P7Ew/exec", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  })
+  .then(() => alert("Données enregistrées dans Google Sheets !"))
+  .catch(err => alert("Erreur : " + err));
+}
 
     // Initialize on load
     window.onload = function() {

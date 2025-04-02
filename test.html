@@ -159,7 +159,12 @@
       border-radius: 5px;
       cursor: pointer;
     }
-  </style>
+  .day.taken {
+  background-color: #ff4d4d !important;
+  color: white;
+  opacity: 1 !important;
+}
+</style>
 </head>
 <body>
 <!-- Le reste du HTML (body content + scripts) sera ajouté dans la deuxième partie -->
@@ -208,7 +213,7 @@
   </div>
 
 <script>
-  const takenWeeks = ['2025-07-01', '2025-07-08'];
+  const takenWeeks = ['2025-03-30', '2025-04-06'];
   let selectedWeeks = [];
   let currentMonth = new Date().getMonth();
   let currentYear = new Date().getFullYear();
@@ -399,7 +404,12 @@
               border-radius: 6px;
               cursor: pointer;
             }
-          </style>
+          .day.taken {
+  background-color: #ff4d4d !important;
+  color: white;
+  opacity: 1 !important;
+}
+</style>
         </head>
         <body>
           <h2>Merci ${nom}!</h2>

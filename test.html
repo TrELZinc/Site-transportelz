@@ -215,9 +215,9 @@
   let autorise = false;
   const dayNames = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
   const classement = {
-    "Luc Tremblay": { rang: 1 },
-    "Marie Duval": { rang: 2 },
-    "Kevin Roy": { rang: 3 }
+    "Luc Tremblay": { rang: 1, solde: 2 },
+    "Marie Duval": { rang: 2, solde: 1 },
+    "Kevin Roy": { rang: 3, solde: 2 }
   };
 
   function afficherInfosChauffeur() {
@@ -232,12 +232,12 @@
         autorise = true;
         calendrier.classList.remove("disabled");
         bouton.disabled = false;
-        div.innerHTML = `<div class="turn-box success">C’est ton tour de choisir tes vacances !<br>Merci de faire ton choix dès maintenant.</div>`;
+        div.innerHTML = `<div class="turn-box success">C’est ton tour de choisir tes vacances !<br><strong>Il te reste ${classement[nom].solde} semaine(s) à prendre.</strong><br>Merci de faire ton choix dès maintenant.</div>`;
       } else {
         autorise = false;
         calendrier.classList.add("disabled");
         bouton.disabled = true;
-        div.innerHTML = `<div class="turn-box waiting">Tu es actuellement <strong>#${rang}</strong> dans la liste. Merci de patienter.</div>`;
+        div.innerHTML = `<div class="turn-box waiting">Tu es actuellement <strong>#${rang}</strong> dans la liste.<br><strong>Il te reste ${classement[nom].solde} semaine(s) à prendre.</strong><br>Merci de patienter.</div>`;
       }
     } else {
       div.innerHTML = "";

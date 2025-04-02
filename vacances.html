@@ -1,89 +1,41 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vacances Chauffeurs</title>
+  <title>Calendrier Vacances</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
+    html, body {
       margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background-color: #f4f4f4; /* Couleur de fond pour les marges */
     }
-    header {
-      background: #000;
-      color: white;
-      text-align: center;
-      padding: 1rem;
-    }
-    header img {
-      max-height: 70px;
-      margin-bottom: 10px;
-    }
-    .container {
-      max-width: 900px;
-      margin: auto;
-      padding: 20px;
-    }
-    select, button {
-      font-size: 1.2rem;
-      padding: 12px;
-      width: 100%;
-      max-width: 400px;
-      margin: 10px auto;
+    iframe {
+      width: calc(100% - 20px); /* Ajuster la largeur pour inclure les marges */
+      height: calc(100% - 20px); /* Ajuster la hauteur pour inclure les marges */
+      border: none;
       display: block;
+      margin: 10px; /* Ajouter des marges de 10px */
+      background-color: #ffffff; /* Couleur de fond de l'iframe */
     }
-    .info {
-      text-align: center;
-      margin-top: 20px;
+    @media (max-width: 600px) {
+      iframe {
+        width: calc(100% - 20px); /* Réduire les marges sur les petits écrans */
+        height: calc(100% - 20px); /* Réduire les marges sur les petits écrans */
+        margin: 15px; /* Ajouter des marges de 5px */
+        background-color: #ffffff; /* Couleur de fond de l'iframe */
+      }
     }
   </style>
 </head>
 <body>
-  <header>
-    <img src="assets/logo.jpeg" alt="Logo" />
-    <div>Planification des Vacances</div>
-  </header>
-
-  <div class="container">
-    <select id="chauffeur">
-      <option value="">-- Sélectionnez votre nom --</option>
-    </select>
-    <div class="info" id="info"></div>
-    <button onclick="chargerChauffeurs()">Recharger les données</button>
-  </div>
-
-  <script>
-    const url = "https://script.google.com/macros/s/AKfycbx4iR4bZucxF5yazJU_DkHTTGXHk4ZNMPPF1WiG28ZjqV4W8TdBvAggf9jMGWQjUFPhtA/exec";
-
-    function chargerChauffeurs() {
-      fetch(url, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "getChauffeursData" })
-      })
-      .then(res => res.json())
-      .then(data => {
-        const select = document.getElementById("chauffeur");
-        select.innerHTML = '<option value="">-- Sélectionnez votre nom --</option>';
-        data.forEach(chauffeur => {
-          const option = document.createElement("option");
-          option.value = chauffeur.nom;
-          option.textContent = chauffeur.nom;
-          select.appendChild(option);
-        });
-        document.getElementById("info").textContent = "Données chargées avec succès.";
-      })
-      .catch(err => {
-        document.getElementById("info").textContent = "Erreur de chargement.";
-        console.error(err);
-      });
-    }
-
-    // Chargement initial
-    window.onload = chargerChauffeurs;
-  </script>
+  <iframe
+    src="https://script.google.com/macros/s/AKfycbzBgXo8oon4OWqwBIZbANUdgQ7oscN4YYfgs4gOblgNyqZ8lST0_4_2tn3KW2Yz4F0vUw/exec"
+    allowfullscreen
+    loading="lazy"
+    scrolling="no"
+  ></iframe>
 </body>
 </html>

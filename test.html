@@ -5,37 +5,59 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Calendrier Vacances</title>
   <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
+      background-color: #f4f4f4;
       overflow: hidden;
-      background-color: #f4f4f4; /* Couleur de fond pour les marges */
+      font-family: 'Arial', sans-serif;
     }
     iframe {
-      width: calc(100% - 20px); /* Ajuster la largeur pour inclure les marges */
-      height: calc(100% - 20px); /* Ajuster la hauteur pour inclure les marges */
+      width: 100%;
+      height: calc(100vh - 70px);
       border: none;
       display: block;
-      margin: 10px; /* Ajouter des marges de 10px */
-      background-color: #ffffff; /* Couleur de fond de l'iframe */
+      background-color: #fff;
     }
-    @media (max-width: 600px) {
-      iframe {
-        width: calc(100% - 20px); /* Réduire les marges sur les petits écrans */
-        height: calc(100% - 20px); /* Réduire les marges sur les petits écrans */
-        margin: 15px; /* Ajouter des marges de 5px */
-        background-color: #ffffff; /* Couleur de fond de l'iframe */
-      }
+    .button-container {
+      display: flex;
+      justify-content: center;
+      padding: 10px;
+      background-color: #f4f4f4;
+    }
+    .button {
+      background-color: #000;
+      color: white;
+      padding: 12px 24px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      font-family: 'Comfortaa', sans-serif;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s ease;
+    }
+    .button:hover {
+      background-color: #222;
     }
   </style>
 </head>
 <body>
   <iframe
+    title="Calendrier des vacances"
     src="https://script.google.com/macros/s/AKfycbzBgXo8oon4OWqwBIZbANUdgQ7oscN4YYfgs4gOblgNyqZ8lST0_4_2tn3KW2Yz4F0vUw/exec"
+    sandbox="allow-same-origin allow-scripts"
     allowfullscreen
     loading="lazy"
-    scrolling="no"
   ></iframe>
+
+  <div class="button-container">
+    <a href="index.html" class="button">⬅️ Retour au menu</a>
+  </div>
 </body>
 </html>

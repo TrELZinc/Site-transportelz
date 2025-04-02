@@ -12,10 +12,18 @@
       overflow: hidden;
     }
     iframe {
-      width: 100%;
-      height: 100%;
+      width: calc(100% - 20px); /* Ajuster la largeur pour inclure les marges */
+      height: calc(100% - 20px); /* Ajuster la hauteur pour inclure les marges */
       border: none;
       display: block;
+      margin: 10px; /* Ajouter des marges de 10px */
+    }
+    @media (max-width: 600px) {
+      iframe {
+        width: calc(100% - 10px); /* Réduire les marges sur les petits écrans */
+        height: calc(100% - 10px); /* Réduire les marges sur les petits écrans */
+        margin: 5px; /* Ajouter des marges de 5px */
+      }
     }
   </style>
 </head>

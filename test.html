@@ -10,25 +10,21 @@
       margin: 0;
       background: #f4f4f4;
     }
-
     header {
       background-color: #000;
       color: white;
       text-align: center;
       padding: 1rem;
     }
-
     header img {
       max-height: 70px;
       margin-bottom: 10px;
     }
-
     .container {
       max-width: 900px;
       margin: auto;
       padding: 20px;
     }
-
     .remarks {
       text-align: center;
       font-size: 1.2rem;
@@ -36,12 +32,10 @@
       font-weight: bold;
       margin: 20px 0;
     }
-
     .controls {
       text-align: center;
       margin-bottom: 10px;
     }
-
     select#chauffeur {
       font-size: 1.2rem;
       padding: 12px;
@@ -50,7 +44,6 @@
       border: 1px solid #ccc;
       border-radius: 5px;
     }
-
     .turn-box {
       border-radius: 8px;
       padding: 15px;
@@ -59,31 +52,26 @@
       font-size: 1.2rem;
       text-align: center;
     }
-
     .turn-box.success {
       background-color: #d4edda;
       color: #155724;
       border: 2px solid #c3e6cb;
     }
-
     .turn-box.waiting {
       background-color: #f8d7da;
       color: #721c24;
       border: 2px solid #f5c6cb;
     }
-
     .month-display {
       text-align: center;
       font-size: 2rem;
       font-weight: bold;
       margin: 20px 0 5px 0;
     }
-
     .month-nav {
       text-align: center;
       margin-bottom: 20px;
     }
-
     .month-nav button {
       background-color: transparent;
       color: red;
@@ -92,13 +80,11 @@
       margin: 0 10px;
       cursor: pointer;
     }
-
     #calendar {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       gap: 4px;
     }
-
     .day-name {
       text-align: center;
       font-weight: bold;
@@ -106,7 +92,6 @@
       padding: 8px;
       border-radius: 4px;
     }
-
     .day {
       text-align: center;
       background: white;
@@ -114,27 +99,22 @@
       border-radius: 4px;
       cursor: pointer;
     }
-
     .day:hover {
       background: #e0e0e0;
     }
-
     .taken {
       background-color: #ff4d4d !important;
       color: white;
       cursor: not-allowed;
     }
-
     .selected {
       background-color: #4da6ff !important;
       color: white;
     }
-
     .disabled {
       pointer-events: none;
       opacity: 0.4;
     }
-
     button#submit {
       display: block;
       margin: 30px auto 10px auto;
@@ -145,8 +125,6 @@
       border: none;
       border-radius: 5px;
     }
-
-    /* Modal */
     .modal {
       display: none;
       position: fixed;
@@ -155,7 +133,6 @@
       width: 100%; height: 100%;
       background-color: rgba(0,0,0,0.4);
     }
-
     .modal-content {
       background-color: #fff;
       margin: 15% auto;
@@ -164,7 +141,6 @@
       border-radius: 8px;
       text-align: center;
     }
-
     .modal-content input {
       padding: 10px;
       font-size: 1rem;
@@ -173,7 +149,6 @@
       border: 1px solid #ccc;
       border-radius: 5px;
     }
-
     .modal-content button {
       margin-top: 10px;
       padding: 10px 20px;
@@ -187,6 +162,8 @@
   </style>
 </head>
 <body>
+<!-- Le reste du HTML (body content + scripts) sera ajouté dans la deuxième partie -->
+
   <header>
     <img src="assets/logo.jpeg" alt="Logo">
     <div>Planification des Vacances</div>
@@ -230,183 +207,220 @@
     </div>
   </div>
 
-  <script>
-    const takenWeeks = ['2025-07-01', '2025-07-08'];
-    let selectedWeeks = [];
-    let currentMonth = new Date().getMonth();
-    let currentYear = new Date().getFullYear();
-    let autorise = false;
-    const dayNames = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+<script>
+  const takenWeeks = ['2025-07-01', '2025-07-08'];
+  let selectedWeeks = [];
+  let currentMonth = new Date().getMonth();
+  let currentYear = new Date().getFullYear();
+  let autorise = false;
+  const dayNames = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+  const classement = {
+    "Luc Tremblay": { rang: 1 },
+    "Marie Duval": { rang: 2 },
+    "Kevin Roy": { rang: 3 }
+  };
 
-    const classement = {
-      "Luc Tremblay": { rang: 1 },
-      "Marie Duval": { rang: 2 },
-      "Kevin Roy": { rang: 3 }
-    };
+  function afficherInfosChauffeur() {
+    const nom = document.getElementById("chauffeur").value;
+    const div = document.getElementById("rangMessage");
+    const calendrier = document.getElementById("calendar");
+    const bouton = document.getElementById("submit");
 
-    function afficherInfosChauffeur() {
-      const nom = document.getElementById("chauffeur").value;
-      const div = document.getElementById("rangMessage");
-      const calendrier = document.getElementById("calendar");
-      const bouton = document.getElementById("submit");
-
-      if (classement[nom]) {
-        const rang = classement[nom].rang;
-        if (rang === 1) {
-          autorise = true;
-          calendrier.classList.remove("disabled");
-          bouton.disabled = false;
-          div.innerHTML = `<div class="turn-box success">C’est ton tour de choisir tes vacances !<br>Merci de faire ton choix dès maintenant.</div>`;
-        } else {
-          autorise = false;
-          calendrier.classList.add("disabled");
-          bouton.disabled = true;
-          div.innerHTML = `<div class="turn-box waiting">Tu es actuellement <strong>#${rang}</strong> dans la liste. Merci de patienter.</div>`;
-        }
+    if (classement[nom]) {
+      const rang = classement[nom].rang;
+      if (rang === 1) {
+        autorise = true;
+        calendrier.classList.remove("disabled");
+        bouton.disabled = false;
+        div.innerHTML = `<div class="turn-box success">C’est ton tour de choisir tes vacances !<br>Merci de faire ton choix dès maintenant.</div>`;
       } else {
-        div.innerHTML = "";
+        autorise = false;
         calendrier.classList.add("disabled");
         bouton.disabled = true;
+        div.innerHTML = `<div class="turn-box waiting">Tu es actuellement <strong>#${rang}</strong> dans la liste. Merci de patienter.</div>`;
       }
-
-      selectedWeeks = [];
-      updateButtonText();
-      generateCalendar(currentMonth, currentYear);
+    } else {
+      div.innerHTML = "";
+      calendrier.classList.add("disabled");
+      bouton.disabled = true;
     }
 
-    function getStartOfWeek(date) {
-      const d = new Date(date);
-      const day = d.getDay();
-      const diff = d.getDate() - day;
-      return new Date(d.setDate(diff));
-    }
-
-    function formatDate(date) {
-      return date.toISOString().split('T')[0];
-    }
-
-    function changeMonth(delta) {
-      currentMonth += delta;
-      if (currentMonth < 0) {
-        currentMonth = 11;
-        currentYear--;
-      } else if (currentMonth > 11) {
-        currentMonth = 0;
-        currentYear++;
-      }
-      generateCalendar(currentMonth, currentYear);
-    }
-
-    function toggleWeekFromDate(clickedDate) {
-      const weekStart = getStartOfWeek(clickedDate);
-      const weekKey = formatDate(weekStart);
-      if (takenWeeks.includes(weekKey)) {
-        alert("Cette semaine est déjà prise.");
-        return;
-      }
-      if (selectedWeeks.length >= 2 && !selectedWeeks.includes(weekKey)) {
-        alert("Vous ne pouvez sélectionner que deux semaines maximum.");
-        return;
-      }
-      const index = selectedWeeks.indexOf(weekKey);
-      if (index > -1) {
-        selectedWeeks.splice(index, 1);
-      } else {
-        selectedWeeks.push(weekKey);
-      }
-      updateButtonText();
-      generateCalendar(currentMonth, currentYear);
-    }
-
-    function updateButtonText() {
-      const btn = document.getElementById("submit");
-      btn.textContent = selectedWeeks.length > 1 ? "Demander ces semaines" : "Demander cette semaine";
-    }
-
-    function generateCalendar(month, year) {
-      const calendar = document.getElementById('calendar');
-      const monthYear = document.getElementById('month-year');
-      const firstDay = new Date(year, month, 1);
-      const startDay = new Date(firstDay);
-      startDay.setDate(1 - firstDay.getDay());
-
-      calendar.innerHTML = '';
-      monthYear.textContent = firstDay.toLocaleString('fr-FR', { month: 'long', year: 'numeric' }).toUpperCase();
-
-      for (let i = 0; i < 7; i++) {
-        const dayName = document.createElement('div');
-        dayName.className = 'day-name';
-        dayName.textContent = dayNames[i];
-        calendar.appendChild(dayName);
-      }
-
-      for (let i = 0; i < 42; i++) {
-        const day = new Date(startDay);
-        day.setDate(startDay.getDate() + i);
-        const dayDiv = document.createElement('div');
-        dayDiv.className = 'day';
-        dayDiv.textContent = day.getDate();
-
-        const weekStart = getStartOfWeek(day);
-        const weekKey = formatDate(weekStart);
-
-        if (day.getMonth() !== month) {
-          dayDiv.style.opacity = "0.3";
-        }
-
-        if (takenWeeks.includes(weekKey)) {
-          dayDiv.classList.add('taken');
-        } else if (selectedWeeks.includes(weekKey)) {
-          const selectedStart = new Date(weekStart);
-          const selectedEnd = new Date(weekStart);
-          selectedEnd.setDate(selectedEnd.getDate() + 6);
-          if (day >= selectedStart && day <= selectedEnd) {
-            dayDiv.classList.add('selected');
-            dayDiv.style.opacity = "1";
-          }
-          if (autorise) dayDiv.onclick = () => toggleWeekFromDate(day);
-        } else {
-          if (autorise) dayDiv.onclick = () => toggleWeekFromDate(day);
-        }
-
-        calendar.appendChild(dayDiv);
-      }
-    }
-
-    function openPasswordPopup() {
-      if (selectedWeeks.length === 0) {
-        alert("Veuillez sélectionner au moins une semaine.");
-        return;
-      }
-      document.getElementById("passwordModal").style.display = "block";
-      document.getElementById("motdepasse").value = "";
-    }
-
-    function validerMotDePasse() {
-      const nom = document.getElementById("chauffeur").value;
-      const motdepasse = document.getElementById("motdepasse").value.trim();
-      if (!motdepasse) {
-        alert("Veuillez entrer votre mot de passe.");
-        return;
-      }
-      document.getElementById("passwordModal").style.display = "none";
-
-      // Simule une confirmation finale
-      const confirmation = `Chauffeur : ${nom}
-Mot de passe : ${motdepasse}
-Semaines choisies :\n${selectedWeeks.join('\n')}`;
-      alert(confirmation);
-    }
-
-    // Ferme la popup si on clique à l’extérieur
-    window.onclick = function(event) {
-      const modal = document.getElementById("passwordModal");
-      if (event.target === modal) {
-        modal.style.display = "none";
-      }
-    }
-
+    selectedWeeks = [];
+    updateButtonText();
     generateCalendar(currentMonth, currentYear);
-  </script>
+  }
+
+  function getStartOfWeek(date) {
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = d.getDate() - day;
+    return new Date(d.setDate(diff));
+  }
+
+  function formatDate(date) {
+    return date.toISOString().split('T')[0];
+  }
+
+  function changeMonth(delta) {
+    currentMonth += delta;
+    if (currentMonth < 0) {
+      currentMonth = 11;
+      currentYear--;
+    } else if (currentMonth > 11) {
+      currentMonth = 0;
+      currentYear++;
+    }
+    generateCalendar(currentMonth, currentYear);
+  }
+
+  function toggleWeekFromDate(clickedDate) {
+    const weekStart = getStartOfWeek(clickedDate);
+    const weekKey = formatDate(weekStart);
+    if (takenWeeks.includes(weekKey)) {
+      alert("Cette semaine est déjà prise.");
+      return;
+    }
+    if (selectedWeeks.length >= 2 && !selectedWeeks.includes(weekKey)) {
+      alert("Vous ne pouvez sélectionner que deux semaines maximum.");
+      return;
+    }
+    const index = selectedWeeks.indexOf(weekKey);
+    if (index > -1) {
+      selectedWeeks.splice(index, 1);
+    } else {
+      selectedWeeks.push(weekKey);
+    }
+    updateButtonText();
+    generateCalendar(currentMonth, currentYear);
+  }
+
+  function updateButtonText() {
+    const btn = document.getElementById("submit");
+    btn.textContent = selectedWeeks.length > 1 ? "Demander ces semaines" : "Demander cette semaine";
+  }
+
+  function generateCalendar(month, year) {
+    const calendar = document.getElementById('calendar');
+    const monthYear = document.getElementById('month-year');
+    const firstDay = new Date(year, month, 1);
+    const startDay = new Date(firstDay);
+    startDay.setDate(1 - firstDay.getDay());
+
+    calendar.innerHTML = '';
+    monthYear.textContent = firstDay.toLocaleString('fr-FR', { month: 'long', year: 'numeric' }).toUpperCase();
+
+    for (let i = 0; i < 7; i++) {
+      const dayName = document.createElement('div');
+      dayName.className = 'day-name';
+      dayName.textContent = dayNames[i];
+      calendar.appendChild(dayName);
+    }
+
+    for (let i = 0; i < 42; i++) {
+      const day = new Date(startDay);
+      day.setDate(startDay.getDate() + i);
+      const dayDiv = document.createElement('div');
+      dayDiv.className = 'day';
+      dayDiv.textContent = day.getDate();
+
+      const weekStart = getStartOfWeek(day);
+      const weekKey = formatDate(weekStart);
+
+      if (day.getMonth() !== month) {
+        dayDiv.style.opacity = "0.3";
+      }
+
+      if (takenWeeks.includes(weekKey)) {
+        dayDiv.classList.add('taken');
+      } else if (selectedWeeks.includes(weekKey)) {
+        const selectedStart = new Date(weekStart);
+        const selectedEnd = new Date(weekStart);
+        selectedEnd.setDate(selectedEnd.getDate() + 6);
+        if (day >= selectedStart && day <= selectedEnd) {
+          dayDiv.classList.add('selected');
+          dayDiv.style.opacity = "1";
+        }
+        if (autorise) dayDiv.onclick = () => toggleWeekFromDate(day);
+      } else {
+        if (autorise) dayDiv.onclick = () => toggleWeekFromDate(day);
+      }
+
+      calendar.appendChild(dayDiv);
+    }
+  }
+
+  function openPasswordPopup() {
+    if (selectedWeeks.length === 0) {
+      alert("Veuillez sélectionner au moins une semaine.");
+      return;
+    }
+    document.getElementById("passwordModal").style.display = "block";
+    document.getElementById("motdepasse").value = "";
+  }
+
+  function validerMotDePasse() {
+    const nom = document.getElementById("chauffeur").value;
+    const motdepasse = document.getElementById("motdepasse").value.trim();
+    if (!motdepasse) {
+      alert("Veuillez entrer votre mot de passe.");
+      return;
+    }
+    document.getElementById("passwordModal").style.display = "none";
+
+    const confirmationHTML = `
+      <html>
+        <head>
+          <title>Confirmation</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              background: #f4f4f4;
+              text-align: center;
+              padding: 40px;
+            }
+            h2 { color: #155724; }
+            ul { list-style: none; padding: 0; }
+            li {
+              background: #4da6ff; color: white;
+              margin: 10px auto;
+              padding: 12px;
+              width: 80%; max-width: 400px;
+              border-radius: 8px;
+              font-size: 1.2rem;
+            }
+            button {
+              margin-top: 30px;
+              padding: 12px 24px;
+              font-size: 1rem;
+              background: #000;
+              color: white;
+              border: none;
+              border-radius: 6px;
+              cursor: pointer;
+            }
+          </style>
+        </head>
+        <body>
+          <h2>Merci ${nom}!</h2>
+          <p>Voici les semaines que tu as sélectionnées :</p>
+          <ul>${selectedWeeks.map(s => `<li>${s}</li>`).join('')}</ul>
+          <p>Un gestionnaire confirmera ta demande sous peu.</p>
+          <button onclick="window.close()">Retour au calendrier</button>
+        </body>
+      </html>`;
+
+    const newWindow = window.open('', '_blank');
+    newWindow.document.write(confirmationHTML);
+    newWindow.document.close();
+  }
+
+  window.onclick = function(event) {
+    const modal = document.getElementById("passwordModal");
+    if (event.target === modal) modal.style.display = "none";
+  }
+
+  generateCalendar(currentMonth, currentYear);
+</script>
 </body>
 </html>

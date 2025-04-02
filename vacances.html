@@ -14,7 +14,7 @@
     }
     iframe {
       width: calc(100% - 20px); /* Ajuster la largeur pour inclure les marges */
-      height: calc(100% - 20px); /* Ajuster la hauteur pour inclure les marges */
+      height: calc(100% - 60px); /* Ajuster la hauteur pour inclure les marges et le bouton */
       border: none;
       display: block;
       margin: 10px; /* Ajouter des marges de 10px */
@@ -23,10 +23,30 @@
     @media (max-width: 600px) {
       iframe {
         width: calc(100% - 20px); /* Réduire les marges sur les petits écrans */
-        height: calc(100% - 20px); /* Réduire les marges sur les petits écrans */
+        height: calc(100% - 60px); /* Ajuster la hauteur pour inclure les marges et le bouton */
         margin: 15px; /* Ajouter des marges de 5px */
         background-color: #ffffff; /* Couleur de fond de l'iframe */
       }
+    }
+    .button-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .button {
+      background-color: #000;
+      color: #fff;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      font-family: 'Comfortaa', sans-serif;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
   </style>
 </head>
@@ -37,5 +57,8 @@
     loading="lazy"
     scrolling="no"
   ></iframe>
+  <div class="button-container">
+    <a href="index.html" class="button">⬅️ Retour au menu principal</a>
+  </div>
 </body>
 </html>

@@ -633,17 +633,25 @@
       elements.tableBody.innerHTML = "";
       
       if (savedRows.length > 0) {
-        savedRows.forEach(data => {
-          const row = createRow();
-          const cells = row.querySelectorAll("td");
-          data.forEach((val, idx) => {
-            cells[idx].textContent = val;
-          });
-          elements.tableBody.appendChild(row);
-        });
-      } else {
-        generateDefaultRows(9);
-      }
+  savedRows.forEach(rowData => {
+    const row = createRow();
+    const cells = row.querySelectorAll("td");
+
+    cells[0].textContent = rowData.rang || "";
+    cells[1].textContent = rowData.client || "";
+    cells[2].textContent = rowData.type || "";
+    cells[3].textContent = rowData.depart || "";
+    cells[4].textContent = rowData.livraison || "";
+    cells[5].textContent = rowData.chauffeur || "";
+    cells[6].textContent = rowData.camion || "";
+    cells[7].textContent = rowData.remorque || "";
+
+    elements.tableBody.appendChild(row);
+  });
+} else {
+  generateDefaultRows(9);
+}
+
       
       if (note) elements.noteField.value = note;
       if (date) elements.dateSelect.value = date;

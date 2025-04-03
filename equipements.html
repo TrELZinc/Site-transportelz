@@ -302,29 +302,40 @@ function updateEquipementStatus(camionsSet, remorquesSet) {
 }
   </script>
 <script>
- <script>
   const db = firebase.firestore();
 
-  // Récupère la dernière date enregistrée
-  async function getLastRecordedDate() {
+  async function getLastRecordedEquipments() {
     try {
       const snapshot = await db.collection("disponibilites")
         .orderBy("timestamp", "desc")
         .limit(1)
         .get();
 
-      if (!snapshot.empty) {
-        const lastData = snapshot.docs[0].data();
-        return lastData.date || null;
-      }
+      if (snapshot.empty) return null;
+
+      const doc = snapshot.docs[0];
+      const data = doc.data();
+
+      const usedCamions = new Set();
+      const usedRemorques = new Set();
+
+      (data.rows || []).forEach(row => {
+        if (row.camion) usedCamions.add(row.camion.trim());
+        if (row.remorque) usedRemorques.add(row.remorque.trim());
+      });
+
+      return {
+        date: data.date || "Date inconnue",
+        camions: usedCamions,
+        remorques: usedRemorques
+      };
     } catch (error) {
-      console.error("Erreur en récupérant la dernière date :", error);
+      console.error("Erreur Firebase:", error);
+      return null;
     }
-    return null;
   }
 
-  // Met à jour les statuts selon les camions/remorques utilisés
-  function updateEquipementStatus(usedCamions, usedRemorques) {
+  function updateEquipementStatus(camionsSet, remorquesSet) {
     const rows = document.querySelectorAll("#equipementList .row");
 
     rows.forEach(row => {
@@ -332,7 +343,7 @@ function updateEquipementStatus(camionsSet, remorquesSet) {
       const badge = row.querySelector(".status");
       if (!unit || !badge) return;
 
-      const estPlanifie = usedCamions.has(unit) || usedRemorques.has(unit);
+      const estPlanifie = camionsSet.has(unit) || remorquesSet.has(unit);
 
       badge.textContent = estPlanifie ? "PLANIFIÉ" : "DISPONIBLE";
       badge.classList.toggle("planifie", estPlanifie);
@@ -340,41 +351,15 @@ function updateEquipementStatus(camionsSet, remorquesSet) {
     });
   }
 
-  // Charge les camions/remorques utilisés pour une date donnée
-  async function fetchPlannedEquipments(date) {
-    const usedCamions = new Set();
-    const usedRemorques = new Set();
-
-    try {
-      const snapshot = await db.collection("disponibilites")
-        .where("date", "==", date)
-        .get();
-
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        (data.rows || []).forEach(row => {
-          if (row.camion) usedCamions.add(row.camion.trim());
-          if (row.remorque) usedRemorques.add(row.remorque.trim());
-        });
-      });
-
-      updateEquipementStatus(usedCamions, usedRemorques);
-    } catch (error) {
-      console.error("Erreur de lecture Firebase:", error);
-    }
-  }
-
-  // Initialisation
   window.addEventListener("DOMContentLoaded", async () => {
-    const lastDate = await getLastRecordedDate();
+    const info = await getLastRecordedEquipments();
     const dateEl = document.getElementById("dateAffichee");
 
-    if (lastDate) {
-      dateEl.textContent = `Dernière mise à jour : ${lastDate}`;
-      await fetchPlannedEquipments(lastDate);
+    if (info) {
+      dateEl.textContent = `Dernière mise à jour : ${info.date}`;
+      updateEquipementStatus(info.camions, info.remorques);
     } else {
       dateEl.textContent = "Aucune donnée disponible.";
-      console.warn("Aucune donnée disponible.");
     }
   });
 </script>

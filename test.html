@@ -3,61 +3,600 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Calendrier Vacances</title>
+  <title>Sommaire</title>
   <style>
-    *, *::before, *::after {
-      box-sizing: border-box;
-    }
+    /* Styles de base */
     html, body {
       margin: 0;
-      padding: 0;
-      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
       background-color: #f4f4f4;
-      overflow: hidden;
-      font-family: 'Arial', sans-serif;
+      font-size: 16px;
     }
-    iframe {
+
+    /* En-tête */
+    header {
+      background-color: #111;
       width: 100%;
-      height: calc(100vh - 70px);
-      border: none;
-      display: block;
-      background-color: #fff;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-sizing: border-box;
+      z-index: 1000;
     }
-    .button-container {
+    header img {
+      height: 40px;
+    }
+
+    /* Menu hamburger */
+    .menu-toggle {
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+    }
+    .menu-toggle span {
+      height: 3px;
+      width: 25px;
+      background: white;
+      margin: 4px 0;
+      transition: 0.3s;
+    }
+    .menu {
+      display: none;
+      position: absolute;
+      top: 60px;
+      right: 20px;
+      background-color: #111;
+      border: 1px solid #444;
+      border-radius: 6px;
+      padding: 10px;
+      z-index: 999;
+    }
+    .menu.show {
+      display: block;
+    }
+    .menu a {
+      display: block;
+      color: white;
+      padding: 8px 12px;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .menu a:hover {
+      background-color: #333;
+    }
+
+    /* Container et tableau */
+    .container {
+      padding: 20px;
+      max-width: 1000px;
+      margin: auto;
+    }
+    .top-bar {
       display: flex;
       justify-content: center;
+      margin-bottom: 10px;
+    }
+    .top-bar input[type="date"] {
+      padding: 8px 12px;
+      font-size: 16px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
+    textarea {
+      width: 100%;
       padding: 10px;
-      background-color: #f4f4f4;
-    }
-    .button {
-      background-color: #000;
-      color: white;
-      padding: 12px 24px;
-      font-size: 1rem;
-      border: none;
       border-radius: 8px;
-      cursor: pointer;
-      text-decoration: none;
-      font-family: 'Comfortaa', sans-serif;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-      transition: background-color 0.3s ease;
+      border: 1px solid #ccc;
+      resize: vertical;
+      box-sizing: border-box;
+      font-size: 15px;
     }
-    .button:hover {
-      background-color: #222;
+    .table-wrapper {
+      overflow-x: auto;
+      margin-top: 20px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    table {
+      min-width: 900px;
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #999;
+      text-align: center;
+      vertical-align: middle;
+      padding: 6px;
+    }
+    th {
+      background-color: #d32f2f;
+      color: white;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    tr:nth-child(even) td {
+      background-color: #f7f7f7;
+    }
+    tr:nth-child(odd) td {
+      background-color: #ffffff;
+    }
+    td[contenteditable] {
+      outline: none;
+      text-transform: uppercase;
+    }
+
+    /* Boutons */
+    .buttons {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .buttons button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .reset-btn { background-color: #e74c3c; }
+    .save-btn { background-color: #2ecc71; }
+    .send-btn { background-color: black; }
+    .copy-btn {
+      font-size: 12px;
+      padding: 3px 6px;
+      background-color: #555;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .copy-btn:hover {
+      background-color: #333;
+    }
+    .arrow-next {
+      position: absolute;
+      z-index: 1000;
+      display: none;
+      padding: 2px 6px;
+      font-size: 14px;
+      border-radius: 6px;
+      background: #111;
+      color: #fff;
+      border: none;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .container {
+        padding: 12px;
+      }
+      .buttons {
+        margin-bottom: 40px;
+      }
+      table {
+        font-size: 13px;
+      }
+      th, td {
+        padding: 6px;
+        height: 32px;
+        font-size: 14px;
+      }
     }
   </style>
 </head>
 <body>
-  <iframe
-    title="Calendrier des vacances"
-    src="https://script.google.com/macros/s/AKfycbzBgXo8oon4OWqwBIZbANUdgQ7oscN4YYfgs4gOblgNyqZ8lST0_4_2tn3KW2Yz4F0vUw/exec"
-    sandbox="allow-same-origin allow-scripts"
-    allowfullscreen
-    loading="lazy"
-  ></iframe>
-
-  <div class="button-container">
-    <a href="index.html" class="button">⬅️ Retour au menu</a>
+  <header>
+    <img src="assets/logo.jpeg" alt="Logo Transport ELZ">
+    <div class="menu-toggle" id="menuToggle">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <div class="menu" id="menuDropdown">
+      <a href="dispos.html">Disponibilités</a>
+      <a href="linktree.html">Menu</a>
+    </div>
+  </header>
+  <div class="container">
+    <div class="top-bar">
+      <input type="date" id="dateSelect" />
+    </div>
+    <label for="note">Note:</label>
+    <textarea id="note" rows="2"></textarea>
+    <div class="table-wrapper">
+      <table id="dispoTable">
+        <thead>
+          <tr>
+            <th style="width:70px;">RANG</th>
+            <th style="width:200px;">CLIENT</th>
+            <th style="width:80px;">TYPE</th>
+            <th style="width:80px;">DÉPART</th>
+            <th style="width:80px;">LIVRAISON</th>
+            <th style="width:100px;">CHAUFFEUR</th>
+            <th style="width:90px;">CAMION</th>
+            <th style="width:100px;">REMORQUE</th>
+            <th style="width:60px;">COPIE</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+    <div class="buttons">
+      <button class="reset-btn" id="resetBtn">Reset</button>
+      <button class="save-btn" id="saveBtn">Save</button>
+      <button class="send-btn" id="sendBtn">Send</button>
+    </div>
   </div>
+
+  <script>
+    // Configuration et constantes
+    const API_URL = "https://script.google.com/macros/s/AKfycbxlZYjCtXljPDBiTwjjQk-XPuctE3HukS2_Lf7K-p_WEuENn3sALsFlAtd-ZGYTovEX/exec";
+    const CHAUFFEUR_MAP = {
+      "JFJ": { nom: "Jeff", tel: "4185202502" },
+      "AL": { nom: "Alain", tel: "4182710206" },
+      "PF": { nom: "Patrick", tel: "4185696346" },
+      "RPE": { nom: "Rraymond", tel: "4186706104" },
+      "CYR": { nom: "Clement", tel: "5819223336" },
+      "BPQ": { nom: "Benoit", tel: "5819933470" },
+      "RED": { nom: "Rejean", tel: "4183254436" },
+      "SIR": { nom: "Simon", tel: "4185760436" },
+    };
+    const STORAGE_KEYS = {
+      note: "dispo_note",
+      date: "dispo_date",
+      rows: "dispo_rows"
+    };
+    const DAYS_FR = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+    const MONTHS_FR = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+
+    // Éléments DOM
+    const elements = {
+      dateSelect: document.getElementById("dateSelect"),
+      noteField: document.getElementById("note"),
+      tableBody: document.getElementById("tableBody"),
+      dispoTable: document.getElementById("dispoTable"),
+      resetBtn: document.getElementById("resetBtn"),
+      saveBtn: document.getElementById("saveBtn"),
+      sendBtn: document.getElementById("sendBtn"),
+      menuToggle: document.getElementById("menuToggle"),
+      menuDropdown: document.getElementById("menuDropdown")
+    };
+    
+    // Fonctions pour la gestion des lignes du tableau
+    function createRow() {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td contenteditable inputmode="numeric"></td>
+        <td contenteditable></td>
+        <td contenteditable></td>
+        <td contenteditable></td>
+        <td contenteditable></td>
+        <td contenteditable></td>
+        <td contenteditable inputmode="numeric"></td>
+        <td contenteditable inputmode="numeric"></td>
+        <td><button class="copy-btn">📋</button></td>
+      `;
+      // Attacher l'événement directement lors de la création
+      const copyBtn = row.querySelector(".copy-btn");
+      copyBtn.addEventListener("click", () => copyRow(row));
+      return row;
+    }
+
+    function generateDefaultRows(n = 9) {
+      elements.tableBody.innerHTML = "";
+      for (let i = 0; i < n; i++) {
+        elements.tableBody.appendChild(createRow());
+      }
+    }
+    
+    // Fonctions pour les opérations principales
+    function formatDate(dateStr) {
+      if (!dateStr) return "";
+      
+      const dateObj = new Date(dateStr + "T00:00:00");
+      const dayName = DAYS_FR[dateObj.getDay()];
+      const dayNum = dateObj.getDate();
+      const monthName = MONTHS_FR[dateObj.getMonth()];
+      return `${dayName} le ${dayNum} ${monthName}`;
+    }
+
+    function copyRow(row) {
+      const cells = row.querySelectorAll("td");
+      
+      const rawCode = (cells[5]?.textContent || "").trim().toUpperCase();
+      const chauffeur = CHAUFFEUR_MAP[rawCode] || { nom: rawCode, tel: "" };
+      
+      const values = [
+        chauffeur.nom,
+        (cells[1]?.textContent || "").trim().toUpperCase(),
+        (cells[2]?.textContent || "").trim().toUpperCase(),
+        (cells[3]?.textContent || "").trim().toUpperCase(),
+        (cells[4]?.textContent || "").trim().toUpperCase(),
+        (cells[6]?.textContent || "").trim().toUpperCase(),
+        (cells[7]?.textContent || "").trim().toUpperCase()
+      ];
+      
+      const labels = ["Chauffeur", "Client", "Type", "Départ", "Livraison", "Camion", "Remorque"];
+      const dayFormatted = formatDate(elements.dateSelect.value);
+      
+      let sms = `Salut,\nVoici ton voyage pour ${dayFormatted}\n\n`;
+      sms += labels.map((label, idx) => `${label}: ${values[idx]}`).join("\n");
+      sms += `\n\nMerci !`;
+      
+      const smsEncoded = encodeURIComponent(sms);
+      const href = chauffeur.tel ? `sms:${chauffeur.tel}?body=${smsEncoded}` : `sms:?body=${smsEncoded}`;
+      
+      // Création et clic du lien
+      const link = document.createElement("a");
+      link.href = href;
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function resetForm() {
+      elements.noteField.value = "";
+      elements.dateSelect.value = "";
+      localStorage.clear();
+      
+      const rows = document.querySelectorAll("#tableBody tr");
+      rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        for (let i = 0; i < 8; i++) {
+          if (cells[i]) cells[i].textContent = "";
+        }
+      });
+    }
+
+    function saveData() {
+      try {
+        localStorage.setItem(STORAGE_KEYS.note, elements.noteField.value);
+        localStorage.setItem(STORAGE_KEYS.date, elements.dateSelect.value);
+        
+        const rows = Array.from(document.querySelectorAll("#dispoTable tbody tr")).map(tr =>
+          Array.from(tr.querySelectorAll("td")).slice(0, 8).map(td => td.textContent.trim())
+        );
+        localStorage.setItem(STORAGE_KEYS.rows, JSON.stringify(rows));
+        // Enregistrement Firestore
+db.collection("disponibilites").add({
+  date: elements.dateSelect.value,
+  note: elements.noteField.value,
+  lignes: rows,
+  timestamp: new Date()
+})
+.then(() => {
+  alert("Données sauvegardées sur Firestore !");
+})
+.catch(error => {
+  console.error("Erreur Firestore:", error);
+  alert("Erreur lors de la sauvegarde en ligne.");
+});
+        alert("Données sauvegardées !");
+      } catch (err) {
+        alert("Erreur lors de la sauvegarde : " + err.message);
+      }
+    }
+
+    function sendForm() {
+      const tableClone = elements.dispoTable.cloneNode(true);
+      const rows = tableClone.querySelectorAll("tbody tr");
+      
+      rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        
+        // Transformation en majuscules
+        for (let i = 0; i < 8; i++) {
+          const cell = cells[i];
+          if (cell.hasAttribute("contenteditable")) {
+            cell.innerText = cell.innerText.trim().toUpperCase();
+          }
+        }
+        
+        // Suppression des boutons de copie
+        const copyCell = cells[8];
+        if (copyCell) copyCell.innerHTML = "";
+      });
+      
+      const data = {
+        note: elements.noteField.value,
+        date: elements.dateSelect.value,
+        table: tableClone.outerHTML
+      };
+      
+      fetch(API_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+      
+      alert("Sommaire envoyé !");
+    }
+    
+    // Gestion de la navigation avec flèche
+    function setupArrowNavigation() {
+      const arrowBtn = document.createElement("button");
+      arrowBtn.textContent = "➡️";
+      arrowBtn.className = "arrow-next";
+      document.body.appendChild(arrowBtn);
+      
+      let currentCell = null;
+      
+      // Fonction pour mettre à jour la position du bouton flèche
+      function updateArrowPosition() {
+        if (!currentCell) return;
+        const rect = currentCell.getBoundingClientRect();
+        arrowBtn.style.top = `${window.scrollY + rect.top + 5}px`;
+        arrowBtn.style.left = `${window.scrollX + rect.right + 5}px`;
+        arrowBtn.style.display = "inline-block";
+      }
+      
+      // Déplacement vers la cellule suivante
+      function moveToNextCell() {
+        if (!currentCell) return;
+        const row = currentCell.closest("tr");
+        const cells = Array.from(row.querySelectorAll("td[contenteditable]"));
+        const idx = cells.indexOf(currentCell);
+        
+        let next = null;
+        
+        if (idx < cells.length - 1) {
+          next = cells[idx + 1];
+        } else {
+          const nextRow = row.nextElementSibling;
+          if (nextRow) {
+            const nextCells = Array.from(nextRow.querySelectorAll("td[contenteditable]"));
+            if (nextCells.length) next = nextCells[0];
+          }
+        }
+        
+        if (next) {
+          next.focus();
+          currentCell = next;
+          
+          // Attendre le rendu avant scroll
+          setTimeout(() => {
+            next.scrollIntoView({
+              behavior: "smooth",
+              block: "nearest",
+              inline: "center"
+            });
+            updateArrowPosition();
+          }, 50);
+        }
+      }
+      
+      // Événements
+      elements.dispoTable.addEventListener("focusin", (e) => {
+        if (e.target.tagName === "TD" && e.target.hasAttribute("contenteditable")) {
+          currentCell = e.target;
+          updateArrowPosition();
+          
+          // Assurer que la cellule est visible
+          currentCell.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest",
+            inline: "center"
+          });
+        }
+      });
+      
+      document.addEventListener("scroll", updateArrowPosition);
+      
+      arrowBtn.addEventListener("click", moveToNextCell);
+      
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest("td") && e.target !== arrowBtn) {
+          arrowBtn.style.display = "none";
+          currentCell = null;
+        }
+      });
+    }
+    
+    // Événement pour convertir le texte en majuscules pendant la saisie
+    document.addEventListener("input", (e) => {
+      if (e.target.matches("td[contenteditable]")) {
+        const selection = window.getSelection();
+        const range = selection.getRangeAt(0);
+        const cursorPos = range.startOffset;
+        
+        const upper = e.target.textContent.toUpperCase();
+        e.target.textContent = upper;
+        
+        // Remet le curseur à la bonne place
+        if (e.target.firstChild) {
+          range.setStart(e.target.firstChild, Math.min(cursorPos, e.target.textContent.length));
+          range.setEnd(e.target.firstChild, Math.min(cursorPos, e.target.textContent.length));
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+      }
+    });
+    
+    // Gestion du menu
+    function setupMenu() {
+      if (elements.menuToggle && elements.menuDropdown) {
+        elements.menuToggle.addEventListener("click", () => {
+          elements.menuDropdown.classList.toggle("show");
+        });
+        
+        document.addEventListener("click", (e) => {
+          if (!elements.menuToggle.contains(e.target) && !elements.menuDropdown.contains(e.target)) {
+            elements.menuDropdown.classList.remove("show");
+          }
+        });
+      }
+    }
+    
+    // Initialisation
+    function init() {
+      // Attacher les gestionnaires d'événements
+      elements.resetBtn.addEventListener("click", resetForm);
+      elements.saveBtn.addEventListener("click", saveData);
+      elements.sendBtn.addEventListener("click", sendForm);
+      
+      // Charger les données sauvegardées
+      const note = localStorage.getItem(STORAGE_KEYS.note);
+      const date = localStorage.getItem(STORAGE_KEYS.date);
+      const savedRows = JSON.parse(localStorage.getItem(STORAGE_KEYS.rows) || "[]");
+      
+      elements.tableBody.innerHTML = "";
+      
+      if (savedRows.length > 0) {
+        savedRows.forEach(data => {
+          const row = createRow();
+          const cells = row.querySelectorAll("td");
+          data.forEach((val, idx) => {
+            cells[idx].textContent = val;
+          });
+          elements.tableBody.appendChild(row);
+        });
+      } else {
+        generateDefaultRows(9);
+      }
+      
+      if (note) elements.noteField.value = note;
+      if (date) elements.dateSelect.value = date;
+      
+      // Configurer les fonctionnalités
+      setupArrowNavigation();
+      setupMenu();
+    }
+    
+    // Démarrer l'application quand la page est chargée
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js"></script>
+
+<script>
+  // Configuration Firebase (la tienne)
+  const firebaseConfig = {
+    apiKey: "AIzaSyD4U85mokKXsAP1AdwClWtcbt8udZrwlAw",
+    authDomain: "sommaireelz.firebaseapp.com",
+    projectId: "sommaireelz",
+    storageBucket: "sommaireelz.firebasestorage.app",
+    messagingSenderId: "171788284751",
+    appId: "1:171788284751:web:694f070d1cafe8b7c04b3a"
+  };
+
+  // Initialiser Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+</script>
 </body>
 </html>

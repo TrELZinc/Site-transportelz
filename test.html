@@ -416,18 +416,20 @@
     }
 
     function resetForm() {
-      elements.noteField.value = "";
-      elements.dateSelect.value = "";
-      localStorage.clear();
-      
-      const rows = document.querySelectorAll("#tableBody tr");
-      rows.forEach(row => {
-        const cells = row.querySelectorAll("td");
-        for (let i = 0; i < 8; i++) {
-          if (cells[i]) cells[i].textContent = "";
-        }
-      });
+  elements.noteField.value = "";
+  elements.dateSelect.value = "";
+  localStorage.clear();
+
+  const rows = document.querySelectorAll("#tableBody tr");
+  rows.forEach((row, index) => {
+    const cells = row.querySelectorAll("td");
+    // Ne pas effacer la 1ʳᵉ cellule (rang)
+    for (let i = 1; i < 8; i++) {
+      if (cells[i]) cells[i].textContent = "";
     }
+  });
+}
+
 
     function saveData() {
   try {

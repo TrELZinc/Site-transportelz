@@ -196,11 +196,11 @@
     }
   </style>
   
-  <!-- Firebase SDKs -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js"></script>
 
+<script>
   const firebaseConfig = {
     apiKey: "AIzaSyD4U85mokKXsAP1AdwClWtcbt8udZrwlAw",
     authDomain: "sommaireelz.firebaseapp.com",
@@ -210,18 +210,8 @@
     appId: "1:171788284751:web:694f070d1cafe8b7c04b3a"
   };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  window.saveToFirebase = async function(data) {
-    try {
-      await addDoc(collection(db, "sommaires"), data);
-      alert("Données sauvegardées dans Firebase !");
-    } catch (e) {
-      console.error("Erreur Firebase :", e);
-      alert("Erreur lors de l'envoi vers Firebase.");
-    }
-  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
 </script>
 </head>
 <body>

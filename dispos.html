@@ -298,12 +298,13 @@
           }
         }
       });
-
+const selectedDate = document.querySelector("#dateSelect")?.value || "";
       const data = {
-        note: document.getElementById("note").value,
-        date: document.getElementById("dateSelect").value,
-        table: tableClone.outerHTML
-      };
+  note: document.getElementById("note").value,
+  date: selectedDate,
+  table: tableClone.outerHTML
+};
+
 
       fetch("https://script.google.com/macros/s/AKfycbwF17Zsiu3-VIJLEMA6gJNfhlcoR7wEqiMyg6T8AwYyqHo8jq7tXLiW_qRf-Qw7NWqPFQ/exec", {
         method: "POST",

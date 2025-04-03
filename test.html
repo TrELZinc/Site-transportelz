@@ -624,66 +624,46 @@
   elements.saveBtn.addEventListener("click", saveData);
   elements.sendBtn.addEventListener("click", sendForm);
 
-  // Si des données locales existent, on les affiche
-  const note = localStorage.getItem(STORAGE_KEYS.note);
-  const date = localStorage.getItem(STORAGE_KEYS.date);
-  const savedRows = JSON.parse(localStorage.getItem(STORAGE_KEYS.rows) || "[]");
-
   elements.tableBody.innerHTML = "";
 
-  if (savedRows.length > 0 && date) {
-    elements.dateSelect.value = date;
-    elements.noteField.value = note || "";
-    savedRows.forEach(rowData => {
-      const row = createRow();
-      const cells = row.querySelectorAll("td");
+  // 🚀 Toujours charger la dernière entrée Firebase (peu importe localStorage)
+  db.collection("disponibilites")
+    .orderBy("timestamp", "desc")
+    .limit(1)
+    .get()
+    .then(snapshot => {
+      if (!snapshot.empty) {
+        const data = snapshot.docs[0].data();
+        elements.dateSelect.value = data.date || "";
+        elements.noteField.value = data.note || "";
 
-      cells[0].textContent = rowData.rang || "";
-      cells[1].textContent = rowData.client || "";
-      cells[2].textContent = rowData.type || "";
-      cells[3].textContent = rowData.depart || "";
-      cells[4].textContent = rowData.livraison || "";
-      cells[5].textContent = rowData.chauffeur || "";
-      cells[6].textContent = rowData.camion || "";
-      cells[7].textContent = rowData.remorque || "";
+        data.rows.forEach(row => {
+          const tr = createRow();
+          const cells = tr.querySelectorAll("td");
+          cells[0].textContent = row.rang || "";
+          cells[1].textContent = row.client || "";
+          cells[2].textContent = row.type || "";
+          cells[3].textContent = row.depart || "";
+          cells[4].textContent = row.livraison || "";
+          cells[5].textContent = row.chauffeur || "";
+          cells[6].textContent = row.camion || "";
+          cells[7].textContent = row.remorque || "";
+          elements.tableBody.appendChild(tr);
+        });
 
-      elements.tableBody.appendChild(row);
+        // 💾 On met aussi à jour le localStorage (pour les copier-coller)
+        localStorage.setItem(STORAGE_KEYS.note, data.note || "");
+        localStorage.setItem(STORAGE_KEYS.date, data.date || "");
+        localStorage.setItem(STORAGE_KEYS.rows, JSON.stringify(data.rows || []));
+
+        console.log("🟢 Dernières données Firebase chargées et localStorage mis à jour.");
+      } else {
+        generateDefaultRows(9);
+        console.log("📭 Aucune donnée dans Firebase.");
+      }
     });
-  } else {
-    // 🆕 Si rien en local, on va chercher la dernière dispo dans Firebase
-    db.collection("disponibilites")
-      .orderBy("timestamp", "desc")
-      .limit(1)
-      .get()
-      .then(snapshot => {
-        if (!snapshot.empty) {
-          const data = snapshot.docs[0].data();
-          elements.dateSelect.value = data.date || "";
-          elements.noteField.value = data.note || "";
 
-          data.rows.forEach(row => {
-            const tr = createRow();
-            const cells = tr.querySelectorAll("td");
-            cells[0].textContent = row.rang || "";
-            cells[1].textContent = row.client || "";
-            cells[2].textContent = row.type || "";
-            cells[3].textContent = row.depart || "";
-            cells[4].textContent = row.livraison || "";
-            cells[5].textContent = row.chauffeur || "";
-            cells[6].textContent = row.camion || "";
-            cells[7].textContent = row.remorque || "";
-            elements.tableBody.appendChild(tr);
-          });
-
-          console.log("🟢 Données Firebase chargées par défaut.");
-        } else {
-          generateDefaultRows(9);
-          console.log("📭 Aucune donnée dans Firebase.");
-        }
-      });
-  }
-
-  // Rechargement si date changée
+  // 🔁 Si l'utilisateur sélectionne une date manuellement
   elements.dateSelect.addEventListener("change", () => {
     const newDate = elements.dateSelect.value;
     if (newDate) {
@@ -694,6 +674,7 @@
   setupArrowNavigation();
   setupMenu();
 }
+
 
     
   // Démarrer l'application quand la page est chargée

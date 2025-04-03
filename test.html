@@ -241,21 +241,6 @@
   </div>
 
   <script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js"></script>
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyD4U85mokKXsAP1AdwClWtcbt8udZrwlAw",
-    authDomain: "sommaireelz.firebaseapp.com",
-    projectId: "sommaireelz",
-    storageBucket: "sommaireelz.firebasestorage.app",
-    messagingSenderId: "171788284751",
-    appId: "1:171788284751:web:694f070d1cafe8b7c04b3a"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-
     // Configuration et constantes
     const API_URL = "https://script.google.com/macros/s/AKfycbxlZYjCtXljPDBiTwjjQk-XPuctE3HukS2_Lf7K-p_WEuENn3sALsFlAtd-ZGYTovEX/exec";
     const CHAUFFEUR_MAP = {
@@ -385,20 +370,7 @@
           Array.from(tr.querySelectorAll("td")).slice(0, 8).map(td => td.textContent.trim())
         );
         localStorage.setItem(STORAGE_KEYS.rows, JSON.stringify(rows));
-        // Enregistrement Firestore
-db.collection("disponibilites").add({
-  date: elements.dateSelect.value,
-  note: elements.noteField.value,
-  lignes: rows,
-  timestamp: new Date()
-})
-.then(() => {
-  alert("Données sauvegardées sur Firestore !");
-})
-.catch(error => {
-  console.error("Erreur Firestore:", error);
-  alert("Erreur lors de la sauvegarde en ligne.");
-});
+        
         alert("Données sauvegardées !");
       } catch (err) {
         alert("Erreur lors de la sauvegarde : " + err.message);
@@ -594,10 +566,5 @@ db.collection("disponibilites").add({
     // Démarrer l'application quand la page est chargée
     document.addEventListener("DOMContentLoaded", init);
   </script>
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js"></script>
-
-
 </body>
 </html>

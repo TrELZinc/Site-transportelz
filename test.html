@@ -398,16 +398,30 @@
   try {
     const note = elements.noteField.value;
     const date = elements.dateSelect.value;
-    const rows = Array.from(document.querySelectorAll("#dispoTable tbody tr")).map(tr =>
-      Array.from(tr.querySelectorAll("td")).slice(0, 8).map(td => td.textContent.trim())
-    );
+
+    // 🔄 On transforme chaque ligne en objet clair au lieu d'un tableau
+    const rows = Array.from(document.querySelectorAll("#dispoTable tbody tr")).map(tr => {
+      const cells = Array.from(tr.querySelectorAll("td")).slice(0, 8);
+      return {
+        rang: cells[0]?.textContent.trim() || "",
+        client: cells[1]?.textContent.trim() || "",
+        type: cells[2]?.textContent.trim() || "",
+        depart: cells[3]?.textContent.trim() || "",
+        livraison: cells[4]?.textContent.trim() || "",
+        chauffeur: cells[5]?.textContent.trim() || "",
+        camion: cells[6]?.textContent.trim() || "",
+        remorque: cells[7]?.textContent.trim() || ""
+      };
+    });
 
     const data = { note, date, rows, timestamp: new Date().toISOString() };
 
+    // Enregistrement local
     localStorage.setItem(STORAGE_KEYS.note, note);
     localStorage.setItem(STORAGE_KEYS.date, date);
     localStorage.setItem(STORAGE_KEYS.rows, JSON.stringify(rows));
 
+    // Envoi vers Firebase
     if (window.saveToFirebase) {
       window.saveToFirebase(data);
     }
@@ -417,6 +431,7 @@
     alert("Erreur lors de la sauvegarde : " + err.message);
   }
 }
+
 
     function sendForm() {
       const tableClone = elements.dispoTable.cloneNode(true);

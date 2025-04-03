@@ -195,6 +195,34 @@
       }
     }
   </style>
+  
+  <!-- Firebase SDKs -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyD4U85mokKXsAP1AdwClWtcbt8udZrwlAw",
+    authDomain: "sommaireelz.firebaseapp.com",
+    projectId: "sommaireelz",
+    storageBucket: "sommaireelz.firebasestorage.app",
+    messagingSenderId: "171788284751",
+    appId: "1:171788284751:web:694f070d1cafe8b7c04b3a"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.saveToFirebase = async function(data) {
+    try {
+      await addDoc(collection(db, "sommaires"), data);
+      alert("Données sauvegardées dans Firebase !");
+    } catch (e) {
+      console.error("Erreur Firebase :", e);
+      alert("Erreur lors de l'envoi vers Firebase.");
+    }
+  };
+</script>
 </head>
 <body>
   <header>
@@ -362,20 +390,28 @@
     }
 
     function saveData() {
-      try {
-        localStorage.setItem(STORAGE_KEYS.note, elements.noteField.value);
-        localStorage.setItem(STORAGE_KEYS.date, elements.dateSelect.value);
-        
-        const rows = Array.from(document.querySelectorAll("#dispoTable tbody tr")).map(tr =>
-          Array.from(tr.querySelectorAll("td")).slice(0, 8).map(td => td.textContent.trim())
-        );
-        localStorage.setItem(STORAGE_KEYS.rows, JSON.stringify(rows));
-        
-        alert("Données sauvegardées !");
-      } catch (err) {
-        alert("Erreur lors de la sauvegarde : " + err.message);
-      }
+  try {
+    const note = elements.noteField.value;
+    const date = elements.dateSelect.value;
+    const rows = Array.from(document.querySelectorAll("#dispoTable tbody tr")).map(tr =>
+      Array.from(tr.querySelectorAll("td")).slice(0, 8).map(td => td.textContent.trim())
+    );
+
+    const data = { note, date, rows, timestamp: new Date().toISOString() };
+
+    localStorage.setItem(STORAGE_KEYS.note, note);
+    localStorage.setItem(STORAGE_KEYS.date, date);
+    localStorage.setItem(STORAGE_KEYS.rows, JSON.stringify(rows));
+
+    if (window.saveToFirebase) {
+      window.saveToFirebase(data);
     }
+
+    alert("Données sauvegardées localement et dans Firebase !");
+  } catch (err) {
+    alert("Erreur lors de la sauvegarde : " + err.message);
+  }
+}
 
     function sendForm() {
       const tableClone = elements.dispoTable.cloneNode(true);

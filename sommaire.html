@@ -195,6 +195,74 @@
       }
     }
   </style>
+  <!-- Firebase SDKs en mode compat pour HTML classique -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyD4U85mokKXsAP1AdwClWtcbt8udZrwlAw",
+    authDomain: "sommaireelz.firebaseapp.com",
+    projectId: "sommaireelz",
+    storageBucket: "sommaireelz.firebasestorage.app",
+    messagingSenderId: "171788284751",
+    appId: "1:171788284751:web:694f070d1cafe8b7c04b3a"
+  };
+
+  // Initialisation Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  // 🔁 Charger depuis Firestore
+  window.loadFromFirebase = function(date) {
+    db.collection("disponibilites")
+      .where("date", "==", date)
+      .orderBy("timestamp", "desc")
+      .limit(1)
+      .get()
+      .then(querySnapshot => {
+        if (!querySnapshot.empty) {
+          const data = querySnapshot.docs[0].data();
+
+          elements.noteField.value = data.note || "";
+          elements.dateSelect.value = data.date || "";
+          elements.tableBody.innerHTML = "";
+
+          data.rows.forEach(row => {
+            const tr = createRow();
+            const cells = tr.querySelectorAll("td");
+            row.forEach((val, i) => {
+              if (cells[i]) cells[i].textContent = val;
+            });
+            elements.tableBody.appendChild(tr);
+          });
+
+          console.log("✅ Données chargées depuis Firebase !");
+        } else {
+          generateDefaultRows(9);
+          console.log("📭 Aucune donnée trouvée dans Firebase.");
+        }
+      })
+      .catch(error => {
+        console.error("❌ Erreur de chargement Firebase :", error);
+      });
+  };
+
+  // ✅ Enregistrer dans Firestore
+  window.saveToFirebase = function(data, callback) {
+  db.collection("disponibilites").add(data)
+    .then(() => {
+      console.log("✅ Enregistrement réussi dans Firestore !");
+      if (typeof callback === "function") callback(); // Appelle le callback après succès
+    })
+    .catch((error) => {
+      console.error("❌ Erreur Firebase :", error);
+      alert("Erreur d’enregistrement Firebase : " + error.message);
+    });
+};
+
+</script>
+
 </head>
 <body>
   <header>
@@ -348,34 +416,60 @@
     }
 
     function resetForm() {
-      elements.noteField.value = "";
-      elements.dateSelect.value = "";
-      localStorage.clear();
-      
-      const rows = document.querySelectorAll("#tableBody tr");
-      rows.forEach(row => {
-        const cells = row.querySelectorAll("td");
-        for (let i = 0; i < 8; i++) {
-          if (cells[i]) cells[i].textContent = "";
-        }
+  elements.noteField.value = "";
+  elements.dateSelect.value = "";
+  localStorage.clear();
+
+  const rows = document.querySelectorAll("#tableBody tr");
+  rows.forEach((row, index) => {
+    const cells = row.querySelectorAll("td");
+    // Ne pas effacer la 1ʳᵉ cellule (rang)
+    for (let i = 1; i < 8; i++) {
+      if (cells[i]) cells[i].textContent = "";
+    }
+  });
+}
+
+
+    function saveData() {
+  try {
+    const note = elements.noteField.value;
+    const date = elements.dateSelect.value;
+
+    const rows = Array.from(document.querySelectorAll("#dispoTable tbody tr")).map(tr => {
+      const cells = Array.from(tr.querySelectorAll("td")).slice(0, 8);
+      return {
+        rang: cells[0]?.textContent.trim() || "",
+        client: cells[1]?.textContent.trim() || "",
+        type: cells[2]?.textContent.trim() || "",
+        depart: cells[3]?.textContent.trim() || "",
+        livraison: cells[4]?.textContent.trim() || "",
+        chauffeur: cells[5]?.textContent.trim() || "",
+        camion: cells[6]?.textContent.trim() || "",
+        remorque: cells[7]?.textContent.trim() || ""
+      };
+    });
+
+    const data = { note, date, rows, timestamp: new Date().toISOString() };
+
+    // Sauvegarde locale
+    localStorage.setItem(STORAGE_KEYS.note, note);
+    localStorage.setItem(STORAGE_KEYS.date, date);
+    localStorage.setItem(STORAGE_KEYS.rows, JSON.stringify(rows));
+
+    // Sauvegarde Firebase, avec un seul message après succès
+    if (window.saveToFirebase) {
+      window.saveToFirebase(data, () => {
+        alert("✅ Données sauvegardées localement ET dans Firebase !");
       });
     }
 
-    function saveData() {
-      try {
-        localStorage.setItem(STORAGE_KEYS.note, elements.noteField.value);
-        localStorage.setItem(STORAGE_KEYS.date, elements.dateSelect.value);
-        
-        const rows = Array.from(document.querySelectorAll("#dispoTable tbody tr")).map(tr =>
-          Array.from(tr.querySelectorAll("td")).slice(0, 8).map(td => td.textContent.trim())
-        );
-        localStorage.setItem(STORAGE_KEYS.rows, JSON.stringify(rows));
-        
-        alert("Données sauvegardées !");
-      } catch (err) {
-        alert("Erreur lors de la sauvegarde : " + err.message);
-      }
-    }
+  } catch (err) {
+    alert("Erreur lors de la sauvegarde : " + err.message);
+  }
+}
+
+
 
     function sendForm() {
       const tableClone = elements.dispoTable.cloneNode(true);
@@ -530,41 +624,66 @@
     
     // Initialisation
     function init() {
-      // Attacher les gestionnaires d'événements
-      elements.resetBtn.addEventListener("click", resetForm);
-      elements.saveBtn.addEventListener("click", saveData);
-      elements.sendBtn.addEventListener("click", sendForm);
-      
-      // Charger les données sauvegardées
-      const note = localStorage.getItem(STORAGE_KEYS.note);
-      const date = localStorage.getItem(STORAGE_KEYS.date);
-      const savedRows = JSON.parse(localStorage.getItem(STORAGE_KEYS.rows) || "[]");
-      
-      elements.tableBody.innerHTML = "";
-      
-      if (savedRows.length > 0) {
-        savedRows.forEach(data => {
-          const row = createRow();
-          const cells = row.querySelectorAll("td");
-          data.forEach((val, idx) => {
-            cells[idx].textContent = val;
-          });
-          elements.tableBody.appendChild(row);
+  elements.resetBtn.addEventListener("click", resetForm);
+  elements.saveBtn.addEventListener("click", saveData);
+  elements.sendBtn.addEventListener("click", sendForm);
+
+  elements.tableBody.innerHTML = "";
+
+  // 🚀 Toujours charger la dernière entrée Firebase (peu importe localStorage)
+  db.collection("disponibilites")
+    .orderBy("timestamp", "desc")
+    .limit(1)
+    .get()
+    .then(snapshot => {
+      if (!snapshot.empty) {
+        const data = snapshot.docs[0].data();
+        elements.dateSelect.value = data.date || "";
+        elements.noteField.value = data.note || "";
+
+        data.rows.forEach(row => {
+          const tr = createRow();
+          const cells = tr.querySelectorAll("td");
+          cells[0].textContent = row.rang || "";
+          cells[1].textContent = row.client || "";
+          cells[2].textContent = row.type || "";
+          cells[3].textContent = row.depart || "";
+          cells[4].textContent = row.livraison || "";
+          cells[5].textContent = row.chauffeur || "";
+          cells[6].textContent = row.camion || "";
+          cells[7].textContent = row.remorque || "";
+          elements.tableBody.appendChild(tr);
         });
+
+        // 💾 On met aussi à jour le localStorage (pour les copier-coller)
+        localStorage.setItem(STORAGE_KEYS.note, data.note || "");
+        localStorage.setItem(STORAGE_KEYS.date, data.date || "");
+        localStorage.setItem(STORAGE_KEYS.rows, JSON.stringify(data.rows || []));
+
+        console.log("🟢 Dernières données Firebase chargées et localStorage mis à jour.");
       } else {
         generateDefaultRows(9);
+        console.log("📭 Aucune donnée dans Firebase.");
       }
-      
-      if (note) elements.noteField.value = note;
-      if (date) elements.dateSelect.value = date;
-      
-      // Configurer les fonctionnalités
-      setupArrowNavigation();
-      setupMenu();
+    });
+
+  // 🔁 Si l'utilisateur sélectionne une date manuellement
+  elements.dateSelect.addEventListener("change", () => {
+    const newDate = elements.dateSelect.value;
+    if (newDate) {
+      loadFromFirebase(newDate);
     }
+  });
+
+  setupArrowNavigation();
+  setupMenu();
+}
+
+
     
-    // Démarrer l'application quand la page est chargée
-    document.addEventListener("DOMContentLoaded", init);
+  // Démarrer l'application quand la page est chargée
+document.addEventListener("DOMContentLoaded", init);
+
   </script>
 </body>
 </html>

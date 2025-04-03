@@ -268,8 +268,10 @@
     snapshot.forEach(doc => {
       const data = doc.data();
       (data.rows || []).forEach(row => {
-        if (row.camion) usedCamions.add(row.camion.trim());
-        if (row.remorque) usedRemorques.add(row.remorque.trim());
+        const camion = String(row.camion || "").trim().toLowerCase();
+        const remorque = String(row.remorque || "").trim().toLowerCase();
+        if (camion) usedCamions.add(camion);
+        if (remorque) usedRemorques.add(remorque);
       });
     });
 
@@ -279,27 +281,24 @@
   }
 }
 
+
 function updateEquipementStatus(camionsSet, remorquesSet) {
   const rows = document.querySelectorAll("#equipementList .row");
 
   rows.forEach(row => {
-    const unit = row.querySelector("span")?.textContent?.trim();
+    const unit = row.querySelector("span")?.textContent?.trim().toLowerCase();
     const badge = row.querySelector(".status");
 
     if (!unit || !badge) return;
 
-    // On vérifie si l’unité est utilisée (camion ou remorque)
-    if (camionsSet.has(unit) || remorquesSet.has(unit)) {
-      badge.textContent = "PLANIFIÉ";
-      badge.classList.remove("disponible");
-      badge.classList.add("planifie");
-    } else {
-      badge.textContent = "DISPONIBLE";
-      badge.classList.remove("planifie");
-      badge.classList.add("disponible");
-    }
+    const estPlanifie = camionsSet.has(unit) || remorquesSet.has(unit);
+
+    badge.textContent = estPlanifie ? "PLANIFIÉ" : "DISPONIBLE";
+    badge.classList.toggle("planifie", estPlanifie);
+    badge.classList.toggle("disponible", !estPlanifie);
   });
 }
+
   </script>
 <script>
   const db = firebase.firestore();

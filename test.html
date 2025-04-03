@@ -213,6 +213,16 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 </script>
+<script>
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  window.saveToFirebase = function(data) {
+    db.collection("disponibilites").add(data)
+      .then(() => console.log("Données bien enregistrées"))
+      .catch(error => console.error("Erreur Firebase:", error));
+  }
+</script>
 </head>
 <body>
   <header>

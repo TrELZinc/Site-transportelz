@@ -501,15 +501,22 @@ function sendForm() {
   };
 
   console.log("Date sélectionnée ajustée :", isoDateString);  // Ajoutez cette ligne pour vérifier la date ajustée
+  console.log("Données envoyées :", data);  // Ajoutez cette ligne pour vérifier les données envoyées
 
   fetch(API_URL, {
     method: "POST",
     mode: "no-cors",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
+  })
+  .then(response => {
+    console.log('Réponse de l\'API:', response);  // Ajoutez cette ligne pour vérifier la réponse de l'API
+    alert("Sommaire envoyé !");
+  })
+  .catch(error => {
+    console.error('Erreur lors de l\'envoi:', error);  // Ajoutez cette ligne pour capturer les erreurs
+    alert("Erreur lors de l'envoi du sommaire.");
   });
-
-  alert("Sommaire envoyé !");
 }
     
     // Gestion de la navigation avec flèche

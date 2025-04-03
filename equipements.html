@@ -124,6 +124,7 @@
     }
   </style>
   <!-- Firebase SDKs -->
+<!-- Firebase SDK (mode compat) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
@@ -136,9 +137,47 @@
     messagingSenderId: "171788284751",
     appId: "1:171788284751:web:694f070d1cafe8b7c04b3a"
   };
+
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
+
+  // 🔍 Marquer les remorques planifiées
+  function majRemorquesPlanifiees() {
+    db.collection("disponibilites")
+      .orderBy("timestamp", "desc")
+      .limit(10)
+      .get()
+      .then(snapshot => {
+        const remorquesUtilisées = new Set();
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          if (Array.isArray(data.rows)) {
+            data.rows.forEach(row => {
+              if (row.remorque) remorquesUtilisées.add(row.remorque.trim());
+            });
+          }
+        });
+
+        // Appliquer l'état "PLANIFIÉ" aux remorques utilisées
+        document.querySelectorAll(".row").forEach(row => {
+          const unit = row.querySelector("span")?.textContent?.trim();
+          if (remorquesUtilisées.has(unit)) {
+            const badge = row.querySelector(".status");
+            badge.textContent = "PLANIFIÉ";
+            badge.classList.remove("disponible");
+            badge.classList.add("planifie");
+          }
+        });
+      })
+      .catch(error => {
+        console.error("Erreur Firestore :", error);
+      });
+  }
+
+  // Charger les données à l'ouverture
+  window.addEventListener("DOMContentLoaded", majRemorquesPlanifiees);
 </script>
+
 
 </head>
 <body>
@@ -146,10 +185,6 @@
     <img src="assets/logo.jpeg" alt="Logo ELZ">
     <h1>Disponibilité des équipements</h1>
   </header>
-
-  <div class="date-select text-center my-3">
-    <input type="date" value="2025-03-26" />
-  </div>
 
   <div class="section" id="equipementList">
     <div class="section-title">3 ESSIEUX</div>
@@ -258,19 +293,35 @@ function updateCamionsStatus(usedSet) {
 }
   </script>
   <script>
-  const dateInput = document.querySelector("#dateSearch");
-  dateInput.addEventListener("change", () => {
-    const selectedDate = dateInput.value;
-    if (selectedDate) fetchPlannedCamions(selectedDate);
-  });
+  // Aller chercher la dernière date enregistrée
+  async function getLastRecordedDate() {
+    try {
+      const snapshot = await db.collection("disponibilites")
+        .orderBy("timestamp", "desc")
+        .limit(1)
+        .get();
 
-  // Charger automatiquement à l'ouverture
-  window.addEventListener("DOMContentLoaded", () => {
-    const today = new Date().toISOString().split("T")[0];
-    dateInput.value = today;
-    fetchPlannedCamions(today);
+      if (!snapshot.empty) {
+        const lastData = snapshot.docs[0].data();
+        return lastData.date;
+      }
+    } catch (error) {
+      console.error("Erreur en récupérant la dernière date :", error);
+    }
+    return null;
+  }
+
+  // Charger automatiquement les camions/remorques planifiés à la dernière date
+  window.addEventListener("DOMContentLoaded", async () => {
+    const lastDate = await getLastRecordedDate();
+    if (lastDate) {
+      fetchPlannedCamions(lastDate);
+    } else {
+      console.warn("Aucune donnée disponible pour afficher les équipements.");
+    }
   });
 </script>
+
 
 </body>
 </html>

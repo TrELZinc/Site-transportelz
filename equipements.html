@@ -174,8 +174,7 @@
       });
   }
 
-  // Charger les données à l'ouverture
-  window.addEventListener("DOMContentLoaded", majRemorquesPlanifiees);
+
 </script>
 
 
@@ -185,6 +184,10 @@
     <img src="assets/logo.jpeg" alt="Logo ELZ">
     <h1>Disponibilité des équipements</h1>
   </header>
+  
+<div class="text-center mt-3">
+  <h5 id="dateAffichee" style="font-weight:bold; font-size: 18px;"></h5>
+</div>
 
   <div class="section" id="equipementList">
     <div class="section-title">3 ESSIEUX</div>
@@ -253,8 +256,9 @@
       }
       document.getElementById('popup').style.display = 'none';
     }
-    async function fetchPlannedCamions(date) {
+    async function fetchPlannedEquipments(date) {
   const usedCamions = new Set();
+  const usedRemorques = new Set();
 
   try {
     const snapshot = await db.collection("disponibilites")
@@ -265,35 +269,41 @@
       const data = doc.data();
       (data.rows || []).forEach(row => {
         if (row.camion) usedCamions.add(row.camion.trim());
+        if (row.remorque) usedRemorques.add(row.remorque.trim());
       });
     });
 
-    updateCamionsStatus(usedCamions);
+    updateEquipementStatus(usedCamions, usedRemorques);
   } catch (error) {
     console.error("Erreur de lecture Firebase:", error);
   }
 }
-function updateCamionsStatus(usedSet) {
-  const allRows = document.querySelectorAll("#equipementList .section-title ~ .row");
-  
-  allRows.forEach(row => {
-    const unit = row.querySelector("span").textContent.trim();
-    const statusEl = row.querySelector(".status");
 
-    if (usedSet.has(unit)) {
-      statusEl.textContent = "PLANIFIÉ";
-      statusEl.classList.remove("disponible");
-      statusEl.classList.add("planifie");
+function updateEquipementStatus(camionsSet, remorquesSet) {
+  const rows = document.querySelectorAll("#equipementList .row");
+
+  rows.forEach(row => {
+    const unit = row.querySelector("span")?.textContent?.trim();
+    const badge = row.querySelector(".status");
+
+    if (!unit || !badge) return;
+
+    // On vérifie si l’unité est utilisée (camion ou remorque)
+    if (camionsSet.has(unit) || remorquesSet.has(unit)) {
+      badge.textContent = "PLANIFIÉ";
+      badge.classList.remove("disponible");
+      badge.classList.add("planifie");
     } else {
-      statusEl.textContent = "DISPONIBLE";
-      statusEl.classList.remove("planifie");
-      statusEl.classList.add("disponible");
+      badge.textContent = "DISPONIBLE";
+      badge.classList.remove("planifie");
+      badge.classList.add("disponible");
     }
   });
 }
   </script>
-  <script>
-  // Aller chercher la dernière date enregistrée
+<script>
+  const db = firebase.firestore();
+
   async function getLastRecordedDate() {
     try {
       const snapshot = await db.collection("disponibilites")
@@ -311,16 +321,62 @@ function updateCamionsStatus(usedSet) {
     return null;
   }
 
-  // Charger automatiquement les camions/remorques planifiés à la dernière date
-  window.addEventListener("DOMContentLoaded", async () => {
-    const lastDate = await getLastRecordedDate();
-    if (lastDate) {
-      fetchPlannedCamions(lastDate);
-    } else {
-      console.warn("Aucune donnée disponible pour afficher les équipements.");
+  async function fetchPlannedEquipments(date) {
+    const usedCamions = new Set();
+    const usedRemorques = new Set();
+
+    try {
+      const snapshot = await db.collection("disponibilites")
+        .where("date", "==", date)
+        .get();
+
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        (data.rows || []).forEach(row => {
+          if (row.camion) usedCamions.add(row.camion.trim());
+          if (row.remorque) usedRemorques.add(row.remorque.trim());
+        });
+      });
+
+      updateEquipementStatus(usedCamions, usedRemorques);
+    } catch (error) {
+      console.error("Erreur de lecture Firebase:", error);
     }
-  });
+  }
+
+  function updateEquipementStatus(camionsSet, remorquesSet) {
+    const rows = document.querySelectorAll("#equipementList .row");
+
+    rows.forEach(row => {
+      const unit = row.querySelector("span")?.textContent?.trim();
+      const badge = row.querySelector(".status");
+
+      if (!unit || !badge) return;
+
+      if (camionsSet.has(unit) || remorquesSet.has(unit)) {
+        badge.textContent = "PLANIFIÉ";
+        badge.classList.remove("disponible");
+        badge.classList.add("planifie");
+      } else {
+        badge.textContent = "DISPONIBLE";
+        badge.classList.remove("planifie");
+        badge.classList.add("disponible");
+      }
+    });
+  }
+
+  window.addEventListener("DOMContentLoaded", async () => {
+  const lastDate = await getLastRecordedDate();
+  if (lastDate) {
+    document.getElementById("dateAffichee").textContent = `Dernière mise à jour: ${lastDate}`;
+    fetchPlannedEquipments(lastDate);
+  } else {
+    console.warn("Aucune donnée disponible pour afficher les équipements.");
+  }
+});
+
 </script>
+
 
 
 </body>

@@ -468,7 +468,7 @@
     alert("Erreur lors de la sauvegarde : " + err.message);
   }
 }
-function sendForm() {
+ function sendForm() {
   const tableClone = document.getElementById("dispoTable").cloneNode(true);
   const rows = tableClone.querySelectorAll("tbody tr");
 
@@ -517,7 +517,8 @@ function sendForm() {
 
   alert("Sommaire envoyé !");
 }
-    
+
+
     // Gestion de la navigation avec flèche
     function setupArrowNavigation() {
       const arrowBtn = document.createElement("button");

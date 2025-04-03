@@ -2,38 +2,17 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Test Firebase Firestore</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 50px;
-      background: #f4f4f4;
-    }
-    button {
-      padding: 15px 30px;
-      font-size: 18px;
-      background-color: #2ecc71;
-      border: none;
-      border-radius: 6px;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #27ae60;
-    }
-  </style>
+  <title>Test Firebase</title>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js"></script>
 </head>
 <body>
-  <h1>Test d'envoi vers Firebase Firestore</h1>
-  <p>Appuie sur le bouton pour envoyer un test</p>
-  <button id="testBtn">Tester Firebase</button>
+  <h1>Test d’enregistrement Firebase</h1>
+  <button onclick="testSave()">Enregistrer un test</button>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
-
+  <script>
+    // Configuration de ton projet Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyD4U85mokKXsAP1AdwClWtcbt8udZrwlAw",
       authDomain: "sommaireelz.firebaseapp.com",
@@ -43,21 +22,22 @@
       appId: "1:171788284751:web:694f070d1cafe8b7c04b3a"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    // Initialisation
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-    document.getElementById("testBtn").addEventListener("click", async () => {
-      try {
-        await addDoc(collection(db, "test"), {
-          message: "Ceci est un test Firebase",
-          date: serverTimestamp()
-        });
-        alert("Envoi réussi ! Vérifie ta collection 'test' dans Firestore.");
-      } catch (error) {
-        console.error("Erreur lors de l'envoi Firebase :", error);
-        alert("Erreur : " + error.message);
-      }
-    });
+    // Fonction de test
+    function testSave() {
+      db.collection("disponibilites").add({
+        message: "Ceci est un test Firebase",
+        timestamp: new Date()
+      }).then(() => {
+        alert("Test sauvegardé dans Firestore !");
+      }).catch((err) => {
+        alert("Erreur : " + err.message);
+        console.error(err);
+      });
+    }
   </script>
 </body>
 </html>

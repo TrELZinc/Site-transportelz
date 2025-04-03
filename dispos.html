@@ -321,6 +321,14 @@
       localStorage.clear();
       generateDefaultRows(9); // Use the existing function to reset rows
     }
+function formatDate(dateStr) {
+  if (!dateStr) return "Date non sélectionnée";
+  const d = new Date(dateStr);
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
 
     function saveData() {
       try {
@@ -365,10 +373,19 @@
       if (date) document.getElementById("dateSelect").value = date;
 
       if (table) {
-        document.getElementById("dispoTable").outerHTML = table;
-      } else {
-        generateDefaultRows(9);
-      }
+  document.getElementById("dispoTable").outerHTML = table;
+  // 🛠️ Important : rebrancher les événements après avoir remplacé le HTML
+  setTimeout(() => {
+    const newTable = document.getElementById("dispoTable");
+    const usCells = newTable.querySelectorAll(".us-cell");
+    usCells.forEach(cell => {
+      cell.onclick = () => toggleUS(cell);
+    });
+  }, 0);
+} else {
+  generateDefaultRows(9);
+}
+
     };
   </script>
 </body>

@@ -302,8 +302,10 @@ function updateEquipementStatus(camionsSet, remorquesSet) {
 }
   </script>
 <script>
+ <script>
   const db = firebase.firestore();
 
+  // Récupère la dernière date enregistrée
   async function getLastRecordedDate() {
     try {
       const snapshot = await db.collection("disponibilites")
@@ -313,7 +315,7 @@ function updateEquipementStatus(camionsSet, remorquesSet) {
 
       if (!snapshot.empty) {
         const lastData = snapshot.docs[0].data();
-        return lastData.date;
+        return lastData.date || null;
       }
     } catch (error) {
       console.error("Erreur en récupérant la dernière date :", error);
@@ -321,6 +323,24 @@ function updateEquipementStatus(camionsSet, remorquesSet) {
     return null;
   }
 
+  // Met à jour les statuts selon les camions/remorques utilisés
+  function updateEquipementStatus(usedCamions, usedRemorques) {
+    const rows = document.querySelectorAll("#equipementList .row");
+
+    rows.forEach(row => {
+      const unit = row.querySelector("span")?.textContent?.trim();
+      const badge = row.querySelector(".status");
+      if (!unit || !badge) return;
+
+      const estPlanifie = usedCamions.has(unit) || usedRemorques.has(unit);
+
+      badge.textContent = estPlanifie ? "PLANIFIÉ" : "DISPONIBLE";
+      badge.classList.toggle("planifie", estPlanifie);
+      badge.classList.toggle("disponible", !estPlanifie);
+    });
+  }
+
+  // Charge les camions/remorques utilisés pour une date donnée
   async function fetchPlannedEquipments(date) {
     const usedCamions = new Set();
     const usedRemorques = new Set();
@@ -344,86 +364,20 @@ function updateEquipementStatus(camionsSet, remorquesSet) {
     }
   }
 
-  function updateEquipementStatus(camionsSet, remorquesSet) {
-    const rows = document.querySelectorAll("#equipementList .row");
+  // Initialisation
+  window.addEventListener("DOMContentLoaded", async () => {
+    const lastDate = await getLastRecordedDate();
+    const dateEl = document.getElementById("dateAffichee");
 
-    rows.forEach(row => {
-      const unit = row.querySelector("span")?.textContent?.trim();
-      const badge = row.querySelector(".status");
-
-      if (!unit || !badge) return;
-
-      if (camionsSet.has(unit) || remorquesSet.has(unit)) {
-        badge.textContent = "PLANIFIÉ";
-        badge.classList.remove("disponible");
-        badge.classList.add("planifie");
-      } else {
-        badge.textContent = "DISPONIBLE";
-        badge.classList.remove("planifie");
-        badge.classList.add("disponible");
-      }
-    });
-  }
-
-  // Fonction pour charger la dernière date + équipements utilisés
-window.addEventListener("DOMContentLoaded", async () => {
-  try {
-    const snapshot = await db.collection("disponibilites")
-      .orderBy("timestamp", "desc")
-      .limit(1)
-      .get();
-
-    if (snapshot.empty) {
-      console.warn("Aucune donnée trouvée.");
-      return;
+    if (lastDate) {
+      dateEl.textContent = `Dernière mise à jour : ${lastDate}`;
+      await fetchPlannedEquipments(lastDate);
+    } else {
+      dateEl.textContent = "Aucune donnée disponible.";
+      console.warn("Aucune donnée disponible.");
     }
-
-    const lastDoc = snapshot.docs[0].data();
-    const lastDate = lastDoc.date || "Date inconnue";
-
-    // Affiche la date dans le h5
-    document.getElementById("dateAffichee").textContent = `Dernière mise à jour: ${lastDate}`;
-
-    // Sets pour équipements utilisés
-    const usedCamions = new Set();
-    const usedRemorques = new Set();
-
-    // Nettoyage + ajout dans les sets
-    (lastDoc.rows || []).forEach(row => {
-      const camion = (row.camion || "").trim().toUpperCase();
-      const remorque = (row.remorque || "").trim().toUpperCase();
-
-      if (camion) usedCamions.add(camion);
-      if (remorque) usedRemorques.add(remorque);
-    });
-
-    // Mise à jour visuelle des statuts
-    document.querySelectorAll("#equipementList .row").forEach(row => {
-      const unit = row.querySelector("span")?.textContent?.trim().toUpperCase();
-      const badge = row.querySelector(".status");
-
-      if (!unit || !badge) return;
-
-      if (usedCamions.has(unit) || usedRemorques.has(unit)) {
-        badge.textContent = "PLANIFIÉ";
-        badge.classList.remove("disponible");
-        badge.classList.add("planifie");
-      } else {
-        badge.textContent = "DISPONIBLE";
-        badge.classList.remove("planifie");
-        badge.classList.add("disponible");
-      }
-    });
-
-  } catch (error) {
-    console.error("Erreur Firebase :", error);
-  }
-});
-
-
+  });
 </script>
-
-
 
 </body>
 </html>

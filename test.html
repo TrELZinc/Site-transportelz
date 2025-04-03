@@ -491,11 +491,12 @@
     if (copyCell) copyCell.innerHTML = "";
   });
 
-  // Récupération et ajustement de la date pour le fuseau horaire
-  const selectedDate = new Date(elements.dateSelect.value);
-  const adjustedDate = new Date(selectedDate.getTime() - (selectedDate.getTimezoneOffset() * 60000));
-  const isoDateString = adjustedDate.toISOString().split('T')[0];
-  
+  // Utilisation de luxon pour ajuster la date
+  const { DateTime } = luxon;
+  const selectedDate = DateTime.fromISO(elements.dateSelect.value, { zone: 'local' });
+  const adjustedDate = selectedDate.setZone('UTC');
+  const isoDateString = adjustedDate.toISODate();
+
   const data = {
     note: elements.noteField.value,
     date: isoDateString,  // Utilisation de la date ajustée

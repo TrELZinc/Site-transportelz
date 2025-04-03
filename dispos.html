@@ -263,58 +263,63 @@
     }
 
     function sendForm() {
-      const tableClone = document.getElementById("dispoTable").cloneNode(true);
-      const rows = tableClone.querySelectorAll("tbody tr");
+  const tableClone = document.getElementById("dispoTable").cloneNode(true);
+  const rows = tableClone.querySelectorAll("tbody tr");
 
-      rows.forEach(row => {
-        const cells = row.querySelectorAll("td");
-        let isRowEmpty = true;
+  rows.forEach(row => {
+    const cells = row.querySelectorAll("td");
+    let isRowEmpty = true;
 
-        for (let i = 0; i < cells.length; i++) {
-          if (i === 1) continue;
-          const text = cells[i]?.innerText?.trim();
-          if (text) {
-            isRowEmpty = false;
-            break;
-          }
-        }
-
-        for (let i = 0; i < cells.length; i++) {
-          const cell = cells[i];
-
-          if (i === 1) {
-            const content = cell.textContent.trim();
-            const isChecked =
-              content.includes("✔️") || content.includes("✅") ||
-              cell.querySelector("input[type='checkbox']")?.checked;
-
-            if (isChecked) {
-              cell.innerHTML = '<span style="font-size:16px;">✔️</span>';
-            } else {
-              cell.innerHTML = isRowEmpty ? '' : '<span style="font-size:16px;">❌</span>';
-            }
-          } else if (cell.hasAttribute("contenteditable")) {
-            cell.innerText = cell.innerText.trim().toUpperCase();
-          }
-        }
-      });
-const selectedDate = document.querySelector("#dateSelect")?.value || "";
-      const data = {
-  note: document.getElementById("note").value,
-  date: selectedDate,
-  table: tableClone.outerHTML
-};
-
-
-      fetch("https://script.google.com/macros/s/AKfycbyY9BgDMSKRIfskGy4MFjX9win_7BJ9QwPbphSwwdgY8ssnF5Nzew9QsynO0ry1mXo30A/exec", {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      });
-
-      alert("Disponibilités envoyées !");
+    for (let i = 0; i < cells.length; i++) {
+      if (i === 1) continue;
+      const text = cells[i]?.innerText?.trim();
+      if (text) {
+        isRowEmpty = false;
+        break;
+      }
     }
+
+    for (let i = 0; i < cells.length; i++) {
+      const cell = cells[i];
+
+      if (i === 1) {
+        const content = cell.textContent.trim();
+        const isChecked =
+          content.includes("✔️") || content.includes("✅") ||
+          cell.querySelector("input[type='checkbox']")?.checked;
+
+        if (isChecked) {
+          cell.innerHTML = '<span style="font-size:16px;">✔️</span>';
+        } else {
+          cell.innerHTML = isRowEmpty ? '' : '<span style="font-size:16px;">❌</span>';
+        }
+      } else if (cell.hasAttribute("contenteditable")) {
+        cell.innerText = cell.innerText.trim().toUpperCase();
+      }
+    }
+  });
+
+  const selectedDate = document.querySelector("#dateSelect")?.value || "";
+  if (!selectedDate) {
+    alert("Veuillez sélectionner une date.");
+    return;
+  }
+
+  const data = {
+    note: document.getElementById("note").value,
+    date: selectedDate,
+    table: tableClone.outerHTML
+  };
+
+  fetch("https://script.google.com/macros/s/AKfycbw_MotKA85bjP7jh--P9lYZDoOV0DW8ZtTSHQrWeWEbECrVEUyBBTmQk1dCW5Bfo6iMOw/exec", {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+
+  alert("Disponibilités envoyées !");
+}
 
     function resetForm() {
       document.getElementById("note").value = "";

@@ -249,17 +249,18 @@
   };
 
   // ✅ Enregistrer dans Firestore
-  window.saveToFirebase = function(data) {
-    db.collection("disponibilites").add(data)
-      .then(() => {
-        console.log("✅ Enregistrement réussi dans Firestore !");
-        alert("Données bien envoyées dans Firebase !");
-      })
-      .catch((error) => {
-        console.error("❌ Erreur Firebase :", error);
-        alert("Erreur d’enregistrement Firebase : " + error.message);
-      });
-  };
+  window.saveToFirebase = function(data, callback) {
+  db.collection("disponibilites").add(data)
+    .then(() => {
+      console.log("✅ Enregistrement réussi dans Firestore !");
+      if (typeof callback === "function") callback(); // Appelle le callback après succès
+    })
+    .catch((error) => {
+      console.error("❌ Erreur Firebase :", error);
+      alert("Erreur d’enregistrement Firebase : " + error.message);
+    });
+};
+
 </script>
 
 </head>
@@ -433,7 +434,6 @@
     const note = elements.noteField.value;
     const date = elements.dateSelect.value;
 
-    // 🔄 On transforme chaque ligne en objet clair au lieu d'un tableau
     const rows = Array.from(document.querySelectorAll("#dispoTable tbody tr")).map(tr => {
       const cells = Array.from(tr.querySelectorAll("td")).slice(0, 8);
       return {
@@ -450,21 +450,23 @@
 
     const data = { note, date, rows, timestamp: new Date().toISOString() };
 
-    // Enregistrement local
+    // Sauvegarde locale
     localStorage.setItem(STORAGE_KEYS.note, note);
     localStorage.setItem(STORAGE_KEYS.date, date);
     localStorage.setItem(STORAGE_KEYS.rows, JSON.stringify(rows));
 
-    // Envoi vers Firebase
+    // Sauvegarde Firebase, avec un seul message après succès
     if (window.saveToFirebase) {
-      window.saveToFirebase(data);
+      window.saveToFirebase(data, () => {
+        alert("✅ Données sauvegardées localement ET dans Firebase !");
+      });
     }
 
-    alert("Données sauvegardées localement et dans Firebase !");
   } catch (err) {
     alert("Erreur lors de la sauvegarde : " + err.message);
   }
 }
+
 
 
     function sendForm() {

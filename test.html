@@ -212,10 +212,6 @@
 
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
-</script>
-<script>
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
 
   window.saveToFirebase = function(data) {
     db.collection("disponibilites").add(data)

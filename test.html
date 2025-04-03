@@ -472,40 +472,47 @@
 
 
     function sendForm() {
-      const tableClone = elements.dispoTable.cloneNode(true);
-      const rows = tableClone.querySelectorAll("tbody tr");
-      
-      rows.forEach(row => {
-        const cells = row.querySelectorAll("td");
-        
-        // Transformation en majuscules
-        for (let i = 0; i < 8; i++) {
-          const cell = cells[i];
-          if (cell.hasAttribute("contenteditable")) {
-            cell.innerText = cell.innerText.trim().toUpperCase();
-          }
-        }
-        
-        // Suppression des boutons de copie
-        const copyCell = cells[8];
-        if (copyCell) copyCell.innerHTML = "";
-      });
-      
-      const data = {
-        note: elements.noteField.value,
-        date: elements.dateSelect.value,
-        table: tableClone.outerHTML
-      };
-      
-      fetch(API_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      });
-      
-      alert("Sommaire envoyé !");
+  const tableClone = elements.dispoTable.cloneNode(true);
+  const rows = tableClone.querySelectorAll("tbody tr");
+
+  rows.forEach(row => {
+    const cells = row.querySelectorAll("td");
+
+    // Transformation en majuscules
+    for (let i = 0; i < 8; i++) {
+      const cell = cells[i];
+      if (cell.hasAttribute("contenteditable")) {
+        cell.innerText = cell.innerText.trim().toUpperCase();
+      }
     }
+
+    // Suppression des boutons de copie
+    const copyCell = cells[8];
+    if (copyCell) copyCell.innerHTML = "";
+  });
+
+  // Récupération et ajustement de la date pour le fuseau horaire
+  const selectedDate = new Date(elements.dateSelect.value);
+  const adjustedDate = new Date(selectedDate.getTime() - (selectedDate.getTimezoneOffset() * 60000));
+  const isoDateString = adjustedDate.toISOString().split('T')[0];
+  
+  const data = {
+    note: elements.noteField.value,
+    date: isoDateString,  // Utilisation de la date ajustée
+    table: tableClone.outerHTML
+  };
+
+  console.log("Date sélectionnée ajustée :", isoDateString);  // Ajoutez cette ligne pour vérifier la date ajustée
+
+  fetch(API_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+
+  alert("Sommaire envoyé !");
+}
     
     // Gestion de la navigation avec flèche
     function setupArrowNavigation() {

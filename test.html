@@ -506,10 +506,7 @@ function sendForm() {
   }
 
   // Format the date correctly
-  const dateObj = new Date(selectedDate);
-  const day = String(dateObj.getDate()).padStart(2, '0');
-  const month = String(dateObj.getMonth() + 1).padStart(2, '0'); // Months are 0-based
-  const year = dateObj.getFullYear();
+  const [year, month, day] = selectedDate.split("-");
   const formattedDate = `${year}-${month}-${day}`;
 
   const data = {

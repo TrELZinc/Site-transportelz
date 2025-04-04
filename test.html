@@ -459,7 +459,7 @@ function formatDate(dateStr) {
     generateDefaultRows(9);
   }
 
-  // 🔁 Toujours tenter de charger la dernière saisie depuis Firestore
+  // 🔁 Charger la dernière saisie depuis Firestore
   db.collection("disponibilites_dispos")
     .orderBy("timestamp", "desc")
     .limit(1)
@@ -483,7 +483,24 @@ function formatDate(dateStr) {
         console.log("📭 Aucune donnée trouvée dans Firestore.");
       }
     });
+
+  // 📱 Gestion du menu hamburger
+  const menuToggle = document.querySelector(".menu-toggle");
+  const menuDropdown = document.getElementById("menuDropdown");
+
+  if (menuToggle && menuDropdown) {
+    menuToggle.addEventListener("click", () => {
+      menuDropdown.classList.toggle("show");
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!menuToggle.contains(e.target) && !menuDropdown.contains(e.target)) {
+        menuDropdown.classList.remove("show");
+      }
+    });
+  }
 };
+
 
   </script>
 </body>

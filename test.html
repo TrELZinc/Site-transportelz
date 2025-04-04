@@ -352,11 +352,18 @@
 }
 
     function resetForm() {
-      document.getElementById("note").value = "";
-      document.getElementById("dateSelect").value = "";
-      localStorage.clear();
-      generateDefaultRows(9); // Use the existing function to reset rows
-    }
+  document.getElementById("note").value = "";
+  document.getElementById("dateSelect").value = "";
+  localStorage.clear();
+
+  const rows = document.querySelectorAll("#dispoTable tbody tr");
+  rows.forEach(row => {
+    const cells = row.querySelectorAll("td");
+    if (cells[4]) cells[4].textContent = "";
+    if (cells[5]) cells[5].textContent = "";
+  });
+}
+
 function formatDate(dateStr) {
   if (!dateStr) return "Date non sélectionnée";
   const d = new Date(dateStr);

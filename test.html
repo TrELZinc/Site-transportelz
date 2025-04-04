@@ -31,15 +31,15 @@
       height: 40px;
     }
     .menu-toggle {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 40px;
-  height: 30px;
-  cursor: pointer;
-  z-index: 1001;
-}
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 40px;
+      height: 30px;
+      cursor: pointer;
+      z-index: 1001;
+    }
 
     .menu-toggle span {
       height: 3px;
@@ -48,20 +48,35 @@
       margin: 4px 0;
       transition: 0.3s;
     }
+    
+    /* Animation pour le hamburger */
+    .menu-toggle.active span:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+    
+    .menu-toggle.active span:nth-child(2) {
+      opacity: 0;
+    }
+    
+    .menu-toggle.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(5px, -5px);
+    }
+    
     .menu {
-  display: none;
-  position: absolute;
-  top: 60px;
-  right: 20px;
-  background-color: #111;
-  border: 1px solid #444;
-  border-radius: 6px;
-  padding: 10px;
-  z-index: 999;
-}
-.menu.show {
-  display: block;
-}
+      display: none;
+      position: absolute;
+      top: 60px;
+      right: 20px;
+      background-color: #111;
+      border: 1px solid #444;
+      border-radius: 6px;
+      padding: 10px;
+      z-index: 999;
+    }
+    
+    .menu.show {
+      display: block;
+    }
 
     .menu a {
       display: block;
@@ -150,12 +165,6 @@
       gap: 10px;
       flex-wrap: wrap;
     }
-    .menu-toggle {
-  width: 40px;
-  height: 30px;
-  justify-content: center;
-  align-items: center;
-}
 
     .buttons button {
       padding: 12px 24px;
@@ -216,11 +225,11 @@
 <body>
   <header>
     <img src="assets/logo.jpeg" alt="Logo Transport ELZ">
-    <div class="menu-toggle">
-  <span></span>
-  <span></span>
-  <span></span>
-</div>
+    <div class="menu-toggle" id="menuToggle">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
 
     <div class="menu" id="menuDropdown">
       <a href="test.html">Sommaire</a>
@@ -252,33 +261,17 @@
   
   <script>
     function saveToFirebase(data, callback) {
-  db.collection("disponibilites_dispos").add(data) // Collection différente
-    .then(() => {
-      console.log("✅ Données enregistrées dans Firestore (dispos) !");
-      if (typeof callback === "function") callback();
-    })
-    .catch((error) => {
-      console.error("❌ Erreur Firestore :", error);
-      alert("Erreur Firestore : " + error.message);
-    });
-}
-
-    // Toggle menu function - simple direct approach
-    function toggleMenu() {
-      const menu = document.getElementById("menuDropdown");
-      menu.classList.toggle("show");
+      db.collection("disponibilites_dispos").add(data) // Collection différente
+        .then(() => {
+          console.log("✅ Données enregistrées dans Firestore (dispos) !");
+          if (typeof callback === "function") callback();
+        })
+        .catch((error) => {
+          console.error("❌ Erreur Firestore :", error);
+          alert("Erreur Firestore : " + error.message);
+        });
     }
-    
-    // Close menu when clicking outside
-    document.addEventListener("click", function(e) {
-      const menu = document.getElementById("menuDropdown");
-      const toggle = document.querySelector(".menu-toggle");
-      
-      if (!toggle.contains(e.target) && !menu.contains(e.target)) {
-        menu.classList.remove("show");
-      }
-    });
-    
+
     function createRow() {
       const row = document.createElement("tr");
       row.innerHTML = `
@@ -307,130 +300,128 @@
     }
 
     function sendForm() {
-  const tableClone = document.getElementById("dispoTable").cloneNode(true);
-  const rows = tableClone.querySelectorAll("tbody tr");
+      const tableClone = document.getElementById("dispoTable").cloneNode(true);
+      const rows = tableClone.querySelectorAll("tbody tr");
 
-  rows.forEach(row => {
-    const cells = row.querySelectorAll("td");
-    let isRowEmpty = true;
+      rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        let isRowEmpty = true;
 
-    for (let i = 0; i < cells.length; i++) {
-      if (i === 1) continue;
-      const text = cells[i]?.innerText?.trim();
-      if (text) {
-        isRowEmpty = false;
-        break;
-      }
-    }
-
-    for (let i = 0; i < cells.length; i++) {
-      const cell = cells[i];
-
-      if (i === 1) {
-        const content = cell.textContent.trim();
-        const isChecked =
-          content.includes("✔️") || content.includes("✅") ||
-          cell.querySelector("input[type='checkbox']")?.checked;
-
-        if (isChecked) {
-          cell.innerHTML = '<span style="font-size:16px;">✔️</span>';
-        } else {
-          cell.innerHTML = isRowEmpty ? '' : '<span style="font-size:16px;">❌</span>';
+        for (let i = 0; i < cells.length; i++) {
+          if (i === 1) continue;
+          const text = cells[i]?.innerText?.trim();
+          if (text) {
+            isRowEmpty = false;
+            break;
+          }
         }
-      } else if (cell.hasAttribute("contenteditable")) {
-        cell.innerText = cell.innerText.trim().toUpperCase();
+
+        for (let i = 0; i < cells.length; i++) {
+          const cell = cells[i];
+
+          if (i === 1) {
+            const content = cell.textContent.trim();
+            const isChecked =
+              content.includes("✔️") || content.includes("✅") ||
+              cell.querySelector("input[type='checkbox']")?.checked;
+
+            if (isChecked) {
+              cell.innerHTML = '<span style="font-size:16px;">✔️</span>';
+            } else {
+              cell.innerHTML = isRowEmpty ? '' : '<span style="font-size:16px;">❌</span>';
+            }
+          } else if (cell.hasAttribute("contenteditable")) {
+            cell.innerText = cell.innerText.trim().toUpperCase();
+          }
+        }
+      });
+
+      const selectedDate = document.querySelector("#dateSelect")?.value || "";
+      if (!selectedDate) {
+        alert("Veuillez sélectionner une date.");
+        return;
       }
+
+      const data = {
+        note: document.getElementById("note").value,
+        date: selectedDate,
+        table: tableClone.outerHTML
+      };
+
+      fetch("https://script.google.com/macros/s/AKfycbxP9hEyqHddVqlgWk2zeeU0-REZUHvnVQ3sXhtJRyiJ-cL_fYWZmE0092TG4lC1bReUxA/exec", {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      alert("Disponibilités envoyées !");
     }
-  });
-
-  const selectedDate = document.querySelector("#dateSelect")?.value || "";
-  if (!selectedDate) {
-    alert("Veuillez sélectionner une date.");
-    return;
-  }
-
-  const data = {
-    note: document.getElementById("note").value,
-    date: selectedDate,
-    table: tableClone.outerHTML
-  };
-
-  fetch("https://script.google.com/macros/s/AKfycbxP9hEyqHddVqlgWk2zeeU0-REZUHvnVQ3sXhtJRyiJ-cL_fYWZmE0092TG4lC1bReUxA/exec", {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  });
-
-  alert("Disponibilités envoyées !");
-}
 
     function resetForm() {
-  document.getElementById("note").value = "";
-  document.getElementById("dateSelect").value = "";
-  localStorage.clear();
+      document.getElementById("note").value = "";
+      document.getElementById("dateSelect").value = "";
+      localStorage.clear();
 
-  const rows = document.querySelectorAll("#dispoTable tbody tr");
-  rows.forEach(row => {
-    const cells = row.querySelectorAll("td");
-    if (cells[4]) cells[4].textContent = "";
-    if (cells[5]) cells[5].textContent = "";
-  });
-}
+      const rows = document.querySelectorAll("#dispoTable tbody tr");
+      rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        if (cells[4]) cells[4].textContent = "";
+        if (cells[5]) cells[5].textContent = "";
+      });
+    }
 
-function formatDate(dateStr) {
-  if (!dateStr) return "Date non sélectionnée";
-  const d = new Date(dateStr);
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  return `${yyyy}-${mm}-${dd}`;
-}
+    function formatDate(dateStr) {
+      if (!dateStr) return "Date non sélectionnée";
+      const d = new Date(dateStr);
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
 
     function saveData() {
-  try {
-    const table = document.getElementById("dispoTable");
-    if (!table) throw new Error("Table introuvable");
+      try {
+        const table = document.getElementById("dispoTable");
+        if (!table) throw new Error("Table introuvable");
 
-    const date = document.getElementById("dateSelect").value;
-    const note = document.getElementById("note").value;
+        const date = document.getElementById("dateSelect").value;
+        const note = document.getElementById("note").value;
 
-    const rows = Array.from(document.querySelectorAll("#dispoTable tbody tr")).map(tr => {
-  const cells = Array.from(tr.querySelectorAll("td")).slice(0, 6).map(td => td.textContent.trim());
-  return {
-    chauffeur: cells[0] || "",
-    us: cells[1] || "",
-    camion: cells[2] || "",
-    remorque: cells[3] || "",
-    depart: cells[4] || "",
-    note: cells[5] || ""
-  };
-});
+        const rows = Array.from(document.querySelectorAll("#dispoTable tbody tr")).map(tr => {
+          const cells = Array.from(tr.querySelectorAll("td")).slice(0, 6).map(td => td.textContent.trim());
+          return {
+            chauffeur: cells[0] || "",
+            us: cells[1] || "",
+            camion: cells[2] || "",
+            remorque: cells[3] || "",
+            depart: cells[4] || "",
+            note: cells[5] || ""
+          };
+        });
 
+        const data = {
+          date,
+          note,
+          table: table.outerHTML,
+          rows,
+          timestamp: new Date().toISOString()
+        };
 
-    const data = {
-      date,
-      note,
-      table: table.outerHTML,
-      rows,
-      timestamp: new Date().toISOString()
-    };
+        // 🧠 Enregistrement local
+        localStorage.setItem("dispo_note", note);
+        localStorage.setItem("dispo_date", date);
+        localStorage.setItem("dispo_table", table.outerHTML);
 
-    // 🧠 Enregistrement local
-    localStorage.setItem("dispo_note", note);
-    localStorage.setItem("dispo_date", date);
-    localStorage.setItem("dispo_table", table.outerHTML);
+        // ☁️ Enregistrement dans Firestore
+        saveToFirebase(data, () => {
+          alert("✅ Données sauvegardées localement et dans Firebase !");
+        });
 
-    // ☁️ Enregistrement dans Firestore
-    saveToFirebase(data, () => {
-      alert("✅ Données sauvegardées localement et dans Firebase !");
-    });
-
-  } catch (err) {
-    alert("Erreur lors de la sauvegarde : " + err.message);
-  }
-}
-
+      } catch (err) {
+        alert("Erreur lors de la sauvegarde : " + err.message);
+      }
+    }
 
     // Cell focus behavior
     document.addEventListener("focusin", function(e) {
@@ -452,78 +443,89 @@ function formatDate(dateStr) {
     });
 
     // Initialize on load
-   window.onload = function() {
-  const note = localStorage.getItem("dispo_note");
-  const date = localStorage.getItem("dispo_date");
-  const table = localStorage.getItem("dispo_table");
+    window.onload = function() {
+      const note = localStorage.getItem("dispo_note");
+      const date = localStorage.getItem("dispo_date");
+      const table = localStorage.getItem("dispo_table");
 
-  if (note) document.getElementById("note").value = note;
-  if (date) document.getElementById("dateSelect").value = date;
+      if (note) document.getElementById("note").value = note;
+      if (date) document.getElementById("dateSelect").value = date;
 
-  if (table) {
-    document.getElementById("dispoTable").outerHTML = table;
-    setTimeout(() => {
-      const newTable = document.getElementById("dispoTable");
-      const usCells = newTable.querySelectorAll(".us-cell");
-      usCells.forEach(cell => {
-        cell.onclick = () => toggleUS(cell);
-      });
-    }, 0);
-  } else {
-    generateDefaultRows(9);
-  }
-
-  // 🔁 Toujours tenter de charger la dernière saisie depuis Firestore
-  db.collection("disponibilites_dispos")
-    .orderBy("timestamp", "desc")
-    .limit(1)
-    .get()
-    .then(snapshot => {
-      if (!snapshot.empty) {
-        const data = snapshot.docs[0].data();
-        document.getElementById("note").value = data.note || "";
-        document.getElementById("dateSelect").value = data.date || "";
-        document.getElementById("dispoTable").outerHTML = data.table;
-
+      if (table) {
+        document.getElementById("dispoTable").outerHTML = table;
         setTimeout(() => {
-          const usCells = document.querySelectorAll(".us-cell");
+          const newTable = document.getElementById("dispoTable");
+          const usCells = newTable.querySelectorAll(".us-cell");
           usCells.forEach(cell => {
             cell.onclick = () => toggleUS(cell);
           });
         }, 0);
-
-        console.log("✅ Données chargées depuis Firestore !");
       } else {
-        console.log("📭 Aucune donnée trouvée dans Firestore.");
+        generateDefaultRows(9);
       }
-    });
-};
 
-  </script>
-  <script>
-window.addEventListener("load", function () {
-  const menuToggle = document.querySelector(".menu-toggle");
-  const menuDropdown = document.getElementById("menuDropdown");
+      // 🔁 Toujours tenter de charger la dernière saisie depuis Firestore
+      db.collection("disponibilites_dispos")
+        .orderBy("timestamp", "desc")
+        .limit(1)
+        .get()
+        .then(snapshot => {
+          if (!snapshot.empty) {
+            const data = snapshot.docs[0].data();
+            document.getElementById("note").value = data.note || "";
+            document.getElementById("dateSelect").value = data.date || "";
+            document.getElementById("dispoTable").outerHTML = data.table;
 
-  if (!menuToggle || !menuDropdown) {
-    console.error("❌ menuToggle ou menuDropdown introuvable !");
-    return;
-  }
+            setTimeout(() => {
+              const usCells = document.querySelectorAll(".us-cell");
+              usCells.forEach(cell => {
+                cell.onclick = () => toggleUS(cell);
+              });
+            }, 0);
 
-  menuToggle.addEventListener("click", function () {
-    console.log("✅ menuToggle cliqué");
-    menuDropdown.classList.toggle("show");
-  });
-
-  document.addEventListener("click", function (e) {
-    if (!menuToggle.contains(e.target) && !menuDropdown.contains(e.target)) {
-      console.log("🟤 Clic extérieur -> fermeture menu");
-      menuDropdown.classList.remove("show");
+            console.log("✅ Données chargées depuis Firestore !");
+          } else {
+            console.log("📭 Aucune donnée trouvée dans Firestore.");
+          }
+        });
+        
+      // Configuration du menu hamburger
+      setupHamburgerMenu();
+    };
+    
+    // Fonction pour configurer le menu hamburger
+    function setupHamburgerMenu() {
+      const menuToggle = document.getElementById('menuToggle');
+      const menuDropdown = document.getElementById('menuDropdown');
+      
+      if (!menuToggle || !menuDropdown) {
+        console.error("❌ menuToggle ou menuDropdown introuvable !");
+        return;
+      }
+      
+      // Gestionnaire d'événement pour le bouton hamburger
+      menuToggle.addEventListener('click', function(e) {
+        e.stopPropagation(); // Éviter la propagation
+        menuToggle.classList.toggle('active');
+        menuDropdown.classList.toggle('show');
+        console.log("✅ Menu toggled");
+      });
+      
+      // Fermer le menu si on clique ailleurs sur la page
+      document.addEventListener('click', function(e) {
+        if (!menuToggle.contains(e.target) && !menuDropdown.contains(e.target)) {
+          menuToggle.classList.remove('active');
+          menuDropdown.classList.remove('show');
+          console.log("🟤 Menu fermé par clic extérieur");
+        }
+      });
+      
+      // Empêcher la fermeture lors du clic sur les éléments du menu
+      menuDropdown.addEventListener('click', function(e) {
+        // On ne propage pas les clics sur les liens, mais on laisse le menu se fermer
+        console.log("🔵 Clic sur un élément du menu");
+      });
     }
-  });
-});
-</script>
-
-
+  </script>
 </body>
 </html>

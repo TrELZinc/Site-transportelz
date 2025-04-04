@@ -49,19 +49,20 @@
       transition: 0.3s;
     }
     .menu {
-      display: none;
-      position: absolute;
-      top: 60px;
-      right: 20px;
-      background-color: #111;
-      border: 1px solid #444;
-      border-radius: 6px;
-      padding: 10px;
-      z-index: 999;
-    }
-    .menu.show {
-      display: block;
-    }
+  display: none;
+  position: absolute;
+  top: 60px;
+  right: 20px;
+  background-color: #111;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 10px;
+  z-index: 999;
+}
+.menu.show {
+  display: block;
+}
+
     .menu a {
       display: block;
       color: white;
@@ -500,24 +501,29 @@ function formatDate(dateStr) {
 
   </script>
   <script>
-  // Assure que le DOM est chargé avant d'attacher les événements
-  document.addEventListener("DOMContentLoaded", function () {
-    const menuToggle = document.querySelector(".menu-toggle");
-    const menuDropdown = document.getElementById("menuDropdown");
+window.addEventListener("load", function () {
+  const menuToggle = document.querySelector(".menu-toggle");
+  const menuDropdown = document.getElementById("menuDropdown");
 
-    if (menuToggle && menuDropdown) {
-      menuToggle.addEventListener("click", function () {
-        menuDropdown.classList.toggle("show");
-      });
+  if (!menuToggle || !menuDropdown) {
+    console.error("❌ menuToggle ou menuDropdown introuvable !");
+    return;
+  }
 
-      document.addEventListener("click", function (e) {
-        if (!menuToggle.contains(e.target) && !menuDropdown.contains(e.target)) {
-          menuDropdown.classList.remove("show");
-        }
-      });
+  menuToggle.addEventListener("click", function () {
+    console.log("✅ menuToggle cliqué");
+    menuDropdown.classList.toggle("show");
+  });
+
+  document.addEventListener("click", function (e) {
+    if (!menuToggle.contains(e.target) && !menuDropdown.contains(e.target)) {
+      console.log("🟤 Clic extérieur -> fermeture menu");
+      menuDropdown.classList.remove("show");
     }
   });
+});
 </script>
+
 
 </body>
 </html>

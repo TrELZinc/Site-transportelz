@@ -442,6 +442,8 @@ function formatDate(dateStr) {
 
   if (table) {
     document.getElementById("dispoTable").outerHTML = table;
+
+    // Rebrancher événements US après remplacement du tableau
     setTimeout(() => {
       const newTable = document.getElementById("dispoTable");
       const usCells = newTable.querySelectorAll(".us-cell");
@@ -453,7 +455,7 @@ function formatDate(dateStr) {
     generateDefaultRows(9);
   }
 
-  // 🔁 Charger la dernière saisie depuis Firestore
+  // 🔁 Charger les dernières données Firebase
   db.collection("disponibilites_dispos")
     .orderBy("timestamp", "desc")
     .limit(1)
@@ -471,27 +473,25 @@ function formatDate(dateStr) {
             cell.onclick = () => toggleUS(cell);
           });
         }, 0);
-
-        console.log("✅ Données chargées depuis Firestore !");
       } else {
         console.log("📭 Aucune donnée trouvée dans Firestore.");
       }
     });
 
-const menuToggle = document.querySelector(".menu-toggle");
-const menuDropdown = document.getElementById("menuDropdown");
+  // ✅ MENU BURGER LOGIC
+  const menuToggle = document.querySelector(".menu-toggle");
+  const menuDropdown = document.getElementById("menuDropdown");
 
-if (menuToggle && menuDropdown) {
-  menuToggle.addEventListener("click", () => {
-    menuDropdown.classList.toggle("show");
-  });
+  if (menuToggle && menuDropdown) {
+    menuToggle.addEventListener("click", () => {
+      menuDropdown.classList.toggle("show");
+    });
 
-  document.addEventListener("click", (e) => {
-    if (!menuToggle.contains(e.target) && !menuDropdown.contains(e.target)) {
-      menuDropdown.classList.remove("show");
-    }
-  });
-}
+    document.addEventListener("click", (e) => {
+      if (!menuToggle.contains(e.target) && !menuDropdown.contains(e.target)) {
+        menuDropdown.classList.remove("show");
+      }
+
 
   </script>
 </body>

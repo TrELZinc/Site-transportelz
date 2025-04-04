@@ -203,11 +203,6 @@
   <header>
     <img src="assets/logo.jpeg" alt="Logo Transport ELZ">
     <!-- Removed ID to simplify and use direct onclick -->
-    <div class="menu-toggle" onclick="toggleMenu()">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
     <div class="menu" id="menuDropdown">
       <a href="test.html">Sommaire</a>
       <a href="linktree.html">Menu</a>
@@ -486,5 +481,25 @@ function formatDate(dateStr) {
 };
 
   </script>
+  <script>
+  // Assure que le DOM est chargé avant d'attacher les événements
+  document.addEventListener("DOMContentLoaded", function () {
+    const menuToggle = document.querySelector(".menu-toggle");
+    const menuDropdown = document.getElementById("menuDropdown");
+
+    if (menuToggle && menuDropdown) {
+      menuToggle.addEventListener("click", function () {
+        menuDropdown.classList.toggle("show");
+      });
+
+      document.addEventListener("click", function (e) {
+        if (!menuToggle.contains(e.target) && !menuDropdown.contains(e.target)) {
+          menuDropdown.classList.remove("show");
+        }
+      });
+    }
+  });
+</script>
+
 </body>
 </html>

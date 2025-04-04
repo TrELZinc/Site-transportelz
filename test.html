@@ -203,7 +203,7 @@
   <header>
     <img src="assets/logo.jpeg" alt="Logo Transport ELZ">
     <!-- Removed ID to simplify and use direct onclick -->
-    <div class="menu-toggle">
+    <div class="menu-toggle" onclick="toggleMenu()">
       <span></span>
       <span></span>
       <span></span>
@@ -249,6 +249,12 @@
     });
 }
 
+    // Toggle menu function - simple direct approach
+    function toggleMenu() {
+      const menu = document.getElementById("menuDropdown");
+      menu.classList.toggle("show");
+    }
+    
     // Close menu when clicking outside
     document.addEventListener("click", function(e) {
       const menu = document.getElementById("menuDropdown");
@@ -442,8 +448,6 @@ function formatDate(dateStr) {
 
   if (table) {
     document.getElementById("dispoTable").outerHTML = table;
-
-    // Rebrancher événements US après remplacement du tableau
     setTimeout(() => {
       const newTable = document.getElementById("dispoTable");
       const usCells = newTable.querySelectorAll(".us-cell");
@@ -455,7 +459,7 @@ function formatDate(dateStr) {
     generateDefaultRows(9);
   }
 
-  // 🔁 Charger les dernières données Firebase
+  // 🔁 Toujours tenter de charger la dernière saisie depuis Firestore
   db.collection("disponibilites_dispos")
     .orderBy("timestamp", "desc")
     .limit(1)
@@ -473,25 +477,13 @@ function formatDate(dateStr) {
             cell.onclick = () => toggleUS(cell);
           });
         }, 0);
+
+        console.log("✅ Données chargées depuis Firestore !");
       } else {
         console.log("📭 Aucune donnée trouvée dans Firestore.");
       }
     });
-
-  // ✅ MENU BURGER LOGIC
-  const menuToggle = document.querySelector(".menu-toggle");
-  const menuDropdown = document.getElementById("menuDropdown");
-
-  if (menuToggle && menuDropdown) {
-    menuToggle.addEventListener("click", () => {
-      menuDropdown.classList.toggle("show");
-    });
-
-    document.addEventListener("click", (e) => {
-      if (!menuToggle.contains(e.target) && !menuDropdown.contains(e.target)) {
-        menuDropdown.classList.remove("show");
-      }
-
+};
 
   </script>
 </body>

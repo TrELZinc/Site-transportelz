@@ -310,7 +310,7 @@
 
   <script>
     // Configuration et constantes
-    const API_URL = "https://script.google.com/macros/s/AKfycbxpPYMiDVncJN8attxLobyURSEuUYjAvN8z9bkN4ddYWZegxZxVJ83fy7ILo6sn_JwR/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbx8TQVHGTN1SB8MVseOINBXCqDHEXVvh4mL9reRHjjZucP8B43SdjrPwUuwy2Ly50in/exec";
     const CHAUFFEUR_MAP = {
       "JFJ": { nom: "Jeff", tel: "4185202502" },
       "AL": { nom: "Alain", tel: "4182710206" },
@@ -500,22 +500,18 @@ function sendForm() {
   });
 
   const selectedDate = document.querySelector("#dateSelect")?.value || "";
-  if (!selectedDate) {
-    alert("Veuillez sélectionner une date.");
-    return;
-  }
+if (!selectedDate) {
+  alert("Veuillez sélectionner une date.");
+  return;
+}
+const data = {
+  note: document.getElementById("note").value,
+  date: selectedDate,
+  table: tableClone.outerHTML
+};
 
-  // Format the date correctly
-  const [year, month, day] = selectedDate.split("-");
-  const formattedDate = `${year}-${month}-${day}`;
 
-  const data = {
-    note: document.getElementById("note").value,
-    date: formattedDate,
-    table: tableClone.outerHTML
-  };
-
-  fetch("https://script.google.com/macros/s/AKfycby2P1Y4DfnRX0AU9Ilkb7Q_3vmnK2_-KcgQiaN_aZVfbHl_u6EfFnjtCDhzNkZayGQ/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbx8TQVHGTN1SB8MVseOINBXCqDHEXVvh4mL9reRHjjZucP8B43SdjrPwUuwy2Ly50in/exec", {
     method: "POST",
     mode: "no-cors",
     headers: { "Content-Type": "application/json" },

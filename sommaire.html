@@ -310,7 +310,7 @@
 
   <script>
     // Configuration et constantes
-    const API_URL = "https://script.google.com/macros/s/AKfycbxlZYjCtXljPDBiTwjjQk-XPuctE3HukS2_Lf7K-p_WEuENn3sALsFlAtd-ZGYTovEX/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbwCAgSIfQhyWIIZdGMixV8JlnGRsVr6shKhj9M9mlwVqS-bjNfSOmGl16nRKhySQCwz/exec";
     const CHAUFFEUR_MAP = {
       "JFJ": { nom: "Jeff", tel: "4185202502" },
       "AL": { nom: "Alain", tel: "4182710206" },
@@ -371,14 +371,17 @@
     
     // Fonctions pour les opérations principales
     function formatDate(dateStr) {
-      if (!dateStr) return "";
-      
-      const dateObj = new Date(dateStr + "T00:00:00");
-      const dayName = DAYS_FR[dateObj.getDay()];
-      const dayNum = dateObj.getDate();
-      const monthName = MONTHS_FR[dateObj.getMonth()];
-      return `${dayName} le ${dayNum} ${monthName}`;
-    }
+  if (!dateStr) return "";
+
+  const [year, month, day] = dateStr.split("-");
+  const dateObj = new Date(Number(year), Number(month) - 1, Number(day));
+
+  const dayName = DAYS_FR[dateObj.getDay()];
+  const dayNum = dateObj.getDate();
+  const monthName = MONTHS_FR[dateObj.getMonth()];
+
+  return `${dayName} le ${dayNum} ${monthName}`;
+}
 
     function copyRow(row) {
       const cells = row.querySelectorAll("td");
@@ -468,45 +471,57 @@
     alert("Erreur lors de la sauvegarde : " + err.message);
   }
 }
+function sendForm() {
+  const tableClone = document.getElementById("dispoTable").cloneNode(true);
+  const rows = tableClone.querySelectorAll("tbody tr");
 
+  rows.forEach(row => {
+    const cells = row.querySelectorAll("td");
+    let isRowEmpty = true;
 
-
-    function sendForm() {
-      const tableClone = elements.dispoTable.cloneNode(true);
-      const rows = tableClone.querySelectorAll("tbody tr");
-      
-      rows.forEach(row => {
-        const cells = row.querySelectorAll("td");
-        
-        // Transformation en majuscules
-        for (let i = 0; i < 8; i++) {
-          const cell = cells[i];
-          if (cell.hasAttribute("contenteditable")) {
-            cell.innerText = cell.innerText.trim().toUpperCase();
-          }
-        }
-        
-        // Suppression des boutons de copie
-        const copyCell = cells[8];
-        if (copyCell) copyCell.innerHTML = "";
-      });
-      
-      const data = {
-        note: elements.noteField.value,
-        date: elements.dateSelect.value,
-        table: tableClone.outerHTML
-      };
-      
-      fetch(API_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      });
-      
-      alert("Sommaire envoyé !");
+    for (let i = 0; i < cells.length; i++) {
+      if (i === 8) continue;  // Skip the copy button cell
+      const text = cells[i]?.innerText?.trim();
+      if (text) {
+        isRowEmpty = false;
+        break;
+      }
     }
-    
+
+    for (let i = 0; i < cells.length; i++) {
+      const cell = cells[i];
+
+      if (i === 8) {  // Handle the copy button cell
+        cell.innerHTML = "";  // Remove the copy button
+      } else if (cell.hasAttribute("contenteditable")) {
+        cell.innerText = cell.innerText.trim().toUpperCase();
+      }
+    }
+  });
+
+  const selectedDate = document.querySelector("#dateSelect")?.value || "";
+if (!selectedDate) {
+  alert("Veuillez sélectionner une date.");
+  return;
+}
+const data = {
+  note: document.getElementById("note").value,
+  date: selectedDate,
+  table: tableClone.outerHTML
+};
+
+
+  fetch("https://script.google.com/macros/s/AKfycbwCAgSIfQhyWIIZdGMixV8JlnGRsVr6shKhj9M9mlwVqS-bjNfSOmGl16nRKhySQCwz/exec", {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+
+  alert("Sommaire envoyé !");
+}
+
+
     // Gestion de la navigation avec flèche
     function setupArrowNavigation() {
       const arrowBtn = document.createElement("button");

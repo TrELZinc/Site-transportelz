@@ -371,14 +371,17 @@
     
     // Fonctions pour les opérations principales
     function formatDate(dateStr) {
-      if (!dateStr) return "";
-      
-      const dateObj = new Date(dateStr + "T00:00:00");
-      const dayName = DAYS_FR[dateObj.getDay()];
-      const dayNum = dateObj.getDate();
-      const monthName = MONTHS_FR[dateObj.getMonth()];
-      return `${dayName} le ${dayNum} ${monthName}`;
-    }
+  if (!dateStr) return "";
+
+  const [year, month, day] = dateStr.split("-");
+  const dateObj = new Date(Number(year), Number(month) - 1, Number(day));
+
+  const dayName = DAYS_FR[dateObj.getDay()];
+  const dayNum = dateObj.getDate();
+  const monthName = MONTHS_FR[dateObj.getMonth()];
+
+  return `${dayName} le ${dayNum} ${monthName}`;
+}
 
     function copyRow(row) {
       const cells = row.querySelectorAll("td");

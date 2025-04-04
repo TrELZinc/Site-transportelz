@@ -297,7 +297,7 @@
     <span></span>
   </summary>
   <div class="menu">
-    <a href="test.html">Sommaire</a>
+    <a href="sommaire.html">Sommaire</a>
     <a href="linktree.html">Menu</a>
   </div>
 </details>
@@ -326,48 +326,6 @@
   </div>
   
   <script>
-    // Ce script va se charger immédiatement
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('⚡ DOM chargé - initialisation du menu hamburger');
-      
-      const menuToggle = document.getElementById('menuToggle');
-      const menuDropdown = document.getElementById('menuDropdown');
-      
-      if (!menuToggle || !menuDropdown) {
-        console.error("❌ menuToggle ou menuDropdown introuvable !");
-        return;
-      }
-      
-      // Afficher dans la console l'état initial pour déboguer
-      console.log('Menu initial:', {
-        menuToggleExists: !!menuToggle,
-        menuDropdownExists: !!menuDropdown,
-        menuDropdownDisplay: window.getComputedStyle(menuDropdown).display
-      });
-      
-      // Gestionnaire d'événement pour le bouton hamburger
-      menuToggle.addEventListener('click', function(e) {
-        console.log('🍔 Click sur le menu hamburger');
-        e.stopPropagation(); // Éviter la propagation
-        menuToggle.classList.toggle('active');
-        menuDropdown.classList.toggle('show');
-        
-        // Vérifier l'état après le toggle pour déboguer
-        console.log('Menu après toggle:', {
-          menuShowClass: menuDropdown.classList.contains('show'),
-          computedDisplay: window.getComputedStyle(menuDropdown).display
-        });
-      });
-      
-      // Fermer le menu si on clique ailleurs sur la page
-      document.addEventListener('click', function(e) {
-        if (!menuToggle.contains(e.target) && !menuDropdown.contains(e.target)) {
-          menuToggle.classList.remove('active');
-          menuDropdown.classList.remove('show');
-          console.log("🟤 Menu fermé par clic extérieur");
-        }
-      });
-    });
     
     function saveToFirebase(data, callback) {
       db.collection("disponibilites_dispos").add(data) // Collection différente

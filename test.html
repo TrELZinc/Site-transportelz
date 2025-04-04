@@ -180,6 +180,24 @@
       }
     }
   </style>
+  <!-- Firebase SDK en mode compat -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyD4U85mokKXsAP1AdwClWtcbt8udZrwlAw",
+    authDomain: "sommaireelz.firebaseapp.com",
+    projectId: "sommaireelz",
+    storageBucket: "sommaireelz.firebasestorage.app",
+    messagingSenderId: "171788284751",
+    appId: "1:171788284751:web:694f070d1cafe8b7c04b3a"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+</script>
+
 </head>
 <body>
   <header>
@@ -219,6 +237,18 @@
   </div>
   
   <script>
+    function saveToFirebase(data, callback) {
+  db.collection("disponibilites_dispos").add(data) // Collection différente
+    .then(() => {
+      console.log("✅ Données enregistrées dans Firestore (dispos) !");
+      if (typeof callback === "function") callback();
+    })
+    .catch((error) => {
+      console.error("❌ Erreur Firestore :", error);
+      alert("Erreur Firestore : " + error.message);
+    });
+}
+
     // Toggle menu function - simple direct approach
     function toggleMenu() {
       const menu = document.getElementById("menuDropdown");
@@ -337,18 +367,40 @@ function formatDate(dateStr) {
 }
 
     function saveData() {
-      try {
-        const table = document.getElementById("dispoTable");
-        if (!table) throw new Error("Table introuvable");
+  try {
+    const table = document.getElementById("dispoTable");
+    if (!table) throw new Error("Table introuvable");
 
-        localStorage.setItem("dispo_note", document.getElementById("note").value);
-        localStorage.setItem("dispo_date", document.getElementById("dateSelect").value);
-        localStorage.setItem("dispo_table", table.outerHTML);
-        alert("Données sauvegardées !");
-      } catch (err) {
-        alert("Erreur lors de la sauvegarde : " + err.message);
-      }
-    }
+    const date = document.getElementById("dateSelect").value;
+    const note = document.getElementById("note").value;
+
+    const rows = Array.from(document.querySelectorAll("#dispoTable tbody tr")).map(tr => {
+      return Array.from(tr.querySelectorAll("td")).slice(0, 6).map(td => td.textContent.trim());
+    });
+
+    const data = {
+      date,
+      note,
+      table: table.outerHTML,
+      rows,
+      timestamp: new Date().toISOString()
+    };
+
+    // 🧠 Enregistrement local
+    localStorage.setItem("dispo_note", note);
+    localStorage.setItem("dispo_date", date);
+    localStorage.setItem("dispo_table", table.outerHTML);
+
+    // ☁️ Enregistrement dans Firestore
+    saveToFirebase(data, () => {
+      alert("✅ Données sauvegardées localement et dans Firebase !");
+    });
+
+  } catch (err) {
+    alert("Erreur lors de la sauvegarde : " + err.message);
+  }
+}
+
 
     // Cell focus behavior
     document.addEventListener("focusin", function(e) {
@@ -370,29 +422,53 @@ function formatDate(dateStr) {
     });
 
     // Initialize on load
-    window.onload = function() {
-      const note = localStorage.getItem("dispo_note");
-      const date = localStorage.getItem("dispo_date");
-      const table = localStorage.getItem("dispo_table");
+   window.onload = function() {
+  const note = localStorage.getItem("dispo_note");
+  const date = localStorage.getItem("dispo_date");
+  const table = localStorage.getItem("dispo_table");
 
-      if (note) document.getElementById("note").value = note;
-      if (date) document.getElementById("dateSelect").value = date;
+  if (note) document.getElementById("note").value = note;
+  if (date) document.getElementById("dateSelect").value = date;
 
-      if (table) {
-  document.getElementById("dispoTable").outerHTML = table;
-  // 🛠️ Important : rebrancher les événements après avoir remplacé le HTML
-  setTimeout(() => {
-    const newTable = document.getElementById("dispoTable");
-    const usCells = newTable.querySelectorAll(".us-cell");
-    usCells.forEach(cell => {
-      cell.onclick = () => toggleUS(cell);
+  if (table) {
+    document.getElementById("dispoTable").outerHTML = table;
+    setTimeout(() => {
+      const newTable = document.getElementById("dispoTable");
+      const usCells = newTable.querySelectorAll(".us-cell");
+      usCells.forEach(cell => {
+        cell.onclick = () => toggleUS(cell);
+      });
+    }, 0);
+  } else {
+    generateDefaultRows(9);
+  }
+
+  // 🔁 Toujours tenter de charger la dernière saisie depuis Firestore
+  db.collection("disponibilites_dispos")
+    .orderBy("timestamp", "desc")
+    .limit(1)
+    .get()
+    .then(snapshot => {
+      if (!snapshot.empty) {
+        const data = snapshot.docs[0].data();
+        document.getElementById("note").value = data.note || "";
+        document.getElementById("dateSelect").value = data.date || "";
+        document.getElementById("dispoTable").outerHTML = data.table;
+
+        setTimeout(() => {
+          const usCells = document.querySelectorAll(".us-cell");
+          usCells.forEach(cell => {
+            cell.onclick = () => toggleUS(cell);
+          });
+        }, 0);
+
+        console.log("✅ Données chargées depuis Firestore !");
+      } else {
+        console.log("📭 Aucune donnée trouvée dans Firestore.");
+      }
     });
-  }, 0);
-} else {
-  generateDefaultRows(9);
-}
+};
 
-    };
   </script>
 </body>
 </html>

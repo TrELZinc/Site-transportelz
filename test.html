@@ -375,8 +375,17 @@ function formatDate(dateStr) {
     const note = document.getElementById("note").value;
 
     const rows = Array.from(document.querySelectorAll("#dispoTable tbody tr")).map(tr => {
-      return Array.from(tr.querySelectorAll("td")).slice(0, 6).map(td => td.textContent.trim());
-    });
+  const cells = Array.from(tr.querySelectorAll("td")).slice(0, 6).map(td => td.textContent.trim());
+  return {
+    chauffeur: cells[0] || "",
+    us: cells[1] || "",
+    camion: cells[2] || "",
+    remorque: cells[3] || "",
+    depart: cells[4] || "",
+    note: cells[5] || ""
+  };
+});
+
 
     const data = {
       date,

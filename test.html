@@ -62,6 +62,7 @@
       transform: rotate(-45deg) translate(5px, -5px);
     }
     
+    /* Important: Styles du menu */
     .menu {
       display: none;
       position: absolute;
@@ -72,10 +73,12 @@
       border-radius: 6px;
       padding: 10px;
       z-index: 999;
+      min-width: 150px; /* Largeur minimale pour le menu */
     }
     
+    /* Important: Cette classe contrôle l'affichage du menu */
     .menu.show {
-      display: block;
+      display: block !important; /* Forcer l'affichage */
     }
 
     .menu a {
@@ -260,6 +263,49 @@
   </div>
   
   <script>
+    // Ce script va se charger immédiatement
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('⚡ DOM chargé - initialisation du menu hamburger');
+      
+      const menuToggle = document.getElementById('menuToggle');
+      const menuDropdown = document.getElementById('menuDropdown');
+      
+      if (!menuToggle || !menuDropdown) {
+        console.error("❌ menuToggle ou menuDropdown introuvable !");
+        return;
+      }
+      
+      // Afficher dans la console l'état initial pour déboguer
+      console.log('Menu initial:', {
+        menuToggleExists: !!menuToggle,
+        menuDropdownExists: !!menuDropdown,
+        menuDropdownDisplay: window.getComputedStyle(menuDropdown).display
+      });
+      
+      // Gestionnaire d'événement pour le bouton hamburger
+      menuToggle.addEventListener('click', function(e) {
+        console.log('🍔 Click sur le menu hamburger');
+        e.stopPropagation(); // Éviter la propagation
+        menuToggle.classList.toggle('active');
+        menuDropdown.classList.toggle('show');
+        
+        // Vérifier l'état après le toggle pour déboguer
+        console.log('Menu après toggle:', {
+          menuShowClass: menuDropdown.classList.contains('show'),
+          computedDisplay: window.getComputedStyle(menuDropdown).display
+        });
+      });
+      
+      // Fermer le menu si on clique ailleurs sur la page
+      document.addEventListener('click', function(e) {
+        if (!menuToggle.contains(e.target) && !menuDropdown.contains(e.target)) {
+          menuToggle.classList.remove('active');
+          menuDropdown.classList.remove('show');
+          console.log("🟤 Menu fermé par clic extérieur");
+        }
+      });
+    });
+    
     function saveToFirebase(data, callback) {
       db.collection("disponibilites_dispos").add(data) // Collection différente
         .then(() => {
@@ -488,44 +534,7 @@
             console.log("📭 Aucune donnée trouvée dans Firestore.");
           }
         });
-        
-      // Configuration du menu hamburger
-      setupHamburgerMenu();
     };
-    
-    // Fonction pour configurer le menu hamburger
-    function setupHamburgerMenu() {
-      const menuToggle = document.getElementById('menuToggle');
-      const menuDropdown = document.getElementById('menuDropdown');
-      
-      if (!menuToggle || !menuDropdown) {
-        console.error("❌ menuToggle ou menuDropdown introuvable !");
-        return;
-      }
-      
-      // Gestionnaire d'événement pour le bouton hamburger
-      menuToggle.addEventListener('click', function(e) {
-        e.stopPropagation(); // Éviter la propagation
-        menuToggle.classList.toggle('active');
-        menuDropdown.classList.toggle('show');
-        console.log("✅ Menu toggled");
-      });
-      
-      // Fermer le menu si on clique ailleurs sur la page
-      document.addEventListener('click', function(e) {
-        if (!menuToggle.contains(e.target) && !menuDropdown.contains(e.target)) {
-          menuToggle.classList.remove('active');
-          menuDropdown.classList.remove('show');
-          console.log("🟤 Menu fermé par clic extérieur");
-        }
-      });
-      
-      // Empêcher la fermeture lors du clic sur les éléments du menu
-      menuDropdown.addEventListener('click', function(e) {
-        // On ne propage pas les clics sur les liens, mais on laisse le menu se fermer
-        console.log("🔵 Clic sur un élément du menu");
-      });
-    }
   </script>
 </body>
 </html>

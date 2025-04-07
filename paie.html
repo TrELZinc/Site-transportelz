@@ -435,7 +435,7 @@ startFormAfterDataLoaded();
   });
 </script>
 <script>
-  let tauxMap = {};
+let tauxMap = {};
 let kmMap = {};
 let destinations = [];
 
@@ -459,6 +459,21 @@ fetch("https://script.google.com/macros/s/AKfycbxakbBK9TUcJ5gQQ4nL3vuDoGw2kt9zY3
       return acc;
     }, {});
   })
+  .then(() => {
+    // ⚠️ Important : démarrer formulaire après chargement
+    startFormAfterDataLoaded();
+  })
+  .catch((err) => console.error("Erreur chargement taux ou km:", err));
+
+// ✅ Fonction d'attente (évite appel trop tôt)
+function startFormAfterDataLoaded() {
+  if (destinations.length > 0) {
+    addVoyageSection(); // démarrage formulaire après chargement
+  } else {
+    setTimeout(startFormAfterDataLoaded, 100);
+  }
+}
+
 .catch((err) => console.error("Erreur chargement taux ou km:", err));
 
 function renderKilometrageDestinationSelect(id, selectedOrigine = "St-Basile") {

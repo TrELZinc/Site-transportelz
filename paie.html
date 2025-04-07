@@ -105,7 +105,12 @@
     let voyageCount = 0;
     const MAX_VOYAGES = 3;
 
-    addVoyageSection();
+    function startFormAfterDataLoaded() {
+  if (destinations.length > 0) addVoyageSection();
+  else setTimeout(startFormAfterDataLoaded, 100); // retry every 100ms
+}
+startFormAfterDataLoaded();
+
 
     function addVoyageSection() {
       if (voyageCount >= MAX_VOYAGES) return;

@@ -105,12 +105,7 @@
     let voyageCount = 0;
     const MAX_VOYAGES = 3;
 
-    function startFormAfterDataLoaded() {
-  if (destinations.length > 0) addVoyageSection();
-  else setTimeout(startFormAfterDataLoaded, 100); // retry every 100ms
-}
-startFormAfterDataLoaded();
-
+    addVoyageSection();
 
     function addVoyageSection() {
       if (voyageCount >= MAX_VOYAGES) return;
@@ -141,13 +136,13 @@ startFormAfterDataLoaded();
           const container = section.querySelector(`#details_${id}`);
           if (radio.value === "heure") {
             container.innerHTML = `
-            <div class="mb-3">
-    <label class="form-label fw-bold text-uppercase">Origine</label>
-    <select class="form-select" name="origine_${id}" required>
-      <option value="St-Basile" selected>St-Basile</option>
-      <option value="Vimont">Vimont</option>
-      <option value="Stanstead">Stanstead</option>
-    </select>
+              <div class="mb-3">
+                <label class="form-label fw-bold text-uppercase">Origine</label>
+                <select class="form-select" name="origine_${id}" required>
+                  <option value="St-Basile" selected>St-Basile</option>
+                  <option value="Vimont">Vimont</option>
+                  <option value="Stanstead">Stanstead</option>
+                </select>
               </div>
               <div class="mb-3">
                 <label class="form-label fw-bold text-uppercase">Destination</label>
@@ -187,21 +182,30 @@ startFormAfterDataLoaded();
             `;
             setupSuiviListener(id);
           } else {
-  container.innerHTML = `
-    <div class="mb-3">
-      <label class="form-label fw-bold text-uppercase">Origine</label>
-      <select class="form-select" name="origine_${id}" required>
-        <option value="St-Basile" selected>St-Basile</option>
-        <option value="Vimont">Vimont</option>
-        <option value="Stanstead">Stanstead</option>
-      </select>
-    </div>
-    ${renderKilometrageDestinationSelect(id)}
-    ${id < MAX_VOYAGES ? getSuiviHTML(id) : ''}
-  `;
-  setupSuiviListener(id);
-}
-
+            container.innerHTML = `
+              <div class="mb-3">
+                <label class="form-label fw-bold text-uppercase">Origine</label>
+                <select class="form-select" name="origine_${id}" required>
+                  <option value="St-Basile" selected>St-Basile</option>
+                  <option value="Vimont">Vimont</option>
+                  <option value="Stanstead">Stanstead</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-bold text-uppercase">Ville de destination</label>
+                <input list="destinations" class="form-control" name="destination_${id}" required />
+                <datalist id="destinations">
+                  <option value="Montréal"></option>
+                  <option value="Québec"></option>
+                  <option value="Gatineau"></option>
+                  <option value="Sherbrooke"></option>
+                  <option value="Drummondville"></option>
+                </datalist>
+              </div>
+              ${id < MAX_VOYAGES ? getSuiviHTML(id) : ''}
+            `;
+            setupSuiviListener(id);
+          }
         });
       });
     }
@@ -435,77 +439,44 @@ startFormAfterDataLoaded();
   });
 </script>
 <script>
-let tauxMap = {};
-let kmMap = {};
-let destinations = [];
+  let tauxMap = {}; // par nom chauffeur
+  let kmMap = {}; // origine -> destination -> km
 
-fetch("https://script.google.com/macros/s/AKfycbxakbBK9TUcJ5gQQ4nL3vuDoGw2kt9zY3fMVb1tImOvnWNXdNb3kYIIGRh-VLp5dkNi/exec")
-  .then((res) => res.json())
-  .then((data) => {
-    tauxMap = data.chauffeurs.reduce((acc, el) => {
-      acc[el.nom] = {
-        taux_h: parseFloat(el.taux_h),
-        taux_km: parseFloat(el.taux_km),
-      };
-      return acc;
-    }, {});
+  fetch("https://script.google.com/macros/s/AKfycbxakbBK9TUcJ5gQQ4nL3vuDoGw2kt9zY3fMVb1tImOvnWNXdNb3kYIIGRh-VLp5dkNi/exec")
+    .then((res) => res.json())
+    .then((data) => {
+      tauxMap = data.chauffeurs.reduce((acc, el) => {
+        acc[el.nom] = {
+          taux_h: parseFloat(el.taux_h),
+          taux_km: parseFloat(el.taux_km),
+        };
+        return acc;
+      }, {});
 
-    kmMap = data.kilometrages.reduce((acc, el) => {
-      acc[el.origine] = acc[el.origine] || {};
-      acc[el.origine][el.destination] = parseFloat(el.km);
-      if (!destinations.includes(el.destination)) {
-        destinations.push(el.destination);
-      }
-      return acc;
-    }, {});
-  })
-  .then(() => {
-    // ⚠️ Important : démarrer formulaire après chargement
-    startFormAfterDataLoaded();
-  })
-  .catch((err) => console.error("Erreur chargement taux ou km:", err));
+      kmMap = data.kilometrages.reduce((acc, el) => {
+        acc[el.origine] = acc[el.origine] || {};
+        acc[el.origine][el.destination] = parseFloat(el.km);
+        return acc;
+      }, {});
 
-// ✅ Fonction d'attente (évite appel trop tôt)
-function startFormAfterDataLoaded() {
-  if (destinations.length > 0) {
-    addVoyageSection(); // démarrage formulaire après chargement
-  } else {
-    setTimeout(startFormAfterDataLoaded, 100);
-  }
-}
-
-.catch((err) => console.error("Erreur chargement taux ou km:", err));
-
-function renderKilometrageDestinationSelect(id, selectedOrigine = "St-Basile") {
-  const list = destinations
-    .map(dest => `<option value="${dest}">${dest}</option>`)
-    .join("");
-
-  return `
-    <div class="mb-3">
-      <label class="form-label fw-bold text-uppercase">Ville de destination</label>
-      <select class="form-select" name="destination_${id}" id="destination_${id}" required>
-        <option value="">-- Sélectionner --</option>
-        ${list}
-      </select>
-      <div id="distance_${id}" class="mt-2 small text-muted"></div>
-    </div>
-  `;
-}
-
-document.addEventListener("change", (e) => {
-  if (e.target.name?.startsWith("origine_") || e.target.name?.startsWith("destination_")) {
-    const id = e.target.name.split("_")[1];
-    const origine = document.querySelector(`[name="origine_${id}"]`)?.value;
-    const destination = document.querySelector(`[name="destination_${id}"]`)?.value;
-
-    if (origine && destination) {
-      const km = kmMap?.[origine]?.[destination];
-      const label = document.getElementById(`distance_${id}`);
-      label.innerText = km ? `Distance: ${km} km` : "Distance inconnue";
-    }
-  }
-});
+      const destinationInputs = document.querySelectorAll('input[list="destinations"]');
+      destinationInputs.forEach(input => {
+        input.addEventListener('focus', () => {
+          const origineSelect = input.closest('.section-box').querySelector('select[name^="origine_"]');
+          const datalist = input.nextElementSibling;
+          const origine = origineSelect?.value;
+          datalist.innerHTML = "";
+          if (kmMap[origine]) {
+            Object.keys(kmMap[origine]).forEach(dest => {
+              const option = document.createElement("option");
+              option.value = dest;
+              datalist.appendChild(option);
+            });
+          }
+        });
+      });
+    })
+    .catch((err) => console.error("Erreur chargement taux ou km:", err));
 
   btnPreview.addEventListener("click", () => {
     const data = new FormData(document.getElementById("formulaire"));

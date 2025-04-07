@@ -376,6 +376,11 @@ function isTimeValid(dH, dM, fH, fM) {
       const typeMatch = key.match(/^type_voyage_(\d+)/);
       const origineMatch = key.match(/^origine_(\d+)/);
       const destinationMatch = key.match(/^destination_(\d+)/);
+      
+      if (!isTimeValid(dH, dM, fH, fM)) {
+  alert(`Erreur dans Voyage ${id}: l’heure de fin est avant l’heure de début.`);
+  return;
+}
 
       if (heureMatch) {
         const [, type, part, id] = heureMatch;
@@ -394,11 +399,14 @@ function isTimeValid(dH, dM, fH, fM) {
         voyages[id] = voyages[id] || {};
         let destinationValue = value;
         if (value === "autre") {
-          const custom = data.get(`destination_autre_${id}`);
-          if (custom?.trim()) {
-            destinationValue = custom.trim();
-          }
-        }
+  const custom = data.get(`destination_autre_${id}`);
+  if (!custom?.trim()) {
+    alert(`Veuillez spécifier la destination pour le voyage ${id}.`);
+    return;
+  }
+  destinationValue = custom.trim();
+}
+
         voyages[id].destination = destinationValue;
       } else {
         let label = key.replace(/_/g, " ").replace(/\d+$/, "").toUpperCase();
@@ -446,7 +454,7 @@ function isTimeValid(dH, dM, fH, fM) {
     const data = {};
     formData.forEach((val, key) => data[key] = val);
 
-    fetch("https://script.google.com/macros/s/AKfycbxakbBK9TUcJ5gQQ4nL3vuDoGw2kt9zY3fMVb1tImOvnWNXdNb3kYIIGRh-VLp5dkNi/exec", {
+    ("https://script.google.com/macros/s/AKfycbxakbBK9TUcJ5gQQ4nL3vuDoGw2kt9zY3fMVb1tImOvnWNXdNb3kYIIGRh-VLp5dkNi/exec", {
       method: "POST",
       mode: "no-cors",
       body: JSON.stringify(data),
@@ -621,13 +629,15 @@ document.addEventListener("change", (e) => {
     }, {});
 
     kmMap = data.kilometrages.reduce((acc, el) => {
-      acc[el.origine] = acc[el.origine] || {};
-      acc[el.origine][el.destination] = parseFloat(el.km);
-      if (!destinations.includes(el.destination)) {
-        destinations.push(el.destination);
-      }
-      return acc;
-    }, {});
+  acc[el.origine] = acc[el.origine] || {};
+  acc[el.origine][el.destination] = parseFloat(el.km);
+  if (!destinations.includes(el.destination)) {
+    destinations.push(el.destination);
+  }
+  return acc;
+}, {});
+})
+
 
     // ✅ Appel ici APRÈS avoir toutes les destinations
     addVoyageSection();

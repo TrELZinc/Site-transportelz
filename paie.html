@@ -414,63 +414,67 @@
   const btnModifier = document.getElementById("btn-modifier");
 
   btnPreview.addEventListener("click", () => {
-  const data = new FormData(document.getElementById("formulaire"));
-  let html = "";
-  const regrouped = {};
+    const data = new FormData(document.getElementById("formulaire"));
+    let html = "";
+    const regrouped = {};
+    let totalMinutes = 0;
 
-  for (const [key, value] of data.entries()) {
-    if (value.trim() === "") continue;
+    for (const [key, value] of data.entries()) {
+      if (value.trim() === "") continue;
 
-    // Regrouper les heures
-    const match = key.match(/(heure_(debut|fin))_([hm])_(\d+)/);
-    if (match) {
-      const [, base, type, part, id] = match;
-      const label = `heure_${type}_${id}`;
-      regrouped[label] = regrouped[label] || {};
-      regrouped[label][part] = value;
-      continue;
+      const match = key.match(/(heure_(debut|fin))_([hm])_(\d+)/);
+      if (match) {
+        const [, , type, part, id] = match;
+        const label = `heure_${type}_${id}`;
+        regrouped[label] = regrouped[label] || {};
+        regrouped[label][part] = value;
+        continue;
+      }
+
+      let label = key.replace(/_/g, " ").replace(/\d+$/, "").toUpperCase();
+      if (label === "AUTRE") label = "AUTRE VOYAGE";
+      html += `<p><strong>${label}:</strong> ${value}</p>`;
     }
 
-    // Autre champ
-    let label = key.replace(/_/g, " ").replace(/\d+$/, "").toUpperCase();
-    if (label === "AUTRE") label = "AUTRE VOYAGE";
-    html += `<p><strong>${label}:</strong> ${value}</p>`;
-  }
+    const voyages = {};
+    for (const [label, val] of Object.entries(regrouped)) {
+      const type = label.includes("debut") ? "debut" : "fin";
+      const id = label.match(/\d+$/)?.[0] || "";
+      voyages[id] = voyages[id] || {};
+      voyages[id][type] = val;
+    }
 
-  // Heures + durée
-  const voyages = {};
-  for (const [label, val] of Object.entries(regrouped)) {
-    const type = label.includes("debut") ? "debut" : "fin";
-    const id = label.match(/\d+$/)?.[0] || "";
-    voyages[id] = voyages[id] || {};
-    voyages[id][type] = val;
-  }
+    Object.entries(voyages).forEach(([id, v]) => {
+      const dH = parseInt(v.debut?.h || "0", 10);
+      const dM = parseInt(v.debut?.m || "0", 10);
+      const fH = parseInt(v.fin?.h || "0", 10);
+      const fM = parseInt(v.fin?.m || "0", 10);
 
-  Object.entries(voyages).forEach(([id, v]) => {
-    const dH = parseInt(v.debut?.h || "0", 10);
-    const dM = parseInt(v.debut?.m || "0", 10);
-    const fH = parseInt(v.fin?.h || "0", 10);
-    const fM = parseInt(v.fin?.m || "0", 10);
+      const debutStr = `${String(dH).padStart(2, "0")}h${String(dM).padStart(2, "0")}`;
+      const finStr = `${String(fH).padStart(2, "0")}h${String(fM).padStart(2, "0")}`;
 
-    const debutStr = `${String(dH).padStart(2, "0")}h${String(dM).padStart(2, "0")}`;
-    const finStr = `${String(fH).padStart(2, "0")}h${String(fM).padStart(2, "0")}`;
+      html += `<p><strong>HEURE DE DÉBUT (Voyage ${id}):</strong> ${debutStr}</p>`;
+      html += `<p><strong>HEURE DE FIN (Voyage ${id}):</strong> ${finStr}</p>`;
 
-    html += `<p><strong>HEURE DE DÉBUT (Voyage ${id}):</strong> ${debutStr}</p>`;
-    html += `<p><strong>HEURE DE FIN (Voyage ${id}):</strong> ${finStr}</p>`;
+      let durationMin = (fH * 60 + fM) - (dH * 60 + dM);
+      if (durationMin < 0) durationMin = 0;
+      totalMinutes += durationMin;
 
-    // Calcule durée
-    let totalMin = (fH * 60 + fM) - (dH * 60 + dM);
-    if (totalMin < 0) totalMin = 0;
-    const h = Math.floor(totalMin / 60);
-    const m = totalMin % 60;
+      const h = Math.floor(durationMin / 60);
+      const m = durationMin % 60;
+      html += `<p><strong>DURÉE (Voyage ${id}):</strong> ${h}h${String(m).padStart(2, "0")}</p>`;
+    });
 
-    html += `<p><strong>DURÉE (Voyage ${id}):</strong> ${h}h${String(m).padStart(2, "0")}</p>`;
+    if (totalMinutes > 0) {
+      const totalH = Math.floor(totalMinutes / 60);
+      const totalM = totalMinutes % 60;
+      html += `<hr/><p><strong>TOTAL D'HEURES TRAVAILLÉES:</strong> ${totalH}h${String(totalM).padStart(2, "0")}</p>`;
+    }
+
+    resumeContent.innerHTML = html;
+    document.getElementById("formulaire").classList.add("d-none");
+    resumeContainer.classList.remove("d-none");
   });
-
-  resumeContent.innerHTML = html;
-  document.getElementById("formulaire").classList.add("d-none");
-  resumeContainer.classList.remove("d-none");
-});
 
   btnModifier.addEventListener("click", () => {
     resumeContainer.classList.add("d-none");

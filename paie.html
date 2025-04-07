@@ -213,11 +213,103 @@
     }
 
     function afficherSectionFinale() {
-      if (document.getElementById("final_section")) return;
-      const script = document.createElement("script");
-      script.src = "FINAL_SECTION_PLACEHOLDER";
-      document.body.appendChild(script);
-    }
+  const section = document.createElement("div");
+  section.className = "section-box";
+  section.innerHTML = `
+    <h5 class="mb-3">Fin du journal de bord</h5>
+
+    <!-- Diesel -->
+    <div class="mb-3">
+      <label class="form-label">Avez-vous fait le plein de diesel ?</label>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="diesel" value="non" id="diesel_non" required />
+        <label class="form-check-label" for="diesel_non">Non</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="diesel" value="stbasile" id="diesel_stbasile" required />
+        <label class="form-check-label" for="diesel_stbasile">Oui, St Basile Transport</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="diesel" value="esso" id="diesel_esso" required />
+        <label class="form-check-label" for="diesel_esso">Oui, ESSO Deschambault</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="diesel" value="irving" id="diesel_irving" required />
+        <label class="form-check-label" for="diesel_irving">Oui, Irving USA</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="diesel" value="autre" id="diesel_autre" required />
+        <label class="form-check-label" for="diesel_autre">Spécifiez</label>
+      </div>
+      <input type="text" class="form-control mt-2 d-none" id="diesel_spec" name="diesel_spec" placeholder="Autre station" />
+    </div>
+
+    <!-- Litres diesel -->
+    <div class="mb-3 d-none" id="litres_diesel_block">
+      <label class="form-label">Inscrivez la quantité de litres (diesel)</label>
+      <input type="number" inputmode="numeric" class="form-control" name="litres_diesel" />
+    </div>
+
+    <!-- Urée -->
+    <div class="mb-3">
+      <label class="form-label">Avez-vous fait le plein d’urée ?</label>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="uree" value="non" id="uree_non" required />
+        <label class="form-check-label" for="uree_non">Non</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="uree" value="garage_elz" id="uree_elz" required />
+        <label class="form-check-label" for="uree_elz">Oui, au garage ELZ</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="uree" value="garage_stb" id="uree_stb" required />
+        <label class="form-check-label" for="uree_stb">Oui, au garage St-Basile Transport</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="uree" value="autre" id="uree_autre" required />
+        <label class="form-check-label" for="uree_autre">Spécifiez</label>
+      </div>
+      <input type="text" class="form-control mt-2 d-none" id="uree_spec" name="uree_spec" placeholder="Autre endroit" />
+    </div>
+
+    <!-- Litres urée -->
+    <div class="mb-3 d-none" id="litres_uree_block">
+      <label class="form-label">Inscrivez la quantité de litres (urée)</label>
+      <input type="number" inputmode="numeric" class="form-control" name="litres_uree" />
+    </div>
+
+    <!-- Note -->
+    <div class="mb-3">
+      <label class="form-label">Note</label>
+      <textarea class="form-control" name="note" rows="3" placeholder="Votre note (facultatif)"></textarea>
+    </div>
+  `;
+
+  voyageContainer.appendChild(section);
+
+  // Interactions dynamiques
+  const dieselRadios = document.querySelectorAll('input[name="diesel"]');
+  const dieselSpec = document.getElementById("diesel_spec");
+  const dieselLitres = document.getElementById("litres_diesel_block");
+
+  dieselRadios.forEach((r) => {
+    r.addEventListener("change", () => {
+      dieselSpec.classList.toggle("d-none", r.id !== "diesel_autre");
+      dieselLitres.classList.toggle("d-none", r.value === "non");
+    });
+  });
+
+  const ureeRadios = document.querySelectorAll('input[name="uree"]');
+  const ureeSpec = document.getElementById("uree_spec");
+  const ureeLitres = document.getElementById("litres_uree_block");
+
+  ureeRadios.forEach((r) => {
+    r.addEventListener("change", () => {
+      ureeSpec.classList.toggle("d-none", r.id !== "uree_autre");
+      ureeLitres.classList.toggle("d-none", r.value === "non");
+    });
+  });
+}
   </script>
 </body>
 </html>

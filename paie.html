@@ -417,13 +417,34 @@
     const data = new FormData(document.getElementById("formulaire"));
     let html = "";
 
-    for (const [key, value] of data.entries()) {
-      if (value.trim() !== "") {
-        let label = key.replace(/_/g, " ").replace(/\d+$/, "").toUpperCase();
-        if (label.trim() === "AUTRE") label = "AUTRE VOYAGE";
-        html += `<p><strong>${label}:</strong> ${value}</p>`;
-      }
-    }
+    const regrouped = {};
+for (const [key, value] of data.entries()) {
+  if (value.trim() === "") continue;
+
+  // Regrouper début/fin H et M ensemble
+  const match = key.match(/(heure_(debut|fin))_([hm])_(\d+)/);
+  if (match) {
+    const [, base, type, part, id] = match;
+    const label = `heure_${type}_${id}`;
+    regrouped[label] = regrouped[label] || {};
+    regrouped[label][part] = value;
+    continue;
+  }
+
+  // Sinon, champ normal
+  let label = key.replace(/_/g, " ").replace(/\d+$/, "").toUpperCase();
+  if (label === "AUTRE") label = "AUTRE VOYAGE";
+  html += `<p><strong>${label}:</strong> ${value}</p>`;
+}
+
+// Ajouter les heures combinées (après la boucle)
+for (const [label, val] of Object.entries(regrouped)) {
+  const type = label.includes("debut") ? "HEURE DE DÉBUT" : "HEURE DE FIN";
+  const id = label.match(/\d+$/)?.[0] || "";
+  const hhmm = `${val.h || "--"}h${val.m || "--"}`;
+  html += `<p><strong>${type} (Voyage ${id}):</strong> ${hhmm}</p>`;
+}
+
 
     resumeContent.innerHTML = html;
     document.getElementById("formulaire").classList.add("d-none");

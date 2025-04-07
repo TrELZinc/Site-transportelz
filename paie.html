@@ -408,7 +408,8 @@
 
     for (const [key, value] of data.entries()) {
       if (value.trim() !== "") {
-        const label = key.replace(/_/g, " ").replace(/\d+$/, "").toUpperCase();
+        let label = key.replace(/_/g, " ").replace(/\d+$/, "").toUpperCase();
+        if (label.trim() === "AUTRE") label = "AUTRE VOYAGE";
         html += `<p><strong>${label}:</strong> ${value}</p>`;
       }
     }

@@ -174,8 +174,6 @@
         <option value="30">30</option>
         <option value="45">45</option>
       </select>
-    </div><!--REPLACE_END--> name="heure_debut_h_${id}" required />
-              </div>
               <div class="mb-3">
                 <label class="form-label">Heure de fin</label>
                 <div class="d-flex gap-2">
@@ -211,8 +209,6 @@
         <option value="30">30</option>
         <option value="45">45</option>
       </select>
-    </div><!--REPLACE_END--> name="heure_fin_h_${id}" required />
-              </div>
               ${id < MAX_VOYAGES ? getSuiviHTML(id) : ''}
             `;
             setupSuiviListener(id);

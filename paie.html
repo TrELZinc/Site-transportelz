@@ -529,8 +529,8 @@ document.addEventListener("change", (e) => {
   let label = key.replace(/_/g, " ").replace(/\d+$/, "").toUpperCase();
   if (label === "AUTRE") label = "AUTRE VOYAGE";
   html += `<p><strong>${label}:</strong> ${value}</p>`;
+  }
 }
-
 
     for (const [id, obj] of Object.entries(heures)) {
       const dH = parseInt(obj.debut.h || "0", 10);

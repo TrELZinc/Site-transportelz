@@ -158,99 +158,128 @@
         </button>
       </form>
     </div>
- <script>
-  const radios = document.querySelectorAll('input[name="type_voyage"]');
+<script>
   const form = document.getElementById("formulaire");
+  const bouton = form.querySelector("button[type='submit']");
+  const voyageContainer = document.createElement("div");
+  voyageContainer.className = "mt-4";
+  form.insertBefore(voyageContainer, bouton);
 
-  const champConditionnel = document.createElement("div");
-  champConditionnel.className = "section-box";
-  form.insertBefore(champConditionnel, form.querySelector("button"));
+  let voyageCount = 0;
+  const MAX_VOYAGES = 3;
 
-  radios.forEach((radio) => {
-    radio.addEventListener("change", () => {
-      const selected = document.querySelector(
-        'input[name="type_voyage"]:checked'
-      )?.value;
+  addVoyageSection(); // 1er voyage
 
-      if (selected === "heure") {
-        champConditionnel.innerHTML = `
-          <h5 class="mb-3">Détails du voyage à l’heure</h5>
+  function addVoyageSection() {
+    if (voyageCount >= MAX_VOYAGES) return;
 
-          <div class="mb-3">
-            <label for="origine" class="form-label">Origine</label>
-            <select class="form-select" id="origine" name="origine" required>
-              <option value="St-Basile" selected>St-Basile</option>
-              <option value="Vimont">Vimont</option>
-              <option value="Stanstead">Stanstead</option>
-            </select>
-          </div>
+    voyageCount++;
+    const idSuffix = voyageCount;
+    const section = document.createElement("div");
+    section.className = "section-box";
+    section.innerHTML = `
+      <h5 class="mb-3">Voyage ${idSuffix}</h5>
 
-          <div class="mb-3">
-            <label for="heure_debut" class="form-label">Heure de début</label>
-            <input type="time" class="form-control" id="heure_debut" name="heure_debut" required />
-          </div>
+      <div class="mb-3">
+        <label class="form-label">Type de voyage</label>
+        <div class="form-check">
+          <input class="form-check-input type-radio" type="radio" name="type_voyage_${idSuffix}" id="km_${idSuffix}" value="kilometrage" required>
+          <label class="form-check-label" for="km_${idSuffix}">Voyage au kilométrage</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input type-radio" type="radio" name="type_voyage_${idSuffix}" id="heure_${idSuffix}" value="heure" required>
+          <label class="form-check-label" for="heure_${idSuffix}">Voyage à l’heure</label>
+        </div>
+      </div>
 
-          <div class="mb-3">
-            <label for="heure_fin" class="form-label">Heure de fin</label>
-            <input type="time" class="form-control" id="heure_fin" name="heure_fin" required />
-          </div>
+      <div id="details_${idSuffix}"></div>
+    `;
 
-          <div class="mb-3">
-            <label class="form-label">Avez-vous fait un autre voyage ensuite ?</label>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="autre_voyage" id="oui_heure" value="oui" required />
-              <label class="form-check-label" for="oui_heure">Oui</label>
+    voyageContainer.appendChild(section);
+
+    const radios = section.querySelectorAll(`input[name="type_voyage_${idSuffix}"]`);
+    radios.forEach((radio) => {
+      radio.addEventListener("change", () => {
+        const type = radio.value;
+        const detailsDiv = section.querySelector(`#details_${idSuffix}`);
+
+        if (type === "heure") {
+          detailsDiv.innerHTML = `
+            <div class="mb-3">
+              <label class="form-label">Origine</label>
+              <select class="form-select" name="origine_${idSuffix}" required>
+                <option value="St-Basile" selected>St-Basile</option>
+                <option value="Vimont">Vimont</option>
+                <option value="Stanstead">Stanstead</option>
+              </select>
             </div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="autre_voyage" id="non_heure" value="non" required />
-              <label class="form-check-label" for="non_heure">Non</label>
-            </div>
-          </div>
-        `;
-      } else if (selected === "kilometrage") {
-        champConditionnel.innerHTML = `
-          <h5 class="mb-3">Détails du voyage au kilométrage</h5>
 
-          <div class="mb-3">
-            <label for="origine_km" class="form-label">Origine</label>
-            <select class="form-select" id="origine_km" name="origine_km" required>
-              <option value="St-Basile" selected>St-Basile</option>
-              <option value="Vimont">Vimont</option>
-              <option value="Stanstead">Stanstead</option>
-            </select>
-          </div>
-
-          <div class="mb-3">
-            <label for="destination" class="form-label">Ville de destination</label>
-            <input list="destinations" class="form-control" id="destination" name="destination" required />
-            <datalist id="destinations">
-              <option value="Montréal"></option>
-              <option value="Québec"></option>
-              <option value="Drummondville"></option>
-              <option value="Laval"></option>
-              <option value="Gatineau"></option>
-              <option value="Ottawa"></option>
-              <option value="Sherbrooke"></option>
-            </datalist>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">Avez-vous fait un autre voyage ensuite ?</label>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="autre_voyage" id="oui_km" value="oui" required />
-              <label class="form-check-label" for="oui_km">Oui</label>
+            <div class="mb-3">
+              <label class="form-label">Heure de début</label>
+              <input type="time" class="form-control" name="heure_debut_${idSuffix}" required />
             </div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="autre_voyage" id="non_km" value="non" required />
-              <label class="form-check-label" for="non_km">Non</label>
+
+            <div class="mb-3">
+              <label class="form-label">Heure de fin</label>
+              <input type="time" class="form-control" name="heure_fin_${idSuffix}" required />
             </div>
-          </div>
-        `;
-      } else {
-        champConditionnel.innerHTML = "";
-      }
+          ` + addSuiviHTML(idSuffix);
+        } else {
+          detailsDiv.innerHTML = `
+            <div class="mb-3">
+              <label class="form-label">Origine</label>
+              <select class="form-select" name="origine_${idSuffix}" required>
+                <option value="St-Basile" selected>St-Basile</option>
+                <option value="Vimont">Vimont</option>
+                <option value="Stanstead">Stanstead</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Ville de destination</label>
+              <input list="destinations" class="form-control" name="destination_${idSuffix}" required />
+              <datalist id="destinations">
+                <option value="Montréal"></option>
+                <option value="Québec"></option>
+                <option value="Gatineau"></option>
+                <option value="Sherbrooke"></option>
+                <option value="Drummondville"></option>
+              </datalist>
+            </div>
+          ` + addSuiviHTML(idSuffix);
+        }
+
+        setupSuiviListener(idSuffix);
+      });
     });
-  });
+  }
+
+  function addSuiviHTML(id) {
+    return `
+      <div class="mb-3 mt-3">
+        <label class="form-label">Avez-vous fait un autre voyage ensuite ?</label>
+        <div class="form-check">
+          <input class="form-check-input autre-radio" type="radio" name="autre_${id}" id="oui_${id}" value="oui" required />
+          <label class="form-check-label" for="oui_${id}">Oui</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input autre-radio" type="radio" name="autre_${id}" id="non_${id}" value="non" required />
+          <label class="form-check-label" for="non_${id}">Non</label>
+        </div>
+      </div>
+    `;
+  }
+
+  function setupSuiviListener(id) {
+    const ouiRadio = document.getElementById(`oui_${id}`);
+    if (ouiRadio) {
+      ouiRadio.addEventListener("change", () => {
+        if (voyageCount < MAX_VOYAGES) {
+          addVoyageSection();
+        }
+      });
+    }
+  }
 </script>
   </body>
 </html>

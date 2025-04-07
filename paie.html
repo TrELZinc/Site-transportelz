@@ -407,7 +407,7 @@
 </div>
 
 
-<script>
+><script>
   const btnPreview = document.getElementById("btn-preview");
   const resumeContainer = document.getElementById("resumeContainer");
   const resumeContent = document.getElementById("resumeContent");
@@ -419,15 +419,16 @@
     const regrouped = {};
     let totalMinutes = 0;
 
+    const tempHeures = {}; // stocke les heures avec id
+
     for (const [key, value] of data.entries()) {
       if (value.trim() === "") continue;
 
       const match = key.match(/heure_(debut|fin)_(h|m)_(\d+)/);
       if (match) {
         const [, type, part, id] = match;
-        const label = `heure_${type}_${id}`;
-        regrouped[label] = regrouped[label] || {};
-        regrouped[label][part] = value;
+        tempHeures[id] = tempHeures[id] || { debut: {}, fin: {} };
+        tempHeures[id][type][part] = value;
         continue;
       }
 
@@ -436,19 +437,11 @@
       html += `<p><strong>${label}:</strong> ${value}</p>`;
     }
 
-    const voyages = {};
-    for (const [label, val] of Object.entries(regrouped)) {
-      const type = label.includes("debut") ? "debut" : "fin";
-      const id = label.match(/\d+$/)?.[0] || "";
-      voyages[id] = voyages[id] || {};
-      voyages[id][type] = val;
-    }
-
-    Object.entries(voyages).forEach(([id, v]) => {
-      const dH = parseInt(v.debut?.h || "0", 10);
-      const dM = parseInt(v.debut?.m || "0", 10);
-      const fH = parseInt(v.fin?.h || "0", 10);
-      const fM = parseInt(v.fin?.m || "0", 10);
+    Object.entries(tempHeures).forEach(([id, obj]) => {
+      const dH = parseInt(obj.debut.h || "0", 10);
+      const dM = parseInt(obj.debut.m || "0", 10);
+      const fH = parseInt(obj.fin.h || "0", 10);
+      const fM = parseInt(obj.fin.m || "0", 10);
 
       const debutStr = `${String(dH).padStart(2, "0")}h${String(dM).padStart(2, "0")}`;
       const finStr = `${String(fH).padStart(2, "0")}h${String(fM).padStart(2, "0")}`;

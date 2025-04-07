@@ -86,7 +86,7 @@
 
       <div id="voyageContainer"></div>
 
-      <button type="submit" class="btn btn-primary w-100 mt-3">Soumettre</button>
+      <button type="button" class="btn btn-primary w-100 mt-3" id="btn-preview">Prévisualiser</button>
     </form>
   </div>
 
@@ -174,7 +174,7 @@
         <option value="30">30</option>
         <option value="45">45</option>
       </select>
-    </div><!--REPLACE_END-->
+    </div><!--REPLACE_END--> name="heure_debut_h_${id}" required />
               </div>
               <div class="mb-3">
                 <label class="form-label">Heure de fin</label>
@@ -211,7 +211,7 @@
         <option value="30">30</option>
         <option value="45">45</option>
       </select>
-    </div><!--REPLACE_END-->
+    </div><!--REPLACE_END--> name="heure_fin_h_${id}" required />
               </div>
               ${id < MAX_VOYAGES ? getSuiviHTML(id) : ''}
             `;
@@ -284,5 +284,51 @@
       document.body.appendChild(script);
     }
   </script>
+
+<!-- Résumé -->
+<div class="container py-4 d-none" id="resumeContainer">
+  <div class="section-box">
+    <h4 class="mb-3">Résumé de votre journée</h4>
+    <div id="resumeContent"></div>
+    <div class="d-flex justify-content-between mt-4">
+      <button type="button" class="btn btn-secondary" id="btn-modifier">Modifier</button>
+      <button type="submit" class="btn btn-success" id="btn-confirm">Confirmer et envoyer</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  const btnPreview = document.getElementById("btn-preview");
+  const resumeContainer = document.getElementById("resumeContainer");
+  const resumeContent = document.getElementById("resumeContent");
+  const btnModifier = document.getElementById("btn-modifier");
+
+  btnPreview.addEventListener("click", () => {
+    const data = new FormData(document.getElementById("formulaire"));
+    let html = "";
+
+    for (const [key, value] of data.entries()) {
+      if (value.trim() !== "") {
+        const label = key.replace(/_/g, " ").replace(/\d+$/, "").toUpperCase();
+        html += `<p><strong>${label}:</strong> ${value}</p>`;
+      }
+    }
+
+    resumeContent.innerHTML = html;
+    document.getElementById("formulaire").classList.add("d-none");
+    resumeContainer.classList.remove("d-none");
+  });
+
+  btnModifier.addEventListener("click", () => {
+    resumeContainer.classList.add("d-none");
+    document.getElementById("formulaire").classList.remove("d-none");
+  });
+
+  document.getElementById("btn-confirm").addEventListener("click", () => {
+    document.getElementById("formulaire").submit();
+  });
+</script>
+
 </body>
 </html>

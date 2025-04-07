@@ -437,14 +437,33 @@
 
   // Envoi du formulaire après confirmation
   document.getElementById("btn-confirm").addEventListener("click", () => {
-    resumeContainer.classList.add("d-none");
-    document.getElementById("confirmationContainer").classList.remove("d-none");
-    // document.getElementById("formulaire").submit(); // activer ça plus tard avec Google Sheets
+  const formData = new FormData(document.getElementById("formulaire"));
+  const data = {};
+  formData.forEach((val, key) => data[key] = val);
 
+  fetch("https://script.google.com/macros/s/AKfycbwDpu9mbawoCGeXVwENdlhSq29u4Un2A8RrK3K0R0ELMDmV9l8BwcJor03HF5_FhuuH/exec", {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: { "Content-Type": "application/json" }
+  })
+  .then(res => res.json())
+  .then(res => {
+    if (res.result === "success") {
+      resumeContainer.classList.add("d-none");
+      document.getElementById("confirmationContainer").classList.remove("d-none");
+    } else {
+      alert("Erreur lors de l'envoi.");
+    }
+  })
+  .catch(err => {
+    alert("Erreur de connexion au serveur.");
+    console.error(err);
   });
+});
+
 </script>
   <script>
-  fetch("https://script.google.com/macros/s/AKfycbxANSch7Vz9F0Vud2_qSJE6XwOMASmvt4RbCvYQ-XVv08ptCqoHMPu3kYPuP8MUYSdo/exec") // à remplacer par l'URL réelle de Google Apps Script
+  fetch("https://script.google.com/macros/s/AKfycbwDpu9mbawoCGeXVwENdlhSq29u4Un2A8RrK3K0R0ELMDmV9l8BwcJor03HF5_FhuuH/exec") // à remplacer par l'URL réelle de Google Apps Script
     .then(res => res.json())
     .then(data => {
       const select = document.getElementById("nom");

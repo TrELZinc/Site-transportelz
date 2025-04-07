@@ -438,7 +438,6 @@
     document.getElementById("confirmationContainer").classList.remove("d-none");
   });
 </script>
-  
 <script>
   let tauxMap = {}; // par nom chauffeur
   let kmMap = {}; // origine -> destination -> km
@@ -446,7 +445,7 @@
   fetch("https://script.google.com/macros/s/AKfycbxakbBK9TUcJ5gQQ4nL3vuDoGw2kt9zY3fMVb1tImOvnWNXdNb3kYIIGRh-VLp5dkNi/exec")
     .then((res) => res.json())
     .then((data) => {
-      tauxMap = data.taux.reduce((acc, el) => {
+      tauxMap = data.chauffeurs.reduce((acc, el) => {
         acc[el.nom] = {
           taux_h: parseFloat(el.taux_h),
           taux_km: parseFloat(el.taux_km),
@@ -454,11 +453,28 @@
         return acc;
       }, {});
 
-      kmMap = data.km.reduce((acc, el) => {
+      kmMap = data.kilometrages.reduce((acc, el) => {
         acc[el.origine] = acc[el.origine] || {};
-        acc[el.origine][el.destination] = parseFloat(el.kilometrage);
+        acc[el.origine][el.destination] = parseFloat(el.km);
         return acc;
       }, {});
+
+      const destinationInputs = document.querySelectorAll('input[list="destinations"]');
+      destinationInputs.forEach(input => {
+        input.addEventListener('focus', () => {
+          const origineSelect = input.closest('.section-box').querySelector('select[name^="origine_"]');
+          const datalist = input.nextElementSibling;
+          const origine = origineSelect?.value;
+          datalist.innerHTML = "";
+          if (kmMap[origine]) {
+            Object.keys(kmMap[origine]).forEach(dest => {
+              const option = document.createElement("option");
+              option.value = dest;
+              datalist.appendChild(option);
+            });
+          }
+        });
+      });
     })
     .catch((err) => console.error("Erreur chargement taux ou km:", err));
 
@@ -547,6 +563,7 @@
     resumeContainer.classList.remove("d-none");
   });
 </script>
+
  <script>
   fetch("https://script.google.com/macros/s/AKfycbxakbBK9TUcJ5gQQ4nL3vuDoGw2kt9zY3fMVb1tImOvnWNXdNb3kYIIGRh-VLp5dkNi/exec")
     .then(res => res.json())

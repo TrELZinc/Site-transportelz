@@ -104,7 +104,12 @@
     const voyageContainer = document.getElementById("voyageContainer");
     let voyageCount = 0;
     const MAX_VOYAGES = 3;
-
+    
+function isTimeValid(dH, dM, fH, fM) {
+    const debut = dH * 60 + dM;
+    const fin = fH * 60 + fM;
+    return fin >= debut;
+  }
     function addVoyageSection() {
       if (voyageCount >= MAX_VOYAGES) return;
       voyageCount++;

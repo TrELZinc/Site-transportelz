@@ -158,5 +158,60 @@
         </button>
       </form>
     </div>
+    <script>
+  const radios = document.querySelectorAll('input[name="type_voyage"]');
+  const form = document.getElementById("formulaire");
+
+  const champConditionnel = document.createElement("div");
+  champConditionnel.className = "section-box";
+  form.insertBefore(champConditionnel, form.querySelector("button"));
+
+  radios.forEach((radio) => {
+    radio.addEventListener("change", () => {
+      const selected = document.querySelector(
+        'input[name="type_voyage"]:checked'
+      )?.value;
+
+      if (selected === "heure") {
+        champConditionnel.innerHTML = `
+          <h5 class="mb-3">Détails du voyage à l’heure</h5>
+
+          <div class="mb-3">
+            <label for="origine" class="form-label">Origine</label>
+            <select class="form-select" id="origine" name="origine" required>
+              <option value="St-Basile" selected>St-Basile</option>
+              <option value="Vimont">Vimont</option>
+              <option value="Stanstead">Stanstead</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="heure_debut" class="form-label">Heure de début</label>
+            <input type="time" class="form-control" id="heure_debut" name="heure_debut" required />
+          </div>
+
+          <div class="mb-3">
+            <label for="heure_fin" class="form-label">Heure de fin</label>
+            <input type="time" class="form-control" id="heure_fin" name="heure_fin" required />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Avez-vous fait un autre voyage ensuite ?</label>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="autre_voyage" id="oui" value="oui" required />
+              <label class="form-check-label" for="oui">Oui</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="autre_voyage" id="non" value="non" required />
+              <label class="form-check-label" for="non">Non</label>
+            </div>
+          </div>
+        `;
+      } else {
+        champConditionnel.innerHTML = ""; // on vide pour tout autre cas
+      }
+    });
+  });
+</script>
   </body>
 </html>

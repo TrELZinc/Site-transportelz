@@ -431,18 +431,7 @@
   let tauxMap = {};
 let kmMap = {};
 let destinations = [];
-
-fetch("https://script.google.com/macros/s/AKfycbxakbBK9TUcJ5gQQ4nL3vuDoGw2kt9zY3fMVb1tImOvnWNXdNb3kYIIGRh-VLp5dkNi/exec")
-  .then((res) => res.json())
-  .then((data) => {
-    tauxMap = data.chauffeurs.reduce((acc, el) => {
-      acc[el.nom] = {
-        taux_h: parseFloat(el.taux_h),
-        taux_km: parseFloat(el.taux_km),
-      };
-      return acc;
-    }, {});
-
+  
     kmMap = data.kilometrages.reduce((acc, el) => {
       acc[el.origine] = acc[el.origine] || {};
       acc[el.origine][el.destination] = parseFloat(el.km);
@@ -457,7 +446,7 @@ fetch("https://script.google.com/macros/s/AKfycbxakbBK9TUcJ5gQQ4nL3vuDoGw2kt9zY3
 function renderKilometrageDestinationSelect(id, selectedOrigine = "St-Basile") {
   const list = destinations
     .map(dest => `<option value="${dest}">${dest}</option>`)
-    .join("");
+    .join("") + `<option value="autre">Autre (à spécifier)</option>`; // ✅ on ajoute l'option "autre"
 
   return `
     <div class="mb-3">
@@ -466,16 +455,27 @@ function renderKilometrageDestinationSelect(id, selectedOrigine = "St-Basile") {
         <option value="">-- Sélectionner --</option>
         ${list}
       </select>
+
+      <!-- ✅ Champ texte qui s'affiche seulement si "Autre" est choisi -->
+      <input type="text" class="form-control mt-2 d-none" name="destination_autre_${id}" id="destination_autre_${id}" placeholder="Spécifiez la destination" />
+
       <div id="distance_${id}" class="mt-2 small text-muted"></div>
     </div>
   `;
 }
+
 
 document.addEventListener("change", (e) => {
   if (e.target.name?.startsWith("origine_") || e.target.name?.startsWith("destination_")) {
     const id = e.target.name.split("_")[1];
     const origine = document.querySelector(`[name="origine_${id}"]`)?.value;
     const destination = document.querySelector(`[name="destination_${id}"]`)?.value;
+
+    if (e.target.name?.startsWith("destination_")) {
+  const id = e.target.name.split("_")[1];
+  const autreInput = document.getElementById(`destination_autre_${id}`);
+  autreInput?.classList.toggle("d-none", e.target.value !== "autre");
+}
 
     if (origine && destination) {
       const km = kmMap?.[origine]?.[destination];
@@ -503,27 +503,34 @@ document.addEventListener("change", (e) => {
       const destinationMatch = key.match(/^destination_(\d+)/);
 
       if (heureMatch) {
-        const [, type, part, id] = heureMatch;
-        heures[id] = heures[id] || { debut: {}, fin: {} };
-        heures[id][type][part] = value;
-      } else if (typeMatch) {
-        const id = typeMatch[1];
-        voyages[id] = voyages[id] || {};
-        voyages[id].type = value;
-      } else if (origineMatch) {
-        const id = origineMatch[1];
-        voyages[id] = voyages[id] || {};
-        voyages[id].origine = value;
-      } else if (destinationMatch) {
-        const id = destinationMatch[1];
-        voyages[id] = voyages[id] || {};
-        voyages[id].destination = value;
-      } else {
-        let label = key.replace(/_/g, " ").replace(/\d+$/, "").toUpperCase();
-        if (label === "AUTRE") label = "AUTRE VOYAGE";
-        html += `<p><strong>${label}:</strong> ${value}</p>`;
-      }
+  const [, type, part, id] = heureMatch;
+  heures[id] = heures[id] || { debut: {}, fin: {} };
+  heures[id][type][part] = value;
+} else if (typeMatch) {
+  const id = typeMatch[1];
+  voyages[id] = voyages[id] || {};
+  voyages[id].type = value;
+} else if (origineMatch) {
+  const id = origineMatch[1];
+  voyages[id] = voyages[id] || {};
+  voyages[id].origine = value;
+} else if (destinationMatch) {
+  const id = destinationMatch[1];
+  voyages[id] = voyages[id] || {};
+  let destinationValue = value;
+  if (value === "autre") {
+    const custom = data.get(`destination_autre_${id}`);
+    if (custom?.trim()) {
+      destinationValue = custom.trim();
     }
+  }
+  voyages[id].destination = destinationValue;
+} else {
+  let label = key.replace(/_/g, " ").replace(/\d+$/, "").toUpperCase();
+  if (label === "AUTRE") label = "AUTRE VOYAGE";
+  html += `<p><strong>${label}:</strong> ${value}</p>`;
+}
+
 
     for (const [id, obj] of Object.entries(heures)) {
       const dH = parseInt(obj.debut.h || "0", 10);

@@ -442,25 +442,22 @@
   formData.forEach((val, key) => data[key] = val);
 
   fetch("https://script.google.com/macros/s/AKfycbwDpu9mbawoCGeXVwENdlhSq29u4Un2A8RrK3K0R0ELMDmV9l8BwcJor03HF5_FhuuH/exec", {
-    method: "POST",
-    mode: "no-cors",
-    body: JSON.stringify(data),
-    headers: { "Content-Type": "application/json" }
-  })
-  .then(res => res.json())
-  .then(res => {
-    if (res.result === "success") {
-      resumeContainer.classList.add("d-none");
-      document.getElementById("confirmationContainer").classList.remove("d-none");
-    } else {
-      alert("Erreur lors de l'envoi.");
-    }
-  })
-  .catch(err => {
-    alert("Erreur de connexion au serveur.");
-    console.error(err);
-  });
+  method: "POST",
+  mode: "no-cors",
+  body: JSON.stringify(data),
+  headers: {
+    "Content-Type": "application/json"
+  }
+})
+// Pas de .then car pas de réponse lisible en no-cors
+.catch(err => {
+  alert("Erreur de connexion au serveur.");
+  console.error(err);
 });
+
+// Affichage manuel immédiat
+resumeContainer.classList.add("d-none");
+document.getElementById("confirmationContainer").classList.remove("d-none");
 
 </script>
   <script>

@@ -158,7 +158,7 @@
         </button>
       </form>
     </div>
-    <script>
+ <script>
   const radios = document.querySelectorAll('input[name="type_voyage"]');
   const form = document.getElementById("formulaire");
 
@@ -198,17 +198,56 @@
           <div class="mb-3">
             <label class="form-label">Avez-vous fait un autre voyage ensuite ?</label>
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="autre_voyage" id="oui" value="oui" required />
-              <label class="form-check-label" for="oui">Oui</label>
+              <input class="form-check-input" type="radio" name="autre_voyage" id="oui_heure" value="oui" required />
+              <label class="form-check-label" for="oui_heure">Oui</label>
             </div>
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="autre_voyage" id="non" value="non" required />
-              <label class="form-check-label" for="non">Non</label>
+              <input class="form-check-input" type="radio" name="autre_voyage" id="non_heure" value="non" required />
+              <label class="form-check-label" for="non_heure">Non</label>
+            </div>
+          </div>
+        `;
+      } else if (selected === "kilometrage") {
+        champConditionnel.innerHTML = `
+          <h5 class="mb-3">Détails du voyage au kilométrage</h5>
+
+          <div class="mb-3">
+            <label for="origine_km" class="form-label">Origine</label>
+            <select class="form-select" id="origine_km" name="origine_km" required>
+              <option value="St-Basile" selected>St-Basile</option>
+              <option value="Vimont">Vimont</option>
+              <option value="Stanstead">Stanstead</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="destination" class="form-label">Ville de destination</label>
+            <input list="destinations" class="form-control" id="destination" name="destination" required />
+            <datalist id="destinations">
+              <option value="Montréal"></option>
+              <option value="Québec"></option>
+              <option value="Drummondville"></option>
+              <option value="Laval"></option>
+              <option value="Gatineau"></option>
+              <option value="Ottawa"></option>
+              <option value="Sherbrooke"></option>
+            </datalist>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Avez-vous fait un autre voyage ensuite ?</label>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="autre_voyage" id="oui_km" value="oui" required />
+              <label class="form-check-label" for="oui_km">Oui</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="autre_voyage" id="non_km" value="non" required />
+              <label class="form-check-label" for="non_km">Non</label>
             </div>
           </div>
         `;
       } else {
-        champConditionnel.innerHTML = ""; // on vide pour tout autre cas
+        champConditionnel.innerHTML = "";
       }
     });
   });

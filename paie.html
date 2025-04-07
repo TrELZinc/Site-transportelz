@@ -427,7 +427,7 @@
     const data = {};
     formData.forEach((val, key) => data[key] = val);
 
-    fetch("https://script.google.com/macros/s/AKfycbyp9aMiAFwCwuB9BJ_UnIbwo-TuQvwvEfjGUC-UbBlVR0f_-9o5ZO5ZApOiuV2hGA1m/exec", {
+    fetch("https://script.google.com/macros/s/AKfycbxakbBK9TUcJ5gQQ4nL3vuDoGw2kt9zY3fMVb1tImOvnWNXdNb3kYIIGRh-VLp5dkNi/exec", {
       method: "POST",
       mode: "no-cors",
       body: JSON.stringify(data),
@@ -443,7 +443,7 @@
   let tauxMap = {}; // par nom chauffeur
   let kmMap = {}; // origine -> destination -> km
 
-  fetch("https://script.google.com/macros/s/AKfycbyp9aMiAFwCwuB9BJ_UnIbwo-TuQvwvEfjGUC-UbBlVR0f_-9o5ZO5ZApOiuV2hGA1m/exec")
+  fetch("https://script.google.com/macros/s/AKfycbxakbBK9TUcJ5gQQ4nL3vuDoGw2kt9zY3fMVb1tImOvnWNXdNb3kYIIGRh-VLp5dkNi/exec")
     .then((res) => res.json())
     .then((data) => {
       tauxMap = data.taux.reduce((acc, el) => {
@@ -547,5 +547,24 @@
     resumeContainer.classList.remove("d-none");
   });
 </script>
+ <script>
+  fetch("https://script.google.com/macros/s/AKfycbxakbBK9TUcJ5gQQ4nL3vuDoGw2kt9zY3fMVb1tImOvnWNXdNb3kYIIGRh-VLp5dkNi/exec")
+    .then(res => res.json())
+    .then(data => {
+      const select = document.getElementById("nom");
+      if (data?.chauffeurs?.length) {
+        data.chauffeurs.forEach(chauffeur => {
+          const opt = document.createElement("option");
+          opt.value = chauffeur.nom;
+          opt.textContent = chauffeur.nom;
+          select.appendChild(opt);
+        });
+      } else {
+        console.warn("Aucun chauffeur trouvé dans la réponse.");
+      }
+    })
+    .catch(err => console.error("Erreur chargement chauffeurs:", err));
+</script>
+ 
 </body>
 </html>

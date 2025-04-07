@@ -57,21 +57,22 @@
           <input type="date" class="form-control" id="date" name="date" required />
         </div>
         <div class="mb-3">
-          <label for="nom" class="form-label fw-bold text-uppercase">Nom complet</label>
-          <input type="text" class="form-control" id="nom" name="nom" required />
+          <select class="form-select" id="nom" name="nom" required>
+          <option value="">-- Sélectionner votre nom --</option>
+        </select>
         </div>
         <div class="mb-3">
           <label for="camion" class="form-label fw-bold text-uppercase">Numéro de camion</label>
           <select class="form-select" id="camion" name="camion" required>
             <option value="">-- Sélectionner --</option>
-            <option value="C001">Camion 1103</option>
-            <option value="C002">Camion 1202</option>
-            <option value="C003">Camion 1303</option>
-            <option value="C004">Camion 1404</option>
-            <option value="C005">Camion 1502</option>
-            <option value="C006">Camion 1603</option>
-            <option value="C007">Camion 1703</option>
-            <option value="C008">Camion 1803</option>
+            <option value="1103">Camion 1103</option>
+            <option value="1202">Camion 1202</option>
+            <option value="1303">Camion 1303</option>
+            <option value="1404">Camion 1404</option>
+            <option value="1502">Camion 1502</option>
+            <option value="1603">Camion 1603</option>
+            <option value="1703">Camion 1703</option>
+            <option value="1803">Camion 1803</option>
           </select>
         </div>
         <div class="mb-3">
@@ -441,6 +442,20 @@
     // document.getElementById("formulaire").submit(); // activer ça plus tard avec Google Sheets
 
   });
+</script>
+  <script>
+  fetch("https://script.google.com/macros/s/AKfycbypNmPmmlzYO4DnJJd5B8LSKhK4roVC3cg_6pY2jwg9kiNX7gyMiPMGv0DrElxJzBFA/exec") // à remplacer par l'URL réelle de Google Apps Script
+    .then(res => res.json())
+    .then(data => {
+      const select = document.getElementById("nom");
+      data.forEach(chauffeur => {
+        const opt = document.createElement("option");
+        opt.value = chauffeur.nom;
+        opt.textContent = chauffeur.nom;
+        select.appendChild(opt);
+      });
+    })
+    .catch(err => console.error("Erreur chargement chauffeurs:", err));
 </script>
 </body>
 </html>

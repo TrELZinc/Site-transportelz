@@ -362,21 +362,45 @@
     const data = new FormData(formEl);
     let html = "";
     const heures = {};
+    const voyages = {}; // <-- ajouté pour garder info type/ville etc
     let totalMinutes = 0;
 
     for (const [key, value] of data.entries()) {
       if (value.trim() === "") continue;
       const heureMatch = key.match(/heure_(debut|fin)_([hm])_(\d+)/);
+      const typeMatch = key.match(/^type_voyage_(\d+)/);
+      const origineMatch = key.match(/^origine_(\d+)/);
+      const destinationMatch = key.match(/^destination_(\d+)/);
+
       if (heureMatch) {
         const [, type, part, id] = heureMatch;
         heures[id] = heures[id] || { debut: {}, fin: {} };
         heures[id][type][part] = value;
+      } else if (typeMatch) {
+        const id = typeMatch[1];
+        voyages[id] = voyages[id] || {};
+        voyages[id].type = value;
+      } else if (origineMatch) {
+        const id = origineMatch[1];
+        voyages[id] = voyages[id] || {};
+        voyages[id].origine = value;
+      } else if (destinationMatch) {
+        const id = destinationMatch[1];
+        voyages[id] = voyages[id] || {};
+        let destinationValue = value;
+        if (value === "autre") {
+          const custom = data.get(`destination_autre_${id}`);
+          if (custom?.trim()) {
+            destinationValue = custom.trim();
+          }
+        }
+        voyages[id].destination = destinationValue;
       } else {
         let label = key.replace(/_/g, " ").replace(/\d+$/, "").toUpperCase();
         if (label === "AUTRE") label = "AUTRE VOYAGE";
         html += `<p><strong>${label}:</strong> ${value}</p>`;
       }
-    }
+    } // <-- BUG FIX: cette accolade manquait !
 
     for (const [id, obj] of Object.entries(heures)) {
       const dH = parseInt(obj.debut.h || "0", 10);
@@ -405,7 +429,8 @@
     formEl.classList.add("d-none");
     resumeContainer.classList.remove("d-none");
   });
-
+</script>
+<script>
   btnModifier.addEventListener("click", () => {
     resumeContainer.classList.add("d-none");
     document.getElementById("formulaire").classList.remove("d-none");

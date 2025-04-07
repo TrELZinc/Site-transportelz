@@ -406,66 +406,58 @@
   </div>
 </div>
 
-
-><script>
+<script>
   const btnPreview = document.getElementById("btn-preview");
   const resumeContainer = document.getElementById("resumeContainer");
   const resumeContent = document.getElementById("resumeContent");
   const btnModifier = document.getElementById("btn-modifier");
 
   btnPreview.addEventListener("click", () => {
-    const data = new FormData(document.getElementById("formulaire"));
+    const formEl = document.getElementById("formulaire");
+    const data = new FormData(formEl);
     let html = "";
-    const regrouped = {};
+    const heures = {};
     let totalMinutes = 0;
-
-    const tempHeures = {}; // stocke les heures avec id
 
     for (const [key, value] of data.entries()) {
       if (value.trim() === "") continue;
-
-      const match = key.match(/heure_(debut|fin)_(h|m)_(\d+)/);
-      if (match) {
-        const [, type, part, id] = match;
-        tempHeures[id] = tempHeures[id] || { debut: {}, fin: {} };
-        tempHeures[id][type][part] = value;
-        continue;
+      const heureMatch = key.match(/heure_(debut|fin)_([hm])_(\d+)/);
+      if (heureMatch) {
+        const [, type, part, id] = heureMatch;
+        heures[id] = heures[id] || { debut: {}, fin: {} };
+        heures[id][type][part] = value;
+      } else {
+        let label = key.replace(/_/g, " ").replace(/\d+$/, "").toUpperCase();
+        if (label === "AUTRE") label = "AUTRE VOYAGE";
+        html += `<p><strong>${label}:</strong> ${value}</p>`;
       }
-
-      let label = key.replace(/_/g, " ").replace(/\d+$/, "").toUpperCase();
-      if (label === "AUTRE") label = "AUTRE VOYAGE";
-      html += `<p><strong>${label}:</strong> ${value}</p>`;
     }
 
-    Object.entries(tempHeures).forEach(([id, obj]) => {
+    for (const [id, obj] of Object.entries(heures)) {
       const dH = parseInt(obj.debut.h || "0", 10);
       const dM = parseInt(obj.debut.m || "0", 10);
       const fH = parseInt(obj.fin.h || "0", 10);
       const fM = parseInt(obj.fin.m || "0", 10);
-
       const debutStr = `${String(dH).padStart(2, "0")}h${String(dM).padStart(2, "0")}`;
       const finStr = `${String(fH).padStart(2, "0")}h${String(fM).padStart(2, "0")}`;
-
       html += `<p><strong>VOYAGE ${id} - HEURE DE DÉBUT:</strong> ${debutStr}</p>`;
       html += `<p><strong>VOYAGE ${id} - HEURE DE FIN:</strong> ${finStr}</p>`;
-
-      let durationMin = (fH * 60 + fM) - (dH * 60 + dM);
-      if (durationMin < 0) durationMin = 0;
-      totalMinutes += durationMin;
-
-      const h = Math.floor(durationMin / 60);
-      const m = durationMin % 60;
-      html += `<p><strong>VOYAGE ${id} - DURÉE:</strong> ${h}h${String(m).padStart(2, "0")}</p>`;
-    });
+      let duration = (fH * 60 + fM) - (dH * 60 + dM);
+      if (duration < 0) duration = 0;
+      totalMinutes += duration;
+      const durH = Math.floor(duration / 60);
+      const durM = duration % 60;
+      html += `<p><strong>VOYAGE ${id} - DURÉE:</strong> ${durH}h${String(durM).padStart(2, "0")}</p>`;
+    }
 
     if (totalMinutes > 0) {
-      const totalH = Math.floor(totalMinutes / 60);
-      const totalM = totalMinutes % 60;
-      html += `<hr/><p><strong>TOTAL D'HEURES TRAVAILLÉES:</strong> ${totalH}h${String(totalM).padStart(2, "0")}</p>`;
+      const h = Math.floor(totalMinutes / 60);
+      const m = totalMinutes % 60;
+      html += `<hr/><p><strong>TOTAL D'HEURES TRAVAILLÉES:</strong> ${h}h${String(m).padStart(2, "0")}</p>`;
     }
 
     resumeContent.innerHTML = html;
-    document.getElementById("formulaire").classList.add("d-none");
+    formEl.classList.add("d-none");
     resumeContainer.classList.remove("d-none");
   });
 
@@ -474,32 +466,23 @@
     document.getElementById("formulaire").classList.remove("d-none");
   });
 
-  // Envoi du formulaire après confirmation
   document.getElementById("btn-confirm").addEventListener("click", () => {
-  const formData = new FormData(document.getElementById("formulaire"));
-  const data = {};
-  formData.forEach((val, key) => data[key] = val);
+    const formData = new FormData(document.getElementById("formulaire"));
+    const data = {};
+    formData.forEach((val, key) => data[key] = val);
 
-  fetch("https://script.google.com/macros/s/AKfycbwDpu9mbawoCGeXVwENdlhSq29u4Un2A8RrK3K0R0ELMDmV9l8BwcJor03HF5_FhuuH/exec", {
-  method: "POST",
-  mode: "no-cors",
-  body: JSON.stringify(data),
-  headers: {
-    "Content-Type": "application/json"
-  }
-})
-// Pas de .then car pas de réponse lisible en no-cors
-.catch(err => {
-  alert("Erreur de connexion au serveur.");
-  console.error(err);
-});
+    fetch("https://script.google.com/macros/s/AKfycbwDpu9mbawoCGeXVwENdlhSq29u4Un2A8RrK3K0R0ELMDmV9l8BwcJor03HF5_FhuuH/exec", {
+      method: "POST",
+      mode: "no-cors",
+      body: JSON.stringify(data),
+      headers: { "Content-Type": "application/json" }
+    });
 
-// Affichage manuel immédiat
-resumeContainer.classList.add("d-none");
-document.getElementById("confirmationContainer").classList.remove("d-none");
-});
-  
+    resumeContainer.classList.add("d-none");
+    document.getElementById("confirmationContainer").classList.remove("d-none");
+  });
 </script>
+  
   <script>
   fetch("https://script.google.com/macros/s/AKfycbwDpu9mbawoCGeXVwENdlhSq29u4Un2A8RrK3K0R0ELMDmV9l8BwcJor03HF5_FhuuH/exec") // à remplacer par l'URL réelle de Google Apps Script
     .then(res => res.json())

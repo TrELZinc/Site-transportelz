@@ -33,8 +33,14 @@
     .menu-toggle {
       display: flex;
       flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 40px;
+      height: 30px;
       cursor: pointer;
+      z-index: 1001;
     }
+
     .menu-toggle span {
       height: 3px;
       width: 25px;
@@ -42,6 +48,21 @@
       margin: 4px 0;
       transition: 0.3s;
     }
+    
+    /* Animation pour le hamburger */
+    .menu-toggle.active span:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+    
+    .menu-toggle.active span:nth-child(2) {
+      opacity: 0;
+    }
+    
+    .menu-toggle.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(5px, -5px);
+    }
+    
+    /* Important: Styles du menu */
     .menu {
       display: none;
       position: absolute;
@@ -52,10 +73,14 @@
       border-radius: 6px;
       padding: 10px;
       z-index: 999;
+      min-width: 150px; /* Largeur minimale pour le menu */
     }
+    
+    /* Important: Cette classe contrôle l'affichage du menu */
     .menu.show {
-      display: block;
+      display: block !important; /* Forcer l'affichage */
     }
+
     .menu a {
       display: block;
       color: white;
@@ -143,6 +168,69 @@
       gap: 10px;
       flex-wrap: wrap;
     }
+    .menu-wrapper {
+  position: relative;
+}
+
+.menu-toggle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 30px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.menu-toggle::-webkit-details-marker {
+  display: none;
+}
+
+.menu-toggle span {
+  height: 3px;
+  width: 25px;
+  background: white;
+  margin: 4px 0;
+  transition: 0.3s;
+}
+
+.menu-wrapper[open] .menu-toggle span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.menu-wrapper[open] .menu-toggle span:nth-child(2) {
+  opacity: 0;
+}
+
+.menu-wrapper[open] .menu-toggle span:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+.menu {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  background-color: #111;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 10px;
+  z-index: 999;
+  min-width: 150px;
+}
+
+.menu a {
+  display: block;
+  color: white;
+  padding: 8px 12px;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.menu a:hover {
+  background-color: #333;
+}
+
     .buttons button {
       padding: 12px 24px;
       border: none;
@@ -180,20 +268,39 @@
       }
     }
   </style>
+  <!-- Firebase SDK en mode compat -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyD4U85mokKXsAP1AdwClWtcbt8udZrwlAw",
+    authDomain: "sommaireelz.firebaseapp.com",
+    projectId: "sommaireelz",
+    storageBucket: "sommaireelz.firebasestorage.app",
+    messagingSenderId: "171788284751",
+    appId: "1:171788284751:web:694f070d1cafe8b7c04b3a"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+</script>
+
 </head>
 <body>
   <header>
     <img src="assets/logo.jpeg" alt="Logo Transport ELZ">
-    <!-- Removed ID to simplify and use direct onclick -->
-    <div class="menu-toggle" onclick="toggleMenu()">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
-    <div class="menu" id="menuDropdown">
-      <a href="test.html">Sommaire</a>
-      <a href="linktree.html">Menu</a>
-    </div>
+    <details class="menu-wrapper">
+  <summary class="menu-toggle">
+    <span></span>
+    <span></span>
+    <span></span>
+  </summary>
+  <div class="menu">
+    <a href="sommaire.html">Sommaire</a>
+    <a href="linktree.html">Menu</a>
+  </div>
+</details>
   </header>
   <div class="container">
     <div class="top-bar">
@@ -219,22 +326,19 @@
   </div>
   
   <script>
-    // Toggle menu function - simple direct approach
-    function toggleMenu() {
-      const menu = document.getElementById("menuDropdown");
-      menu.classList.toggle("show");
+    
+    function saveToFirebase(data, callback) {
+      db.collection("disponibilites_dispos").add(data) // Collection différente
+        .then(() => {
+          console.log("✅ Données enregistrées dans Firestore (dispos) !");
+          if (typeof callback === "function") callback();
+        })
+        .catch((error) => {
+          console.error("❌ Erreur Firestore :", error);
+          alert("Erreur Firestore : " + error.message);
+        });
     }
-    
-    // Close menu when clicking outside
-    document.addEventListener("click", function(e) {
-      const menu = document.getElementById("menuDropdown");
-      const toggle = document.querySelector(".menu-toggle");
-      
-      if (!toggle.contains(e.target) && !menu.contains(e.target)) {
-        menu.classList.remove("show");
-      }
-    });
-    
+
     function createRow() {
       const row = document.createElement("tr");
       row.innerHTML = `
@@ -263,88 +367,124 @@
     }
 
     function sendForm() {
-  const tableClone = document.getElementById("dispoTable").cloneNode(true);
-  const rows = tableClone.querySelectorAll("tbody tr");
+      const tableClone = document.getElementById("dispoTable").cloneNode(true);
+      const rows = tableClone.querySelectorAll("tbody tr");
 
-  rows.forEach(row => {
-    const cells = row.querySelectorAll("td");
-    let isRowEmpty = true;
+      rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        let isRowEmpty = true;
 
-    for (let i = 0; i < cells.length; i++) {
-      if (i === 1) continue;
-      const text = cells[i]?.innerText?.trim();
-      if (text) {
-        isRowEmpty = false;
-        break;
-      }
-    }
-
-    for (let i = 0; i < cells.length; i++) {
-      const cell = cells[i];
-
-      if (i === 1) {
-        const content = cell.textContent.trim();
-        const isChecked =
-          content.includes("✔️") || content.includes("✅") ||
-          cell.querySelector("input[type='checkbox']")?.checked;
-
-        if (isChecked) {
-          cell.innerHTML = '<span style="font-size:16px;">✔️</span>';
-        } else {
-          cell.innerHTML = isRowEmpty ? '' : '<span style="font-size:16px;">❌</span>';
+        for (let i = 0; i < cells.length; i++) {
+          if (i === 1) continue;
+          const text = cells[i]?.innerText?.trim();
+          if (text) {
+            isRowEmpty = false;
+            break;
+          }
         }
-      } else if (cell.hasAttribute("contenteditable")) {
-        cell.innerText = cell.innerText.trim().toUpperCase();
+
+        for (let i = 0; i < cells.length; i++) {
+          const cell = cells[i];
+
+          if (i === 1) {
+            const content = cell.textContent.trim();
+            const isChecked =
+              content.includes("✔️") || content.includes("✅") ||
+              cell.querySelector("input[type='checkbox']")?.checked;
+
+            if (isChecked) {
+              cell.innerHTML = '<span style="font-size:16px;">✔️</span>';
+            } else {
+              cell.innerHTML = isRowEmpty ? '' : '<span style="font-size:16px;">❌</span>';
+            }
+          } else if (cell.hasAttribute("contenteditable")) {
+            cell.innerText = cell.innerText.trim().toUpperCase();
+          }
+        }
+      });
+
+      const selectedDate = document.querySelector("#dateSelect")?.value || "";
+      if (!selectedDate) {
+        alert("Veuillez sélectionner une date.");
+        return;
       }
+
+      const data = {
+        note: document.getElementById("note").value,
+        date: selectedDate,
+        table: tableClone.outerHTML
+      };
+
+      fetch("https://script.google.com/macros/s/AKfycbyq8lsT9xzM2AEpBEyHcH4PgCa0egwnHLvYTMP9S66C6HufgmYK3YIxzAKoXsS-XpsUTg/exec", {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      alert("Disponibilités envoyées !");
     }
-  });
-
-  const selectedDate = document.querySelector("#dateSelect")?.value || "";
-  if (!selectedDate) {
-    alert("Veuillez sélectionner une date.");
-    return;
-  }
-
-  const data = {
-    note: document.getElementById("note").value,
-    date: selectedDate,
-    table: tableClone.outerHTML
-  };
-
-  fetch("https://script.google.com/macros/s/AKfycbxpF0SN_syQGYNoJT1i1GunEZk8RluWHHogxp9FoABcBx3LHDIAbv6aNrv-6FWD1ucGGA/exec", {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  });
-
-  alert("Disponibilités envoyées !");
-}
 
     function resetForm() {
       document.getElementById("note").value = "";
       document.getElementById("dateSelect").value = "";
       localStorage.clear();
-      generateDefaultRows(9); // Use the existing function to reset rows
+
+      const rows = document.querySelectorAll("#dispoTable tbody tr");
+      rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        if (cells[4]) cells[4].textContent = "";
+        if (cells[5]) cells[5].textContent = "";
+      });
     }
-function formatDate(dateStr) {
-  if (!dateStr) return "Date non sélectionnée";
-  const d = new Date(dateStr);
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  return `${yyyy}-${mm}-${dd}`;
-}
+
+    function formatDate(dateStr) {
+      if (!dateStr) return "Date non sélectionnée";
+      const d = new Date(dateStr);
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
 
     function saveData() {
       try {
         const table = document.getElementById("dispoTable");
         if (!table) throw new Error("Table introuvable");
 
-        localStorage.setItem("dispo_note", document.getElementById("note").value);
-        localStorage.setItem("dispo_date", document.getElementById("dateSelect").value);
+        const date = document.getElementById("dateSelect").value;
+        const note = document.getElementById("note").value;
+
+        const rows = Array.from(document.querySelectorAll("#dispoTable tbody tr")).map(tr => {
+          const cells = Array.from(tr.querySelectorAll("td")).slice(0, 6).map(td => td.textContent.trim());
+          return {
+            chauffeur: cells[0] || "",
+            us: cells[1] || "",
+            camion: cells[2] || "",
+            remorque: cells[3] || "",
+            depart: cells[4] || "",
+            note: cells[5] || ""
+          };
+        });
+
+        const data = {
+          date,
+          note,
+          table: table.outerHTML,
+          rows,
+          timestamp: new Date().toISOString()
+        };
+
+        // 🧠 Enregistrement local
+        localStorage.setItem("dispo_note", note);
+        localStorage.setItem("dispo_date", date);
         localStorage.setItem("dispo_table", table.outerHTML);
-        alert("Données sauvegardées !");
+
+        // ☁️ Enregistrement dans Firestore
+        saveToFirebase(data, () => {
+          alert("✅ Données sauvegardées localement et dans Firebase !");
+        });
+
       } catch (err) {
         alert("Erreur lors de la sauvegarde : " + err.message);
       }
@@ -379,19 +519,42 @@ function formatDate(dateStr) {
       if (date) document.getElementById("dateSelect").value = date;
 
       if (table) {
-  document.getElementById("dispoTable").outerHTML = table;
-  // 🛠️ Important : rebrancher les événements après avoir remplacé le HTML
-  setTimeout(() => {
-    const newTable = document.getElementById("dispoTable");
-    const usCells = newTable.querySelectorAll(".us-cell");
-    usCells.forEach(cell => {
-      cell.onclick = () => toggleUS(cell);
-    });
-  }, 0);
-} else {
-  generateDefaultRows(9);
-}
+        document.getElementById("dispoTable").outerHTML = table;
+        setTimeout(() => {
+          const newTable = document.getElementById("dispoTable");
+          const usCells = newTable.querySelectorAll(".us-cell");
+          usCells.forEach(cell => {
+            cell.onclick = () => toggleUS(cell);
+          });
+        }, 0);
+      } else {
+        generateDefaultRows(9);
+      }
 
+      // 🔁 Toujours tenter de charger la dernière saisie depuis Firestore
+      db.collection("disponibilites_dispos")
+        .orderBy("timestamp", "desc")
+        .limit(1)
+        .get()
+        .then(snapshot => {
+          if (!snapshot.empty) {
+            const data = snapshot.docs[0].data();
+            document.getElementById("note").value = data.note || "";
+            document.getElementById("dateSelect").value = data.date || "";
+            document.getElementById("dispoTable").outerHTML = data.table;
+
+            setTimeout(() => {
+              const usCells = document.querySelectorAll(".us-cell");
+              usCells.forEach(cell => {
+                cell.onclick = () => toggleUS(cell);
+              });
+            }, 0);
+
+            console.log("✅ Données chargées depuis Firestore !");
+          } else {
+            console.log("📭 Aucune donnée trouvée dans Firestore.");
+          }
+        });
     };
   </script>
 </body>

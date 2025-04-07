@@ -105,8 +105,6 @@
     let voyageCount = 0;
     const MAX_VOYAGES = 3;
 
-    addVoyageSection();
-
     function addVoyageSection() {
       if (voyageCount >= MAX_VOYAGES) return;
       voyageCount++;
@@ -575,21 +573,30 @@ document.addEventListener("change", (e) => {
 
  <script>
   fetch("https://script.google.com/macros/s/AKfycbxakbBK9TUcJ5gQQ4nL3vuDoGw2kt9zY3fMVb1tImOvnWNXdNb3kYIIGRh-VLp5dkNi/exec")
-    .then(res => res.json())
-    .then(data => {
-      const select = document.getElementById("nom");
-      if (data?.chauffeurs?.length) {
-        data.chauffeurs.forEach(chauffeur => {
-          const opt = document.createElement("option");
-          opt.value = chauffeur.nom;
-          opt.textContent = chauffeur.nom;
-          select.appendChild(opt);
-        });
-      } else {
-        console.warn("Aucun chauffeur trouvé dans la réponse.");
+  .then(res => res.json())
+  .then(data => {
+    tauxMap = data.chauffeurs.reduce((acc, el) => {
+      acc[el.nom] = {
+        taux_h: parseFloat(el.taux_h),
+        taux_km: parseFloat(el.taux_km),
+      };
+      return acc;
+    }, {});
+
+    kmMap = data.kilometrages.reduce((acc, el) => {
+      acc[el.origine] = acc[el.origine] || {};
+      acc[el.origine][el.destination] = parseFloat(el.km);
+      if (!destinations.includes(el.destination)) {
+        destinations.push(el.destination);
       }
-    })
-    .catch(err => console.error("Erreur chargement chauffeurs:", err));
+      return acc;
+    }, {});
+
+    // ✅ Appel ici APRÈS avoir toutes les destinations
+    addVoyageSection();
+  })
+  .catch(err => console.error("Erreur chargement taux ou km:", err));
+
 </script>
  
 </body>

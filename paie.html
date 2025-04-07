@@ -105,7 +105,39 @@
             <option value="R010">Remorque R010</option>
           </select>
         </div>
+<hr class="my-4" />
 
+<div class="p-3 rounded" style="background-color: #f8f9fa;">
+  <h5 class="mb-3 text-dark">Type de voyage</h5>
+
+  <div class="form-check">
+    <input
+      class="form-check-input"
+      type="radio"
+      name="type_voyage"
+      id="voyage_km"
+      value="kilometrage"
+      required
+    />
+    <label class="form-check-label text-dark" for="voyage_km">
+      Voyage au kilométrage
+    </label>
+  </div>
+
+  <div class="form-check">
+    <input
+      class="form-check-input"
+      type="radio"
+      name="type_voyage"
+      id="voyage_heure"
+      value="heure"
+      required
+    />
+    <label class="form-check-label text-dark" for="voyage_heure">
+      Voyage à l’heure
+    </label>
+  </div>
+</div>
         <button type="submit" class="btn btn-primary w-100">
           Continuer
         </button>

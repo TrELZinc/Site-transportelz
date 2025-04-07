@@ -396,6 +396,16 @@
   </div>
 </div>
 
+<!-- Confirmation après envoi -->
+<div class="container py-4 d-none" id="confirmationContainer">
+  <div class="section-box text-center">
+    <h4 class="mb-3 text-success">Formulaire envoyé 🎉</h4>
+    <p>Merci pour votre envoi. Vos données ont été enregistrées avec succès.</p>
+    <button class="btn btn-primary mt-3" onclick="window.location.reload()">Remplir un nouveau formulaire</button>
+  </div>
+</div>
+
+
 <script>
   const btnPreview = document.getElementById("btn-preview");
   const resumeContainer = document.getElementById("resumeContainer");
@@ -426,7 +436,10 @@
 
   // Envoi du formulaire après confirmation
   document.getElementById("btn-confirm").addEventListener("click", () => {
-    document.getElementById("formulaire").submit();
+    resumeContainer.classList.add("d-none");
+    document.getElementById("confirmationContainer").classList.remove("d-none");
+    // document.getElementById("formulaire").submit(); // activer ça plus tard avec Google Sheets
+
   });
 </script>
 </body>

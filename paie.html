@@ -128,26 +128,29 @@
           const container = section.querySelector(`#details_${id}`);
           if (radio.value === "heure") {
             container.innerHTML = `
-              <div class="mb-3">
-                <label class="form-label">Origine</label>
-                <select class="form-select" name="origine_${id}" required>
-                  <option value="St-Basile" selected>St-Basile</option>
-                  <option value="Vimont">Vimont</option>
-                  <option value="Stanstead">Stanstead</option>
-                </select>
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Destination</label>
-                <input type="text" class="form-control" name="destination_${id}" required />
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Heure de début</label>
-                <input type="time" class="form-control" name="heure_debut_${id}" required />
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Heure de fin</label>
-                <input type="time" class="form-control" name="heure_fin_${id}" required />
-              </div>
+             <div class="mb-3">
+  <label class="form-label">Origine</label>
+  <select class="form-select" name="origine_${id}" required>
+    <option value="St-Basile" selected>St-Basile</option>
+    <option value="Vimont">Vimont</option>
+    <option value="Stanstead">Stanstead</option>
+  </select>
+</div>
+
+<div class="mb-3">
+  <label class="form-label">Destination</label>
+  <input type="text" class="form-control" name="destination_${id}" required />
+</div>
+
+<div class="mb-3">
+  <label class="form-label">Heure de début</label>
+  <input type="time" step="900" class="form-control" name="heure_debut_${id}" required />
+</div>
+
+<div class="mb-3">
+  <label class="form-label">Heure de fin</label>
+  <input type="time" step="900" class="form-control" name="heure_fin_${id}" required />
+</div>
               ${id < MAX_VOYAGES ? getSuiviHTML(id) : ''}
             `;
             setupSuiviListener(id);

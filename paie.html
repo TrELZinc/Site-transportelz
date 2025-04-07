@@ -422,9 +422,9 @@
     for (const [key, value] of data.entries()) {
       if (value.trim() === "") continue;
 
-      const match = key.match(/(heure_(debut|fin))_([hm])_(\d+)/);
+      const match = key.match(/heure_(debut|fin)_(h|m)_(\d+)/);
       if (match) {
-        const [, , type, part, id] = match;
+        const [, type, part, id] = match;
         const label = `heure_${type}_${id}`;
         regrouped[label] = regrouped[label] || {};
         regrouped[label][part] = value;
@@ -453,8 +453,8 @@
       const debutStr = `${String(dH).padStart(2, "0")}h${String(dM).padStart(2, "0")}`;
       const finStr = `${String(fH).padStart(2, "0")}h${String(fM).padStart(2, "0")}`;
 
-      html += `<p><strong>HEURE DE DÉBUT (Voyage ${id}):</strong> ${debutStr}</p>`;
-      html += `<p><strong>HEURE DE FIN (Voyage ${id}):</strong> ${finStr}</p>`;
+      html += `<p><strong>VOYAGE ${id} - HEURE DE DÉBUT:</strong> ${debutStr}</p>`;
+      html += `<p><strong>VOYAGE ${id} - HEURE DE FIN:</strong> ${finStr}</p>`;
 
       let durationMin = (fH * 60 + fM) - (dH * 60 + dM);
       if (durationMin < 0) durationMin = 0;
@@ -462,7 +462,7 @@
 
       const h = Math.floor(durationMin / 60);
       const m = durationMin % 60;
-      html += `<p><strong>DURÉE (Voyage ${id}):</strong> ${h}h${String(m).padStart(2, "0")}</p>`;
+      html += `<p><strong>VOYAGE ${id} - DURÉE:</strong> ${h}h${String(m).padStart(2, "0")}</p>`;
     });
 
     if (totalMinutes > 0) {

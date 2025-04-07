@@ -440,18 +440,84 @@
 </script>
   
   <script>
-  fetch("https://script.google.com/macros/s/AKfycbwDpu9mbawoCGeXVwENdlhSq29u4Un2A8RrK3K0R0ELMDmV9l8BwcJor03HF5_FhuuH/exec") // à remplacer par l'URL réelle de Google Apps Script
-    .then(res => res.json())
-    .then(data => {
-      const select = document.getElementById("nom");
-      data.forEach(chauffeur => {
-        const opt = document.createElement("option");
-        opt.value = chauffeur.nom;
-        opt.textContent = chauffeur.nom;
-        select.appendChild(opt);
-      });
-    })
-    .catch(err => console.error("Erreur chargement chauffeurs:", err));
+  // Lecture dynamique des taux
+let tauxChauffeurs = {};
+
+// Lecture de la feuille "TauxChauffeurs"
+fetch("https://script.google.com/macros/s/AKfycbwDpu9mbawoCGeXVwENdlhSq29u4Un2A8RrK3K0R0ELMDmV9l8BwcJor03HF5_FhuuH/exec?sheet=TauxChauffeurs")
+  .then(res => res.json())
+  .then(data => {
+    tauxChauffeurs = data.reduce((acc, row) => {
+      acc[row.nom] = {
+        taux_km: parseFloat(row.taux_km) || 0,
+        taux_heure: parseFloat(row.taux_heure) || 0
+      };
+      return acc;
+    }, {});
+  })
+  .catch(err => console.error("Erreur chargement taux:", err));
+
+btnPreview.addEventListener("click", () => {
+  const formEl = document.getElementById("formulaire");
+  const data = new FormData(formEl);
+  let html = "";
+  const heures = {};
+  let totalMinutes = 0;
+  let totalMontant = 0;
+
+  const chauffeur = data.get("nom");
+  const taux = tauxChauffeurs[chauffeur] || { taux_km: 0, taux_heure: 0 };
+
+  for (const [key, value] of data.entries()) {
+    if (value.trim() === "") continue;
+    const heureMatch = key.match(/heure_(debut|fin)_([hm])_(\d+)/);
+    if (heureMatch) {
+      const [, type, part, id] = heureMatch;
+      heures[id] = heures[id] || { debut: {}, fin: {} };
+      heures[id][type][part] = value;
+    } else {
+      let label = key.replace(/_/g, " ").replace(/\d+$/, "").toUpperCase();
+      if (label === "AUTRE") label = "AUTRE VOYAGE";
+      html += `<p><strong>${label}:</strong> ${value}</p>`;
+    }
+  }
+
+  for (const [id, obj] of Object.entries(heures)) {
+    const dH = parseInt(obj.debut.h || "0", 10);
+    const dM = parseInt(obj.debut.m || "0", 10);
+    const fH = parseInt(obj.fin.h || "0", 10);
+    const fM = parseInt(obj.fin.m || "0", 10);
+    const debutStr = `${String(dH).padStart(2, "0")}h${String(dM).padStart(2, "0")}`;
+    const finStr = `${String(fH).padStart(2, "0")}h${String(fM).padStart(2, "0")}`;
+
+    html += `<p><strong>VOYAGE ${id} - HEURE DE DÉBUT:</strong> ${debutStr}</p>`;
+    html += `<p><strong>VOYAGE ${id} - HEURE DE FIN:</strong> ${finStr}</p>`;
+
+    let duration = (fH * 60 + fM) - (dH * 60 + dM);
+    if (duration < 0) duration = 0;
+    totalMinutes += duration;
+    const durH = Math.floor(duration / 60);
+    const durM = duration % 60;
+
+    const montant = (duration / 60) * taux.taux_heure;
+    totalMontant += montant;
+
+    html += `<p><strong>VOYAGE ${id} - DURÉE:</strong> ${durH}h${String(durM).padStart(2, "0")}</p>`;
+    html += `<p><strong>VOYAGE ${id} - MONTANT:</strong> ${montant.toFixed(2)} $</p>`;
+  }
+
+  if (totalMinutes > 0) {
+    const h = Math.floor(totalMinutes / 60);
+    const m = totalMinutes % 60;
+    html += `<hr/><p><strong>TOTAL D'HEURES TRAVAILLÉES:</strong> ${h}h${String(m).padStart(2, "0")}</p>`;
+    html += `<p><strong>TOTAL PAYABLE:</strong> ${totalMontant.toFixed(2)} $</p>`;
+  }
+
+  resumeContent.innerHTML = html;
+  formEl.classList.add("d-none");
+  resumeContainer.classList.remove("d-none");
+});
+
 </script>
 </body>
 </html>

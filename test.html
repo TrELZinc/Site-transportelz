@@ -444,6 +444,7 @@ function generateHeureHtml(id) {
 </div>
 
 <script>
+document.addEventListener("DOMContentLoaded", () => {
   const btnPreview = document.getElementById("btn-preview");
   const resumeContainer = document.getElementById("resumeContainer");
   const resumeContent = document.getElementById("resumeContent");
@@ -456,7 +457,7 @@ function generateHeureHtml(id) {
     const heures = {};
     let totalMinutes = 0;
 
-     [key, value] of data.entries()) {
+    for (const [key, value] of data.entries()) {
       if (value.trim() === "") continue;
       const heureMatch = key.match(/heure_(debut|fin)_([hm])_(\d+)/);
       if (heureMatch) {
@@ -470,7 +471,7 @@ function generateHeureHtml(id) {
       }
     }
 
-     [id, obj] of Object.entries(heures)) {
+    for (const [id, obj] of Object.entries(heures)) {
       const dH = parseInt(obj.debut.h || "0", 10);
       const dM = parseInt(obj.debut.m || "0", 10);
       const fH = parseInt(obj.fin.h || "0", 10);
@@ -518,7 +519,9 @@ function generateHeureHtml(id) {
     resumeContainer.classList.add("d-none");
     document.getElementById("confirmationContainer").classList.remove("d-none");
   });
+});
 </script>
+
 
 <script>
   let tauxMap = {}; // par nom chauffeur

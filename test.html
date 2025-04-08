@@ -183,27 +183,21 @@
             setupSuiviListener(id);
           } else {
             container.innerHTML = `
-              <div class="mb-3">
-                <label class="form-label fw-bold text-uppercase">Origine</label>
-                <select class="form-select" name="origine_${id}" required>
-                  <option value="St-Basile" selected>St-Basile</option>
-                  <option value="Vimont">Vimont</option>
-                  <option value="Stanstead">Stanstead</option>
-                </select>
-              </div>
-              <div class="mb-3">
-                <label class="form-label fw-bold text-uppercase">Ville de destination</label>
-                <input list="destinations_${id}" class="form-control destination-input" name="destination_${id}" required />
-                  <datalist id="destinations_${id}"></datalist>
-                  <option value="Montréal"></option>
-                  <option value="Québec"></option>
-                  <option value="Gatineau"></option>
-                  <option value="Sherbrooke"></option>
-                  <option value="Drummondville"></option>
-                </datalist>
-              </div>
-              ${id < MAX_VOYAGES ? getSuiviHTML(id) : ''}
-            `;
+  <div class="mb-3">
+    <label class="form-label fw-bold text-uppercase">Origine</label>
+    <select class="form-select" name="origine_${id}" required>
+      <option value="St-Basile" selected>St-Basile</option>
+      <option value="Vimont">Vimont</option>
+      <option value="Stanstead">Stanstead</option>
+    </select>
+  </div>
+  <div class="mb-3">
+    <label class="form-label fw-bold text-uppercase">Ville de destination</label>
+    <input list="destinations_${id}" class="form-control destination-input" name="destination_${id}" required />
+    <datalist id="destinations_${id}"></datalist>
+  </div>
+  ${id < MAX_VOYAGES ? getSuiviHTML(id) : ''}
+`;
             setupSuiviListener(id);
           }
         });

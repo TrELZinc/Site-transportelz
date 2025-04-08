@@ -107,9 +107,15 @@
   <p class="mt-3">Chargement du formulaire...</p>
 </div>
   <script>
+    
     function normalizeStr(str) {
-  return (str || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+  return (str || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // ❗ corrige ici : sans l'échappement mal placé
+    .toLowerCase()
+    .trim();
 }
+
     
     const form = document.getElementById("formulaire");
     const voyageContainer = document.getElementById("voyageContainer");
@@ -639,14 +645,26 @@ document.getElementById("loader").style.display = "none";
 
     for (const [id, v] of Object.entries(voyages)) {
   if (v.type === "km") {
-    const origine = (v.origine || "").toLowerCase().trim();
-    const destination = (v.destination || "").toLowerCase().trim();
+    const origineNorm = normalizeStr(v.origine);
+    const destinationNorm = normalizeStr(v.destination);
+    const distancekm = kmMap[origineNorm]?.[destinationNorm] ?? 0;
     const montant = distancekm * taux.taux_km;
+
     html += `<p><strong>VOYAGE ${id} - DISTANCE:</strong> ${distancekm || "Inconnue"} km</p>`;
+    html += `<p><strong>VOYAGE ${id} - MONTANT (KM):</strong> ${montant.toFixed(2)}$</p>`;
+
     totalMontant += montant;
 
-    html += `<p><strong>VOYAGE ${id} - DISTANCE:</strong> ${km} km</p>`;
-    html += `<p><strong>VOYAGE ${id} - MONTANT (KM):</strong> ${montant.toFixed(2)}$</p>`;
+    // Debug log (facultatif)
+    console.log(`✅ VOYAGE ${id}`, {
+      origineNorm,
+      destinationNorm,
+      distancekm,
+      montant
+    });
+  }
+}
+
 
     // Debug logs pour analyse
     console.log(`🎯 VOYAGE ${id}`);

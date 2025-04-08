@@ -240,14 +240,18 @@ function setupAutocomplete(input, listContainer, origine) {
   });
 
   input.addEventListener("blur", () => {
-    setTimeout(() => {
-      const destNorm = normalizeStr(input.value);
-      const distanceKm = kmMap[origineNorm]?.[destNorm];
-      preview.textContent = destNorm
-        ? (distanceKm !== undefined ? `Distance estimée : ${distanceKm} km` : "Distance inconnue.")
-        : "";
-    }, 200);
-  });
+  setTimeout(() => {
+    const destNorm = normalizeStr(input.value);
+    const distanceKm = kmMap[origineNorm]?.[destNorm];
+    preview.textContent = ""; // ✅ Vide d'abord
+    if (destNorm) {
+      preview.textContent = distanceKm !== undefined
+        ? `Distance estimée : ${distanceKm} km`
+        : "Distance inconnue.";
+    }
+  }, 200);
+});
+
 
   document.addEventListener("click", (e) => {
     if (!listContainer.contains(e.target) && e.target !== input) {

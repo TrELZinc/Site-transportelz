@@ -13,7 +13,9 @@
 .mb-3 {
   margin-bottom: 1.25rem;
 }
-
+.autocomplete-list div:hover {
+  background-color: #f0f0f0;
+}
     body {
       background-color: #f8f9fa;
       color: #212529;
@@ -50,7 +52,7 @@
 <body>
   <div class="container py-4">
     <h2 class="mb-4 text-center">Journal de travail</h2>
-    <form id="formulaire">
+    <form id="formulaire" class="d-none">
       <div class="section-box">
         <div class="mb-3">
           <label for="date" class="form-label fw-bold text-uppercase">Date</label>
@@ -98,117 +100,196 @@
       <button type="button" class="btn btn-primary w-100 mt-3" id="btn-preview">Prévisualiser</button>
     </form>
   </div>
-
+<div id="loader" class="text-center py-5">
+  <div class="spinner-border text-danger" role="status">
+    <span class="visually-hidden">Chargement...</span>
+  </div>
+  <p class="mt-3">Chargement du formulaire...</p>
+</div>
   <script>
+    
+    function normalizeStr(str) {
+  return (str || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // ❗ corrige ici : sans l'échappement mal placé
+    .toLowerCase()
+    .trim();
+}
+
+    
     const form = document.getElementById("formulaire");
     const voyageContainer = document.getElementById("voyageContainer");
     let voyageCount = 0;
     const MAX_VOYAGES = 3;
 
-    addVoyageSection();
 
     function addVoyageSection() {
-      if (voyageCount >= MAX_VOYAGES) return;
-      voyageCount++;
-      const id = voyageCount;
+  if (voyageCount >= MAX_VOYAGES) return;
+  voyageCount++;
+  const id = voyageCount;
 
-      const section = document.createElement("div");
-      section.className = "section-box";
-      section.innerHTML = `
-        <h5 class="mb-3">Voyage ${id}</h5>
-        <div class="mb-3">
-          <label class="form-label fw-bold text-uppercase">Type de voyage</label>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="type_voyage_${id}" id="km_${id}" value="kilometrage" required>
-            <label class="form-check-label" for="km_${id}">Voyage au kilométrage</label>
+  const section = document.createElement("div");
+  section.className = "section-box";
+  section.innerHTML = `
+    <h5 class="mb-3">Voyage ${id}</h5>
+    <div class="mb-3">
+      <label class="form-label fw-bold text-uppercase">Type de voyage</label>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="type_voyage_${id}" id="km_${id}" value="kilometrage" required>
+        <label class="form-check-label" for="km_${id}">Voyage au kilométrage</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="type_voyage_${id}" id="heure_${id}" value="heure" required>
+        <label class="form-check-label" for="heure_${id}">Voyage à l’heure</label>
+      </div>
+    </div>
+    <div id="details_${id}"></div>
+  `;
+  voyageContainer.appendChild(section);
+
+  section.querySelectorAll(`input[name="type_voyage_${id}"]`).forEach((radio) => {
+    radio.addEventListener("change", () => {
+      const container = section.querySelector(`#details_${id}`);
+      if (radio.value === "heure") {
+        container.innerHTML = `
+          <div class="mb-3">
+            <label class="form-label fw-bold text-uppercase">Origine</label>
+            <select class="form-select" name="origine_${id}" required>
+              <option value="St-Basile" selected>St-Basile</option>
+              <option value="Vimont">Vimont</option>
+              <option value="Stanstead">Stanstead</option>
+            </select>
           </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="type_voyage_${id}" id="heure_${id}" value="heure" required>
-            <label class="form-check-label" for="heure_${id}">Voyage à l’heure</label>
+          <div class="mb-3">
+            <label class="form-label fw-bold text-uppercase">Destination</label>
+            <input type="text" class="form-control" name="destination_${id}" required />
           </div>
-        </div>
-        <div id="details_${id}"></div>
-      `;
-      voyageContainer.appendChild(section);
+          ${generateHeureHtml(id)}
+          ${id < MAX_VOYAGES ? getSuiviHTML(id) : ''}
+        `;
+        setupSuiviListener(id);
+      } else {
+        container.innerHTML = `
+          <div class="mb-3">
+            <label class="form-label fw-bold text-uppercase">Origine</label>
+            <select class="form-select origine-select" name="origine_${id}" id="origine_${id}" required>
+              <option value="St-Basile" selected>St-Basile</option>
+              <option value="Vimont">Vimont</option>
+              <option value="Stanstead">Stanstead</option>
+            </select>
+          </div>
+          <div class="mb-3 position-relative">
+            <label class="form-label fw-bold text-uppercase">Ville de destination</label>
+            <input type="text" class="form-control destination-input" name="destination_${id}" id="destination_${id}" autocomplete="off" required />
+            <div class="autocomplete-list position-absolute bg-white border border-1 rounded shadow-sm z-3 w-100" id="autocomplete_${id}" style="display: none;"></div>
+          </div>
+          ${id < MAX_VOYAGES ? getSuiviHTML(id) : ''}
+        `;
+        setupSuiviListener(id);
 
-      section.querySelectorAll(`input[name="type_voyage_${id}"]`).forEach((radio) => {
-        radio.addEventListener("change", () => {
-          const container = section.querySelector(`#details_${id}`);
-          if (radio.value === "heure") {
-            container.innerHTML = `
-              <div class="mb-3">
-                <label class="form-label fw-bold text-uppercase">Origine</label>
-                <select class="form-select" name="origine_${id}" required>
-                  <option value="St-Basile" selected>St-Basile</option>
-                  <option value="Vimont">Vimont</option>
-                  <option value="Stanstead">Stanstead</option>
-                </select>
-              </div>
-              <div class="mb-3">
-                <label class="form-label fw-bold text-uppercase">Destination</label>
-                <input type="text" class="form-control" name="destination_${id}" required />
-              </div>
-              <div class="mb-3">
-  <label class="form-label fw-bold text-uppercase">Heure de début</label>
-  <div class="d-flex gap-2">
-    <select class="form-select" name="heure_debut_h_${id}" required>
-      ${Array.from({length: 24}, (_, i) => `<option value="${String(i).padStart(2, '0')}">${String(i).padStart(2, '0')}</option>`).join('')}
-    </select>
-    <select class="form-select" name="heure_debut_m_${id}" required>
-      <option value="00">00</option>
-      <option value="15">15</option>
-      <option value="30">30</option>
-      <option value="45">45</option>
-    </select>
-  </div>
-</div>
+        const origineSelect = section.querySelector(`#origine_${id}`);
+        const destinationInput = section.querySelector(`#destination_${id}`);
+        const listContainer = section.querySelector(`#autocomplete_${id}`);
 
-<div class="mb-3">
-  <label class="form-label fw-bold text-uppercase">Heure de fin</label>
-  <div class="d-flex gap-2">
-    <select class="form-select" name="heure_fin_h_${id}" required>
-      ${Array.from({length: 24}, (_, i) => `<option value="${String(i).padStart(2, '0')}">${String(i).padStart(2, '0')}</option>`).join('')}
-    </select>
-    <select class="form-select" name="heure_fin_m_${id}" required>
-      <option value="00">00</option>
-      <option value="15">15</option>
-      <option value="30">30</option>
-      <option value="45">45</option>
-    </select>
-  </div>
-</div>
-
-              ${id < MAX_VOYAGES ? getSuiviHTML(id) : ''}
-            `;
-            setupSuiviListener(id);
-          } else {
-            container.innerHTML = `
-              <div class="mb-3">
-                <label class="form-label fw-bold text-uppercase">Origine</label>
-                <select class="form-select" name="origine_${id}" required>
-                  <option value="St-Basile" selected>St-Basile</option>
-                  <option value="Vimont">Vimont</option>
-                  <option value="Stanstead">Stanstead</option>
-                </select>
-              </div>
-              <div class="mb-3">
-                <label class="form-label fw-bold text-uppercase">Ville de destination</label>
-                <input list="destinations" class="form-control" name="destination_${id}" required />
-                <datalist id="destinations">
-                  <option value="Montréal"></option>
-                  <option value="Québec"></option>
-                  <option value="Gatineau"></option>
-                  <option value="Sherbrooke"></option>
-                  <option value="Drummondville"></option>
-                </datalist>
-              </div>
-              ${id < MAX_VOYAGES ? getSuiviHTML(id) : ''}
-            `;
-            setupSuiviListener(id);
-          }
+        setupAutocomplete(destinationInput, listContainer, origineSelect.value.toLowerCase().trim());
+        origineSelect.addEventListener("change", () => {
+        setupAutocomplete(destinationInput, listContainer, origineSelect.value.toLowerCase().trim());
         });
+      }
+    });
+  });
+}
+
+function setupAutocomplete(input, listContainer, origine) {
+  const origineNorm = normalizeStr(origine);
+  let preview = document.createElement("div");
+  preview.className = "text-muted mt-1 small";
+  input.parentNode.appendChild(preview);
+
+  input.addEventListener("input", () => {
+    const valeur = normalizeStr(input.value);
+    listContainer.innerHTML = "";
+    listContainer.style.display = "none";
+    preview.textContent = "";
+
+    if (!valeur || !kmMap[origineNorm]) return;
+
+    const correspondants = Object.keys(kmMap[origineNorm]).filter(dest =>
+      normalizeStr(dest).includes(valeur)
+    );
+
+    if (correspondants.length === 0) return;
+
+    correspondants.forEach(dest => {
+      const opt = document.createElement("div");
+      opt.className = "p-2 border-bottom";
+      opt.style.cursor = "pointer";
+      opt.textContent = dest;
+      opt.addEventListener("click", () => {
+        input.value = dest;
+        listContainer.innerHTML = "";
+        listContainer.style.display = "none";
+
+        const destNorm = normalizeStr(dest);
+        const distanceKm = kmMap[origineNorm]?.[destNorm];
+        preview.textContent = distanceKm !== undefined ? `Distance estimée : ${distanceKm} km` : "Distance inconnue.";
       });
+      listContainer.appendChild(opt);
+    });
+    listContainer.style.display = "block";
+  });
+
+  input.addEventListener("blur", () => {
+  setTimeout(() => {
+    const valeur = normalizeStr(input.value);
+    const distanceKm = kmMap[origineNorm]?.[valeur];
+    preview.textContent = distanceKm !== undefined
+      ? `Distance estimée : ${distanceKm} km`
+      : "";
+  }, 200);
+});
+
+  document.addEventListener("click", (e) => {
+    if (!listContainer.contains(e.target) && e.target !== input) {
+      listContainer.style.display = "none";
     }
+  });
+}
+
+
+function generateHeureHtml(id) {
+  return `
+    <div class="mb-3">
+      <label class="form-label fw-bold text-uppercase">Heure de début</label>
+      <div class="d-flex gap-2">
+        <select class="form-select" name="heure_debut_h_${id}" required>
+          ${Array.from({length: 24}, (_, i) => `<option value="${String(i).padStart(2, '0')}">${String(i).padStart(2, '0')}</option>`).join('')}
+        </select>
+        <select class="form-select" name="heure_debut_m_${id}" required>
+          <option value="00">00</option>
+          <option value="15">15</option>
+          <option value="30">30</option>
+          <option value="45">45</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label fw-bold text-uppercase">Heure de fin</label>
+      <div class="d-flex gap-2">
+        <select class="form-select" name="heure_fin_h_${id}" required>
+          ${Array.from({length: 24}, (_, i) => `<option value="${String(i).padStart(2, '0')}">${String(i).padStart(2, '0')}</option>`).join('')}
+        </select>
+        <select class="form-select" name="heure_fin_m_${id}" required>
+          <option value="00">00</option>
+          <option value="15">15</option>
+          <option value="30">30</option>
+          <option value="45">45</option>
+        </select>
+      </div>
+    </div>
+  `;
+}
 
     function getSuiviHTML(id) {
       return `
@@ -363,10 +444,16 @@
 </div>
 
 <script>
+document.addEventListener("DOMContentLoaded", () => {
   const btnPreview = document.getElementById("btn-preview");
   const resumeContainer = document.getElementById("resumeContainer");
   const resumeContent = document.getElementById("resumeContent");
   const btnModifier = document.getElementById("btn-modifier");
+
+  if (!btnPreview) {
+    console.error("⛔ Le bouton #btn-preview est introuvable dans le DOM !");
+    return;
+  }
 
   btnPreview.addEventListener("click", () => {
     const formEl = document.getElementById("formulaire");
@@ -437,137 +524,78 @@
     resumeContainer.classList.add("d-none");
     document.getElementById("confirmationContainer").classList.remove("d-none");
   });
+});
 </script>
+
+
 <script>
   let tauxMap = {}; // par nom chauffeur
   let kmMap = {}; // origine -> destination -> km
 
   fetch("https://script.google.com/macros/s/AKfycbxakbBK9TUcJ5gQQ4nL3vuDoGw2kt9zY3fMVb1tImOvnWNXdNb3kYIIGRh-VLp5dkNi/exec")
-    .then((res) => res.json())
-    .then((data) => {
-      tauxMap = data.chauffeurs.reduce((acc, el) => {
-        acc[el.nom] = {
-          taux_h: parseFloat(el.taux_h),
-          taux_km: parseFloat(el.taux_km),
-        };
-        return acc;
-      }, {});
+  .then((res) => res.json())
+  .then((data) => {
+  console.log("Réponse brute reçue du fetch :", data);
 
-      kmMap = data.kilometrages.reduce((acc, el) => {
-        acc[el.origine] = acc[el.origine] || {};
-        acc[el.origine][el.destination] = parseFloat(el.km);
-        return acc;
-      }, {});
+    tauxMap = data.chauffeurs.reduce((acc, el) => {
+      acc[el.nom] = {
+        taux_h: parseFloat(el.taux_h),
+        taux_km: parseFloat(el.taux_km),
+      };
+      return acc;
+    }, {});
 
-      const destinationInputs = document.querySelectorAll('input[list="destinations"]');
-      destinationInputs.forEach(input => {
-        input.addEventListener('focus', () => {
-          const origineSelect = input.closest('.section-box').querySelector('select[name^="origine_"]');
-          const datalist = input.nextElementSibling;
-          const origine = origineSelect?.value;
-          datalist.innerHTML = "";
-          if (kmMap[origine]) {
-            Object.keys(kmMap[origine]).forEach(dest => {
-              const option = document.createElement("option");
-              option.value = dest;
-              datalist.appendChild(option);
-            });
-          }
-        });
-      });
-    })
-    .catch((err) => console.error("Erreur chargement taux ou km:", err));
+    kmMap = data.km.reduce((acc, el) => {
+  const origine = (el.origine || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+  const destination = (el.destination || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+  const kmValue = parseFloat(el.kilometrage);
 
-  btnPreview.addEventListener("click", () => {
-    const data = new FormData(document.getElementById("formulaire"));
-    const chauffeur = data.get("nom");
-    const taux = tauxMap[chauffeur] || { taux_h: 0, taux_km: 0 };
-    let html = "";
-    let totalMinutes = 0;
-    let totalMontant = 0;
+  if (!acc[origine]) acc[origine] = {};
+  acc[origine][destination] = isNaN(kmValue) ? 0 : kmValue;
 
-    const heures = {};
-    const voyages = {};
+  return acc;
+}, {});
 
-    for (const [key, value] of data.entries()) {
-      const heureMatch = key.match(/heure_(debut|fin)_([hm])_(\d+)/);
-      const typeMatch = key.match(/^type_voyage_(\d+)/);
-      const origineMatch = key.match(/^origine_(\d+)/);
-      const destinationMatch = key.match(/^destination_(\d+)/);
 
-      if (heureMatch) {
-        const [, type, part, id] = heureMatch;
-        heures[id] = heures[id] || { debut: {}, fin: {} };
-        heures[id][type][part] = value;
-      } else if (typeMatch) {
-        const id = typeMatch[1];
-        voyages[id] = voyages[id] || {};
-        voyages[id].type = value;
-      } else if (origineMatch) {
-        const id = origineMatch[1];
-        voyages[id] = voyages[id] || {};
-        voyages[id].origine = value;
-      } else if (destinationMatch) {
-        const id = destinationMatch[1];
-        voyages[id] = voyages[id] || {};
-        voyages[id].destination = value;
-      } else {
-        let label = key.replace(/_/g, " ").replace(/\d+$/, "").toUpperCase();
-        if (label === "AUTRE") label = "AUTRE VOYAGE";
-        html += `<p><strong>${label}:</strong> ${value}</p>`;
-      }
-    }
 
-    for (const [id, obj] of Object.entries(heures)) {
-      const dH = parseInt(obj.debut.h || "0", 10);
-      const dM = parseInt(obj.debut.m || "0", 10);
-      const fH = parseInt(obj.fin.h || "0", 10);
-      const fM = parseInt(obj.fin.m || "0", 10);
-      const debutStr = `${String(dH).padStart(2, "0")}h${String(dM).padStart(2, "0")}`;
-      const finStr = `${String(fH).padStart(2, "0")}h${String(fM).padStart(2, "0")}`;
-      html += `<p><strong>VOYAGE ${id} - HEURE DE DÉBUT:</strong> ${debutStr}</p>`;
-      html += `<p><strong>VOYAGE ${id} - HEURE DE FIN:</strong> ${finStr}</p>`;
-      let duration = (fH * 60 + fM) - (dH * 60 + dM);
-      if (duration < 0) duration = 0;
-      totalMinutes += duration;
-      const durH = Math.floor(duration / 60);
-      const durM = duration % 60;
-      html += `<p><strong>VOYAGE ${id} - DURÉE:</strong> ${durH}h${String(durM).padStart(2, "0")}</p>`;
-      if (voyages[id]?.type === "heure") {
-        const montant = (duration / 60) * taux.taux_h;
-        totalMontant += montant;
-        html += `<p><strong>VOYAGE ${id} - MONTANT (Heure):</strong> ${montant.toFixed(2)}$</p>`;
-      }
-    }
+    // Autocomplétion déclenchée au focus
+    document.addEventListener("focusin", (e) => {
+      if (e.target.classList.contains("destination-input")) {
+        const input = e.target;
+        const section = input.closest(".section-box");
+        const origineSelect = section.querySelector('select[name^="origine_"]');
+        const origine = origineSelect?.value;
+        const datalistId = input.getAttribute("list");
+        const datalist = document.getElementById(datalistId);
 
-    for (const [id, v] of Object.entries(voyages)) {
-      if (v.type === "kilometrage") {
-        const km = kmMap[v.origine]?.[v.destination] || 0;
-        const montant = km * taux.taux_km;
-        totalMontant += montant;
-        html += `<p><strong>VOYAGE ${id} - DISTANCE:</strong> ${km} km</p>`;
-        html += `<p><strong>VOYAGE ${id} - MONTANT (KM):</strong> ${montant.toFixed(2)}$</p>`;
-      }
-    }
+        if (!datalist || !origine) return;
 
-    if (totalMinutes > 0) {
-      const h = Math.floor(totalMinutes / 60);
-      const m = totalMinutes % 60;
-      html += `<hr/><p><strong>TOTAL TEMPS:</strong> ${h}h${String(m).padStart(2, "0")}</p>`;
-    }
+        datalist.innerHTML = ""; // Nettoyer
 
-    html += `<p><strong>TOTAL GÉNÉRAL À PAYER:</strong> ${totalMontant.toFixed(2)}$</p>`;
-
-    resumeContent.innerHTML = html;
-    formEl.classList.add("d-none");
-    resumeContainer.classList.remove("d-none");
+        if (kmMap[origineNorm]) {
+  Object.keys(kmMap[origineNorm]).forEach((destination) => {
+    const option = document.createElement("option");
+    option.value = destination;
+    datalist.appendChild(option);
   });
+}
+      }
+    });
+
+    // >>> APPEL ICI : tout est prêt, on peut construire le formulaire
+    addVoyageSection();
+    document.getElementById("formulaire").classList.remove("d-none");
+document.getElementById("loader").style.display = "none";
+  })
+  .catch((err) => console.error("Erreur chargement taux ou km:", err));
+  
 </script>
 
  <script>
   fetch("https://script.google.com/macros/s/AKfycbxakbBK9TUcJ5gQQ4nL3vuDoGw2kt9zY3fMVb1tImOvnWNXdNb3kYIIGRh-VLp5dkNi/exec")
     .then(res => res.json())
     .then(data => {
+  console.log("Réponse brute reçue du fetch :", data);
       const select = document.getElementById("nom");
       if (data?.chauffeurs?.length) {
         data.chauffeurs.forEach(chauffeur => {

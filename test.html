@@ -507,7 +507,7 @@ function generateHeureHtml(id) {
       return acc;
     }, {});
 
-    kmMap = data.kilometrages.reduce((acc, el) => {
+    kmMap = data.km.reduce((acc, el) => {
       acc[el.origine] = acc[el.origine] || {};
       acc[el.origine][el.destination] = parseFloat(el.km);
       return acc;

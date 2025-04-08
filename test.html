@@ -107,6 +107,10 @@
   <p class="mt-3">Chargement du formulaire...</p>
 </div>
   <script>
+    function normalizeStr(str) {
+  return (str || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+}
+    
     const form = document.getElementById("formulaire");
     const voyageContainer = document.getElementById("voyageContainer");
     let voyageCount = 0;
@@ -234,20 +238,21 @@ function setupAutocomplete(input, listContainer, origine) {
   });
 
   input.addEventListener("blur", () => {
-    setTimeout(() => {
-      const destNorm = input.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-      const km = kmMap[origineNorm]?.[destNorm];
+  setTimeout(() => {
+    const destNorm = normalizeStr(input.value); // 🧼 Nettoyage avancé
+    const km = kmMap[origineNorm]?.[destNorm];
 
-      
-      if (destNorm) {
-        preview.textContent = km
-          ? `Distance estimée : ${km} km`
-          : "Distance inconnue.";
-      } else {
-        preview.textContent = "";
-      }
-    }, 200);
-  });
+    console.log("🔍 Recherche kmMap[", origineNorm, "][", destNorm, "] =", km); // 🐛 Debug
+
+    if (destNorm) {
+      preview.textContent = km
+        ? `Distance estimée : ${km} km`
+        : "Distance inconnue.";
+    } else {
+      preview.textContent = "";
+    }
+  }, 200);
+});
 
   document.addEventListener("click", (e) => {
     if (!listContainer.contains(e.target) && e.target !== input) {
@@ -538,15 +543,16 @@ function generateHeureHtml(id) {
     }, {});
 
     kmMap = data.km.reduce((acc, el) => {
-  const origine = el.origine.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
-  const destination = el.destination.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+  const origine = (el.origine || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+  const destination = (el.destination || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
   const kmValue = parseFloat(el.km);
 
-  acc[origine] = acc[origine] || {};
+  if (!acc[origine]) acc[origine] = {};
   acc[origine][destination] = isNaN(kmValue) ? 0 : kmValue;
 
   return acc;
 }, {});
+
 
 
     // Autocomplétion déclenchée au focus

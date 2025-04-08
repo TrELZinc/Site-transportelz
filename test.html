@@ -181,9 +181,9 @@
         const destinationInput = section.querySelector(`#destination_${id}`);
         const listContainer = section.querySelector(`#autocomplete_${id}`);
 
-        setupAutocomplete(destinationInput, listContainer, origineSelect.value);
+        setupAutocomplete(destinationInput, listContainer, origineSelect.value.toLowerCase().trim());
         origineSelect.addEventListener("change", () => {
-          setupAutocomplete(destinationInput, listContainer, origineSelect.value);
+        setupAutocomplete(destinationInput, listContainer, origineSelect.value.toLowerCase().trim());
         });
       }
     });
@@ -232,18 +232,29 @@ function setupAutocomplete(input, listContainer, origine) {
   });
 
   input.addEventListener("blur", () => {
-    setTimeout(() => {
-      const destNorm = input.value.toLowerCase().trim();
-      const km = kmMap[origineNorm]?.[destNorm];
-      preview.textContent = km ? `Distance estimée : ${km} km` : "";
-    }, 200); // Laisse le temps au clic de se faire
-  });
-
-  document.addEventListener("click", (e) => {
-    if (!listContainer.contains(e.target) && e.target !== input) {
-      listContainer.style.display = "none";
+  setTimeout(() => {
+    const destNorm = input.value.toLowerCase().trim();
+    const km = kmMap[origineNorm]?.[destNorm];
+    
+    // ✅ Affiche seulement si destination n’est pas vide
+    if (destNorm) {
+      preview.textContent = km
+        ? `Distance estimée : ${km} km`
+        : "Distance inconnue.";
+    } else {
+      preview.textContent = "";
     }
-  });
+  }, 200);
+});
+
+  option.addEventListener("click", () => {
+  input.value = dest;
+  listContainer.innerHTML = "";
+  listContainer.style.display = "none";
+
+  const km = kmMap[origineNorm]?.[dest.toLowerCase().trim()];
+  preview.textContent = km ? `Distance estimée : ${km} km` : "Distance inconnue.";
+});
 }
 
 function generateHeureHtml(id) {

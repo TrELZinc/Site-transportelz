@@ -456,7 +456,7 @@ function generateHeureHtml(id) {
     const heures = {};
     let totalMinutes = 0;
 
-    for (const [key, value] of data.entries()) {
+     [key, value] of data.entries()) {
       if (value.trim() === "") continue;
       const heureMatch = key.match(/heure_(debut|fin)_([hm])_(\d+)/);
       if (heureMatch) {
@@ -470,7 +470,7 @@ function generateHeureHtml(id) {
       }
     }
 
-    for (const [id, obj] of Object.entries(heures)) {
+     [id, obj] of Object.entries(heures)) {
       const dH = parseInt(obj.debut.h || "0", 10);
       const dM = parseInt(obj.debut.m || "0", 10);
       const fH = parseInt(obj.fin.h || "0", 10);
@@ -645,23 +645,25 @@ document.getElementById("loader").style.display = "none";
 
     for (const [id, v] of Object.entries(voyages)) {
   if (v.type === "km") {
-    const origineNorm = normalizeStr(v.origine);
-    const destinationNorm = normalizeStr(v.destination);
+    const origineNorm = normalizeStr(v.origine || "");
+    const destinationNorm = normalizeStr(v.destination || "");
     const distancekm = kmMap[origineNorm]?.[destinationNorm] ?? 0;
     const montant = distancekm * taux.taux_km;
 
-    html += `<p><strong>VOYAGE ${id} - DISTANCE:</strong> ${distancekm || "Inconnue"} km</p>`;
+    html += `<p><strong>VOYAGE ${id} - DISTANCE:</strong> ${distancekm} km</p>`;
     html += `<p><strong>VOYAGE ${id} - MONTANT (KM):</strong> ${montant.toFixed(2)}$</p>`;
+
     totalMontant += montant;
 
-    // ✅ Debug propre
+    // Debug (tu peux enlever)
     console.log(`🎯 VOYAGE ${id}`);
-    console.log("Origine (norm):", origineNorm);
-    console.log("Destination (norm):", destinationNorm);
-    console.log("kmMap[origine] =", kmMap[origineNorm]);
-    console.log("kmMap[origine][destination] =", kmMap[origineNorm]?.[destinationNorm]);
+    console.log("Origine:", origineNorm);
+    console.log("Destination:", destinationNorm);
+    console.log("Distance:", distancekm);
+    console.log("Montant:", montant);
   }
 }
+
 
 
 

@@ -540,7 +540,7 @@ function generateHeureHtml(id) {
     kmMap = data.km.reduce((acc, el) => {
   const origine = (el.origine || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
   const destination = (el.destination || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
-  const kmValue = parseFloat(el.km);
+  const kmValue = parseFloat(el.kilometrage);
 
   if (!acc[origine]) acc[origine] = {};
   acc[origine][destination] = isNaN(kmValue) ? 0 : kmValue;

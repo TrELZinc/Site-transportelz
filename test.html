@@ -191,14 +191,16 @@
 }
 
 function setupAutocomplete(input, listContainer, origine) {
+  const origineNorm = origine.toLowerCase().trim(); // 🔁 Harmonise l'origine
+
   input.addEventListener("input", () => {
-    const valeur = input.value.toLowerCase();
+    const valeur = input.value.toLowerCase().trim();
     listContainer.innerHTML = "";
     listContainer.style.display = "none";
 
-    if (!valeur || !kmMap[origine]) return;
+    if (!valeur || !kmMap[origineNorm]) return;
 
-    const correspondants = Object.keys(kmMap[origine]).filter(dest =>
+    const correspondants = Object.keys(kmMap[origineNorm]).filter(dest =>
       dest.toLowerCase().includes(valeur)
     );
 

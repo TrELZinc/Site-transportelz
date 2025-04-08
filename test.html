@@ -241,17 +241,13 @@ function setupAutocomplete(input, listContainer, origine) {
 
   input.addEventListener("blur", () => {
   setTimeout(() => {
-    const destNorm = normalizeStr(input.value);
-    const distanceKm = kmMap[origineNorm]?.[destNorm];
-    preview.textContent = ""; // ✅ Vide d'abord
-    if (destNorm) {
-      preview.textContent = distanceKm !== undefined
-        ? `Distance estimée : ${distanceKm} km`
-        : "Distance inconnue.";
-    }
+    const valeur = normalizeStr(input.value);
+    const distanceKm = kmMap[origineNorm]?.[valeur];
+    preview.textContent = distanceKm !== undefined
+      ? `Distance estimée : ${distanceKm} km`
+      : "";
   }, 200);
 });
-
 
   document.addEventListener("click", (e) => {
     if (!listContainer.contains(e.target) && e.target !== input) {
@@ -568,13 +564,13 @@ function generateHeureHtml(id) {
 
         datalist.innerHTML = ""; // Nettoyer
 
-        if (kmMap[origine]) {
-          Object.keys(kmMap[origine]).forEach((destination) => {
-            const option = document.createElement("option");
-            option.value = destination;
-            datalist.appendChild(option);
-          });
-        }
+        if (kmMap[origineNorm]) {
+  Object.keys(kmMap[origineNorm]).forEach((destination) => {
+    const option = document.createElement("option");
+    option.value = destination;
+    datalist.appendChild(option);
+  });
+}
       }
     });
 

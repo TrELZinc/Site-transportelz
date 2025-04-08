@@ -508,10 +508,16 @@ function generateHeureHtml(id) {
     }, {});
 
     kmMap = data.km.reduce((acc, el) => {
-      acc[el.origine] = acc[el.origine] || {};
-      acc[el.origine][el.destination] = parseFloat(el.km);
-      return acc;
-    }, {});
+  const origine = el.origine.toLowerCase().trim();
+  const destination = el.destination.toLowerCase().trim();
+  const kmValue = parseFloat(el.km);
+
+  acc[origine] = acc[origine] || {};
+  acc[origine][destination] = isNaN(kmValue) ? 0 : kmValue;
+
+  return acc;
+}, {});
+
 
     // Autocomplétion déclenchée au focus
     document.addEventListener("focusin", (e) => {
@@ -608,9 +614,8 @@ document.getElementById("loader").style.display = "none";
 
     for (const [id, v] of Object.entries(voyages)) {
   if (v.type === "km") {
-    const origine = (v.origine || "").trim();
-    const destination = (v.destination || "").trim();
-
+    const origine = (v.origine || "").toLowerCase().trim();
+    const destination = (v.destination || "").toLowerCase().trim();
     const km = kmMap[origine]?.[destination] || 0;
     const montant = km * taux.taux_km;
     totalMontant += montant;
@@ -637,7 +642,7 @@ document.getElementById("loader").style.display = "none";
     html += `<p><strong>TOTAL GÉNÉRAL À PAYER:</strong> ${totalMontant.toFixed(2)}$</p>`;
 
     resumeContent.innerHTML = html;
-    formEl.classList.add("d-none");
+    document.getElementById("formulaire").classList.add("d-none");
     resumeContainer.classList.remove("d-none");
   });
 </script>

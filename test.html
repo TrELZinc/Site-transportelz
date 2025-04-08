@@ -450,6 +450,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const resumeContent = document.getElementById("resumeContent");
   const btnModifier = document.getElementById("btn-modifier");
 
+  if (!btnPreview) {
+    console.error("⛔ Le bouton #btn-preview est introuvable dans le DOM !");
+    return;
+  }
+
   btnPreview.addEventListener("click", () => {
     const formEl = document.getElementById("formulaire");
     const data = new FormData(formEl);

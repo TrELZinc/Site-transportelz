@@ -607,7 +607,7 @@ document.getElementById("loader").style.display = "none";
     }
 
     for (const [id, v] of Object.entries(voyages)) {
-  if (v.type === "kilometrage") {
+  if (v.type === "km") {
     const origine = (v.origine || "").trim();
     const destination = (v.destination || "").trim();
 

@@ -13,7 +13,9 @@
 .mb-3 {
   margin-bottom: 1.25rem;
 }
-
+.autocomplete-list div:hover {
+  background-color: #f0f0f0;
+}
     body {
       background-color: #f8f9fa;
       color: #212529;
@@ -108,101 +110,152 @@
     addVoyageSection();
 
     function addVoyageSection() {
-      if (voyageCount >= MAX_VOYAGES) return;
-      voyageCount++;
-      const id = voyageCount;
+  if (voyageCount >= MAX_VOYAGES) return;
+  voyageCount++;
+  const id = voyageCount;
 
-      const section = document.createElement("div");
-      section.className = "section-box";
-      section.innerHTML = `
-        <h5 class="mb-3">Voyage ${id}</h5>
-        <div class="mb-3">
-          <label class="form-label fw-bold text-uppercase">Type de voyage</label>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="type_voyage_${id}" id="km_${id}" value="kilometrage" required>
-            <label class="form-check-label" for="km_${id}">Voyage au kilométrage</label>
+  const section = document.createElement("div");
+  section.className = "section-box";
+  section.innerHTML = `
+    <h5 class="mb-3">Voyage ${id}</h5>
+    <div class="mb-3">
+      <label class="form-label fw-bold text-uppercase">Type de voyage</label>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="type_voyage_${id}" id="km_${id}" value="kilometrage" required>
+        <label class="form-check-label" for="km_${id}">Voyage au kilométrage</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="type_voyage_${id}" id="heure_${id}" value="heure" required>
+        <label class="form-check-label" for="heure_${id}">Voyage à l’heure</label>
+      </div>
+    </div>
+    <div id="details_${id}"></div>
+  `;
+  voyageContainer.appendChild(section);
+
+  section.querySelectorAll(`input[name="type_voyage_${id}"]`).forEach((radio) => {
+    radio.addEventListener("change", () => {
+      const container = section.querySelector(`#details_${id}`);
+      if (radio.value === "heure") {
+        container.innerHTML = `
+          <div class="mb-3">
+            <label class="form-label fw-bold text-uppercase">Origine</label>
+            <select class="form-select" name="origine_${id}" required>
+              <option value="St-Basile" selected>St-Basile</option>
+              <option value="Vimont">Vimont</option>
+              <option value="Stanstead">Stanstead</option>
+            </select>
           </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="type_voyage_${id}" id="heure_${id}" value="heure" required>
-            <label class="form-check-label" for="heure_${id}">Voyage à l’heure</label>
+          <div class="mb-3">
+            <label class="form-label fw-bold text-uppercase">Destination</label>
+            <input type="text" class="form-control" name="destination_${id}" required />
           </div>
-        </div>
-        <div id="details_${id}"></div>
-      `;
-      voyageContainer.appendChild(section);
+          ${generateHeureHtml(id)}
+          ${id < MAX_VOYAGES ? getSuiviHTML(id) : ''}
+        `;
+        setupSuiviListener(id);
+      } else {
+        container.innerHTML = `
+          <div class="mb-3">
+            <label class="form-label fw-bold text-uppercase">Origine</label>
+            <select class="form-select origine-select" name="origine_${id}" id="origine_${id}" required>
+              <option value="St-Basile" selected>St-Basile</option>
+              <option value="Vimont">Vimont</option>
+              <option value="Stanstead">Stanstead</option>
+            </select>
+          </div>
+          <div class="mb-3 position-relative">
+            <label class="form-label fw-bold text-uppercase">Ville de destination</label>
+            <input type="text" class="form-control destination-input" name="destination_${id}" id="destination_${id}" autocomplete="off" required />
+            <div class="autocomplete-list position-absolute bg-white border border-1 rounded shadow-sm z-3 w-100" id="autocomplete_${id}" style="display: none;"></div>
+          </div>
+          ${id < MAX_VOYAGES ? getSuiviHTML(id) : ''}
+        `;
+        setupSuiviListener(id);
 
-      section.querySelectorAll(`input[name="type_voyage_${id}"]`).forEach((radio) => {
-        radio.addEventListener("change", () => {
-          const container = section.querySelector(`#details_${id}`);
-          if (radio.value === "heure") {
-            container.innerHTML = `
-              <div class="mb-3">
-                <label class="form-label fw-bold text-uppercase">Origine</label>
-                <select class="form-select" name="origine_${id}" required>
-                  <option value="St-Basile" selected>St-Basile</option>
-                  <option value="Vimont">Vimont</option>
-                  <option value="Stanstead">Stanstead</option>
-                </select>
-              </div>
-              <div class="mb-3">
-                <label class="form-label fw-bold text-uppercase">Destination</label>
-                <input type="text" class="form-control" name="destination_${id}" required />
-              </div>
-              <div class="mb-3">
-  <label class="form-label fw-bold text-uppercase">Heure de début</label>
-  <div class="d-flex gap-2">
-    <select class="form-select" name="heure_debut_h_${id}" required>
-      ${Array.from({length: 24}, (_, i) => `<option value="${String(i).padStart(2, '0')}">${String(i).padStart(2, '0')}</option>`).join('')}
-    </select>
-    <select class="form-select" name="heure_debut_m_${id}" required>
-      <option value="00">00</option>
-      <option value="15">15</option>
-      <option value="30">30</option>
-      <option value="45">45</option>
-    </select>
-  </div>
-</div>
+        const origineSelect = section.querySelector(`#origine_${id}`);
+        const destinationInput = section.querySelector(`#destination_${id}`);
+        const listContainer = section.querySelector(`#autocomplete_${id}`);
 
-<div class="mb-3">
-  <label class="form-label fw-bold text-uppercase">Heure de fin</label>
-  <div class="d-flex gap-2">
-    <select class="form-select" name="heure_fin_h_${id}" required>
-      ${Array.from({length: 24}, (_, i) => `<option value="${String(i).padStart(2, '0')}">${String(i).padStart(2, '0')}</option>`).join('')}
-    </select>
-    <select class="form-select" name="heure_fin_m_${id}" required>
-      <option value="00">00</option>
-      <option value="15">15</option>
-      <option value="30">30</option>
-      <option value="45">45</option>
-    </select>
-  </div>
-</div>
-
-              ${id < MAX_VOYAGES ? getSuiviHTML(id) : ''}
-            `;
-            setupSuiviListener(id);
-          } else {
-            container.innerHTML = `
-  <div class="mb-3">
-    <label class="form-label fw-bold text-uppercase">Origine</label>
-    <select class="form-select" name="origine_${id}" required>
-      <option value="St-Basile" selected>St-Basile</option>
-      <option value="Vimont">Vimont</option>
-      <option value="Stanstead">Stanstead</option>
-    </select>
-  </div>
-  <div class="mb-3">
-    <label class="form-label fw-bold text-uppercase">Ville de destination</label>
-    <input list="destinations_${id}" class="form-control destination-input" name="destination_${id}" required />
-    <datalist id="destinations_${id}"></datalist>
-  </div>
-  ${id < MAX_VOYAGES ? getSuiviHTML(id) : ''}
-`;
-            setupSuiviListener(id);
-          }
+        setupAutocomplete(destinationInput, listContainer, origineSelect.value);
+        origineSelect.addEventListener("change", () => {
+          setupAutocomplete(destinationInput, listContainer, origineSelect.value);
         });
+      }
+    });
+  });
+}
+
+function setupAutocomplete(input, listContainer, origine) {
+  input.addEventListener("input", () => {
+    const valeur = input.value.toLowerCase();
+    listContainer.innerHTML = "";
+    listContainer.style.display = "none";
+
+    if (!valeur || !kmMap[origine]) return;
+
+    const correspondants = Object.keys(kmMap[origine]).filter(dest =>
+      dest.toLowerCase().includes(valeur)
+    );
+
+    if (correspondants.length === 0) return;
+
+    correspondants.forEach(dest => {
+      const option = document.createElement("div");
+      option.className = "p-2 border-bottom";
+      option.style.cursor = "pointer";
+      option.textContent = dest;
+      option.addEventListener("click", () => {
+        input.value = dest;
+        listContainer.innerHTML = "";
+        listContainer.style.display = "none";
       });
+      listContainer.appendChild(option);
+    });
+
+    listContainer.style.display = "block";
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!listContainer.contains(e.target) && e.target !== input) {
+      listContainer.style.display = "none";
     }
+  });
+}
+
+function generateHeureHtml(id) {
+  return `
+    <div class="mb-3">
+      <label class="form-label fw-bold text-uppercase">Heure de début</label>
+      <div class="d-flex gap-2">
+        <select class="form-select" name="heure_debut_h_${id}" required>
+          ${Array.from({length: 24}, (_, i) => `<option value="${String(i).padStart(2, '0')}">${String(i).padStart(2, '0')}</option>`).join('')}
+        </select>
+        <select class="form-select" name="heure_debut_m_${id}" required>
+          <option value="00">00</option>
+          <option value="15">15</option>
+          <option value="30">30</option>
+          <option value="45">45</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label fw-bold text-uppercase">Heure de fin</label>
+      <div class="d-flex gap-2">
+        <select class="form-select" name="heure_fin_h_${id}" required>
+          ${Array.from({length: 24}, (_, i) => `<option value="${String(i).padStart(2, '0')}">${String(i).padStart(2, '0')}</option>`).join('')}
+        </select>
+        <select class="form-select" name="heure_fin_m_${id}" required>
+          <option value="00">00</option>
+          <option value="15">15</option>
+          <option value="30">30</option>
+          <option value="45">45</option>
+        </select>
+      </div>
+    </div>
+  `;
+}
 
     function getSuiviHTML(id) {
       return `

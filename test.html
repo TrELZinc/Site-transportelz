@@ -195,72 +195,60 @@
 }
 
 function setupAutocomplete(input, listContainer, origine) {
-  const origineNorm = origine.toLowerCase().trim();
-
-  // Créer l'affichage de la distance
+  const origineNorm = normalizeStr(origine);
   let preview = document.createElement("div");
   preview.className = "text-muted mt-1 small";
-  input.parentNode.appendChild(preview); // Ajout sous le champ
+  input.parentNode.appendChild(preview);
 
   input.addEventListener("input", () => {
-    const valeur = input.value.toLowerCase().trim();
+    const valeur = normalizeStr(input.value);
     listContainer.innerHTML = "";
     listContainer.style.display = "none";
-    preview.textContent = ""; // Reset preview
+    preview.textContent = "";
 
     if (!valeur || !kmMap[origineNorm]) return;
 
     const correspondants = Object.keys(kmMap[origineNorm]).filter(dest =>
-      dest.toLowerCase().includes(valeur)
+      normalizeStr(dest).includes(valeur)
     );
 
     if (correspondants.length === 0) return;
 
     correspondants.forEach(dest => {
-      const option = document.createElement("div");
-      option.className = "p-2 border-bottom";
-      option.style.cursor = "pointer";
-      option.textContent = dest;
-
-      option.addEventListener("click", () => {
+      const opt = document.createElement("div");
+      opt.className = "p-2 border-bottom";
+      opt.style.cursor = "pointer";
+      opt.textContent = dest;
+      opt.addEventListener("click", () => {
         input.value = dest;
         listContainer.innerHTML = "";
         listContainer.style.display = "none";
 
-        const km = kmMap[origineNorm]?.[
-  dest.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim()
-];
-function normalizeStr(str) {
-  return (str || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
-}
-const km = kmMap[origineNorm]?.[normalizeStr(dest)];
-preview.textContent = km !== undefined
-  ? `Distance estimée : ${km} km`
-  : "Distance inconnue.";
-
-
-      listContainer.appendChild(option);
+        const destNorm = normalizeStr(dest);
+        const distanceKm = kmMap[origineNorm]?.[destNorm];
+        preview.textContent = distanceKm !== undefined ? `Distance estimée : ${distanceKm} km` : "Distance inconnue.";
+      });
+      listContainer.appendChild(opt);
     });
-
     listContainer.style.display = "block";
   });
 
   input.addEventListener("blur", () => {
-  setTimeout(() => {
-    const destNorm = normalizeStr(input.value); // 🧼 Nettoyage avancé
-    const km = kmMap[origineNorm]?.[destNorm];
+    setTimeout(() => {
+      const destNorm = normalizeStr(input.value);
+      const distanceKm = kmMap[origineNorm]?.[destNorm];
+      preview.textContent = destNorm
+        ? (distanceKm !== undefined ? `Distance estimée : ${distanceKm} km` : "Distance inconnue.")
+        : "";
+    }, 200);
+  });
 
-    console.log("🔍 Recherche kmMap[", origineNorm, "][", destNorm, "] =", km); // 🐛 Debug
-
-    if (destNorm) {
-      preview.textContent = km
-        ? `Distance estimée : ${km} km`
-        : "Distance inconnue.";
-    } else {
-      preview.textContent = "";
+  document.addEventListener("click", (e) => {
+    if (!listContainer.contains(e.target) && e.target !== input) {
+      listContainer.style.display = "none";
     }
-  }, 200);
-});
+  });
+}
 
   document.addEventListener("click", (e) => {
     if (!listContainer.contains(e.target) && e.target !== input) {
@@ -660,8 +648,8 @@ document.getElementById("loader").style.display = "none";
   if (v.type === "km") {
     const origine = (v.origine || "").toLowerCase().trim();
     const destination = (v.destination || "").toLowerCase().trim();
-    const km = kmMap[origine]?.[destination] || 0;
-    const montant = km * taux.taux_km;
+    const montant = distancekm * taux.taux_km;
+    html += `<p><strong>VOYAGE ${id} - DISTANCE:</strong> ${distancekm || "Inconnue"} km</p>`;
     totalMontant += montant;
 
     html += `<p><strong>VOYAGE ${id} - DISTANCE:</strong> ${km} km</p>`;

@@ -497,6 +497,8 @@ function generateHeureHtml(id) {
   fetch("https://script.google.com/macros/s/AKfycbxakbBK9TUcJ5gQQ4nL3vuDoGw2kt9zY3fMVb1tImOvnWNXdNb3kYIIGRh-VLp5dkNi/exec")
   .then((res) => res.json())
   .then((data) => {
+  console.log("Réponse brute reçue du fetch :", data);
+
     tauxMap = data.chauffeurs.reduce((acc, el) => {
       acc[el.nom] = {
         taux_h: parseFloat(el.taux_h),
@@ -632,6 +634,7 @@ document.getElementById("loader").style.display = "none";
   fetch("https://script.google.com/macros/s/AKfycbxakbBK9TUcJ5gQQ4nL3vuDoGw2kt9zY3fMVb1tImOvnWNXdNb3kYIIGRh-VLp5dkNi/exec")
     .then(res => res.json())
     .then(data => {
+  console.log("Réponse brute reçue du fetch :", data);
       const select = document.getElementById("nom");
       if (data?.chauffeurs?.length) {
         data.chauffeurs.forEach(chauffeur => {

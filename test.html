@@ -107,7 +107,6 @@
     let voyageCount = 0;
     const MAX_VOYAGES = 3;
 
-    addVoyageSection();
 
     function addVoyageSection() {
   if (voyageCount >= MAX_VOYAGES) return;
@@ -490,46 +489,51 @@ function generateHeureHtml(id) {
   let kmMap = {}; // origine -> destination -> km
 
   fetch("https://script.google.com/macros/s/AKfycbxakbBK9TUcJ5gQQ4nL3vuDoGw2kt9zY3fMVb1tImOvnWNXdNb3kYIIGRh-VLp5dkNi/exec")
-    .then((res) => res.json())
-    .then((data) => {
-      tauxMap = data.chauffeurs.reduce((acc, el) => {
-        acc[el.nom] = {
-          taux_h: parseFloat(el.taux_h),
-          taux_km: parseFloat(el.taux_km),
-        };
-        return acc;
-      }, {});
+  .then((res) => res.json())
+  .then((data) => {
+    tauxMap = data.chauffeurs.reduce((acc, el) => {
+      acc[el.nom] = {
+        taux_h: parseFloat(el.taux_h),
+        taux_km: parseFloat(el.taux_km),
+      };
+      return acc;
+    }, {});
 
-      kmMap = data.kilometrages.reduce((acc, el) => {
-        acc[el.origine] = acc[el.origine] || {};
-        acc[el.origine][el.destination] = parseFloat(el.km);
-        return acc;
-      }, {});
+    kmMap = data.kilometrages.reduce((acc, el) => {
+      acc[el.origine] = acc[el.origine] || {};
+      acc[el.origine][el.destination] = parseFloat(el.km);
+      return acc;
+    }, {});
 
-      document.addEventListener("focusin", (e) => {
-  if (e.target.classList.contains("destination-input")) {
-    const input = e.target;
-    const section = input.closest(".section-box");
-    const origineSelect = section.querySelector('select[name^="origine_"]');
-    const origine = origineSelect?.value;
-    const datalistId = input.getAttribute("list");
-    const datalist = document.getElementById(datalistId);
+    // Autocomplétion déclenchée au focus
+    document.addEventListener("focusin", (e) => {
+      if (e.target.classList.contains("destination-input")) {
+        const input = e.target;
+        const section = input.closest(".section-box");
+        const origineSelect = section.querySelector('select[name^="origine_"]');
+        const origine = origineSelect?.value;
+        const datalistId = input.getAttribute("list");
+        const datalist = document.getElementById(datalistId);
 
-    if (!datalist || !origine) return;
+        if (!datalist || !origine) return;
 
-    datalist.innerHTML = ""; // Nettoyer
+        datalist.innerHTML = ""; // Nettoyer
 
-    if (kmMap[origine]) {
-      Object.keys(kmMap[origine]).forEach((destination) => {
-        const option = document.createElement("option");
-        option.value = destination;
-        datalist.appendChild(option);
-      });
-    }
-  }
-});
-    .catch((err) => console.error("Erreur chargement taux ou km:", err));
+        if (kmMap[origine]) {
+          Object.keys(kmMap[origine]).forEach((destination) => {
+            const option = document.createElement("option");
+            option.value = destination;
+            datalist.appendChild(option);
+          });
+        }
+      }
+    });
 
+    // >>> APPEL ICI : tout est prêt, on peut construire le formulaire
+    addVoyageSection();
+  })
+  .catch((err) => console.error("Erreur chargement taux ou km:", err));
+  
   btnPreview.addEventListener("click", () => {
     const data = new FormData(document.getElementById("formulaire"));
     const chauffeur = data.get("nom");

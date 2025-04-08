@@ -223,7 +223,7 @@ function setupAutocomplete(input, listContainer, origine) {
         listContainer.innerHTML = "";
         listContainer.style.display = "none";
 
-        const km = kmMap[origineNorm]?.[dest.toLowerCase().trim()];
+        const km = kmMap[origineNorm]?.[dest.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim()];
         preview.textContent = km ? `Distance estimée : ${km} km` : "Distance inconnue.";
       });
 
@@ -235,8 +235,9 @@ function setupAutocomplete(input, listContainer, origine) {
 
   input.addEventListener("blur", () => {
     setTimeout(() => {
-      const destNorm = input.value.toLowerCase().trim();
+      const destNorm = input.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
       const km = kmMap[origineNorm]?.[destNorm];
+
       
       if (destNorm) {
         preview.textContent = km
@@ -537,8 +538,8 @@ function generateHeureHtml(id) {
     }, {});
 
     kmMap = data.km.reduce((acc, el) => {
-  const origine = el.origine.toLowerCase().trim();
-  const destination = el.destination.toLowerCase().trim();
+  const origine = el.origine.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+  const destination = el.destination.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
   const kmValue = parseFloat(el.km);
 
   acc[origine] = acc[origine] || {};

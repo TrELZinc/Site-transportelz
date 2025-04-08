@@ -100,7 +100,12 @@
       <button type="button" class="btn btn-primary w-100 mt-3" id="btn-preview">Prévisualiser</button>
     </form>
   </div>
-
+<div id="loader" class="text-center py-5">
+  <div class="spinner-border text-danger" role="status">
+    <span class="visually-hidden">Chargement...</span>
+  </div>
+  <p class="mt-3">Chargement du formulaire...</p>
+</div>
   <script>
     const form = document.getElementById("formulaire");
     const voyageContainer = document.getElementById("voyageContainer");
@@ -531,6 +536,8 @@ function generateHeureHtml(id) {
 
     // >>> APPEL ICI : tout est prêt, on peut construire le formulaire
     addVoyageSection();
+    document.getElementById("formulaire").classList.remove("d-none");
+document.getElementById("loader").style.display = "none";
   })
   .catch((err) => console.error("Erreur chargement taux ou km:", err));
   

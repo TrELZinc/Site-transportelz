@@ -491,159 +491,66 @@ function generateHeureHtml(id) {
 </script>
 <script>
   let tauxMap = {}; // par nom chauffeur
-  let kmMap = {}; // origine -> destination -> km
+  let kmMap = {};   // origine -> destination -> km
 
-  fetch("https://script.google.com/macros/s/AKfycbxakbBK9TUcJ5gQQ4nL3vuDoGw2kt9zY3fMVb1tImOvnWNXdNb3kYIIGRh-VLp5dkNi/exec")
-  .then((res) => res.json())
-  .then((data) => {
-    tauxMap = data.chauffeurs.reduce((acc, el) => {
-      acc[el.nom] = {
-        taux_h: parseFloat(el.taux_h),
-        taux_km: parseFloat(el.taux_km),
-      };
-      return acc;
-    }, {});
-
-    kmMap = data.kilometrages.reduce((acc, el) => {
-      acc[el.origine] = acc[el.origine] || {};
-      acc[el.origine][el.destination] = parseFloat(el.km);
-      return acc;
-    }, {});
-
-    // Autocomplétion déclenchée au focus
-    document.addEventListener("focusin", (e) => {
-      if (e.target.classList.contains("destination-input")) {
-        const input = e.target;
-        const section = input.closest(".section-box");
-        const origineSelect = section.querySelector('select[name^="origine_"]');
-        const origine = origineSelect?.value;
-        const datalistId = input.getAttribute("list");
-        const datalist = document.getElementById(datalistId);
-
-        if (!datalist || !origine) return;
-
-        datalist.innerHTML = ""; // Nettoyer
-
-        if (kmMap[origine]) {
-          Object.keys(kmMap[origine]).forEach((destination) => {
-            const option = document.createElement("option");
-            option.value = destination;
-            datalist.appendChild(option);
-          });
-        }
-      }
-    });
-
-    // >>> APPEL ICI : tout est prêt, on peut construire le formulaire
-    addVoyageSection();
-    document.getElementById("formulaire").classList.remove("d-none");
-document.getElementById("loader").style.display = "none";
-  })
-  .catch((err) => console.error("Erreur chargement taux ou km:", err));
-  
-  btnPreview.addEventListener("click", () => {
-    const data = new FormData(document.getElementById("formulaire"));
-    const chauffeur = data.get("nom");
-    const taux = tauxMap[chauffeur] || { taux_h: 0, taux_km: 0 };
-    let html = "";
-    let totalMinutes = 0;
-    let totalMontant = 0;
-
-    const heures = {};
-    const voyages = {};
-
-    for (const [key, value] of data.entries()) {
-      const heureMatch = key.match(/heure_(debut|fin)_([hm])_(\d+)/);
-      const typeMatch = key.match(/^type_voyage_(\d+)/);
-      const origineMatch = key.match(/^origine_(\d+)/);
-      const destinationMatch = key.match(/^destination_(\d+)/);
-
-      if (heureMatch) {
-        const [, type, part, id] = heureMatch;
-        heures[id] = heures[id] || { debut: {}, fin: {} };
-        heures[id][type][part] = value;
-      } else if (typeMatch) {
-        const id = typeMatch[1];
-        voyages[id] = voyages[id] || {};
-        voyages[id].type = value;
-      } else if (origineMatch) {
-        const id = origineMatch[1];
-        voyages[id] = voyages[id] || {};
-        voyages[id].origine = value;
-      } else if (destinationMatch) {
-        const id = destinationMatch[1];
-        voyages[id] = voyages[id] || {};
-        voyages[id].destination = value;
-      } else {
-        let label = key.replace(/_/g, " ").replace(/\d+$/, "").toUpperCase();
-        if (label === "AUTRE") label = "AUTRE VOYAGE";
-        html += `<p><strong>${label}:</strong> ${value}</p>`;
-      }
-    }
-
-    for (const [id, obj] of Object.entries(heures)) {
-      const dH = parseInt(obj.debut.h || "0", 10);
-      const dM = parseInt(obj.debut.m || "0", 10);
-      const fH = parseInt(obj.fin.h || "0", 10);
-      const fM = parseInt(obj.fin.m || "0", 10);
-      const debutStr = `${String(dH).padStart(2, "0")}h${String(dM).padStart(2, "0")}`;
-      const finStr = `${String(fH).padStart(2, "0")}h${String(fM).padStart(2, "0")}`;
-      html += `<p><strong>VOYAGE ${id} - HEURE DE DÉBUT:</strong> ${debutStr}</p>`;
-      html += `<p><strong>VOYAGE ${id} - HEURE DE FIN:</strong> ${finStr}</p>`;
-      let duration = (fH * 60 + fM) - (dH * 60 + dM);
-      if (duration < 0) duration = 0;
-      totalMinutes += duration;
-      const durH = Math.floor(duration / 60);
-      const durM = duration % 60;
-      html += `<p><strong>VOYAGE ${id} - DURÉE:</strong> ${durH}h${String(durM).padStart(2, "0")}</p>`;
-      if (voyages[id]?.type === "heure") {
-        const montant = (duration / 60) * taux.taux_h;
-        totalMontant += montant;
-        html += `<p><strong>VOYAGE ${id} - MONTANT (Heure):</strong> ${montant.toFixed(2)}$</p>`;
-      }
-    }
-
-    for (const [id, v] of Object.entries(voyages)) {
-      if (v.type === "kilometrage") {
-        const km = kmMap[v.origine]?.[v.destination] || 0;
-        const montant = km * taux.taux_km;
-        totalMontant += montant;
-        html += `<p><strong>VOYAGE ${id} - DISTANCE:</strong> ${km} km</p>`;
-        html += `<p><strong>VOYAGE ${id} - MONTANT (KM):</strong> ${montant.toFixed(2)}$</p>`;
-      }
-    }
-
-    if (totalMinutes > 0) {
-      const h = Math.floor(totalMinutes / 60);
-      const m = totalMinutes % 60;
-      html += `<hr/><p><strong>TOTAL TEMPS:</strong> ${h}h${String(m).padStart(2, "0")}</p>`;
-    }
-
-    html += `<p><strong>TOTAL GÉNÉRAL À PAYER:</strong> ${totalMontant.toFixed(2)}$</p>`;
-
-    resumeContent.innerHTML = html;
-    formEl.classList.add("d-none");
-    resumeContainer.classList.remove("d-none");
-  });
-</script>
-
- <script>
+  // Un seul fetch pour tout récupérer
   fetch("https://script.google.com/macros/s/AKfycbxakbBK9TUcJ5gQQ4nL3vuDoGw2kt9zY3fMVb1tImOvnWNXdNb3kYIIGRh-VLp5dkNi/exec")
     .then(res => res.json())
     .then(data => {
-      const select = document.getElementById("nom");
-      if (data?.chauffeurs?.length) {
+      // 1. Charger tauxMap
+      tauxMap = data.chauffeurs.reduce((acc, chauffeur) => {
+        acc[chauffeur.nom] = {
+          taux_h: parseFloat(chauffeur.taux_h),
+          taux_km: parseFloat(chauffeur.taux_km),
+        };
+        return acc;
+      }, {});
+
+      // 2. Charger kmMap
+      kmMap = data.kilometrages.reduce((acc, trajet) => {
+        acc[trajet.origine] = acc[trajet.origine] || {};
+        acc[trajet.origine][trajet.destination] = parseFloat(trajet.km);
+        return acc;
+      }, {});
+
+      // 3. Charger le select des noms
+      const selectNom = document.getElementById("nom");
+      if (data.chauffeurs?.length) {
         data.chauffeurs.forEach(chauffeur => {
           const opt = document.createElement("option");
           opt.value = chauffeur.nom;
           opt.textContent = chauffeur.nom;
-          select.appendChild(opt);
+          selectNom.appendChild(opt);
         });
-      } else {
-        console.warn("Aucun chauffeur trouvé dans la réponse.");
       }
+
+      // 4. Autocomplétion dynamique au focus
+      document.addEventListener("focusin", (e) => {
+        if (e.target.classList.contains("destination-input")) {
+          const input = e.target;
+          const section = input.closest(".section-box");
+          const origineSelect = section.querySelector('select[name^="origine_"]');
+          const origine = origineSelect?.value;
+          const datalistId = input.getAttribute("list");
+          const datalist = document.getElementById(datalistId);
+          if (!datalist || !origine) return;
+          datalist.innerHTML = "";
+          if (kmMap[origine]) {
+            Object.keys(kmMap[origine]).forEach(destination => {
+              const option = document.createElement("option");
+              option.value = destination;
+              datalist.appendChild(option);
+            });
+          }
+        }
+      });
+
+      // 5. Tout est prêt : afficher formulaire, cacher loader
+      addVoyageSection();
+      document.getElementById("formulaire").classList.remove("d-none");
+      document.getElementById("loader").style.display = "none";
     })
-    .catch(err => console.error("Erreur chargement chauffeurs:", err));
+    .catch(err => console.error("Erreur lors du chargement initial:", err));
 </script>
  
 </body>

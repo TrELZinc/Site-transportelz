@@ -607,14 +607,26 @@ document.getElementById("loader").style.display = "none";
     }
 
     for (const [id, v] of Object.entries(voyages)) {
-      if (v.type === "kilometrage") {
-        const km = kmMap[v.origine]?.[v.destination] || 0;
-        const montant = km * taux.taux_km;
-        totalMontant += montant;
-        html += `<p><strong>VOYAGE ${id} - DISTANCE:</strong> ${km} km</p>`;
-        html += `<p><strong>VOYAGE ${id} - MONTANT (KM):</strong> ${montant.toFixed(2)}$</p>`;
-      }
-    }
+  if (v.type === "kilometrage") {
+    const origine = (v.origine || "").trim();
+    const destination = (v.destination || "").trim();
+
+    const km = kmMap[origine]?.[destination] || 0;
+    const montant = km * taux.taux_km;
+    totalMontant += montant;
+
+    html += `<p><strong>VOYAGE ${id} - DISTANCE:</strong> ${km} km</p>`;
+    html += `<p><strong>VOYAGE ${id} - MONTANT (KM):</strong> ${montant.toFixed(2)}$</p>`;
+
+    // Debug logs pour analyse
+    console.log(`🎯 VOYAGE ${id}`);
+    console.log("Origine:", origine);
+    console.log("Destination:", destination);
+    console.log("kmMap[origine] =", kmMap[origine]);
+    console.log("kmMap[origine][destination] =", kmMap[origine]?.[destination]);
+  }
+}
+
 
     if (totalMinutes > 0) {
       const h = Math.floor(totalMinutes / 60);

@@ -652,28 +652,17 @@ document.getElementById("loader").style.display = "none";
 
     html += `<p><strong>VOYAGE ${id} - DISTANCE:</strong> ${distancekm || "Inconnue"} km</p>`;
     html += `<p><strong>VOYAGE ${id} - MONTANT (KM):</strong> ${montant.toFixed(2)}$</p>`;
-
     totalMontant += montant;
 
-    // Debug log (facultatif)
-    console.log(`✅ VOYAGE ${id}`, {
-      origineNorm,
-      destinationNorm,
-      distancekm,
-      montant
-    });
-  }
-}
-
-
-    // Debug logs pour analyse
+    // ✅ Debug propre
     console.log(`🎯 VOYAGE ${id}`);
-    console.log("Origine:", origine);
-    console.log("Destination:", destination);
-    console.log("kmMap[origine] =", kmMap[origine]);
-    console.log("kmMap[origine][destination] =", kmMap[origine]?.[destination]);
+    console.log("Origine (norm):", origineNorm);
+    console.log("Destination (norm):", destinationNorm);
+    console.log("kmMap[origine] =", kmMap[origineNorm]);
+    console.log("kmMap[origine][destination] =", kmMap[origineNorm]?.[destinationNorm]);
   }
 }
+
 
 
     if (totalMinutes > 0) {

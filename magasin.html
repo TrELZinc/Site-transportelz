@@ -99,7 +99,7 @@
   </div>
 
   <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbxXehLCwJ6_nxy-sv0h8EhDWLUIw5YFPXRZuGuSJvNAv1LO1NRBdAiKY6PPyPEtABFS/exec'; // à remplacer
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyfPYY_fFOnUd0g9z2xq9YzMu9IEh9FZmhBEg27UoSR0_lf5ZjciGkHPtb-8R3KOng/exec'; // à remplacer
     const nom = localStorage.getItem('nom') || 'Inconnu';
     const courriel = localStorage.getItem('email') || 'non défini';
 
@@ -109,38 +109,61 @@
       .then(data => afficherArticles(data));
 
     function afficherArticles(articles) {
-      const container = document.getElementById('articles');
-      articles.forEach(article => {
-        const div = document.createElement('div');
-        div.className = 'article';
-        div.innerHTML = `
-          <img src="${article.image}" alt="${article.nom}" />
-          <h3>${article.nom}</h3>
-          <p>${article.description}</p>
-          <button onclick="commander('${article.nom}')">Commander</button>
-        `;
-        container.appendChild(div);
-      });
-    }
+  const container = document.getElementById('articles');
+  articles.forEach(article => {
+    const div = document.createElement('div');
+    div.className = 'article';
 
-    function commander(articleNom) {
-      const data = {
-        nom,
-        courriel,
-        article: articleNom,
-        date: new Date().toISOString()
-      };
+    // Crée un selecteur de taille seulement si l'article contient "t-shirt"
+    const isVetement = article.nom.toLowerCase().includes("t-shirt");
 
-      fetch(scriptURL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
+    div.innerHTML = `
+      <img src="${article.image}" alt="${article.nom}" />
+      <h3>${article.nom}</h3>
+      <p>${article.description}</p>
+      ${isVetement ? `
+        <label for="taille-${article.nom}">Taille :</label>
+        <select id="taille-${article.nom}">
+          <option value="S">S</option>
+          <option value="M">M</option>
+          <option value="L">L</option>
+          <option value="XL">XL</option>
+          <option value="XXL">XXL</option>
+        </select>
+      ` : ''}
+      <button onclick="commander('${article.nom}', ${isVetement})">Commander</button>
+    `;
+    container.appendChild(div);
+  });
+}
+}
 
-      document.getElementById('confirmation').innerText =
-        `Commande envoyée pour : ${articleNom}`;
-    }
+    function commander(articleNom, hasSize) {
+  let taille = '';
+  if (hasSize) {
+    const select = document.getElementById(`taille-${articleNom}`);
+    taille = select ? select.value : '';
+  }
+
+  const data = {
+    nom,
+    courriel,
+    article: articleNom,
+    taille: taille,
+    date: new Date().toISOString()
+  };
+
+  fetch(scriptURL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+
+  document.getElementById('confirmation').innerText =
+    `Commande envoyée pour : ${articleNom}${taille ? ' - Taille ' + taille : ''}`;
+}
+
   </script>
 </body>
 </html>

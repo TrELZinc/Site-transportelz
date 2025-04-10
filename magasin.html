@@ -108,39 +108,39 @@
       .then(res => res.json())
       .then(data => afficherArticles(data));
 
-    function afficherArticles(articles) {
-  const container = document.getElementById('articles');
-  articles.forEach(article => {
-    const div = document.createElement('div');
-    div.className = 'article';
+        function afficherArticles(articles) {
+      const container = document.getElementById('articles');
+      articles.forEach((article, index) => {
+        const div = document.createElement('div');
+        div.className = 'article';
 
-    // Crée un selecteur de taille seulement si l'article contient "t-shirt"
-    const isVetement = article.nom.toLowerCase().includes("t-shirt");
+        const isVetement = article.nom.toLowerCase().includes("t-shirt");
 
-    div.innerHTML = `
-      <img src="${article.image}" alt="${article.nom}" />
-      <h3>${article.nom}</h3>
-      <p>${article.description}</p>
-      ${isVetement ? `
-        <label for="taille-${article.nom}">Taille :</label>
-        <select id="taille-${article.nom}">
-          <option value="S">S</option>
-          <option value="M">M</option>
-          <option value="L">L</option>
-          <option value="XL">XL</option>
-          <option value="XXL">XXL</option>
-        </select>
-      ` : ''}
-      <button onclick="commander('${article.nom}', ${isVetement})">Commander</button>
-    `;
-    container.appendChild(div);
-  });
-}
+        div.innerHTML = `
+          <img src="${article.image}" alt="${article.nom}" />
+          <h3>${article.nom}</h3>
+          <p>${article.description}</p>
+          ${isVetement ? `
+            <label for="taille-${index}">Taille :</label>
+            <select id="taille-${index}">
+              <option value="S">S</option>
+              <option value="M">M</option>
+              <option value="L">L</option>
+              <option value="XL">XL</option>
+              <option value="XXL">XXL</option>
+            </select>
+          ` : ''}
+          <button onclick="commander('${article.nom}', ${isVetement}, ${index})">Commander</button>
+        `;
+        container.appendChild(div);
+      });
+    }
 
-    function commander(articleNom, hasSize) {
+
+    function commander(articleNom, hasSize, index) {
   let taille = '';
   if (hasSize) {
-    const select = document.getElementById(`taille-${articleNom}`);
+    const select = document.getElementById(`taille-${index}`);
     taille = select ? select.value : '';
   }
 

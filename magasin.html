@@ -212,13 +212,6 @@
     <div class="articles" id="articles"></div>
     <div id="confirmation"></div>
 
-    <div id="panier-modal">
-      <h2>Confirmation de commande</h2>
-      <ul id="liste-panier"></ul>
-      <button id="confirm-btn" onclick="envoyerCommande()">Confirmer la commande</button>
-    </div>
-  </div>
-
   <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyx4kFzQG2qYrOxGlsTlmIK1n9EC-sRCetRvK8qw229EalNeD73SdPiI4OmV04o_T5m/exec'; // À remplacer par ton URL Apps Script
     const nom = localStorage.getItem('nom') || 'Inconnu';
@@ -319,6 +312,11 @@ function fermerPanier() {
   panier.length = 0;
   document.getElementById('panier-btn').innerText = `Voir mon panier (0)`;
 }
+document.getElementById('overlay').addEventListener('click', function(e) {
+  if (e.target === this) {
+    fermerPanier();
+  }
+});
 
   </script>
   <div id="toast">Ajouté au panier ✅</div>

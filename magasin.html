@@ -171,15 +171,6 @@
   align-items: center;
 }
 
-#panier-modal {
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  width: 90%;
-  max-width: 400px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.25);
-}
-
 #panier-modal h2 {
   margin-top: 0;
 }
@@ -317,9 +308,10 @@ document.getElementById('overlay').addEventListener('click', function(e) {
     fermerPanier();
   }
 });
+</script>
 
-  </script>
-  <div id="toast">Ajouté au panier ✅</div>
+<div id="toast">Ajouté au panier ✅</div>
+
 <div id="overlay">
   <div id="panier-modal">
     <h2>Mon panier</h2>
@@ -328,5 +320,7 @@ document.getElementById('overlay').addEventListener('click', function(e) {
     <button id="fermer-btn" onclick="fermerPanier()">Fermer</button>
   </div>
 </div>
+
 </body>
 </html>
+

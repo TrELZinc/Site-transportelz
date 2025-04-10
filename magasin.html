@@ -48,7 +48,11 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      height: 380px;
+      height: auto;
+      min-height: 380px;
+      box-sizing: border-box;
+      margin-bottom: 10px;
+      width: 100%;
     }
 
     .article-content {
@@ -59,7 +63,11 @@
     }
 
     .article-actions {
-      margin-top: auto;
+      margin-top: 15px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .article-image-container {
@@ -95,10 +103,13 @@
       border-radius: 20px;
       cursor: pointer;
       font-family: inherit;
+      width: 80%;
+      max-width: 160px;
     }
 
     .select-taille {
       margin-top: 10px;
+      margin-bottom: 5px;
     }
 
     .select-taille select {
@@ -112,6 +123,10 @@
       .select-taille select {
         font-size: 1.2em;
         padding: 10px 14px;
+      }
+      
+      .article {
+        min-height: 420px;
       }
     }
 

@@ -6,29 +6,6 @@
   <title>Magasin ELZ</title>
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet" />
   <style>
-    .article {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-.article img {
-  width: 100%;
-  height: 160px;
-  object-fit: contain;
-  border-radius: 8px;
-}
-
-.article-content {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-}
-
-.article-actions {
-  margin-top: auto;
-}
-
     body {
       margin: 0;
       font-family: 'Comfortaa', sans-serif;
@@ -68,12 +45,35 @@
       padding: 15px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 380px;
+    }
+
+    .article-content {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    .article-actions {
+      margin-top: auto;
+    }
+
+    .article-image-container {
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
     }
 
     .article img {
       max-width: 100%;
-      height: 150px;
-      object-fit: cover;
+      max-height: 200px;
+      object-fit: contain;
       border-radius: 8px;
     }
 
@@ -205,7 +205,7 @@
 </head>
 <body>
   <header>
-    <img src="assets/logo.jpeg" alt="Logo ELZ" />
+    <img src="assets/logo.jpeg" alt="Logo ELZ" onerror="this.src='https://via.placeholder.com/150x50?text=Logo+ELZ'" />
   </header>
 
   <div class="container">
@@ -236,48 +236,83 @@
     const panier = [];
     const vetements = ['t-shirt', 'polo', 'hoodie', 'pantalon'];
 
+    // Simulation des données en cas d'échec du chargement
+    const produitsParDefaut = [
+      {
+        nom: 'T-shirt',
+        description: 'T-shirt noir avec logo ELZ',
+        image: 'https://via.placeholder.com/300x300?text=T-shirt+ELZ',
+        stock: 10
+      },
+      {
+        nom: 'Casquette',
+        description: 'Casquette noire avec logo ELZ',
+        image: 'https://via.placeholder.com/300x300?text=Casquette+ELZ',
+        stock: 15
+      },
+      {
+        nom: 'Polo',
+        description: 'Polo noir avec logo ELZ',
+        image: 'https://via.placeholder.com/300x300?text=Polo+ELZ',
+        stock: 8
+      }
+    ];
+
+    // Tentative de chargement des données depuis l'API
     fetch(scriptURL)
       .then(res => res.json())
-      .then(data => afficherArticles(data));
+      .then(data => afficherArticles(data))
+      .catch(error => {
+        console.error('Erreur lors du chargement des données:', error);
+        afficherArticles(produitsParDefaut);
+      });
 
     function afficherArticles(articles) {
-  const container = document.getElementById('articles');
-  articles.forEach((article, index) => {
-    const div = document.createElement('div');
-    div.className = 'article';
+      const container = document.getElementById('articles');
+      container.innerHTML = ''; // Vider le conteneur avant d'ajouter les articles
+      
+      articles.forEach((article, index) => {
+        const div = document.createElement('div');
+        div.className = 'article';
 
-    const isVetement = vetements.some(type => article.nom.toLowerCase().includes(type));
-    const stock = parseInt(article.stock || 0);
-    const rupture = stock === 0;
+        const isVetement = vetements.some(type => article.nom.toLowerCase().includes(type));
+        const stock = parseInt(article.stock || 0);
+        const rupture = stock === 0;
 
-    div.innerHTML = `
-      <div class="article-content">
-        <img src="${article.image}" alt="${article.nom}" />
-        <h3>${article.nom}</h3>
-        <p>${article.description}</p>
-        ${isVetement ? `
-          <div class="select-taille">
-            <label for="taille-${index}">Taille :</label>
-            <select id="taille-${index}">
-              <option value="S">S</option>
-              <option value="M">M</option>
-              <option value="L">L</option>
-              <option value="XL">XL</option>
-              <option value="XXL">XXL</option>
-            </select>
+        div.innerHTML = `
+          <div class="article-content">
+            <div class="article-image-container">
+              <img 
+                src="${article.image}" 
+                alt="${article.nom}" 
+                onerror="this.src='https://via.placeholder.com/300x300?text=${encodeURIComponent(article.nom)}'"
+              />
+            </div>
+            <h3>${article.nom}</h3>
+            <p>${article.description || ''}</p>
+            ${isVetement ? `
+              <div class="select-taille">
+                <label for="taille-${index}">Taille :</label>
+                <select id="taille-${index}">
+                  <option value="S">S</option>
+                  <option value="M">M</option>
+                  <option value="L">L</option>
+                  <option value="XL">XL</option>
+                  <option value="XXL">XXL</option>
+                </select>
+              </div>
+            ` : ''}
           </div>
-        ` : ''}
-      </div>
-      <div class="article-actions">
-        ${rupture
-          ? `<p style="color:red;font-weight:bold">Stock épuisé 🔥</p>`
-          : `<p style="color:green;font-weight:bold">Stock : ${stock} 🟢</p>
-             <button onclick="ajouterAuPanier('${article.nom}', ${isVetement}, ${index})">Ajouter au panier</button>`}
-      </div>
-    `;
-    container.appendChild(div);
-  });
-}
+          <div class="article-actions">
+            ${rupture
+              ? `<p style="color:red;font-weight:bold">Stock épuisé 🔥</p>`
+              : `<p style="color:green;font-weight:bold">Stock : ${stock} 🟢</p>
+                 <button onclick="ajouterAuPanier('${article.nom}', ${isVetement}, ${index})">Ajouter au panier</button>`}
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
 
     function ajouterAuPanier(nomArticle, hasSize, index) {
       let taille = '';
@@ -323,6 +358,11 @@
     }
 
     function envoyerCommande() {
+      if (panier.length === 0) {
+        alert("Votre panier est vide.");
+        return;
+      }
+      
       const numeroCommande = `ELZ${Math.floor(1000 + Math.random() * 9000)}`;
       const payload = {
         nom,
@@ -337,6 +377,8 @@
         mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
+      }).catch(error => {
+        console.error('Erreur lors de l\'envoi de la commande:', error);
       });
 
       document.getElementById('confirmation-message').innerText = `Commande envoyée ! Numéro : ${numeroCommande}`;

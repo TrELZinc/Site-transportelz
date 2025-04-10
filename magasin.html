@@ -134,7 +134,9 @@
     const div = document.createElement('div');
     div.className = 'article';
 
-    const isVetement = article.nom.toLowerCase().includes("t-shirt, polo");
+    const vetements = ['t-shirt', 'polo', 'hoodie', 'pantalon'];
+    const isVetement = vetements.some(type => article.nom.toLowerCase().includes(type));
+
 
     div.innerHTML = `
       <img src="${article.image}" alt="${article.nom}" />

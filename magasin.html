@@ -19,11 +19,19 @@
     header img {
       height: 50px;
     }
-    .card img {
+    .card {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .card-img-top {
       height: 160px;
+      width: 100%;
       object-fit: contain;
       padding: 10px;
-      background-color: white;
+      background-color: #fff;
     }
     .btn-black {
       background-color: #000;
@@ -48,7 +56,7 @@
       <button id="panier-btn" class="btn btn-black">🛒 Voir mon panier (0)</button>
     </div>
 
-    <div class="row" id="articles"></div>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4" id="articles"></div>
   </div>
 
 

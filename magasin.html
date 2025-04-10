@@ -270,6 +270,12 @@
         description: 'Polo noir avec logo ELZ',
         image: 'https://via.placeholder.com/300x300?text=Polo+ELZ',
         stock: 8
+      },
+      {
+        nom: 'Bottes',
+        description: 'Bottes de sécurité',
+        image: 'https://via.placeholder.com/300x300?text=Bottes+ELZ',
+        stock: 5
       }
     ];
 
@@ -291,6 +297,7 @@
         div.className = 'article';
 
         const isVetement = vetements.some(type => article.nom.toLowerCase().includes(type));
+        const isChaussure = article.nom.toLowerCase().includes('botte') || article.nom.toLowerCase().includes('chaussure');
         const stock = parseInt(article.stock || 0);
         const rupture = stock === 0;
 
@@ -317,12 +324,26 @@
                 </select>
               </div>
             ` : ''}
+            ${isChaussure ? `
+              <div class="select-taille">
+                <label for="taille-${index}">Pointure :</label>
+                <select id="taille-${index}">
+                  <option value="39">39</option>
+                  <option value="40">40</option>
+                  <option value="41">41</option>
+                  <option value="42">42</option>
+                  <option value="43">43</option>
+                  <option value="44">44</option>
+                  <option value="45">45</option>
+                </select>
+              </div>
+            ` : ''}
           </div>
           <div class="article-actions">
             ${rupture
               ? `<p style="color:red;font-weight:bold">Stock épuisé 🔥</p>`
               : `<p style="color:green;font-weight:bold">Stock : ${stock} 🟢</p>
-                 <button onclick="ajouterAuPanier('${article.nom}', ${isVetement}, ${index})">Ajouter au panier</button>`}
+                 <button onclick="ajouterAuPanier('${article.nom}', ${isVetement || isChaussure}, ${index})">Ajouter au panier</button>`}
           </div>
         `;
         container.appendChild(div);

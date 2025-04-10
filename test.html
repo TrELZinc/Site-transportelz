@@ -3,32 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sommaire</title>
+  <title>Disponibilités</title>
   <style>
-    /* Styles de base */
     html, body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
       background-color: #f4f4f4;
       font-size: 16px;
     }
-
-    /* En-tête */
     header {
       background-color: #111;
-      width: 100%;
       padding: 10px 20px;
+      margin: 0;
+      width: 100vw;
+      box-sizing: border-box;
+      overflow: hidden;
+      position: relative;
+      left: 50%;
+      right: 50%;
+      margin-left: -50vw;
+      margin-right: -50vw;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      box-sizing: border-box;
-      z-index: 1000;
     }
     header img {
       height: 40px;
     }
-
-    /* Container et tableau */
     .container {
       padding: 20px;
       max-width: 1000px;
@@ -67,34 +68,38 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
     table {
-      min-width: 900px;
+      min-width: 700px;
       width: 100%;
       border-collapse: collapse;
     }
     th, td {
-      border: 1px solid #999;
+      border: 1px solid #ccc;
+      padding: 8px;
       text-align: center;
       vertical-align: middle;
-      padding: 6px;
+      height: 36px;
     }
     th {
       background-color: #d32f2f;
       color: white;
       font-weight: bold;
-      text-transform: uppercase;
-    }
-    tr:nth-child(even) td {
-      background-color: #f7f7f7;
-    }
-    tr:nth-child(odd) td {
-      background-color: #ffffff;
     }
     td[contenteditable] {
       outline: none;
       text-transform: uppercase;
     }
-
-    /* Boutons */
+    .us-cell {
+      font-size: 16px;
+      vertical-align: middle;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .us-cell span {
+      font-size: 16px;
+      display: inline-block;
+      line-height: 1;
+      vertical-align: middle;
+    }
     .buttons {
       margin-top: 20px;
       display: flex;
@@ -102,6 +107,7 @@
       gap: 10px;
       flex-wrap: wrap;
     }
+
     .buttons button {
       padding: 12px 24px;
       border: none;
@@ -114,35 +120,14 @@
     .reset-btn { background-color: #e74c3c; }
     .save-btn { background-color: #2ecc71; }
     .send-btn { background-color: black; }
-    .copy-btn {
-      font-size: 12px;
-      padding: 3px 6px;
-      background-color: #555;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .copy-btn:hover {
-      background-color: #333;
-    }
-    .arrow-next {
-      position: absolute;
-      z-index: 1000;
-      display: none;
-      padding: 2px 6px;
-      font-size: 14px;
-      border-radius: 6px;
-      background: #111;
-      color: #fff;
-      border: none;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    }
 
-    /* Responsive */
     @media (max-width: 600px) {
+      body {
+        padding: 0 12px 40px 12px;
+      }
       .container {
-        padding: 12px;
+        padding-left: 12px;
+        padding-right: 12px;
       }
       .buttons {
         margin-bottom: 40px;
@@ -155,9 +140,12 @@
         height: 32px;
         font-size: 14px;
       }
+      .us-cell {
+        font-size: 14px !important;
+      }
     }
   </style>
-  <!-- Firebase SDKs en mode compat pour HTML classique -->
+  <!-- Firebase SDK en mode compat -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
@@ -171,70 +159,19 @@
     appId: "1:171788284751:web:694f070d1cafe8b7c04b3a"
   };
 
-  // Initialisation Firebase
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
-
-  // 🔁 Charger depuis Firestore
-  window.loadFromFirebase = function(date) {
-    db.collection("disponibilites")
-      .where("date", "==", date)
-      .orderBy("timestamp", "desc")
-      .limit(1)
-      .get()
-      .then(querySnapshot => {
-        if (!querySnapshot.empty) {
-          const data = querySnapshot.docs[0].data();
-
-          elements.noteField.value = data.note || "";
-          elements.dateSelect.value = data.date || "";
-          elements.tableBody.innerHTML = "";
-
-          data.rows.forEach(row => {
-            const tr = createRow();
-            const cells = tr.querySelectorAll("td");
-            row.forEach((val, i) => {
-              if (cells[i]) cells[i].textContent = val;
-            });
-            elements.tableBody.appendChild(tr);
-          });
-
-          console.log("✅ Données chargées depuis Firebase !");
-        } else {
-          generateDefaultRows(9);
-          console.log("📭 Aucune donnée trouvée dans Firebase.");
-        }
-      })
-      .catch(error => {
-        console.error("❌ Erreur de chargement Firebase :", error);
-      });
-  };
-
-  // ✅ Enregistrer dans Firestore
-  window.saveToFirebase = function(data, callback) {
-  db.collection("disponibilites").add(data)
-    .then(() => {
-      console.log("✅ Enregistrement réussi dans Firestore !");
-      if (typeof callback === "function") callback(); // Appelle le callback après succès
-    })
-    .catch((error) => {
-      console.error("❌ Erreur Firebase :", error);
-      alert("Erreur d’enregistrement Firebase : " + error.message);
-    });
-};
-
 </script>
 
 </head>
 <body>
   <header>
   <img src="assets/logo.jpeg" alt="Logo Transport ELZ">
-  <button onclick="window.location.href='dispos.html'" 
+  <button onclick="window.location.href='sommaire.html'" 
           style="padding: 10px 18px; background-color: #d32f2f; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">
-    Dispos
+    Sommaire
   </button>
 </header>
-
   <div class="container">
     <div class="top-bar">
       <input type="date" id="dateSelect" />
@@ -245,401 +182,250 @@
       <table id="dispoTable">
         <thead>
           <tr>
-            <th style="width:70px;">RANG</th>
-            <th style="width:200px;">CLIENT</th>
-            <th style="width:80px;">TYPE</th>
-            <th style="width:80px;">DÉPART</th>
-            <th style="width:80px;">LIVRAISON</th>
-            <th style="width:100px;">CHAUFFEUR</th>
-            <th style="width:90px;">CAMION</th>
-            <th style="width:100px;">REMORQUE</th>
-            <th style="width:60px;">COPIE</th>
+            <th>CHAUFFEUR</th><th>US</th><th>CAMION</th><th>REMORQUE</th><th>DÉPART</th><th>NOTE</th>
           </tr>
         </thead>
         <tbody id="tableBody"></tbody>
       </table>
     </div>
     <div class="buttons">
-      <button class="reset-btn" id="resetBtn">Reset</button>
-      <button class="save-btn" id="saveBtn">Save</button>
-      <button class="send-btn" id="sendBtn">Send</button>
+      <button class="reset-btn" onclick="resetForm()">Reset</button>
+      <button class="save-btn" onclick="saveData()">Save</button>
+      <button class="send-btn" onclick="sendForm()">Send</button>
     </div>
   </div>
-
+  
   <script>
-    // Configuration et constantes
-    const API_URL = "https://script.google.com/macros/s/AKfycbwCAgSIfQhyWIIZdGMixV8JlnGRsVr6shKhj9M9mlwVqS-bjNfSOmGl16nRKhySQCwz/exec";
-    const CHAUFFEUR_MAP = {
-      "JFJ": { nom: "Jeff", tel: "4185202502" },
-      "AL": { nom: "Alain", tel: "4182710206" },
-      "PF": { nom: "Patrick", tel: "4185696346" },
-      "RPE": { nom: "Rraymond", tel: "4186706104" },
-      "CYR": { nom: "Clement", tel: "5819223336" },
-      "BPQ": { nom: "Benoit", tel: "5819933470" },
-      "RED": { nom: "Rejean", tel: "4183254436" },
-      "SIR": { nom: "Simon", tel: "4185760436" },
-    };
-    const STORAGE_KEYS = {
-      note: "dispo_note",
-      date: "dispo_date",
-      rows: "dispo_rows"
-    };
-    const DAYS_FR = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
-    const MONTHS_FR = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
-
-    // Éléments DOM
-    const elements = {
-      dateSelect: document.getElementById("dateSelect"),
-      noteField: document.getElementById("note"),
-      tableBody: document.getElementById("tableBody"),
-      dispoTable: document.getElementById("dispoTable"),
-      resetBtn: document.getElementById("resetBtn"),
-      saveBtn: document.getElementById("saveBtn"),
-      sendBtn: document.getElementById("sendBtn"),
-    };
     
-    // Fonctions pour la gestion des lignes du tableau
+    function saveToFirebase(data, callback) {
+      db.collection("disponibilites_dispos").add(data) // Collection différente
+        .then(() => {
+          console.log("✅ Données enregistrées dans Firestore (dispos) !");
+          if (typeof callback === "function") callback();
+        })
+        .catch((error) => {
+          console.error("❌ Erreur Firestore :", error);
+          alert("Erreur Firestore : " + error.message);
+        });
+    }
+
     function createRow() {
       const row = document.createElement("tr");
       row.innerHTML = `
-        <td contenteditable inputmode="numeric"></td>
         <td contenteditable></td>
-        <td contenteditable></td>
-        <td contenteditable></td>
-        <td contenteditable></td>
-        <td contenteditable></td>
+        <td class="us-cell" onclick="toggleUS(this)" style="font-size:16px;">❌</td>
         <td contenteditable inputmode="numeric"></td>
         <td contenteditable inputmode="numeric"></td>
-        <td><button class="copy-btn">📋</button></td>
+        <td contenteditable></td>
+        <td contenteditable></td>
       `;
-      // Attacher l'événement directement lors de la création
-      const copyBtn = row.querySelector(".copy-btn");
-      copyBtn.addEventListener("click", () => copyRow(row));
       return row;
     }
 
     function generateDefaultRows(n = 9) {
-      elements.tableBody.innerHTML = "";
+      const tbody = document.getElementById("tableBody");
+      tbody.innerHTML = "";
       for (let i = 0; i < n; i++) {
-        elements.tableBody.appendChild(createRow());
+        tbody.appendChild(createRow());
       }
     }
-    
-    // Fonctions pour les opérations principales
-    function formatDate(dateStr) {
-  if (!dateStr) return "";
 
-  const [year, month, day] = dateStr.split("-");
-  const dateObj = new Date(Number(year), Number(month) - 1, Number(day));
+    function toggleUS(cell) {
+      cell.innerHTML = cell.innerHTML.includes("✔️")
+        ? "❌"
+        : '<span style="color:#c62828; font-size:16px;">✔️</span>';
+    }
 
-  const dayName = DAYS_FR[dateObj.getDay()];
-  const dayNum = dateObj.getDate();
-  const monthName = MONTHS_FR[dateObj.getMonth()];
+    function sendForm() {
+      const tableClone = document.getElementById("dispoTable").cloneNode(true);
+      const rows = tableClone.querySelectorAll("tbody tr");
 
-  return `${dayName} le ${dayNum} ${monthName}`;
-}
+      rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        let isRowEmpty = true;
 
-    function copyRow(row) {
-      const cells = row.querySelectorAll("td");
-      
-      const rawCode = (cells[5]?.textContent || "").trim().toUpperCase();
-      const chauffeur = CHAUFFEUR_MAP[rawCode] || { nom: rawCode, tel: "" };
-      
-      const values = [
-        chauffeur.nom,
-        (cells[1]?.textContent || "").trim().toUpperCase(),
-        (cells[2]?.textContent || "").trim().toUpperCase(),
-        (cells[3]?.textContent || "").trim().toUpperCase(),
-        (cells[4]?.textContent || "").trim().toUpperCase(),
-        (cells[6]?.textContent || "").trim().toUpperCase(),
-        (cells[7]?.textContent || "").trim().toUpperCase()
-      ];
-      
-      const labels = ["Chauffeur", "Client", "Type", "Départ", "Livraison", "Camion", "Remorque"];
-      const dayFormatted = formatDate(elements.dateSelect.value);
-      
-      let sms = `Salut,\nVoici ton voyage pour ${dayFormatted}\n\n`;
-      sms += labels.map((label, idx) => `${label}: ${values[idx]}`).join("\n");
-      sms += `\n\nMerci !`;
-      
-      const smsEncoded = encodeURIComponent(sms);
-      const href = chauffeur.tel ? `sms:${chauffeur.tel}?body=${smsEncoded}` : `sms:?body=${smsEncoded}`;
-      
-      // Création et clic du lien
-      const link = document.createElement("a");
-      link.href = href;
-      link.style.display = "none";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+        for (let i = 0; i < cells.length; i++) {
+          if (i === 1) continue;
+          const text = cells[i]?.innerText?.trim();
+          if (text) {
+            isRowEmpty = false;
+            break;
+          }
+        }
+
+        for (let i = 0; i < cells.length; i++) {
+          const cell = cells[i];
+
+          if (i === 1) {
+            const content = cell.textContent.trim();
+            const isChecked =
+              content.includes("✔️") || content.includes("✅") ||
+              cell.querySelector("input[type='checkbox']")?.checked;
+
+            if (isChecked) {
+              cell.innerHTML = '<span style="font-size:16px;">✔️</span>';
+            } else {
+              cell.innerHTML = isRowEmpty ? '' : '<span style="font-size:16px;">❌</span>';
+            }
+          } else if (cell.hasAttribute("contenteditable")) {
+            cell.innerText = cell.innerText.trim().toUpperCase();
+          }
+        }
+      });
+
+      const selectedDate = document.querySelector("#dateSelect")?.value || "";
+      if (!selectedDate) {
+        alert("Veuillez sélectionner une date.");
+        return;
+      }
+
+      const data = {
+        note: document.getElementById("note").value,
+        date: selectedDate,
+        table: tableClone.outerHTML
+      };
+
+      fetch("https://script.google.com/macros/s/AKfycbyq8lsT9xzM2AEpBEyHcH4PgCa0egwnHLvYTMP9S66C6HufgmYK3YIxzAKoXsS-XpsUTg/exec", {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      alert("Disponibilités envoyées !");
     }
 
     function resetForm() {
-  elements.noteField.value = "";
-  elements.dateSelect.value = "";
-  localStorage.clear();
+      document.getElementById("note").value = "";
+      document.getElementById("dateSelect").value = "";
+      localStorage.clear();
 
-  const rows = document.querySelectorAll("#tableBody tr");
-  rows.forEach((row, index) => {
-    const cells = row.querySelectorAll("td");
-    // Ne pas effacer la 1ʳᵉ cellule (rang)
-    for (let i = 1; i < 8; i++) {
-      if (cells[i]) cells[i].textContent = "";
+      const rows = document.querySelectorAll("#dispoTable tbody tr");
+      rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        if (cells[4]) cells[4].textContent = "";
+        if (cells[5]) cells[5].textContent = "";
+      });
     }
-  });
-}
 
+    function formatDate(dateStr) {
+      if (!dateStr) return "Date non sélectionnée";
+      const d = new Date(dateStr);
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
 
     function saveData() {
-  try {
-    const note = elements.noteField.value;
-    const date = elements.dateSelect.value;
+      try {
+        const table = document.getElementById("dispoTable");
+        if (!table) throw new Error("Table introuvable");
 
-    const rows = Array.from(document.querySelectorAll("#dispoTable tbody tr")).map(tr => {
-      const cells = Array.from(tr.querySelectorAll("td")).slice(0, 8);
-      return {
-        rang: cells[0]?.textContent.trim() || "",
-        client: cells[1]?.textContent.trim() || "",
-        type: cells[2]?.textContent.trim() || "",
-        depart: cells[3]?.textContent.trim() || "",
-        livraison: cells[4]?.textContent.trim() || "",
-        chauffeur: cells[5]?.textContent.trim() || "",
-        camion: cells[6]?.textContent.trim() || "",
-        remorque: cells[7]?.textContent.trim() || ""
-      };
-    });
+        const date = document.getElementById("dateSelect").value;
+        const note = document.getElementById("note").value;
 
-    const data = { note, date, rows, timestamp: new Date().toISOString() };
-
-    // Sauvegarde locale
-    localStorage.setItem(STORAGE_KEYS.note, note);
-    localStorage.setItem(STORAGE_KEYS.date, date);
-    localStorage.setItem(STORAGE_KEYS.rows, JSON.stringify(rows));
-
-    // Sauvegarde Firebase, avec un seul message après succès
-    if (window.saveToFirebase) {
-      window.saveToFirebase(data, () => {
-        alert("✅ Données sauvegardées localement ET dans Firebase !");
-      });
-    }
-
-  } catch (err) {
-    alert("Erreur lors de la sauvegarde : " + err.message);
-  }
-}
-function sendForm() {
-  const tableClone = document.getElementById("dispoTable").cloneNode(true);
-  const rows = tableClone.querySelectorAll("tbody tr");
-
-  rows.forEach(row => {
-    const cells = row.querySelectorAll("td");
-    let isRowEmpty = true;
-
-    for (let i = 0; i < cells.length; i++) {
-      if (i === 8) continue;  // Skip the copy button cell
-      const text = cells[i]?.innerText?.trim();
-      if (text) {
-        isRowEmpty = false;
-        break;
-      }
-    }
-
-    for (let i = 0; i < cells.length; i++) {
-      const cell = cells[i];
-
-      if (i === 8) {  // Handle the copy button cell
-        cell.innerHTML = "";  // Remove the copy button
-      } else if (cell.hasAttribute("contenteditable")) {
-        cell.innerText = cell.innerText.trim().toUpperCase();
-      }
-    }
-  });
-
-  const selectedDate = document.querySelector("#dateSelect")?.value || "";
-if (!selectedDate) {
-  alert("Veuillez sélectionner une date.");
-  return;
-}
-const data = {
-  note: document.getElementById("note").value,
-  date: selectedDate,
-  table: tableClone.outerHTML
-};
-
-
-  fetch("https://script.google.com/macros/s/AKfycbwCAgSIfQhyWIIZdGMixV8JlnGRsVr6shKhj9M9mlwVqS-bjNfSOmGl16nRKhySQCwz/exec", {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  });
-
-  alert("Sommaire envoyé !");
-}
-
-
-    // Gestion de la navigation avec flèche
-    function setupArrowNavigation() {
-      const arrowBtn = document.createElement("button");
-      arrowBtn.textContent = "➡️";
-      arrowBtn.className = "arrow-next";
-      document.body.appendChild(arrowBtn);
-      
-      let currentCell = null;
-      
-      // Fonction pour mettre à jour la position du bouton flèche
-      function updateArrowPosition() {
-        if (!currentCell) return;
-        const rect = currentCell.getBoundingClientRect();
-        arrowBtn.style.top = `${window.scrollY + rect.top + 5}px`;
-        arrowBtn.style.left = `${window.scrollX + rect.right + 5}px`;
-        arrowBtn.style.display = "inline-block";
-      }
-      
-      // Déplacement vers la cellule suivante
-      function moveToNextCell() {
-        if (!currentCell) return;
-        const row = currentCell.closest("tr");
-        const cells = Array.from(row.querySelectorAll("td[contenteditable]"));
-        const idx = cells.indexOf(currentCell);
-        
-        let next = null;
-        
-        if (idx < cells.length - 1) {
-          next = cells[idx + 1];
-        } else {
-          const nextRow = row.nextElementSibling;
-          if (nextRow) {
-            const nextCells = Array.from(nextRow.querySelectorAll("td[contenteditable]"));
-            if (nextCells.length) next = nextCells[0];
-          }
-        }
-        
-        if (next) {
-          next.focus();
-          currentCell = next;
-          
-          // Attendre le rendu avant scroll
-          setTimeout(() => {
-            next.scrollIntoView({
-              behavior: "smooth",
-              block: "nearest",
-              inline: "center"
-            });
-            updateArrowPosition();
-          }, 50);
-        }
-      }
-      
-      // Événements
-      elements.dispoTable.addEventListener("focusin", (e) => {
-        if (e.target.tagName === "TD" && e.target.hasAttribute("contenteditable")) {
-          currentCell = e.target;
-          updateArrowPosition();
-          
-          // Assurer que la cellule est visible
-          currentCell.scrollIntoView({
-            behavior: "smooth",
-            block: "nearest",
-            inline: "center"
-          });
-        }
-      });
-      
-      document.addEventListener("scroll", updateArrowPosition);
-      
-      arrowBtn.addEventListener("click", moveToNextCell);
-      
-      document.addEventListener("click", (e) => {
-        if (!e.target.closest("td") && e.target !== arrowBtn) {
-          arrowBtn.style.display = "none";
-          currentCell = null;
-        }
-      });
-    }
-    
-    // Événement pour convertir le texte en majuscules pendant la saisie
-    document.addEventListener("input", (e) => {
-      if (e.target.matches("td[contenteditable]")) {
-        const selection = window.getSelection();
-        const range = selection.getRangeAt(0);
-        const cursorPos = range.startOffset;
-        
-        const upper = e.target.textContent.toUpperCase();
-        e.target.textContent = upper;
-        
-        // Remet le curseur à la bonne place
-        if (e.target.firstChild) {
-          range.setStart(e.target.firstChild, Math.min(cursorPos, e.target.textContent.length));
-          range.setEnd(e.target.firstChild, Math.min(cursorPos, e.target.textContent.length));
-          selection.removeAllRanges();
-          selection.addRange(range);
-        }
-      }
-    });
-  
-    
-    // Initialisation
-    function init() {
-  elements.resetBtn.addEventListener("click", resetForm);
-  elements.saveBtn.addEventListener("click", saveData);
-  elements.sendBtn.addEventListener("click", sendForm);
-
-  elements.tableBody.innerHTML = "";
-
-  // 🚀 Toujours charger la dernière entrée Firebase (peu importe localStorage)
-  db.collection("disponibilites")
-    .orderBy("timestamp", "desc")
-    .limit(1)
-    .get()
-    .then(snapshot => {
-      if (!snapshot.empty) {
-        const data = snapshot.docs[0].data();
-        elements.dateSelect.value = data.date || "";
-        elements.noteField.value = data.note || "";
-
-        data.rows.forEach(row => {
-          const tr = createRow();
-          const cells = tr.querySelectorAll("td");
-          cells[0].textContent = row.rang || "";
-          cells[1].textContent = row.client || "";
-          cells[2].textContent = row.type || "";
-          cells[3].textContent = row.depart || "";
-          cells[4].textContent = row.livraison || "";
-          cells[5].textContent = row.chauffeur || "";
-          cells[6].textContent = row.camion || "";
-          cells[7].textContent = row.remorque || "";
-          elements.tableBody.appendChild(tr);
+        const rows = Array.from(document.querySelectorAll("#dispoTable tbody tr")).map(tr => {
+          const cells = Array.from(tr.querySelectorAll("td")).slice(0, 6).map(td => td.textContent.trim());
+          return {
+            chauffeur: cells[0] || "",
+            us: cells[1] || "",
+            camion: cells[2] || "",
+            remorque: cells[3] || "",
+            depart: cells[4] || "",
+            note: cells[5] || ""
+          };
         });
 
-        // 💾 On met aussi à jour le localStorage (pour les copier-coller)
-        localStorage.setItem(STORAGE_KEYS.note, data.note || "");
-        localStorage.setItem(STORAGE_KEYS.date, data.date || "");
-        localStorage.setItem(STORAGE_KEYS.rows, JSON.stringify(data.rows || []));
+        const data = {
+          date,
+          note,
+          table: table.outerHTML,
+          rows,
+          timestamp: new Date().toISOString()
+        };
 
-        console.log("🟢 Dernières données Firebase chargées et localStorage mis à jour.");
-      } else {
-        generateDefaultRows(9);
-        console.log("📭 Aucune donnée dans Firebase.");
+        // 🧠 Enregistrement local
+        localStorage.setItem("dispo_note", note);
+        localStorage.setItem("dispo_date", date);
+        localStorage.setItem("dispo_table", table.outerHTML);
+
+        // ☁️ Enregistrement dans Firestore
+        saveToFirebase(data, () => {
+          alert("✅ Données sauvegardées localement et dans Firebase !");
+        });
+
+      } catch (err) {
+        alert("Erreur lors de la sauvegarde : " + err.message);
+      }
+    }
+
+    // Cell focus behavior
+    document.addEventListener("focusin", function(e) {
+      if (e.target.matches("td[contenteditable]")) {
+        const cell = e.target;
+        const container = document.querySelector(".table-wrapper");
+        
+        if (container) {
+          const offsetLeft = cell.offsetLeft;
+          const containerRect = container.getBoundingClientRect();
+          const scrollLeft = offsetLeft - (containerRect.width / 3);
+          
+          container.scrollTo({
+            left: scrollLeft,
+            behavior: "smooth"
+          });
+        }
       }
     });
 
-  // 🔁 Si l'utilisateur sélectionne une date manuellement
-  elements.dateSelect.addEventListener("change", () => {
-    const newDate = elements.dateSelect.value;
-    if (newDate) {
-      loadFromFirebase(newDate);
-    }
-  });
+    // Initialize on load
+    window.onload = function() {
+      const note = localStorage.getItem("dispo_note");
+      const date = localStorage.getItem("dispo_date");
+      const table = localStorage.getItem("dispo_table");
 
-  setupArrowNavigation();
-}
+      if (note) document.getElementById("note").value = note;
+      if (date) document.getElementById("dateSelect").value = date;
 
+      if (table) {
+        document.getElementById("dispoTable").outerHTML = table;
+        setTimeout(() => {
+          const newTable = document.getElementById("dispoTable");
+          const usCells = newTable.querySelectorAll(".us-cell");
+          usCells.forEach(cell => {
+            cell.onclick = () => toggleUS(cell);
+          });
+        }, 0);
+      } else {
+        generateDefaultRows(9);
+      }
 
-    
-  // Démarrer l'application quand la page est chargée
-document.addEventListener("DOMContentLoaded", init);
+      // 🔁 Toujours tenter de charger la dernière saisie depuis Firestore
+      db.collection("disponibilites_dispos")
+        .orderBy("timestamp", "desc")
+        .limit(1)
+        .get()
+        .then(snapshot => {
+          if (!snapshot.empty) {
+            const data = snapshot.docs[0].data();
+            document.getElementById("note").value = data.note || "";
+            document.getElementById("dateSelect").value = data.date || "";
+            document.getElementById("dispoTable").outerHTML = data.table;
 
+            setTimeout(() => {
+              const usCells = document.querySelectorAll(".us-cell");
+              usCells.forEach(cell => {
+                cell.onclick = () => toggleUS(cell);
+              });
+            }, 0);
+
+            console.log("✅ Données chargées depuis Firestore !");
+          } else {
+            console.log("📭 Aucune donnée trouvée dans Firestore.");
+          }
+        });
+    };
   </script>
 </body>
 </html>

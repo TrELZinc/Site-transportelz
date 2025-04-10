@@ -104,12 +104,6 @@
       cursor: pointer;
     }
 
-    #confirmation {
-      text-align: center;
-      margin-top: 30px;
-      font-weight: bold;
-    }
-
     #toast {
       position: fixed;
       bottom: 20px;
@@ -141,7 +135,7 @@
       align-items: center;
     }
 
-    #panier-modal {
+    .modal {
       background: white;
       border-radius: 12px;
       padding: 20px;
@@ -152,22 +146,29 @@
       text-align: center;
     }
 
-    #panier-modal h2 {
-      margin-top: 0;
-    }
-
-    #panier-modal ul {
+    .modal ul {
       list-style: none;
       padding: 0;
       margin-bottom: 20px;
       text-align: left;
     }
 
-    #panier-modal li {
+    .modal li {
       padding: 5px 0;
+      display: flex;
+      justify-content: space-between;
     }
 
-    #confirm-btn {
+    .modal li button {
+      background: red;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 2px 6px;
+      cursor: pointer;
+    }
+
+    #confirm-btn, #fermer-btn, #fermer-confirmation {
       background-color: #000;
       color: white;
       padding: 10px 20px;
@@ -175,15 +176,6 @@
       border: none;
       cursor: pointer;
       font-family: inherit;
-    }
-
-    #fermer-btn {
-      background: transparent;
-      color: #000;
-      border: 1px solid #000;
-      padding: 5px 10px;
-      border-radius: 10px;
-      cursor: pointer;
       margin-top: 10px;
     }
   </style>
@@ -195,20 +187,22 @@
 
   <div class="container">
     <h1>Magasin interne ELZ</h1>
-    <button id="panier-btn" onclick="afficherPanier()">Voir mon panier (0)</button>
+    <button id="panier-btn" onclick="afficherPanier()">🛒 Voir mon panier (0)</button>
     <div class="articles" id="articles"></div>
-    <div id="confirmation"></div>
   </div>
 
-  <!-- Toast + Overlay -->
   <div id="toast">Ajouté au panier ✅</div>
 
   <div id="overlay">
-    <div id="panier-modal">
+    <div class="modal" id="panier-modal">
       <h2>Mon panier</h2>
       <ul id="liste-panier"></ul>
       <button id="confirm-btn" onclick="envoyerCommande()">Confirmer la commande</button>
       <button id="fermer-btn" onclick="fermerPanier()">Fermer</button>
+    </div>
+    <div class="modal" id="confirmation-modal" style="display:none">
+      <h2 id="confirmation-message"></h2>
+      <button id="fermer-confirmation" onclick="fermerPanier()">Fermer</button>
     </div>
   </div>
 
@@ -217,7 +211,6 @@
     const nom = localStorage.getItem('nom') || 'Inconnu';
     const courriel = localStorage.getItem('email') || 'non défini';
     const panier = [];
-
     const vetements = ['t-shirt', 'polo', 'hoodie', 'pantalon'];
 
     fetch(scriptURL)
@@ -231,6 +224,8 @@
         div.className = 'article';
 
         const isVetement = vetements.some(type => article.nom.toLowerCase().includes(type));
+        const stock = parseInt(article.stock);
+        const rupture = stock === 0;
 
         div.innerHTML = `
           <img src="${article.image}" alt="${article.nom}" />
@@ -248,7 +243,8 @@
               </select>
             </div>
           ` : ''}
-          <button onclick="ajouterAuPanier('${article.nom}', ${isVetement}, ${index})">Ajouter au panier</button>
+          ${rupture ? '<p style="color:red;font-weight:bold">En rupture de stock</p>' : 
+          `<button onclick="ajouterAuPanier('${article.nom}', ${isVetement}, ${index})">Ajouter au panier</button>`}
         `;
         container.appendChild(div);
       });
@@ -262,7 +258,7 @@
       }
 
       panier.push({ article: nomArticle, taille });
-      document.getElementById('panier-btn').innerText = `Voir mon panier (${panier.length})`;
+      document.getElementById('panier-btn').innerText = `🛒 Voir mon panier (${panier.length})`;
 
       const toast = document.getElementById('toast');
       toast.classList.add('show');
@@ -272,15 +268,25 @@
     function afficherPanier() {
       const overlay = document.getElementById('overlay');
       const liste = document.getElementById('liste-panier');
-      liste.innerHTML = '';
+      const panierModal = document.getElementById('panier-modal');
+      const confirmationModal = document.getElementById('confirmation-modal');
 
+      liste.innerHTML = '';
       panier.forEach((item, i) => {
         const li = document.createElement('li');
-        li.textContent = `${item.article}${item.taille ? ' - Taille ' + item.taille : ''}`;
+        li.innerHTML = `${item.article}${item.taille ? ' - Taille ' + item.taille : ''} <button onclick="supprimerArticle(${i})">🗑</button>`;
         liste.appendChild(li);
       });
 
+      panierModal.style.display = 'block';
+      confirmationModal.style.display = 'none';
       overlay.style.display = 'flex';
+    }
+
+    function supprimerArticle(index) {
+      panier.splice(index, 1);
+      afficherPanier();
+      document.getElementById('panier-btn').innerText = `🛒 Voir mon panier (${panier.length})`;
     }
 
     function fermerPanier() {
@@ -304,15 +310,14 @@
         body: JSON.stringify(payload)
       });
 
-      document.getElementById('confirmation').innerText =
-        `Commande envoyée ! Numéro : ${numeroCommande}`;
-      fermerPanier();
+      document.getElementById('confirmation-message').innerText = `Commande envoyée ! Numéro : ${numeroCommande}`;
+      document.getElementById('panier-modal').style.display = 'none';
+      document.getElementById('confirmation-modal').style.display = 'block';
       panier.length = 0;
-      document.getElementById('panier-btn').innerText = `Voir mon panier (0)`;
+      document.getElementById('panier-btn').innerText = `🛒 Voir mon panier (0)`;
     }
 
-    // Clic sur fond flou pour fermer
-    document.getElementById('overlay').addEventListener('click', function (e) {
+    document.getElementById('overlay').addEventListener('click', function(e) {
       if (e.target === this) fermerPanier();
     });
   </script>

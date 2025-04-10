@@ -104,30 +104,66 @@
       cursor: pointer;
     }
 
-    #confirmation, #panier-modal {
+    #confirmation {
       text-align: center;
       margin-top: 30px;
       font-weight: bold;
     }
 
-    #panier-modal {
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #000;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 20px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 9999;
+    }
+
+    #toast.show {
+      opacity: 1;
+    }
+
+    #overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(6px);
+      z-index: 999;
       display: none;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #panier-modal {
       background: white;
-      border-radius: 10px;
+      border-radius: 12px;
       padding: 20px;
-      max-width: 500px;
-      margin: 40px auto;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+      z-index: 1000;
+      text-align: center;
+    }
+
+    #panier-modal h2 {
+      margin-top: 0;
     }
 
     #panier-modal ul {
       list-style: none;
       padding: 0;
       margin-bottom: 20px;
+      text-align: left;
     }
 
     #panier-modal li {
-      text-align: left;
       padding: 5px 0;
     }
 
@@ -140,56 +176,16 @@
       cursor: pointer;
       font-family: inherit;
     }
-  
-#toast {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #000;
-  color: #fff;
-  padding: 10px 20px;
-  border-radius: 20px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: 9999;
-}
 
-#toast.show {
-  opacity: 1;
-}
-
-#overlay {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
-  background: rgba(0,0,0,0.5);
-  backdrop-filter: blur(6px);
-  z-index: 999;
-  display: none;
-  justify-content: center;
-  align-items: center;
-}
-
-#panier-modal h2 {
-  margin-top: 0;
-}
-
-#panier-modal ul {
-  text-align: left;
-  margin-bottom: 20px;
-}
-
-#fermer-btn {
-  background: transparent;
-  color: #000;
-  border: 1px solid #000;
-  padding: 5px 10px;
-  border-radius: 10px;
-  cursor: pointer;
-  margin-top: 10px;
-}
-
+    #fermer-btn {
+      background: transparent;
+      color: #000;
+      border: 1px solid #000;
+      padding: 5px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -202,9 +198,22 @@
     <button id="panier-btn" onclick="afficherPanier()">Voir mon panier (0)</button>
     <div class="articles" id="articles"></div>
     <div id="confirmation"></div>
+  </div>
+
+  <!-- Toast + Overlay -->
+  <div id="toast">Ajouté au panier ✅</div>
+
+  <div id="overlay">
+    <div id="panier-modal">
+      <h2>Mon panier</h2>
+      <ul id="liste-panier"></ul>
+      <button id="confirm-btn" onclick="envoyerCommande()">Confirmer la commande</button>
+      <button id="fermer-btn" onclick="fermerPanier()">Fermer</button>
+    </div>
+  </div>
 
   <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbyx4kFzQG2qYrOxGlsTlmIK1n9EC-sRCetRvK8qw229EalNeD73SdPiI4OmV04o_T5m/exec'; // À remplacer par ton URL Apps Script
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyx4kFzQG2qYrOxGlsTlmIK1n9EC-sRCetRvK8qw229EalNeD73SdPiI4OmV04o_T5m/exec';
     const nom = localStorage.getItem('nom') || 'Inconnu';
     const courriel = localStorage.getItem('email') || 'non défini';
     const panier = [];
@@ -245,82 +254,67 @@
       });
     }
 
-   function ajouterAuPanier(nomArticle, hasSize, index) {
-  let taille = '';
-  if (hasSize) {
-    const select = document.getElementById(`taille-${index}`);
-    taille = select ? select.value : '';
-  }
+    function ajouterAuPanier(nomArticle, hasSize, index) {
+      let taille = '';
+      if (hasSize) {
+        const select = document.getElementById(`taille-${index}`);
+        taille = select ? select.value : '';
+      }
 
-  panier.push({ article: nomArticle, taille });
-  document.getElementById('panier-btn').innerText = `Voir mon panier (${panier.length})`;
+      panier.push({ article: nomArticle, taille });
+      document.getElementById('panier-btn').innerText = `Voir mon panier (${panier.length})`;
 
-  // Affiche le toast
-  const toast = document.getElementById('toast');
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2000);
-}
-
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
 
     function afficherPanier() {
-  const overlay = document.getElementById('overlay');
-  const liste = document.getElementById('liste-panier');
-  liste.innerHTML = '';
+      const overlay = document.getElementById('overlay');
+      const liste = document.getElementById('liste-panier');
+      liste.innerHTML = '';
 
-  panier.forEach((item, i) => {
-    const li = document.createElement('li');
-    li.textContent = `${item.article}${item.taille ? ' - Taille ' + item.taille : ''}`;
-    liste.appendChild(li);
-  });
+      panier.forEach((item, i) => {
+        const li = document.createElement('li');
+        li.textContent = `${item.article}${item.taille ? ' - Taille ' + item.taille : ''}`;
+        liste.appendChild(li);
+      });
 
-  overlay.style.display = 'flex';
-}
-function fermerPanier() {
-  document.getElementById('overlay').style.display = 'none';
-}
+      overlay.style.display = 'flex';
+    }
 
+    function fermerPanier() {
+      document.getElementById('overlay').style.display = 'none';
+    }
 
     function envoyerCommande() {
-  const numeroCommande = `ELZ${Math.floor(1000 + Math.random() * 9000)}`;
-  const payload = {
-    nom,
-    courriel,
-    numeroCommande,
-    date: new Date().toISOString(),
-    panier
-  };
+      const numeroCommande = `ELZ${Math.floor(1000 + Math.random() * 9000)}`;
+      const payload = {
+        nom,
+        courriel,
+        numeroCommande,
+        date: new Date().toISOString(),
+        panier
+      };
 
-  fetch(scriptURL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
+      fetch(scriptURL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
 
-  document.getElementById('confirmation').innerText =
-    `Commande envoyée ! Numéro : ${numeroCommande}`;
-  document.getElementById('overlay').style.display = 'none';
-  panier.length = 0;
-  document.getElementById('panier-btn').innerText = `Voir mon panier (0)`;
-}
-document.getElementById('overlay').addEventListener('click', function(e) {
-  if (e.target === this) {
-    fermerPanier();
-  }
-});
-</script>
+      document.getElementById('confirmation').innerText =
+        `Commande envoyée ! Numéro : ${numeroCommande}`;
+      fermerPanier();
+      panier.length = 0;
+      document.getElementById('panier-btn').innerText = `Voir mon panier (0)`;
+    }
 
-<div id="toast">Ajouté au panier ✅</div>
-
-<div id="overlay">
-  <div id="panier-modal">
-    <h2>Mon panier</h2>
-    <ul id="liste-panier"></ul>
-    <button id="confirm-btn" onclick="envoyerCommande()">Confirmer la commande</button>
-    <button id="fermer-btn" onclick="fermerPanier()">Fermer</button>
-  </div>
-</div>
-
+    // Clic sur fond flou pour fermer
+    document.getElementById('overlay').addEventListener('click', function (e) {
+      if (e.target === this) fermerPanier();
+    });
+  </script>
 </body>
 </html>
-

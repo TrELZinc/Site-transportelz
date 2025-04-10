@@ -28,44 +28,6 @@
       height: 40px;
     }
 
-    /* Menu hamburger */
-    .menu-toggle {
-      display: flex;
-      flex-direction: column;
-      cursor: pointer;
-    }
-    .menu-toggle span {
-      height: 3px;
-      width: 25px;
-      background: white;
-      margin: 4px 0;
-      transition: 0.3s;
-    }
-    .menu {
-      display: none;
-      position: absolute;
-      top: 60px;
-      right: 20px;
-      background-color: #111;
-      border: 1px solid #444;
-      border-radius: 6px;
-      padding: 10px;
-      z-index: 999;
-    }
-    .menu.show {
-      display: block;
-    }
-    .menu a {
-      display: block;
-      color: white;
-      padding: 8px 12px;
-      text-decoration: none;
-      font-size: 14px;
-    }
-    .menu a:hover {
-      background-color: #333;
-    }
-
     /* Container et tableau */
     .container {
       padding: 20px;
@@ -266,17 +228,13 @@
 </head>
 <body>
   <header>
-    <img src="assets/logo.jpeg" alt="Logo Transport ELZ">
-    <div class="menu-toggle" id="menuToggle">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
-    <div class="menu" id="menuDropdown">
-      <a href="dispos.html">Disponibilités</a>
-      <a href="linktree.html">Menu</a>
-    </div>
-  </header>
+  <img src="assets/logo.jpeg" alt="Logo Transport ELZ">
+  <button onclick="window.location.href='dispos.html'" 
+          style="padding: 10px 18px; background-color: #d32f2f; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">
+    Dispos
+  </button>
+</header>
+
   <div class="container">
     <div class="top-bar">
       <input type="date" id="dateSelect" />
@@ -338,8 +296,6 @@
       resetBtn: document.getElementById("resetBtn"),
       saveBtn: document.getElementById("saveBtn"),
       sendBtn: document.getElementById("sendBtn"),
-      menuToggle: document.getElementById("menuToggle"),
-      menuDropdown: document.getElementById("menuDropdown")
     };
     
     // Fonctions pour la gestion des lignes du tableau
@@ -621,21 +577,7 @@ const data = {
         }
       }
     });
-    
-    // Gestion du menu
-    function setupMenu() {
-      if (elements.menuToggle && elements.menuDropdown) {
-        elements.menuToggle.addEventListener("click", () => {
-          elements.menuDropdown.classList.toggle("show");
-        });
-        
-        document.addEventListener("click", (e) => {
-          if (!elements.menuToggle.contains(e.target) && !elements.menuDropdown.contains(e.target)) {
-            elements.menuDropdown.classList.remove("show");
-          }
-        });
-      }
-    }
+  
     
     // Initialisation
     function init() {
@@ -691,7 +633,6 @@ const data = {
   });
 
   setupArrowNavigation();
-  setupMenu();
 }
 
 

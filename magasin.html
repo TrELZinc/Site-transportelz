@@ -243,8 +243,10 @@
               </select>
             </div>
           ` : ''}
-          ${rupture ? '<p style="color:red;font-weight:bold">En rupture de stock</p>' : 
-          `<button onclick="ajouterAuPanier('${article.nom}', ${isVetement}, ${index})">Ajouter au panier</button>`}
+          ${rupture
+            ? `<p style="color:red;font-weight:bold">Stock épuisé 🔥</p>`
+            : `<p style="color:green;font-weight:bold">Stock : ${stock} 🟢</p>
+             <button onclick="ajouterAuPanier('${article.nom}', ${isVetement}, ${index})">Ajouter au panier</button>`}
         `;
         container.appendChild(div);
       });

@@ -74,37 +74,72 @@
       font-family: inherit;
     }
 
-    .article button:disabled {
-      background: grey;
-      cursor: not-allowed;
+    .select-taille {
+      margin-top: 10px;
     }
 
-    #confirmation {
+    .select-taille select {
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 1em;
+    }
+
+    @media (max-width: 600px) {
+      .select-taille select {
+        font-size: 1.2em;
+        padding: 10px 14px;
+      }
+    }
+
+    #panier-btn {
+      display: block;
+      margin: 20px auto;
+      background-color: #000;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-family: inherit;
+      border: none;
+      cursor: pointer;
+    }
+
+    #confirmation, #panier-modal {
       text-align: center;
       margin-top: 30px;
       font-weight: bold;
-      color: green;
     }
-    .select-taille {
-  margin-top: 10px;
-  margin-bottom: 10px;
-}
 
-.select-taille select {
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: 1em;
-}
+    #panier-modal {
+      display: none;
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      max-width: 500px;
+      margin: 40px auto;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
 
-/* Agrandir sur mobile */
-@media (max-width: 600px) {
-  .select-taille select {
-    font-size: 1.2em;
-    padding: 10px 14px;
-  }
-}
+    #panier-modal ul {
+      list-style: none;
+      padding: 0;
+      margin-bottom: 20px;
+    }
 
+    #panier-modal li {
+      text-align: left;
+      padding: 5px 0;
+    }
+
+    #confirm-btn {
+      background-color: #000;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 20px;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+    }
   </style>
 </head>
 <body>
@@ -114,80 +149,107 @@
 
   <div class="container">
     <h1>Magasin interne ELZ</h1>
+    <button id="panier-btn" onclick="afficherPanier()">Voir mon panier (0)</button>
     <div class="articles" id="articles"></div>
     <div id="confirmation"></div>
+
+    <div id="panier-modal">
+      <h2>Confirmation de commande</h2>
+      <ul id="liste-panier"></ul>
+      <button id="confirm-btn" onclick="envoyerCommande()">Confirmer la commande</button>
+    </div>
   </div>
 
   <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbyfPYY_fFOnUd0g9z2xq9YzMu9IEh9FZmhBEg27UoSR0_lf5ZjciGkHPtb-8R3KOng/exec'; // à remplacer
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyx4kFzQG2qYrOxGlsTlmIK1n9EC-sRCetRvK8qw229EalNeD73SdPiI4OmV04o_T5m/exec'; // À remplacer par ton URL Apps Script
     const nom = localStorage.getItem('nom') || 'Inconnu';
     const courriel = localStorage.getItem('email') || 'non défini';
+    const panier = [];
 
-    // Récupérer les articles
+    const vetements = ['t-shirt', 'polo', 'hoodie', 'pantalon'];
+
     fetch(scriptURL)
       .then(res => res.json())
       .then(data => afficherArticles(data));
 
-        function afficherArticles(articles) {
-  const container = document.getElementById('articles');
-  articles.forEach((article, index) => {
-    const div = document.createElement('div');
-    div.className = 'article';
+    function afficherArticles(articles) {
+      const container = document.getElementById('articles');
+      articles.forEach((article, index) => {
+        const div = document.createElement('div');
+        div.className = 'article';
 
-    const vetements = ['t-shirt', 'polo', 'hoodie', 'pantalon'];
-    const isVetement = vetements.some(type => article.nom.toLowerCase().includes(type));
+        const isVetement = vetements.some(type => article.nom.toLowerCase().includes(type));
 
+        div.innerHTML = `
+          <img src="${article.image}" alt="${article.nom}" />
+          <h3>${article.nom}</h3>
+          <p>${article.description}</p>
+          ${isVetement ? `
+            <div class="select-taille">
+              <label for="taille-${index}">Taille :</label>
+              <select id="taille-${index}">
+                <option value="S">S</option>
+                <option value="M">M</option>
+                <option value="L">L</option>
+                <option value="XL">XL</option>
+                <option value="XXL">XXL</option>
+              </select>
+            </div>
+          ` : ''}
+          <button onclick="ajouterAuPanier('${article.nom}', ${isVetement}, ${index})">Ajouter au panier</button>
+        `;
+        container.appendChild(div);
+      });
+    }
 
-    div.innerHTML = `
-      <img src="${article.image}" alt="${article.nom}" />
-      <h3>${article.nom}</h3>
-      <p>${article.description}</p>
-      ${isVetement ? `
-        <div class="select-taille">
-          <label for="taille-${index}">Taille :</label>
-          <select id="taille-${index}">
-            <option value="S">S</option>
-            <option value="M">M</option>
-            <option value="L">L</option>
-            <option value="XL">XL</option>
-            <option value="XXL">XXL</option>
-          </select>
-        </div>
-      ` : ''}
-      <button onclick="commander('${article.nom}', ${isVetement}, ${index})">Commander</button>
-    `;
-    container.appendChild(div);
-  });
-}
+    function ajouterAuPanier(nomArticle, hasSize, index) {
+      let taille = '';
+      if (hasSize) {
+        const select = document.getElementById(`taille-${index}`);
+        taille = select ? select.value : '';
+      }
 
+      panier.push({ article: nomArticle, taille });
+      document.getElementById('panier-btn').innerText = `Voir mon panier (${panier.length})`;
+    }
 
+    function afficherPanier() {
+      const modal = document.getElementById('panier-modal');
+      const liste = document.getElementById('liste-panier');
+      liste.innerHTML = '';
 
-    function commander(articleNom, hasSize, index) {
-  let taille = '';
-  if (hasSize) {
-    const select = document.getElementById(`taille-${index}`);
-    taille = select ? select.value : '';
-  }
+      panier.forEach((item, i) => {
+        const li = document.createElement('li');
+        li.textContent = `${item.article}${item.taille ? ' - Taille ' + item.taille : ''}`;
+        liste.appendChild(li);
+      });
 
-  const data = {
-    nom,
-    courriel,
-    article: articleNom,
-    taille: taille,
-    date: new Date().toISOString()
-  };
+      modal.style.display = 'block';
+    }
 
-  fetch(scriptURL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  });
+    function envoyerCommande() {
+      const numeroCommande = `ELZ-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${Math.floor(1000 + Math.random() * 9000)}`;
+      const payload = {
+        nom,
+        courriel,
+        numeroCommande,
+        date: new Date().toISOString(),
+        panier
+      };
 
-  document.getElementById('confirmation').innerText =
-    `Commande envoyée pour : ${articleNom}${taille ? ' - Taille ' + taille : ''}`;
-}
+      fetch(scriptURL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
 
+      document.getElementById('confirmation').innerText =
+        `Commande envoyée avec succès ! Numéro : ${numeroCommande}`;
+      document.getElementById('panier-modal').style.display = 'none';
+      panier.length = 0;
+      document.getElementById('panier-btn').innerText = `Voir mon panier (0)`;
+    }
   </script>
 </body>
 </html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Magasin ELZ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Comfortaa', sans-serif;
+      background-color: #f5f5f5;
+    }
+
+    header {
+      background-color: #000;
+      padding: 20px 0;
+      text-align: center;
+    }
+
+    header img {
+      height: 50px;
+    }
+
+    .container {
+      padding: 20px;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .articles {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .article {
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .article img {
+      max-width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .article h3 {
+      margin: 10px 0 5px;
+    }
+
+    .article p {
+      font-size: 0.9em;
+      color: #555;
+    }
+
+    .article button {
+      margin-top: 10px;
+      background: #000;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .article button:disabled {
+      background: grey;
+      cursor: not-allowed;
+    }
+
+    #confirmation {
+      text-align: center;
+      margin-top: 30px;
+      font-weight: bold;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="assets/logo.jpeg" alt="Logo ELZ" />
+  </header>
+
+  <div class="container">
+    <h1>Magasin interne ELZ</h1>
+    <div class="articles" id="articles"></div>
+    <div id="confirmation"></div>
+  </div>
+
+  <script>
+    const scriptURL = 'TON_URL_APPS_SCRIPT'; // à remplacer
+    const nom = localStorage.getItem('nom') || 'Inconnu';
+    const courriel = localStorage.getItem('email') || 'non défini';
+
+    // Récupérer les articles
+    fetch(scriptURL)
+      .then(res => res.json())
+      .then(data => afficherArticles(data));
+
+    function afficherArticles(articles) {
+      const container = document.getElementById('articles');
+      articles.forEach(article => {
+        const div = document.createElement('div');
+        div.className = 'article';
+        div.innerHTML = `
+          <img src="${article.image}" alt="${article.nom}" />
+          <h3>${article.nom}</h3>
+          <p>${article.description}</p>
+          <button onclick="commander('${article.nom}')">Commander</button>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function commander(articleNom) {
+      const data = {
+        nom,
+        courriel,
+        article: articleNom,
+        date: new Date().toISOString()
+      };
+
+      fetch(scriptURL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      document.getElementById('confirmation').innerText =
+        `Commande envoyée pour : ${articleNom}`;
+    }
+  </script>
+</body>
+</html>

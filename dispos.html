@@ -30,67 +30,6 @@
     header img {
       height: 40px;
     }
-    .menu-toggle {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      width: 40px;
-      height: 30px;
-      cursor: pointer;
-      z-index: 1001;
-    }
-
-    .menu-toggle span {
-      height: 3px;
-      width: 25px;
-      background: white;
-      margin: 4px 0;
-      transition: 0.3s;
-    }
-    
-    /* Animation pour le hamburger */
-    .menu-toggle.active span:nth-child(1) {
-      transform: rotate(45deg) translate(5px, 5px);
-    }
-    
-    .menu-toggle.active span:nth-child(2) {
-      opacity: 0;
-    }
-    
-    .menu-toggle.active span:nth-child(3) {
-      transform: rotate(-45deg) translate(5px, -5px);
-    }
-    
-    /* Important: Styles du menu */
-    .menu {
-      display: none;
-      position: absolute;
-      top: 60px;
-      right: 20px;
-      background-color: #111;
-      border: 1px solid #444;
-      border-radius: 6px;
-      padding: 10px;
-      z-index: 999;
-      min-width: 150px; /* Largeur minimale pour le menu */
-    }
-    
-    /* Important: Cette classe contrôle l'affichage du menu */
-    .menu.show {
-      display: block !important; /* Forcer l'affichage */
-    }
-
-    .menu a {
-      display: block;
-      color: white;
-      padding: 8px 12px;
-      text-decoration: none;
-      font-size: 14px;
-    }
-    .menu a:hover {
-      background-color: #333;
-    }
     .container {
       padding: 20px;
       max-width: 1000px;
@@ -168,68 +107,6 @@
       gap: 10px;
       flex-wrap: wrap;
     }
-    .menu-wrapper {
-  position: relative;
-}
-
-.menu-toggle {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 40px;
-  height: 30px;
-  cursor: pointer;
-  list-style: none;
-}
-
-.menu-toggle::-webkit-details-marker {
-  display: none;
-}
-
-.menu-toggle span {
-  height: 3px;
-  width: 25px;
-  background: white;
-  margin: 4px 0;
-  transition: 0.3s;
-}
-
-.menu-wrapper[open] .menu-toggle span:nth-child(1) {
-  transform: rotate(45deg) translate(5px, 5px);
-}
-
-.menu-wrapper[open] .menu-toggle span:nth-child(2) {
-  opacity: 0;
-}
-
-.menu-wrapper[open] .menu-toggle span:nth-child(3) {
-  transform: rotate(-45deg) translate(5px, -5px);
-}
-
-.menu {
-  position: absolute;
-  top: 40px;
-  right: 0;
-  background-color: #111;
-  border: 1px solid #444;
-  border-radius: 6px;
-  padding: 10px;
-  z-index: 999;
-  min-width: 150px;
-}
-
-.menu a {
-  display: block;
-  color: white;
-  padding: 8px 12px;
-  text-decoration: none;
-  font-size: 14px;
-}
-
-.menu a:hover {
-  background-color: #333;
-}
 
     .buttons button {
       padding: 12px 24px;
@@ -289,19 +166,12 @@
 </head>
 <body>
   <header>
-    <img src="assets/logo.jpeg" alt="Logo Transport ELZ">
-    <details class="menu-wrapper">
-  <summary class="menu-toggle">
-    <span></span>
-    <span></span>
-    <span></span>
-  </summary>
-  <div class="menu">
-    <a href="sommaire.html">Sommaire</a>
-    <a href="linktree.html">Menu</a>
-  </div>
-</details>
-  </header>
+  <img src="assets/logo.jpeg" alt="Logo Transport ELZ">
+  <button onclick="window.location.href='sommaire.html'" 
+          style="padding: 10px 18px; background-color: #d32f2f; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">
+    Sommaire
+  </button>
+</header>
   <div class="container">
     <div class="top-bar">
       <input type="date" id="dateSelect" />

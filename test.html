@@ -211,9 +211,12 @@ function setupAutocomplete(input, listContainer, origine) {
 
   const dataOrigine = kmMap[origineNorm];
 
-  let preview = document.createElement("div");
+  let preview = input.parentNode.querySelector(".text-muted.mt-1");
+if (!preview) {
+  preview = document.createElement("div");
   preview.className = "text-muted mt-1 small";
   input.parentNode.appendChild(preview);
+}
 
   input.addEventListener("input", () => {
     const valeur = normalizeStr(input.value);
@@ -239,13 +242,22 @@ function setupAutocomplete(input, listContainer, origine) {
       opt.textContent = dest;
 
       opt.addEventListener("click", () => {
-        input.value = dest;
-        listContainer.innerHTML = "";
-        listContainer.style.display = "none";
-        preview.textContent = distanceKm !== undefined
-          ? `Distance estimée : ${distanceKm} km`
-          : "Distance inconnue.";
-      });
+  input.value = dest;
+  listContainer.innerHTML = "";
+  listContainer.style.display = "none";
+
+  // ⛔ Supprimer affichage si voyage à l'heure avec origine Vimont
+  const voyageDiv = input.closest(".section-box");
+  const origineSelect = voyageDiv?.querySelector("select[name^='origine_']");
+  const typeHeure = voyageDiv?.querySelector("input[type=radio][value=heure]")?.checked;
+
+  const isHeureVimont = typeHeure && origineSelect?.value === "Vimont";
+
+  preview.textContent = (!isHeureVimont && distanceKm !== undefined)
+    ? `Distance estimée : ${Math.round(distanceKm)} km`
+    : "";
+});
+
 
       listContainer.appendChild(opt);
     });

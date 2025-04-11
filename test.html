@@ -500,8 +500,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let totalKm = 0;
   let totalPrime = 0;
   let voyages = [];
+  let vimontLastKmAdded = false;
 
-  // Collecte des voyages
   for (let i = 1; i <= 3; i++) {
     const type = data.get(`type_voyage_${i}`);
     if (!type) continue;
@@ -510,86 +510,65 @@ document.addEventListener("DOMContentLoaded", () => {
     const destination = data.get(`destination_${i}`);
     const normOrigine = normalizeStr(origine);
     const normDestination = normalizeStr(destination);
-    const kmVal = kmMap[normOrigine]?.[normDestination] || 0;
+    const kmBase = (type === "heure" && origine === "Vimont")
+      ? kmMap["st-basile"]?.[normDestination] || 0
+      : kmMap[normOrigine]?.[normDestination] || 0;
 
     if (type === "kilometrage") {
-      voyages.push({ id: i, type, origine, destination, km: kmVal });
-      html += `<p><strong>Voyage ${i} - KM:</strong> ${kmVal}km</p>`;
+      voyages.push({ id: i, type, origine, destination, km: kmBase });
+      html += `<p><strong>Voyage ${i} - KM:</strong> ${kmBase}km</p>`;
     } else {
       const dH = parseInt(data.get(`heure_debut_h_${i}`) || "0", 10);
       const dM = parseInt(data.get(`heure_debut_m_${i}`) || "0", 10);
       const fH = parseInt(data.get(`heure_fin_h_${i}`) || "0", 10);
       const fM = parseInt(data.get(`heure_fin_m_${i}`) || "0", 10);
       const duration = (fH * 60 + fM) - (dH * 60 + dM);
-
       if (duration > 0) totalMinutes += duration;
 
       html += `<p><strong>Voyage ${i} - Heure:</strong> ${dH}h${String(dM).padStart(2, '0')} → ${fH}h${String(fM).padStart(2, '0')}</p>`;
-      voyages.push({ id: i, type, origine });
+      voyages.push({ id: i, type, origine, destination, km: kmBase });
     }
   }
-
-  // Traitement des voyages + exception
-  let lastHeureVimont = null;
 
   for (let i = 0; i < voyages.length; i++) {
     const v = voyages[i];
 
     if (v.type === "kilometrage") {
-      let isDouble = true;
       let kmPayes = v.km;
-
-      const prev = voyages[i - 1];
       const next = voyages[i + 1];
 
-      if (next && next.type === "heure" && normalizeStr(next.origine) === "vimont") {
-        isDouble = false;
-      }
-
-      if (prev && prev.type === "heure" && normalizeStr(prev.origine) === "vimont") {
-        isDouble = false;
-      }
-
-      if (isDouble) {
+      if (next && next.type === "heure" && next.origine === "Vimont") {
+        totalPrime += 60.85;
+      } else {
         kmPayes *= 2;
+        totalPrime += 60.85;
       }
 
       totalKm += kmPayes;
-      totalPrime += 60.85;
+    }
 
-    } else if (v.type === "heure" && normalizeStr(v.origine) === "vimont") {
-      lastHeureVimont = v;
+    if (
+      v.type === "heure" &&
+      v.origine === "Vimont" &&
+      !vimontLastKmAdded &&
+      (
+        !voyages[i + 1] ||
+        (voyages[i + 1].type === "heure" && voyages[i + 1].origine === "Vimont")
+      )
+    ) {
+      totalKm += v.km;
+      vimontLastKmAdded = true;
     }
   }
 
-  // Exception : km simple ajouté si retour à vide depuis Vimont
- // Exception : km simple ajouté si retour à vide depuis Vimont
-if (lastHeureVimont) {
-  const index = voyages.indexOf(lastHeureVimont);
-  const next = voyages[index + 1];
-
-  const isFinDeJournee = !next || (next.type === "heure" && normalizeStr(next.origine) === "vimont");
-
-  if (isFinDeJournee && lastHeureVimont.destination) {
-    const destNorm = normalizeStr(lastHeureVimont.destination);
-    const kmRetour = kmMap["st-basile"]?.[destNorm];
-
-    if (kmRetour) {
-      totalKm += kmRetour;
-      html += `<p><em>+ ${kmRetour}km ajoutés (retour Vimont → St-Basile)</em></p>`;
-    }
-  }
-}
-
-
-  // Calculs finaux
   const totalH = Math.floor(totalMinutes / 60);
   const totalM = totalMinutes % 60;
+
   const montantKm = totalKm * taux.taux_km;
   const montantH = (totalMinutes / 60) * taux.taux_h;
   const montantFinal = montantKm + montantH + totalPrime;
 
-  html += `<hr/><p><strong>KM Payés:</strong> ${Math.round(totalKm)}km</p>`;
+  html += `<hr/><p><strong>KM Payés:</strong> ${totalKm}km</p>`;
   html += `<p><strong>Heures Payées:</strong> ${totalH}h${String(totalM).padStart(2, "0")}</p>`;
   html += `<p><strong>Bonus:</strong> ${totalPrime.toFixed(2)}$</p>`;
   html += `<hr/><p><strong>Total payé estimé:</strong> ${montantFinal.toFixed(2)}$</p>`;

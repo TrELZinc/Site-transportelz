@@ -560,7 +560,7 @@ btnPreview.addEventListener("click", () => {
     const v = voyages[i];
     if (v.type === "kilometrage") {
       let kmPayes = v.km;
-      let label = `Voyage ${v.id} - KM`;
+      let label = `${v.destination || `Voyage ${v.id}`} - KM`;
 
       const next = voyages[i + 1];
 

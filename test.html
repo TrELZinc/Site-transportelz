@@ -546,24 +546,35 @@ fetch("https://script.google.com/macros/s/AKfycbxakbBK9TUcJ5gQQ4nL3vuDoGw2kt9zY3
 
     // Lors du choix du nom → on présélectionne le camion
     selectNom.addEventListener("change", () => {
-      const nom = selectNom.value;
-      const camionParDefaut = chauffeurCamionMap[nom];
+  const nom = selectNom.value;
+  const camionParDefaut = chauffeurCamionMap[nom];
 
-      if (camionParDefaut) {
-        const option = Array.from(selectCamion.options).find(
-          opt => opt.value === camionParDefaut || opt.textContent.includes(camionParDefaut)
-        );
+  if (camionParDefaut) {
+    const option = Array.from(selectCamion.options).find(
+      (opt) => opt.value === camionParDefaut || opt.textContent.includes(camionParDefaut)
+    );
 
-        if (option) {
-          selectCamion.value = option.value;
-        } else {
-          console.warn(`❗ Camion "${camionParDefaut}" introuvable dans le menu.`);
-        }
-      } else {
-        console.log(`ℹ️ Aucun camion par défaut pour ${nom}`);
-        selectCamion.value = ""; // Réinitialiser si vide
-      }
-    });
+    if (option) {
+      selectCamion.value = option.value;
+    } else {
+      console.warn(`❗ Camion "${camionParDefaut}" introuvable.`);
+    }
+  }
+});
+
+// 🔁 AUTO-PRÉSELECTION au chargement si nom déjà choisi
+if (selectNom.value) {
+  const nom = selectNom.value;
+  const camionParDefaut = chauffeurCamionMap[nom];
+  if (camionParDefaut) {
+    const option = Array.from(selectCamion.options).find(
+      opt => opt.value === camionParDefaut || opt.textContent.includes(camionParDefaut)
+    );
+    if (option) {
+      selectCamion.value = option.value;
+    }
+  }
+}
 
     // Appel de l'affichage formulaire
     addVoyageSection();

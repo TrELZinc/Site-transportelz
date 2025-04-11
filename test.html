@@ -189,7 +189,13 @@
 }
 
 function setupAutocomplete(input, listContainer, origine) {
-  const origineNorm = normalizeStr(origine);
+  let origineNorm = normalizeStr(origine);
+
+  // 🚦 Redirection Vimont vers St-Basile
+  if (origineNorm === "vimont") {
+    origineNorm = "st-basile";
+  }
+
   const dataOrigine = kmMap[origineNorm];
 
   let preview = document.createElement("div");

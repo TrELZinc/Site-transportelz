@@ -510,131 +510,79 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 </script>
-
-
 <script>
-  let tauxMap = {}; // par nom chauffeur
-  let kmMap = {}; // origine -> destination -> km
-  let chauffeurCamionMap = {}; // map nom => camion par défaut
-  
-  fetch("https://script.google.com/macros/s/AKfycbxakbBK9TUcJ5gQQ4nL3vuDoGw2kt9zY3fMVb1tImOvnWNXdNb3kYIIGRh-VLp5dkNi/exec")
-  .then((res) => res.json())
-  .then((data) => {
-  console.log("Réponse brute reçue du fetch :", data);
-
-    tauxMap = data.chauffeurs.reduce((acc, el) => {
-      acc[el.nom] = {
-        taux_h: parseFloat(el.taux_h),
-        taux_km: parseFloat(el.taux_km),
-      };
-      return acc;
-    }, {});
-
-    chauffeurCamionMap = data.chauffeurs.reduce((acc, el) => {
-    const nom = el.nom;
-    const camion = (el["camion défaut"] || "").trim(); // ← colonne D dans la feuille
-    if (nom) acc[nom] = camion; // on enregistre même si vide
-    return acc;
-    }, {});
-
-    kmMap = data.km.reduce((acc, el) => {
-  const origine = (el.origine || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
-  const destination = (el.destination || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
-  const kmValue = parseFloat(el.kilometrage);
-
-  if (!acc[origine]) acc[origine] = {};
-  acc[origine][destination] = isNaN(kmValue) ? 0 : kmValue;
-
-  return acc;
-}, {});
-
-
-
-    // Autocomplétion déclenchée au focus
-    document.addEventListener("focusin", (e) => {
-      if (e.target.classList.contains("destination-input")) {
-        const input = e.target;
-        const section = input.closest(".section-box");
-        const origineSelect = section.querySelector('select[name^="origine_"]');
-        const origine = origineSelect?.value;
-        const datalistId = input.getAttribute("list");
-        const datalist = document.getElementById(datalistId);
-
-        if (!datalist || !origine) return;
-
-        datalist.innerHTML = ""; // Nettoyer
-
-        if (kmMap[origineNorm]) {
-  Object.keys(kmMap[origineNorm]).forEach((destination) => {
-    const option = document.createElement("option");
-    option.value = destination;
-    datalist.appendChild(option);
-  });
-}
-      }
-    });
-
-    // >>> APPEL ICI : tout est prêt, on peut construire le formulaire
-    addVoyageSection();
-    document.getElementById("formulaire").classList.remove("d-none");
-document.getElementById("loader").style.display = "none";
-  })
-  .catch((err) => console.error("Erreur chargement taux ou km:", err));
-  
-</script>
-
- <script>
-  let chauffeurCamionMap = {}; // mapping nom → camion
+  let tauxMap = {};
+  let kmMap = {};
+  let chauffeurCamionMap = {};
 
   fetch("https://script.google.com/macros/s/AKfycbxakbBK9TUcJ5gQQ4nL3vuDoGw2kt9zY3fMVb1tImOvnWNXdNb3kYIIGRh-VLp5dkNi/exec")
     .then(res => res.json())
     .then(data => {
-      console.log("Réponse brute reçue du fetch :", data);
+      console.log("📥 Données chargées :", data);
 
       const selectNom = document.getElementById("nom");
       const selectCamion = document.getElementById("camion");
 
+      // Remplir les noms dans le select
       if (data?.chauffeurs?.length) {
-        // Remplir les options dans <select id="nom">
         data.chauffeurs.forEach(chauffeur => {
           const opt = document.createElement("option");
           opt.value = chauffeur.nom;
           opt.textContent = chauffeur.nom;
           selectNom.appendChild(opt);
         });
-
-        // Création du mapping chauffeur → camion
-        chauffeurCamionMap = data.chauffeurs.reduce((acc, el) => {
-          const nom = el.nom;
-          const camion = (el["camion défaut"] || "").trim();
-          if (nom && camion) acc[nom] = camion;
-          return acc;
-        }, {});
-
-        // Écouteur : quand on choisit un nom, on sélectionne automatiquement son camion par défaut
-        selectNom.addEventListener("change", () => {
-          const nom = selectNom.value;
-          const camionParDefaut = chauffeurCamionMap[nom];
-
-          if (camionParDefaut) {
-            const option = Array.from(selectCamion.options).find(
-              (opt) => opt.value === camionParDefaut || opt.textContent === camionParDefaut
-            );
-
-            if (option) {
-              selectCamion.value = option.value;
-            } else {
-              console.warn(`⚠️ Camion "${camionParDefaut}" pas trouvé dans la liste.`);
-            }
-          }
-        });
-      } else {
-        console.warn("Aucun chauffeur trouvé dans la réponse.");
       }
-    })
-    .catch(err => console.error("Erreur chargement chauffeurs:", err));
-</script>
 
+      // Mapping taux
+      tauxMap = data.chauffeurs.reduce((acc, el) => {
+        acc[el.nom] = {
+          taux_h: parseFloat(el.taux_h),
+          taux_km: parseFloat(el.taux_km),
+        };
+        return acc;
+      }, {});
+
+      // Mapping nom → camion
+      chauffeurCamionMap = data.chauffeurs.reduce((acc, el) => {
+        const nom = el.nom;
+        const camion = (el["camion défaut"] || "").trim();
+        acc[nom] = camion;
+        return acc;
+      }, {});
+
+      // Mapping km
+      kmMap = data.km.reduce((acc, el) => {
+        const origine = (el.origine || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+        const destination = (el.destination || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+        const kmValue = parseFloat(el.kilometrage);
+        if (!acc[origine]) acc[origine] = {};
+        acc[origine][destination] = isNaN(kmValue) ? 0 : kmValue;
+        return acc;
+      }, {});
+
+      // Préremplir le camion automatiquement au changement de nom
+      selectNom.addEventListener("change", () => {
+        const nom = selectNom.value;
+        const camionParDefaut = chauffeurCamionMap[nom];
+        if (camionParDefaut) {
+          const option = Array.from(selectCamion.options).find(
+            opt => opt.value === camionParDefaut || opt.textContent === camionParDefaut
+          );
+          if (option) {
+            selectCamion.value = option.value;
+          } else {
+            console.warn(`⚠️ Camion "${camionParDefaut}" non trouvé dans la liste`);
+          }
+        }
+      });
+
+      // Afficher formulaire
+      addVoyageSection();
+      document.getElementById("formulaire").classList.remove("d-none");
+      document.getElementById("loader").style.display = "none";
+    })
+    .catch(err => console.error("❌ Erreur chargement données:", err));
+</script>
  
 </body>
 </html>

@@ -563,18 +563,24 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Exception : km simple ajouté si retour à vide depuis Vimont
-  if (lastHeureVimont) {
-    const index = voyages.indexOf(lastHeureVimont);
-    const next = voyages[index + 1];
+ // Exception : km simple ajouté si retour à vide depuis Vimont
+if (lastHeureVimont) {
+  const index = voyages.indexOf(lastHeureVimont);
+  const next = voyages[index + 1];
 
-    if (!next || (next.type === "heure" && normalizeStr(next.origine) === "vimont")) {
-      const prevKm = [...voyages].slice(0, index).reverse().find(v => v.type === "kilometrage");
-      if (prevKm) {
-        totalKm += prevKm.km;
-        html += `<p><em>+ ${prevKm.km}km ajoutés pour retour Vimont</em></p>`;
-      }
+  const isFinDeJournee = !next || (next.type === "heure" && normalizeStr(next.origine) === "vimont");
+
+  if (isFinDeJournee && lastHeureVimont.destination) {
+    const destNorm = normalizeStr(lastHeureVimont.destination);
+    const kmRetour = kmMap["st-basile"]?.[destNorm];
+
+    if (kmRetour) {
+      totalKm += kmRetour;
+      html += `<p><em>+ ${kmRetour}km ajoutés (retour Vimont → St-Basile)</em></p>`;
     }
   }
+}
+
 
   // Calculs finaux
   const totalH = Math.floor(totalMinutes / 60);

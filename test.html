@@ -490,95 +490,112 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   btnPreview.addEventListener("click", () => {
-    const formEl = document.getElementById("formulaire");
-    const data = new FormData(formEl);
-    const chauffeur = data.get("nom");
-    const taux = tauxMap[chauffeur] || { taux_h: 0, taux_km: 0 };
+  const formEl = document.getElementById("formulaire");
+  const data = new FormData(formEl);
+  const chauffeur = data.get("nom");
+  const taux = tauxMap[chauffeur] || { taux_h: 0, taux_km: 0 };
 
-    let html = "";
-    let totalMinutes = 0;
-    let totalKm = 0;
-    let totalPrime = 0;
-    let voyages = [];
-    let heures = {};
+  let html = "";
+  let totalMinutes = 0;
+  let totalKm = 0;
+  let totalPrime = 0;
+  let voyages = [];
 
-    // Collecte des données voyage par voyage
-    for (let i = 1; i <= 3; i++) {
-      const type = data.get(`type_voyage_${i}`);
-      if (!type) continue;
+  // Collecte des voyages
+  for (let i = 1; i <= 3; i++) {
+    const type = data.get(`type_voyage_${i}`);
+    if (!type) continue;
 
-      const origine = data.get(`origine_${i}`);
-      const destination = data.get(`destination_${i}`);
-      const normOrigine = normalizeStr(origine);
-      const normDestination = normalizeStr(destination);
-      const kmVal = kmMap[normOrigine]?.[normDestination] || 0;
+    const origine = data.get(`origine_${i}`);
+    const destination = data.get(`destination_${i}`);
+    const normOrigine = normalizeStr(origine);
+    const normDestination = normalizeStr(destination);
+    const kmVal = kmMap[normOrigine]?.[normDestination] || 0;
 
-      if (type === "kilometrage") {
-        voyages.push({ id: i, type, origine, destination, km: kmVal });
-        html += `<p><strong>Voyage ${i} - KM:</strong> ${kmVal}km</p>`;
-      } else {
-        const dH = parseInt(data.get(`heure_debut_h_${i}`) || "0", 10);
-        const dM = parseInt(data.get(`heure_debut_m_${i}`) || "0", 10);
-        const fH = parseInt(data.get(`heure_fin_h_${i}`) || "0", 10);
-        const fM = parseInt(data.get(`heure_fin_m_${i}`) || "0", 10);
+    if (type === "kilometrage") {
+      voyages.push({ id: i, type, origine, destination, km: kmVal });
+      html += `<p><strong>Voyage ${i} - KM:</strong> ${kmVal}km</p>`;
+    } else {
+      const dH = parseInt(data.get(`heure_debut_h_${i}`) || "0", 10);
+      const dM = parseInt(data.get(`heure_debut_m_${i}`) || "0", 10);
+      const fH = parseInt(data.get(`heure_fin_h_${i}`) || "0", 10);
+      const fM = parseInt(data.get(`heure_fin_m_${i}`) || "0", 10);
+      const duration = (fH * 60 + fM) - (dH * 60 + dM);
 
-        const duration = (fH * 60 + fM) - (dH * 60 + dM);
-        if (duration > 0) {
-          totalMinutes += duration;
-        }
+      if (duration > 0) totalMinutes += duration;
 
-        html += `<p><strong>Voyage ${i} - Heure:</strong> ${dH}h${String(dM).padStart(2, '0')} → ${fH}h${String(fM).padStart(2, '0')}</p>`;
-        voyages.push({ id: i, type, origine });
+      html += `<p><strong>Voyage ${i} - Heure:</strong> ${dH}h${String(dM).padStart(2, '0')} → ${fH}h${String(fM).padStart(2, '0')}</p>`;
+      voyages.push({ id: i, type, origine });
+    }
+  }
+
+  // Traitement des voyages + exception
+  let lastHeureVimont = null;
+
+  for (let i = 0; i < voyages.length; i++) {
+    const v = voyages[i];
+
+    if (v.type === "kilometrage") {
+      let isDouble = true;
+      let kmPayes = v.km;
+
+      const prev = voyages[i - 1];
+      const next = voyages[i + 1];
+
+      if (next && next.type === "heure" && normalizeStr(next.origine) === "vimont") {
+        isDouble = false;
+      }
+
+      if (prev && prev.type === "heure" && normalizeStr(prev.origine) === "vimont") {
+        isDouble = false;
+      }
+
+      if (isDouble) {
+        kmPayes *= 2;
+      }
+
+      totalKm += kmPayes;
+      totalPrime += 60.85;
+
+    } else if (v.type === "heure" && normalizeStr(v.origine) === "vimont") {
+      lastHeureVimont = v;
+    }
+  }
+
+  // Exception : km simple ajouté si retour à vide depuis Vimont
+  if (lastHeureVimont) {
+    const index = voyages.indexOf(lastHeureVimont);
+    const next = voyages[index + 1];
+
+    if (!next || (next.type === "heure" && normalizeStr(next.origine) === "vimont")) {
+      const prevKm = [...voyages].slice(0, index).reverse().find(v => v.type === "kilometrage");
+      if (prevKm) {
+        totalKm += prevKm.km;
+        html += `<p><em>+ ${prevKm.km}km ajoutés pour retour Vimont</em></p>`;
       }
     }
+  }
 
-    // Traitement des exceptions et totaux
-    for (let i = 0; i < voyages.length; i++) {
-      const v = voyages[i];
-      if (v.type === "kilometrage") {
-        let isBonus = true;
-        let kmPayes = v.km;
+  // Calculs finaux
+  const totalH = Math.floor(totalMinutes / 60);
+  const totalM = totalMinutes % 60;
+  const montantKm = totalKm * taux.taux_km;
+  const montantH = (totalMinutes / 60) * taux.taux_h;
+  const montantFinal = montantKm + montantH + totalPrime;
 
-        // Si voyage suivant existe et commence à Vimont
-        if (voyages[i + 1] && voyages[i + 1].origine === "Vimont") {
-          isBonus = false;
-        }
+  html += `<hr/><p><strong>KM Payés:</strong> ${Math.round(totalKm)}km</p>`;
+  html += `<p><strong>Heures Payées:</strong> ${totalH}h${String(totalM).padStart(2, "0")}</p>`;
+  html += `<p><strong>Bonus:</strong> ${totalPrime.toFixed(2)}$</p>`;
+  html += `<hr/><p><strong>Total payé estimé:</strong> ${montantFinal.toFixed(2)}$</p>`;
 
-        // Si voyage précédent est à l'heure depuis Vimont
-        if (voyages[i - 1] && voyages[i - 1].type === "heure" && voyages[i - 1].origine === "Vimont") {
-          isBonus = false;
-        }
+  resumeContent.innerHTML = html;
+  formEl.classList.add("d-none");
+  resumeContainer.classList.remove("d-none");
+});
 
-        if (isBonus) {
-          kmPayes *= 2;
-          totalPrime += 60.85;
-        }
-
-        totalKm += kmPayes;
-      }
-    }
-
-    const totalH = Math.floor(totalMinutes / 60);
-    const totalM = totalMinutes % 60;
-
-    const montantKm = totalKm * taux.taux_km;
-    const montantH = (totalMinutes / 60) * taux.taux_h;
-    const montantFinal = montantKm + montantH + totalPrime;
-
-    html += `<hr/><p><strong>KM Payés:</strong> ${totalKm}km</p>`;
-    html += `<p><strong>Heures Payées:</strong> ${totalH}h${String(totalM).padStart(2, "0")}</p>`;
-    html += `<p><strong>Bonus:</strong> ${totalPrime.toFixed(2)}$</p>`;
-    html += `<hr/><p><strong>Total payé estimé:</strong> ${montantFinal.toFixed(2)}$</p>`;
-
-    resumeContent.innerHTML = html;
-    formEl.classList.add("d-none");
-    resumeContainer.classList.remove("d-none");
-  });
-
-  btnModifier.addEventListener("click", () => {
-    resumeContainer.classList.add("d-none");
-    document.getElementById("formulaire").classList.remove("d-none");
-  });
+btnModifier.addEventListener("click", () => {
+  resumeContainer.classList.add("d-none");
+  document.getElementById("formulaire").classList.remove("d-none");
 });
 
   document.getElementById("btn-confirm").addEventListener("click", () => {

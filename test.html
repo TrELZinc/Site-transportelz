@@ -175,10 +175,14 @@
         const destinationInput = section.querySelector(`#destination_${id}`);
         const listContainer = section.querySelector(`#autocomplete_${id}`);
 
-        setupAutocomplete(destinationInput, listContainer, origineSelect.value.toLowerCase().trim());
+// 🧠 Reconnexion de l'autocomplétion ici :
+        setupAutocomplete(destinationInput, listContainer, origineSelect.value);
+
+// Quand l'origine change → relancer l'autocomplétion
         origineSelect.addEventListener("change", () => {
-        setupAutocomplete(destinationInput, listContainer, origineSelect.value.toLowerCase().trim());
-        });
+         setupAutocomplete(destinationInput, listContainer, origineSelect.value);
+});
+
       }
     });
   });

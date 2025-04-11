@@ -541,7 +541,7 @@ btnPreview.addEventListener("click", () => {
   const data = new FormData(formEl);
   const chauffeur = data.get("nom");
   const taux = tauxMap[chauffeur] || { taux_h: 0, taux_km: 0 };
-});
+
   let html = "";
   let totalMinutes = 0;
   let totalKm = 0;
@@ -571,7 +571,6 @@ btnPreview.addEventListener("click", () => {
     }
   }
 
-  // Dernier voyage à l’heure depuis Vimont
   const lastVimontHeure = [...voyages].reverse().find(v => v.type === "heure" && v.origine === "Vimont");
 
   for (let i = 0; i < voyages.length; i++) {
@@ -599,18 +598,18 @@ btnPreview.addEventListener("click", () => {
       const destLabel = v.destination ? v.destination : `Voyage ${v.id}`;
       html += `<p><strong>${destLabel} - Heure:</strong> ${h}h${m} → ${h2}h${m2}</p>`;
 
-    // Cas C – Retour Vimont
-    if (
-      v.type === "heure" &&
-      v.origine === "Vimont" &&
-      (!voyages[i + 1] || (voyages[i + 1].type === "heure" && voyages[i + 1].origine === "Vimont"))
-    ) {
-      const dest = normalizeStr(v.destination);
-      const kmRetour = kmMap["st-basile"]?.[dest] || 0;
-      if (!voyages.some(v => v._vimontExtraAdded)) {
-        totalKm += kmRetour;
-         html += `<p><strong>Retour de ${v.destination} :</strong> ${kmRetour}km</p>`;
-        v._vimontExtraAdded = true;
+      if (
+        v.type === "heure" &&
+        v.origine === "Vimont" &&
+        (!voyages[i + 1] || (voyages[i + 1].type === "heure" && voyages[i + 1].origine === "Vimont"))
+      ) {
+        const dest = normalizeStr(v.destination);
+        const kmRetour = kmMap["st-basile"]?.[dest] || 0;
+        if (!voyages.some(v => v._vimontExtraAdded)) {
+          totalKm += kmRetour;
+          html += `<p><strong>Retour de ${v.destination} :</strong> ${kmRetour}km</p>`;
+          v._vimontExtraAdded = true;
+        }
       }
     }
   }
@@ -630,7 +629,6 @@ btnPreview.addEventListener("click", () => {
   formEl.classList.add("d-none");
   resumeContainer.classList.remove("d-none");
 });
-
 btnModifier.addEventListener("click", () => {
   resumeContainer.classList.add("d-none");
   document.getElementById("formulaire").classList.remove("d-none");

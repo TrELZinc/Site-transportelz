@@ -537,26 +537,58 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   for (let i = 0; i < voyages.length; i++) {
-    const v = voyages[i];
-    if (v.type === "kilometrage") {
-      let isForfait = true;
-      let kmPayes = v.km;
+  const v = voyages[i];
+  if (v.type === "kilometrage") {
+    let isBonus = true;
+    let kmPayes = v.km;
+    let kmLibelle = `Voyage ${v.id} - KM`; // Libellé par défaut
 
-      const next1 = voyages[i + 1];
-      const next2 = voyages[i + 2];
+    const next = voyages[i + 1];
+    const nextNext = voyages[i + 2];
 
-      if (next1?.type === "heure" && next1.origine === "Vimont") {
-        isForfait = true;
-        kmPayes = v.km; // pas de x2
-      } else {
-        kmPayes = v.km * 2;
-      }
-
-      totalKm += kmPayes;
-      if (isForfait) totalForfait += 60.85;
+    // Cas : Suivi par voyage à l'heure, origine Vimont
+    if (next?.type === "heure" && next.origine === "Vimont") {
+      isBonus = true;
+      // mais pas de doublement du KM
+      kmPayes = v.km;
+      totalPrime += 60.85;
+      kmLibelle += " (aller simple)";
     }
+
+    // Cas : Suivi par voyage à l'heure, origine St-Basile
+    else if (next?.type === "heure" && next.origine === "St-Basile") {
+      isBonus = true;
+      kmPayes = v.km * 2;
+      totalPrime += 60.85;
+      kmLibelle += " (aller-retour)";
+    }
+
+    // Cas normal sans conditions spéciales
+    else {
+      kmPayes = v.km * 2;
+      totalPrime += 60.85;
+      kmLibelle += " (aller-retour)";
+    }
+
+    totalKm += kmPayes;
+    html += `<p><strong>${kmLibelle}:</strong> ${kmPayes}km</p>`;
   }
 
+  // Détection des cas C - Ajouter le km d’un voyage à l’heure Vimont final
+  if (
+    v.type === "heure" &&
+    v.origine === "Vimont" &&
+    (!voyages[i + 1] || (voyages[i + 1].type === "heure" && voyages[i + 1].origine === "Vimont"))
+  ) {
+    const normDest = normalizeStr(v.destination);
+    const distance = kmMap["st-basile"]?.[normDest] || 0;
+    if (!voyages.some(v => v._vimontExtraAdded)) {
+      totalKm += distance;
+      html += `<p><strong>Retour Vimont (forfait):</strong> ${distance}km</p>`;
+      voyages[i]._vimontExtraAdded = true;
+    }
+  }
+}
   // Ajout km simple du dernier voyage à l'heure depuis Vimont (s'il existe)
   if (lastVimontHeure) {
     const normDest = normalizeStr(lastVimontHeure.destination);

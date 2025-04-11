@@ -533,7 +533,10 @@ fetch("https://script.google.com/macros/s/AKfycbxakbBK9TUcJ5gQQ4nL3vuDoGw2kt9zY3
     }, {});
 
     chauffeurCamionMap = data.chauffeurs.reduce((acc, el) => {
-      acc[el.nom] = (el["camion défaut"] || "").trim();
+      const nom = el["Nom Complet"] || el.nom || "";
+      const camion = (el["camion défaut"] || el["Camion défaut"] || el["camion défaut "] || "").trim();
+      if (nom) acc[nom] = camion;
+
       return acc;
     }, {});
 

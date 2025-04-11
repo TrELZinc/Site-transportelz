@@ -367,20 +367,35 @@ function generateHeureHtml(id) {
     }
 
     function setupSuiviListener(id) {
-      const oui = document.getElementById(`oui_${id}`);
-      const non = document.getElementById(`non_${id}`);
-      if (oui) {
-        oui.addEventListener("change", () => {
-          if (voyageCount < MAX_VOYAGES) {
-            addVoyageSection();
-          }
-        });
+  const oui = document.getElementById(`oui_${id}`);
+  const non = document.getElementById(`non_${id}`);
+
+  if (oui) {
+    oui.addEventListener("change", () => {
+      if (voyageCount < MAX_VOYAGES) {
+        addVoyageSection();
       }
-      if (non) {
-        non.addEventListener("change", afficherSectionFinale);
+    });
+  }
+
+  if (non) {
+    non.addEventListener("change", () => {
+      // Supprimer les voyages suivants s’ils existent
+      while (voyageCount > id) {
+        const sectionToRemove = document.querySelector(`#voyageContainer .section-box:last-child`);
+        if (sectionToRemove) {
+          voyageContainer.removeChild(sectionToRemove);
+          voyageCount--;
+        }
       }
-      if (voyageCount === MAX_VOYAGES) afficherSectionFinale();
-    }
+      afficherSectionFinale();
+    });
+  }
+
+  if (voyageCount === MAX_VOYAGES) {
+    afficherSectionFinale();
+  }
+}
 
     function afficherSectionFinale() {
   const section = document.createElement("div");

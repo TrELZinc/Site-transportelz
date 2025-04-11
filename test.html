@@ -562,7 +562,7 @@ btnPreview.addEventListener("click", () => {
       const kmRetour = kmMap["st-basile"]?.[dest] || 0;
       if (!voyages.some(v => v._vimontExtraAdded)) {
         totalKm += kmRetour;
-        html += `<p><strong>Retour Vimont (forfait):</strong> ${kmRetour}km</p>`;
+         html += `<p><strong>Retour de ${v.destination} :</strong> ${kmRetour}km</p>`;
         v._vimontExtraAdded = true;
       }
     }

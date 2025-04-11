@@ -544,23 +544,23 @@ fetch("https://script.google.com/macros/s/AKfycbxakbBK9TUcJ5gQQ4nL3vuDoGw2kt9zY3
       selectNom.appendChild(opt);
     });
 
-    // 🔁 Fonction de sélection automatique
-    // 🔁 Fonction de sélection automatique
-function preselectCamionPourNom(nom) {
-  const camionCode = (chauffeurCamionMap[nom] || "").replace(/\D/g, ""); // ex: "Camion 1103" → "1103"
-  if (!camionCode) return;
+  function preselectCamionPourNom(nom) {
+  const camionNomComplet = chauffeurCamionMap[nom]; // ex. "Camion 1103"
+  if (!camionNomComplet) return;
 
+  const camionCode = camionNomComplet.replace(/\D/g, ""); // ← extrait "1103"
   const option = Array.from(selectCamion.options).find(
     (opt) => opt.value === camionCode
   );
 
   if (option) {
-    selectCamion.value = camionCode;
+    selectCamion.value = option.value;
     console.log(`🚚 Camion ${camionCode} présélectionné pour ${nom}`);
   } else {
-    console.warn(`❗ Camion ${camionCode} introuvable dans la liste pour ${nom}`);
+    console.warn(`❗ Camion "${camionNomComplet}" (code ${camionCode}) introuvable pour ${nom}`);
   }
 }
+
     // Lorsqu'on sélectionne un NOM
     selectNom.addEventListener("change", () => {
       const nom = selectNom.value;

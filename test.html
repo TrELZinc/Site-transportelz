@@ -531,10 +531,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
 btnPreview.addEventListener("click", () => {
   const formEl = document.getElementById("formulaire");
+
+  // Vérifie si le formulaire est valide
+  if (!formEl.checkValidity()) {
+    formEl.reportValidity();
+    return;
+  }
+
   const data = new FormData(formEl);
   const chauffeur = data.get("nom");
   const taux = tauxMap[chauffeur] || { taux_h: 0, taux_km: 0 };
-
+});
   let html = "";
   let totalMinutes = 0;
   let totalKm = 0;

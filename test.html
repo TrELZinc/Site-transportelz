@@ -498,9 +498,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let html = "";
   let totalMinutes = 0;
   let totalKm = 0;
-  let totalPrime = 0;
+  let totalForfait = 0;
   let voyages = [];
-  let vimontLastKmAdded = false;
 
   for (let i = 1; i <= 3; i++) {
     const type = data.get(`type_voyage_${i}`);
@@ -510,13 +509,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const destination = data.get(`destination_${i}`);
     const normOrigine = normalizeStr(origine);
     const normDestination = normalizeStr(destination);
-    const kmBase = (type === "heure" && origine === "Vimont")
-      ? kmMap["st-basile"]?.[normDestination] || 0
-      : kmMap[normOrigine]?.[normDestination] || 0;
+    const kmVal = kmMap[normOrigine]?.[normDestination] || 0;
 
     if (type === "kilometrage") {
-      voyages.push({ id: i, type, origine, destination, km: kmBase });
-      html += `<p><strong>Voyage ${i} - KM:</strong> ${kmBase}km</p>`;
+      voyages.push({ id: i, type, origine, destination, km: kmVal });
+      html += `<p><strong>Voyage ${i} - KM:</strong> ${kmVal}km</p>`;
     } else {
       const dH = parseInt(data.get(`heure_debut_h_${i}`) || "0", 10);
       const dM = parseInt(data.get(`heure_debut_m_${i}`) || "0", 10);
@@ -526,51 +523,59 @@ document.addEventListener("DOMContentLoaded", () => {
       if (duration > 0) totalMinutes += duration;
 
       html += `<p><strong>Voyage ${i} - Heure:</strong> ${dH}h${String(dM).padStart(2, '0')} → ${fH}h${String(fM).padStart(2, '0')}</p>`;
-      voyages.push({ id: i, type, origine, destination, km: kmBase });
+      voyages.push({ id: i, type, origine, destination });
+    }
+  }
+
+  // Analyse de l'exception
+  let lastVimontHeure = null;
+  for (let i = voyages.length - 1; i >= 0; i--) {
+    if (voyages[i].type === "heure" && voyages[i].origine === "Vimont") {
+      lastVimontHeure = voyages[i];
+      break;
     }
   }
 
   for (let i = 0; i < voyages.length; i++) {
     const v = voyages[i];
-
     if (v.type === "kilometrage") {
+      let isForfait = true;
       let kmPayes = v.km;
-      const next = voyages[i + 1];
 
-      if (next && next.type === "heure" && next.origine === "Vimont") {
-        totalPrime += 60.85;
+      const next1 = voyages[i + 1];
+      const next2 = voyages[i + 2];
+
+      if (next1?.type === "heure" && next1.origine === "Vimont") {
+        isForfait = true;
+        kmPayes = v.km; // pas de x2
       } else {
-        kmPayes *= 2;
-        totalPrime += 60.85;
+        kmPayes = v.km * 2;
       }
 
       totalKm += kmPayes;
+      if (isForfait) totalForfait += 60.85;
     }
+  }
 
-    if (
-      v.type === "heure" &&
-      v.origine === "Vimont" &&
-      !vimontLastKmAdded &&
-      (
-        !voyages[i + 1] ||
-        (voyages[i + 1].type === "heure" && voyages[i + 1].origine === "Vimont")
-      )
-    ) {
-      totalKm += v.km;
-      vimontLastKmAdded = true;
+  // Ajout km simple du dernier voyage à l'heure depuis Vimont (s'il existe)
+  if (lastVimontHeure) {
+    const normDest = normalizeStr(lastVimontHeure.destination);
+    const vimontKm = kmMap["st-basile"]?.[normDest] || 0;
+    if (vimontKm > 0) {
+      totalKm += vimontKm;
+      html += `<p><strong>Kilométrage ajouté (retour Vimont):</strong> ${vimontKm}km</p>`;
     }
   }
 
   const totalH = Math.floor(totalMinutes / 60);
   const totalM = totalMinutes % 60;
-
   const montantKm = totalKm * taux.taux_km;
   const montantH = (totalMinutes / 60) * taux.taux_h;
-  const montantFinal = montantKm + montantH + totalPrime;
+  const montantFinal = montantKm + montantH + totalForfait;
 
   html += `<hr/><p><strong>KM Payés:</strong> ${totalKm}km</p>`;
   html += `<p><strong>Heures Payées:</strong> ${totalH}h${String(totalM).padStart(2, "0")}</p>`;
-  html += `<p><strong>Bonus:</strong> ${totalPrime.toFixed(2)}$</p>`;
+  html += `<p><strong>Forfait:</strong> ${totalForfait.toFixed(2)}$</p>`;
   html += `<hr/><p><strong>Total payé estimé:</strong> ${montantFinal.toFixed(2)}$</p>`;
 
   resumeContent.innerHTML = html;
@@ -582,6 +587,7 @@ btnModifier.addEventListener("click", () => {
   resumeContainer.classList.add("d-none");
   document.getElementById("formulaire").classList.remove("d-none");
 });
+
 
   document.getElementById("btn-confirm").addEventListener("click", () => {
     const formData = new FormData(document.getElementById("formulaire"));

@@ -47,28 +47,26 @@
       box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
       margin-bottom: 1.5rem;
     }
-    .radio-options {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.radio-options .form-check {
+.voyage-toggle {
+  text-align: center;
   padding: 1rem;
-  border: 2px solid #dee2e6;
-  border-radius: 0.5rem;
-  background-color: #fff;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  border: 2px solid #ccc;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
 }
 
-.radio-options .form-check:hover {
+.voyage-toggle:hover {
+  background-color: #f8f9fa;
   border-color: #cc0000;
-  box-shadow: 0 0 0 2px rgba(204, 0, 0, 0.2);
 }
 
-.radio-options input[type="radio"]:checked + .form-check-label {
-  font-weight: 700;
-  color: #cc0000;
+.voyage-toggle.active {
+  background-color: #cc0000;
+  color: white;
+  border-color: #cc0000;
 }
   </style>
 </head>
@@ -141,15 +139,15 @@
     <h5 class="mb-3">Voyage ${id}</h5>
     <div class="mb-3">
   <label class="form-label fw-bold text-uppercase">Type de voyage</label>
-  <div class="radio-options">
-    <div class="form-check">
-      <input class="form-check-input" type="radio" name="type_voyage_${id}" id="km_${id}" value="kilometrage" required>
-      <label class="form-check-label" for="km_${id}">Voyage au kilométrage</label>
-    </div>
-    <div class="form-check">
-      <input class="form-check-input" type="radio" name="type_voyage_${id}" id="heure_${id}" value="heure" required>
-      <label class="form-check-label" for="heure_${id}">Voyage à l’heure</label>
-    </div>
+  <div class="btn-group-toggle w-100" data-toggle="buttons">
+    <label class="btn btn-outline-dark btn-lg w-100 mb-2 voyage-toggle" for="km_${id}">
+      <input type="radio" class="d-none" name="type_voyage_${id}" id="km_${id}" value="kilometrage" required>
+      Voyage au kilométrage
+    </label>
+    <label class="btn btn-outline-dark btn-lg w-100 voyage-toggle" for="heure_${id}">
+      <input type="radio" class="d-none" name="type_voyage_${id}" id="heure_${id}" value="heure" required>
+      Voyage à l’heure
+    </label>
   </div>
 </div>
     <div id="details_${id}"></div>

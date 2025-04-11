@@ -181,18 +181,15 @@
         </div>
       `;
 
-      // Si voyage à l’heure, ajoute les heures
       if (radio.value === "heure") {
         innerHTML += generateHeureHtml(id);
       }
 
-      // Ajouter question de suivi s’il reste de la place
       if (id < MAX_VOYAGES) {
         innerHTML += getSuiviHTML(id);
       }
 
       container.innerHTML = innerHTML;
-
       setupSuiviListener(id);
 
       const origineSelect = section.querySelector(`#origine_${id}`);
@@ -210,72 +207,6 @@
     });
   });
 }
-    } else {
-      container.innerHTML = `
-        <div class="mb-3">
-          <label class="form-label fw-bold text-uppercase">Origine</label>
-          <select class="form-select origine-select" name="origine_${id}" id="origine_${id}" required>
-            <option value="St-Basile" selected>St-Basile</option>
-            <option value="Vimont">Vimont</option>
-            <option value="Stanstead">Stanstead</option>
-          </select>
-        </div>
-        <div class="mb-3 position-relative">
-          <label class="form-label fw-bold text-uppercase">Ville de destination</label>
-          <input type="text" class="form-control destination-input" name="destination_${id}" id="destination_${id}" autocomplete="off" required />
-          <div class="autocomplete-list position-absolute bg-white border border-1 rounded shadow-sm z-3 w-100" id="autocomplete_${id}" style="display: none;"></div>
-        </div>
-        ${id < MAX_VOYAGES ? getSuiviHTML(id) : ''}
-      `;
-
-      setupSuiviListener(id);
-
-  const origineSelect = section.querySelector(`#origine_${id}`);
-  const destinationInput = section.querySelector(`#destination_${id}`);
-  const listContainer = section.querySelector(`#autocomplete_${id}`);
-
-  const applyAutocomplete = () => {
-    const origineVal = origineSelect.value.trim().toLowerCase();
-    const sourceKey = origineVal === "vimont" ? "st-basile" : origineVal;
-    setupAutocomplete(destinationInput, listContainer, sourceKey);
-  };
-
-  applyAutocomplete();
-  origineSelect.addEventListener("change", applyAutocomplete);
-} else {
-  container.innerHTML = `
-    <div class="mb-3">
-      <label class="form-label fw-bold text-uppercase">Origine</label>
-      <select class="form-select origine-select" name="origine_${id}" id="origine_${id}" required>
-        <option value="St-Basile" selected>St-Basile</option>
-        <option value="Vimont">Vimont</option>
-        <option value="Stanstead">Stanstead</option>
-      </select>
-    </div>
-    <div class="mb-3 position-relative">
-      <label class="form-label fw-bold text-uppercase">Ville de destination</label>
-      <input type="text" class="form-control destination-input" name="destination_${id}" id="destination_${id}" autocomplete="off" required />
-      <div class="autocomplete-list position-absolute bg-white border border-1 rounded shadow-sm z-3 w-100" id="autocomplete_${id}" style="display: none;"></div>
-    </div>
-    ${id < MAX_VOYAGES ? getSuiviHTML(id) : ''}
-  `;
-
-  setupSuiviListener(id);
-
-  const origineSelect = section.querySelector(`#origine_${id}`);
-  const destinationInput = section.querySelector(`#destination_${id}`);
-  const listContainer = section.querySelector(`#autocomplete_${id}`);
-
-  setupAutocomplete(destinationInput, listContainer, origineSelect.value);
-  origineSelect.addEventListener("change", () => {
-    setupAutocomplete(destinationInput, listContainer, origineSelect.value);
-  });
-}
-
-    });
-  });
-}
-
 function setupAutocomplete(input, listContainer, origine) {
   let origineNorm = normalizeStr(origine);
 

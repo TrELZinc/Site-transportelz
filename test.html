@@ -523,11 +523,12 @@ fetch("https://script.google.com/macros/s/AKfycbyv98mLkkZmdKET1vQPXQlJ7DD6LxhpkJ
   .then(res => res.json())
   .then(data => {
     console.log("✅ Données reçues :", data);
-    console.table(data.chauffeurs); // 👀 Tableau clair dans la console
+    console.table(data.chauffeurs); // 👀 Visualisation claire
 
     const selectNom = document.getElementById("nom");
     const selectCamion = document.getElementById("camion");
 
+    // 🔁 Création des maps
     tauxMap = data.chauffeurs.reduce((acc, el) => {
       acc[el.nom] = {
         taux_h: parseFloat(el.taux_h),
@@ -540,11 +541,21 @@ fetch("https://script.google.com/macros/s/AKfycbyv98mLkkZmdKET1vQPXQlJ7DD6LxhpkJ
       const nom = el["Nom Complet"] || el.nom || "";
       const camion = (el["camion défaut"] || el["Camion défaut"] || el["camion défaut "] || "").trim();
       if (nom) acc[nom] = camion;
-
       return acc;
     }, {});
 
-    // Remplir les options NOM
+    // ✅ 🗺️ Construction de kmMap pour l'autocomplétion
+    kmMap = data.km.reduce((acc, el) => {
+      const origine = normalizeStr(el.origine);
+      const destination = normalizeStr(el.destination);
+      const distance = parseFloat(el.km);
+      if (!acc[origine]) acc[origine] = {};
+      acc[origine][destination] = isNaN(distance) ? 0 : distance;
+      return acc;
+    }, {});
+    console.log("🗺️ kmMap bien construit :", kmMap);
+
+    // 🔽 Remplissage liste des chauffeurs
     data.chauffeurs.forEach(chauffeur => {
       const opt = document.createElement("option");
       opt.value = chauffeur.nom;
@@ -552,40 +563,40 @@ fetch("https://script.google.com/macros/s/AKfycbyv98mLkkZmdKET1vQPXQlJ7DD6LxhpkJ
       selectNom.appendChild(opt);
     });
 
-  function preselectCamionPourNom(nom) {
-  const camionNomComplet = chauffeurCamionMap[nom]; // ex. "Camion 1103"
-  if (!camionNomComplet) return;
+    // 🔁 Préselection du camion
+    function preselectCamionPourNom(nom) {
+      const camionNomComplet = chauffeurCamionMap[nom]; // ex. "Camion 1103"
+      if (!camionNomComplet) return;
 
-  const camionCode = camionNomComplet.replace(/\D/g, ""); // ← extrait "1103"
-  const option = Array.from(selectCamion.options).find(
-    (opt) => opt.value === camionCode
-  );
+      const camionCode = camionNomComplet.replace(/\D/g, "");
+      const option = Array.from(selectCamion.options).find(
+        (opt) => opt.value === camionCode
+      );
 
-  if (option) {
-    selectCamion.value = option.value;
-    console.log(`🚚 Camion ${camionCode} présélectionné pour ${nom}`);
-  } else {
-    console.warn(`❗ Camion "${camionNomComplet}" (code ${camionCode}) introuvable pour ${nom}`);
-  }
-}
+      if (option) {
+        selectCamion.value = option.value;
+        console.log(`🚚 Camion ${camionCode} présélectionné pour ${nom}`);
+      } else {
+        console.warn(`❗ Camion "${camionNomComplet}" (code ${camionCode}) introuvable pour ${nom}`);
+      }
+    }
 
-    // Lorsqu'on sélectionne un NOM
     selectNom.addEventListener("change", () => {
       const nom = selectNom.value;
       preselectCamionPourNom(nom);
     });
 
-    // Si un nom est déjà sélectionné (ex. : en cache navigateur)
     if (selectNom.value) {
       preselectCamionPourNom(selectNom.value);
     }
 
-    // Appel de l'affichage formulaire
+    // 🆙 Formulaire prêt
     addVoyageSection();
     document.getElementById("formulaire").classList.remove("d-none");
     document.getElementById("loader").style.display = "none";
   })
   .catch(err => console.error("❌ Erreur chargement:", err));
+
 </script>
 
  

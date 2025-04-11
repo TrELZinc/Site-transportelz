@@ -190,6 +190,8 @@
 
 function setupAutocomplete(input, listContainer, origine) {
   const origineNorm = normalizeStr(origine);
+  const dataOrigine = kmMap[origineNorm];
+
   let preview = document.createElement("div");
   preview.className = "text-muted mt-1 small";
   input.parentNode.appendChild(preview);
@@ -200,42 +202,47 @@ function setupAutocomplete(input, listContainer, origine) {
     listContainer.style.display = "none";
     preview.textContent = "";
 
-    if (!valeur || !kmMap[origineNorm]) return;
+    if (!valeur || !dataOrigine) return;
 
-    const correspondants = Object.keys(kmMap[origineNorm]).filter(dest =>
+    const correspondants = Object.keys(dataOrigine).filter(dest =>
       normalizeStr(dest).includes(valeur)
     );
 
     if (correspondants.length === 0) return;
 
     correspondants.forEach(dest => {
+      const destNorm = normalizeStr(dest);
+      const distanceKm = dataOrigine[dest];
+
       const opt = document.createElement("div");
       opt.className = "p-2 border-bottom";
       opt.style.cursor = "pointer";
       opt.textContent = dest;
+
       opt.addEventListener("click", () => {
         input.value = dest;
         listContainer.innerHTML = "";
         listContainer.style.display = "none";
-
-        const destNorm = normalizeStr(dest);
-        const distanceKm = kmMap[origineNorm]?.[destNorm];
-        preview.textContent = distanceKm !== undefined ? `Distance estimée : ${distanceKm} km` : "Distance inconnue.";
+        preview.textContent = distanceKm !== undefined
+          ? `Distance estimée : ${distanceKm} km`
+          : "Distance inconnue.";
       });
+
       listContainer.appendChild(opt);
     });
+
     listContainer.style.display = "block";
   });
 
   input.addEventListener("blur", () => {
-  setTimeout(() => {
-    const valeur = normalizeStr(input.value);
-    const distanceKm = kmMap[origineNorm]?.[valeur];
-    preview.textContent = distanceKm !== undefined
-      ? `Distance estimée : ${distanceKm} km`
-      : "";
-  }, 200);
-});
+    setTimeout(() => {
+      const valeur = normalizeStr(input.value);
+      const distanceKm = dataOrigine?.[Object.keys(dataOrigine).find(d => normalizeStr(d) === valeur)];
+      preview.textContent = distanceKm !== undefined
+        ? `Distance estimée : ${distanceKm} km`
+        : "";
+    }, 200);
+  });
 
   document.addEventListener("click", (e) => {
     if (!listContainer.contains(e.target) && e.target !== input) {
@@ -243,6 +250,7 @@ function setupAutocomplete(input, listContainer, origine) {
     }
   });
 }
+
 
 
 function generateHeureHtml(id) {

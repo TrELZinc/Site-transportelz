@@ -515,7 +515,8 @@ document.addEventListener("DOMContentLoaded", () => {
 <script>
   let tauxMap = {}; // par nom chauffeur
   let kmMap = {}; // origine -> destination -> km
-
+  let chauffeurCamionMap = {}; // map nom => camion par défaut
+  
   fetch("https://script.google.com/macros/s/AKfycbxakbBK9TUcJ5gQQ4nL3vuDoGw2kt9zY3fMVb1tImOvnWNXdNb3kYIIGRh-VLp5dkNi/exec")
   .then((res) => res.json())
   .then((data) => {
@@ -527,6 +528,13 @@ document.addEventListener("DOMContentLoaded", () => {
         taux_km: parseFloat(el.taux_km),
       };
       return acc;
+    }, {});
+
+    chauffeurCamionMap = data.chauffeurs.reduce((acc, el) => {
+    const nom = el.nom;
+    const camion = (el["camion défaut"] || "").trim(); // ← colonne D dans la feuille
+    if (nom) acc[nom] = camion; // on enregistre même si vide
+    return acc;
     }, {});
 
     kmMap = data.km.reduce((acc, el) => {
@@ -576,17 +584,49 @@ document.getElementById("loader").style.display = "none";
 </script>
 
  <script>
+  let chauffeurCamionMap = {}; // mapping nom → camion
+
   fetch("https://script.google.com/macros/s/AKfycbxakbBK9TUcJ5gQQ4nL3vuDoGw2kt9zY3fMVb1tImOvnWNXdNb3kYIIGRh-VLp5dkNi/exec")
     .then(res => res.json())
     .then(data => {
-  console.log("Réponse brute reçue du fetch :", data);
-      const select = document.getElementById("nom");
+      console.log("Réponse brute reçue du fetch :", data);
+
+      const selectNom = document.getElementById("nom");
+      const selectCamion = document.getElementById("camion");
+
       if (data?.chauffeurs?.length) {
+        // Remplir les options dans <select id="nom">
         data.chauffeurs.forEach(chauffeur => {
           const opt = document.createElement("option");
           opt.value = chauffeur.nom;
           opt.textContent = chauffeur.nom;
-          select.appendChild(opt);
+          selectNom.appendChild(opt);
+        });
+
+        // Création du mapping chauffeur → camion
+        chauffeurCamionMap = data.chauffeurs.reduce((acc, el) => {
+          const nom = el.nom;
+          const camion = (el["camion défaut"] || "").trim();
+          if (nom && camion) acc[nom] = camion;
+          return acc;
+        }, {});
+
+        // Écouteur : quand on choisit un nom, on sélectionne automatiquement son camion par défaut
+        selectNom.addEventListener("change", () => {
+          const nom = selectNom.value;
+          const camionParDefaut = chauffeurCamionMap[nom];
+
+          if (camionParDefaut) {
+            const option = Array.from(selectCamion.options).find(
+              (opt) => opt.value === camionParDefaut || opt.textContent === camionParDefaut
+            );
+
+            if (option) {
+              selectCamion.value = option.value;
+            } else {
+              console.warn(`⚠️ Camion "${camionParDefaut}" pas trouvé dans la liste.`);
+            }
+          }
         });
       } else {
         console.warn("Aucun chauffeur trouvé dans la réponse.");
@@ -594,6 +634,7 @@ document.getElementById("loader").style.display = "none";
     })
     .catch(err => console.error("Erreur chargement chauffeurs:", err));
 </script>
+
  
 </body>
 </html>

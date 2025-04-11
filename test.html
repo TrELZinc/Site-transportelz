@@ -549,6 +549,7 @@ btnPreview.addEventListener("click", () => {
     } else {
       const h = data.get(`heure_debut_h_${v.id}`), m = data.get(`heure_debut_m_${v.id}`);
       const h2 = data.get(`heure_fin_h_${v.id}`), m2 = data.get(`heure_fin_m_${v.id}`);
+      const destLabel = v.destination ? v.destination : `Voyage ${v.id}`;
       html += `<p><strong>${destLabel} - Heure:</strong> ${h}h${m} → ${h2}h${m2}</p>`;
 
     // Cas C – Retour Vimont

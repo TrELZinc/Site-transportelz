@@ -611,7 +611,6 @@ btnPreview.addEventListener("click", () => {
     const formData = new FormData(document.getElementById("formulaire"));
     const data = {};
     formData.forEach((val, key) => data[key] = val);
-});
 
     fetch("https://script.google.com/macros/s/AKfycbyv98mLkkZmdKET1vQPXQlJ7DD6LxhpkJ2uWcbVSjDhGcdX8tsQ0LpjQKSBtI4tMTd4/exec", {
       method: "POST",

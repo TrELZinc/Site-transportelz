@@ -138,35 +138,34 @@
   section.innerHTML = `
     <h5 class="mb-3">Voyage ${id}</h5>
     <div class="mb-3">
-  <label class="form-label fw-bold text-uppercase">Type de voyage</label>
-  <div class="btn-group-toggle w-100" data-toggle="buttons">
-    <label class="btn btn-outline-dark btn-lg w-100 mb-2 voyage-toggle" for="km_${id}">
-      <input type="radio" class="d-none" name="type_voyage_${id}" id="km_${id}" value="kilometrage" required>
-      Voyage au kilométrage
-    </label>
-    <label class="btn btn-outline-dark btn-lg w-100 voyage-toggle" for="heure_${id}">
-      <input type="radio" class="d-none" name="type_voyage_${id}" id="heure_${id}" value="heure" required>
-      Voyage à l’heure
-    </label>
-  </div>
-</div>
+      <label class="form-label fw-bold text-uppercase">Type de voyage</label>
+      <div class="btn-group-toggle w-100" data-toggle="buttons">
+        <label class="btn btn-outline-dark btn-lg w-100 mb-2 voyage-toggle" for="km_${id}">
+          <input type="radio" class="d-none" name="type_voyage_${id}" id="km_${id}" value="kilometrage" required>
+          Voyage au kilométrage
+        </label>
+        <label class="btn btn-outline-dark btn-lg w-100 voyage-toggle" for="heure_${id}">
+          <input type="radio" class="d-none" name="type_voyage_${id}" id="heure_${id}" value="heure" required>
+          Voyage à l’heure
+        </label>
+      </div>
+    </div>
     <div id="details_${id}"></div>
   `;
   voyageContainer.appendChild(section);
 
-// Ajout ici : activer visuellement les boutons de type de voyage
-const radios = section.querySelectorAll(`input[name="type_voyage_${id}"]`);
-radios.forEach((radio) => {
-  radio.addEventListener("change", () => {
-    // toggle les classes actives pour les gros boutons
-    radios.forEach(r => r.closest("label").classList.remove("active"));
-    if (radio.checked) {
-      radio.closest("label").classList.add("active");
-    }
+  const radios = section.querySelectorAll(`input[name="type_voyage_${id}"]`);
+  radios.forEach((radio) => {
+    radio.addEventListener("change", () => {
+      radios.forEach(r => r.closest("label").classList.remove("active"));
+      if (radio.checked) {
+        radio.closest("label").classList.add("active");
+      }
 
-    const container = section.querySelector(`#details_${id}`);
-    if (radio.value === "heure") {
-      container.innerHTML = `
+      const container = section.querySelector(`#details_${id}`);
+
+      // Champs communs
+      let innerHTML = `
         <div class="mb-3">
           <label class="form-label fw-bold text-uppercase">Origine</label>
           <select class="form-select origine-select" name="origine_${id}" id="origine_${id}" required>
@@ -180,9 +179,19 @@ radios.forEach((radio) => {
           <input type="text" class="form-control destination-input" name="destination_${id}" id="destination_${id}" autocomplete="off" required />
           <div class="autocomplete-list position-absolute bg-white border border-1 rounded shadow-sm z-3 w-100" id="autocomplete_${id}" style="display: none;"></div>
         </div>
-        ${generateHeureHtml(id)}
-        ${id < MAX_VOYAGES ? getSuiviHTML(id) : ''}
       `;
+
+      // Si voyage à l’heure, ajoute les heures
+      if (radio.value === "heure") {
+        innerHTML += generateHeureHtml(id);
+      }
+
+      // Ajouter question de suivi s’il reste de la place
+      if (id < MAX_VOYAGES) {
+        innerHTML += getSuiviHTML(id);
+      }
+
+      container.innerHTML = innerHTML;
 
       setupSuiviListener(id);
 
@@ -198,7 +207,9 @@ radios.forEach((radio) => {
 
       applyAutocomplete();
       origineSelect.addEventListener("change", applyAutocomplete);
-
+    });
+  });
+}
     } else {
       container.innerHTML = `
         <div class="mb-3">

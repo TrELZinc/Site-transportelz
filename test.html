@@ -513,7 +513,6 @@ document.addEventListener("DOMContentLoaded", () => {
 btnPreview.addEventListener("click", () => {
   const formEl = document.getElementById("formulaire");
 
-  // Vérifie si le formulaire est valide
   if (!formEl.checkValidity()) {
     formEl.reportValidity();
     return;
@@ -552,7 +551,7 @@ btnPreview.addEventListener("click", () => {
     }
   }
 
-  const lastVimontHeure = [...voyages].reverse().find(v => v.type === "heure" && v.origine === "Vimont");
+  const dernierVoyage = voyages[voyages.length - 1];
 
   for (let i = 0; i < voyages.length; i++) {
     const v = voyages[i];
@@ -579,18 +578,12 @@ btnPreview.addEventListener("click", () => {
       const destLabel = v.destination ? v.destination : `Voyage ${v.id}`;
       html += `<p><strong>${destLabel} - Heure:</strong> ${h}h${m} → ${h2}h${m2}</p>`;
 
-      if (
-        v.type === "heure" &&
-        v.origine === "Vimont" &&
-        (!voyages[i + 1] || (voyages[i + 1].type === "heure" && voyages[i + 1].origine === "Vimont"))
-      ) {
+      // Ajouter km de retour seulement si c’est le DERNIER voyage, de type heure, et origine Vimont
+      if (v.type === "heure" && v.origine === "Vimont" && v === dernierVoyage) {
         const dest = normalizeStr(v.destination);
         const kmRetour = kmMap["st-basile"]?.[dest] || 0;
-        if (!voyages.some(v => v._vimontExtraAdded)) {
-          totalKm += kmRetour;
-          html += `<p><strong>Retour de ${v.destination} :</strong> ${kmRetour}km</p>`;
-          v._vimontExtraAdded = true;
-        }
+        totalKm += kmRetour;
+        html += `<p><strong>Retour de ${v.destination} :</strong> ${kmRetour}km</p>`;
       }
     }
   }
@@ -609,10 +602,6 @@ btnPreview.addEventListener("click", () => {
   resumeContent.innerHTML = html;
   formEl.classList.add("d-none");
   resumeContainer.classList.remove("d-none");
-});
-btnModifier.addEventListener("click", () => {
-  resumeContainer.classList.add("d-none");
-  document.getElementById("formulaire").classList.remove("d-none");
 });
 
 

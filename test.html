@@ -266,14 +266,21 @@ if (!preview) {
   });
 
   input.addEventListener("blur", () => {
-    setTimeout(() => {
-      const valeur = normalizeStr(input.value);
-      const distanceKm = dataOrigine?.[Object.keys(dataOrigine).find(d => normalizeStr(d) === valeur)];
-      preview.textContent = distanceKm !== undefined
-        ? `Distance estimée : ${distanceKm} km`
-        : "";
-    }, 200);
-  });
+  setTimeout(() => {
+    const valeur = normalizeStr(input.value);
+    const distanceKm = dataOrigine?.[Object.keys(dataOrigine).find(d => normalizeStr(d) === valeur)];
+
+    const voyageDiv = input.closest(".section-box");
+    const origineSelect = voyageDiv?.querySelector("select[name^='origine_']");
+    const typeHeure = voyageDiv?.querySelector("input[type=radio][value=heure]")?.checked;
+    const isHeureVimont = typeHeure && origineSelect?.value === "Vimont";
+
+    preview.textContent = (!isHeureVimont && distanceKm !== undefined)
+      ? `Distance estimée : ${Math.round(distanceKm)} km`
+      : "";
+  }, 200);
+});
+
 
   document.addEventListener("click", (e) => {
     if (!listContainer.contains(e.target) && e.target !== input) {

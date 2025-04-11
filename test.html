@@ -47,6 +47,29 @@
       box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
       margin-bottom: 1.5rem;
     }
+    .radio-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.radio-options .form-check {
+  padding: 1rem;
+  border: 2px solid #dee2e6;
+  border-radius: 0.5rem;
+  background-color: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.radio-options .form-check:hover {
+  border-color: #cc0000;
+  box-shadow: 0 0 0 2px rgba(204, 0, 0, 0.2);
+}
+
+.radio-options input[type="radio"]:checked + .form-check-label {
+  font-weight: 700;
+  color: #cc0000;
+}
   </style>
 </head>
 <body>
@@ -117,16 +140,18 @@
   section.innerHTML = `
     <h5 class="mb-3">Voyage ${id}</h5>
     <div class="mb-3">
-      <label class="form-label fw-bold text-uppercase">Type de voyage</label>
-      <div class="form-check">
-        <input class="form-check-input" type="radio" name="type_voyage_${id}" id="km_${id}" value="kilometrage" required>
-        <label class="form-check-label" for="km_${id}">Voyage au kilométrage</label>
-      </div>
-      <div class="form-check">
-        <input class="form-check-input" type="radio" name="type_voyage_${id}" id="heure_${id}" value="heure" required>
-        <label class="form-check-label" for="heure_${id}">Voyage à l’heure</label>
-      </div>
+  <label class="form-label fw-bold text-uppercase">Type de voyage</label>
+  <div class="radio-options">
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="type_voyage_${id}" id="km_${id}" value="kilometrage" required>
+      <label class="form-check-label" for="km_${id}">Voyage au kilométrage</label>
     </div>
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="type_voyage_${id}" id="heure_${id}" value="heure" required>
+      <label class="form-check-label" for="heure_${id}">Voyage à l’heure</label>
+    </div>
+  </div>
+</div>
     <div id="details_${id}"></div>
   `;
   voyageContainer.appendChild(section);

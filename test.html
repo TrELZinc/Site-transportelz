@@ -551,7 +551,10 @@ btnPreview.addEventListener("click", () => {
     }
   }
 
-  const dernierVoyage = voyages[voyages.length - 1];
+  // Trouver le dernier voyage à l’heure origine Vimont
+  const lastHeureVimont = [...voyages]
+    .reverse()
+    .find(v => v.type === "heure" && normalizeStr(v.origine) === "vimont");
 
   for (let i = 0; i < voyages.length; i++) {
     const v = voyages[i];
@@ -561,7 +564,7 @@ btnPreview.addEventListener("click", () => {
 
       const next = voyages[i + 1];
 
-      if (next?.type === "heure" && next.origine === "Vimont") {
+      if (next?.type === "heure" && normalizeStr(next.origine) === "vimont") {
         label += " (aller simple)";
         totalPrime += 60.85;
       } else {
@@ -578,8 +581,8 @@ btnPreview.addEventListener("click", () => {
       const destLabel = v.destination ? v.destination : `Voyage ${v.id}`;
       html += `<p><strong>${destLabel} - Heure:</strong> ${h}h${m} → ${h2}h${m2}</p>`;
 
-      // Ajouter km de retour seulement si c’est le DERNIER voyage, de type heure, et origine Vimont
-      if (v.type === "heure" && v.origine === "Vimont" && v === dernierVoyage) {
+      // Si c’est le dernier Vimont à l’heure, ajouter le retour
+      if (v === lastHeureVimont) {
         const dest = normalizeStr(v.destination);
         const kmRetour = kmMap["st-basile"]?.[dest] || 0;
         totalKm += kmRetour;

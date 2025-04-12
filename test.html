@@ -96,7 +96,29 @@
   border-radius: 0.6rem;
   margin-bottom: 0.5rem;
 }
+.fuel-toggle {
+  font-size: 0.95rem;
+  padding: 0.65rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ced4da;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  text-align: left;
+  width: 100%;
+  display: block;
+  margin-bottom: 8px;
+}
 
+.fuel-toggle:hover {
+  background-color: #f8f9fa;
+  border-color: #cc0000;
+}
+
+.fuel-toggle.active {
+  background-color: #cc0000;
+  color: white;
+  border-color: #cc0000;
+}
   </style>
 </head>
 <body>
@@ -427,29 +449,30 @@ radios.forEach((radio) => {
     <!-- Diesel -->
 <div class="mb-3">
   <label class="form-label fw-bold text-uppercase">Avez-vous fait le plein de diesel ?</label>
-  <div class="form-check fuel-check">
-    <input class="form-check-input" type="radio" name="diesel" value="non" id="diesel_non" required />
-    <label class="form-check-label" for="diesel_non">Non</label>
-  </div>
-  <div class="form-check fuel-check">
-    <input class="form-check-input" type="radio" name="diesel" value="stbasile" id="diesel_stbasile" required />
-    <label class="form-check-label" for="diesel_stbasile">Oui, St Basile Transport</label>
-  </div>
-  <div class="form-check fuel-check">
-    <input class="form-check-input" type="radio" name="diesel" value="esso" id="diesel_esso" required />
-    <label class="form-check-label" for="diesel_esso">Oui, ESSO Deschambault</label>
-  </div>
-  <div class="form-check fuel-check">
-    <input class="form-check-input" type="radio" name="diesel" value="irving" id="diesel_irving" required />
-    <label class="form-check-label" for="diesel_irving">Oui, Irving USA</label>
-  </div>
-  <div class="form-check fuel-check">
-    <input class="form-check-input" type="radio" name="diesel" value="autre" id="diesel_autre" required />
-    <label class="form-check-label" for="diesel_autre">Spécifiez</label>
+  <div class="btn-group-toggle d-grid gap-2">
+    <label class="btn btn-outline-secondary fuel-toggle" for="diesel_non">
+      <input class="d-none" type="radio" name="diesel" id="diesel_non" value="non" required />
+      Non
+    </label>
+    <label class="btn btn-outline-secondary fuel-toggle" for="diesel_stbasile">
+      <input class="d-none" type="radio" name="diesel" id="diesel_stbasile" value="stbasile" required />
+      Oui, St Basile Transport
+    </label>
+    <label class="btn btn-outline-secondary fuel-toggle" for="diesel_esso">
+      <input class="d-none" type="radio" name="diesel" id="diesel_esso" value="esso" required />
+      Oui, ESSO Deschambault
+    </label>
+    <label class="btn btn-outline-secondary fuel-toggle" for="diesel_irving">
+      <input class="d-none" type="radio" name="diesel" id="diesel_irving" value="irving" required />
+      Oui, Irving USA
+    </label>
+    <label class="btn btn-outline-secondary fuel-toggle" for="diesel_autre">
+      <input class="d-none" type="radio" name="diesel" id="diesel_autre" value="autre" required />
+      Spécifiez
+    </label>
   </div>
   <input type="text" class="form-control mt-2 d-none" id="diesel_spec" name="diesel_spec" placeholder="Autre station" />
 </div>
-
 <!-- Litres diesel -->
 <div class="mb-3 d-none" id="litres_diesel_block">
   <label class="form-label">Inscrivez la quantité de litres (diesel)</label>
@@ -459,21 +482,23 @@ radios.forEach((radio) => {
 <!-- Urée -->
 <div class="mb-3">
   <label class="form-label fw-bold text-uppercase">Avez-vous fait le plein d’urée ?</label>
-  <div class="form-check fuel-check">
-    <input class="form-check-input" type="radio" name="uree" value="non" id="uree_non" required />
-    <label class="form-check-label" for="uree_non">Non</label>
-  </div>
-  <div class="form-check fuel-check">
-    <input class="form-check-input" type="radio" name="uree" value="garage_elz" id="uree_elz" required />
-    <label class="form-check-label" for="uree_elz">Oui, au garage ELZ</label>
-  </div>
-  <div class="form-check fuel-check">
-    <input class="form-check-input" type="radio" name="uree" value="garage_stb" id="uree_stb" required />
-    <label class="form-check-label" for="uree_stb">Oui, au garage St-Basile Transport</label>
-  </div>
-  <div class="form-check fuel-check">
-    <input class="form-check-input" type="radio" name="uree" value="autre" id="uree_autre" required />
-    <label class="form-check-label" for="uree_autre">Spécifiez</label>
+  <div class="btn-group-toggle d-grid gap-2">
+    <label class="btn btn-outline-secondary fuel-toggle" for="uree_non">
+      <input class="d-none" type="radio" name="uree" id="uree_non" value="non" required />
+      Non
+    </label>
+    <label class="btn btn-outline-secondary fuel-toggle" for="uree_elz">
+      <input class="d-none" type="radio" name="uree" id="uree_elz" value="garage_elz" required />
+      Oui, au garage ELZ
+    </label>
+    <label class="btn btn-outline-secondary fuel-toggle" for="uree_stb">
+      <input class="d-none" type="radio" name="uree" id="uree_stb" value="garage_stb" required />
+      Oui, au garage St-Basile Transport
+    </label>
+    <label class="btn btn-outline-secondary fuel-toggle" for="uree_autre">
+      <input class="d-none" type="radio" name="uree" id="uree_autre" value="autre" required />
+      Spécifiez
+    </label>
   </div>
   <input type="text" class="form-control mt-2 d-none" id="uree_spec" name="uree_spec" placeholder="Autre endroit" />
 </div>
@@ -491,19 +516,32 @@ radios.forEach((radio) => {
     </div>
   `;
 
-  voyageContainer.appendChild(section);
+voyageContainer.appendChild(section);
 
-  // Interactions dynamiques
-  const dieselRadios = document.querySelectorAll('input[name="diesel"]');
-  const dieselSpec = document.getElementById("diesel_spec");
-  const dieselLitres = document.getElementById("litres_diesel_block");
-
-  dieselRadios.forEach((r) => {
-    r.addEventListener("change", () => {
-      dieselSpec.classList.toggle("d-none", r.id !== "diesel_autre");
-      dieselLitres.classList.toggle("d-none", r.value === "non");
+// Activation visuelle des boutons Diesel / Urée
+section.querySelectorAll('.fuel-toggle input[type="radio"]').forEach(input => {
+  input.addEventListener('change', () => {
+    const name = input.name;
+    section.querySelectorAll(`input[name="${name}"]`).forEach(el => {
+      el.closest('.fuel-toggle').classList.remove('active');
     });
+    if (input.checked) {
+      input.closest('.fuel-toggle').classList.add('active');
+    }
   });
+});
+
+// Interactions dynamiques (pour le champ "autre" + litres)
+const dieselRadios = section.querySelectorAll('input[name="diesel"]');
+const dieselSpec = section.querySelector("#diesel_spec");
+const dieselLitres = section.querySelector("#litres_diesel_block");
+
+dieselRadios.forEach((r) => {
+  r.addEventListener("change", () => {
+    dieselSpec.classList.toggle("d-none", r.id !== "diesel_autre");
+    dieselLitres.classList.toggle("d-none", r.value === "non");
+  });
+});
 
   const ureeRadios = document.querySelectorAll('input[name="uree"]');
   const ureeSpec = document.getElementById("uree_spec");

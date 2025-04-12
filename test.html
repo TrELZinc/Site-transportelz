@@ -49,11 +49,11 @@
     }
 .voyage-toggle {
   text-align: center;
-  padding: 1rem;
+  padding: 0.75rem;
   border: 2px solid #ccc;
   border-radius: 0.75rem;
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 1rem;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
 }
@@ -336,11 +336,11 @@ function generateHeureHtml(id) {
     <div class="mb-3 mt-3">
       <label class="form-label fw-bold text-uppercase">Avez-vous fait un autre voyage ensuite ?</label>
       <div class="btn-group-toggle w-100" data-toggle="buttons">
-        <label class="btn btn-outline-dark btn-lg w-100 mb-2 voyage-toggle" for="oui_${id}">
+        <label class="btn btn-outline-dark btn-md w-100 mb-2 voyage-toggle" for="oui_${id}">
           <input type="radio" class="d-none" name="autre_${id}" id="oui_${id}" value="oui" required>
           Oui
         </label>
-        <label class="btn btn-outline-dark btn-lg w-100 voyage-toggle" for="non_${id}">
+        <label class="btn btn-outline-dark btn-md w-100 voyage-toggle" for="non_${id}">
           <input type="radio" class="d-none" name="autre_${id}" id="non_${id}" value="non" required>
           Non
         </label>
@@ -374,7 +374,15 @@ function generateHeureHtml(id) {
       afficherSectionFinale();
     });
   }
-
+const radios = document.querySelectorAll(`input[name="autre_${id}"]`);
+radios.forEach((radio) => {
+  radio.addEventListener("change", () => {
+    radios.forEach(r => r.closest("label").classList.remove("active"));
+    if (radio.checked) {
+      radio.closest("label").classList.add("active");
+    }
+  });
+});
   if (voyageCount === MAX_VOYAGES) {
     afficherSectionFinale();
   }

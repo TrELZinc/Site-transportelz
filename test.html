@@ -547,46 +547,53 @@ btnPreview.addEventListener("click", () => {
       const fM = parseInt(data.get(`heure_fin_m_${i}`) || "0", 10);
       const duration = (fH * 60 + fM) - (dH * 60 + dM);
       if (duration > 0) totalMinutes += duration;
-      voyages.push({ id: i, type, origine, destination });
+      voyages.push({ id: i, type, origine, destination, km: 0 });
     }
   }
 
-  // Trouver le dernier voyage à l’heure origine Vimont
-  const lastHeureVimont = [...voyages]
-    .reverse()
-    .find(v => v.type === "heure" && normalizeStr(v.origine) === "vimont");
+  const lastHeureVimont = [...voyages].reverse().find(
+    v => v.type === "heure" && normalizeStr(v.origine) === "vimont"
+  );
 
   for (let i = 0; i < voyages.length; i++) {
     const v = voyages[i];
+
     if (v.type === "kilometrage") {
       let kmPayes = v.km;
-      let label = `${v.destination || `Voyage ${v.id}`} - KM`;
+      let label = `${v.destination} - KM`;
+      let addPrime = true;
 
       const next = voyages[i + 1];
 
-      if (next?.type === "heure" && normalizeStr(next.origine) === "vimont") {
+      // Exception spéciale St-Basile -> Stanstead puis Stanstead -> autre
+      const isStbToStanstead = normalizeStr(v.origine) === "st-basile" && normalizeStr(v.destination) === "stanstead";
+      const isNextFromStanstead = normalizeStr(next?.origine) === "stanstead" && next?.type === "kilometrage";
+
+      if (isStbToStanstead && isNextFromStanstead) {
+        label += " (aller simple sans forfait)";
+        totalKm += kmPayes;
+        addPrime = false;
+      } else if (next?.type === "heure" && normalizeStr(next.origine) === "vimont") {
         label += " (aller simple)";
-        totalPrime += 60.85;
+        totalKm += kmPayes;
       } else {
         label += " (aller-retour)";
         kmPayes *= 2;
-        totalPrime += 60.85;
+        totalKm += kmPayes;
       }
 
-      totalKm += kmPayes;
+      if (addPrime) totalPrime += 60.85;
+
       html += `<p><strong>${label}:</strong> ${kmPayes}km</p>`;
     } else {
       const h = data.get(`heure_debut_h_${v.id}`), m = data.get(`heure_debut_m_${v.id}`);
       const h2 = data.get(`heure_fin_h_${v.id}`), m2 = data.get(`heure_fin_m_${v.id}`);
-      const destLabel = v.destination ? v.destination : `Voyage ${v.id}`;
-      html += `<p><strong>${destLabel} - Heure:</strong> ${h}h${m} → ${h2}h${m2}</p>`;
+      html += `<p><strong>${v.destination} - Heure:</strong> ${h}h${m} → ${h2}h${m2}</p>`;
 
-      // Si c’est le dernier Vimont à l’heure, ajouter le retour
       if (v === lastHeureVimont) {
-        const dest = normalizeStr(v.destination);
-        const kmRetour = kmMap["st-basile"]?.[dest] || 0;
-        totalKm += kmRetour;
-        html += `<p><strong>Retour de ${v.destination} :</strong> ${kmRetour}km</p>`;
+        const retourKm = kmMap["st-basile"]?.[normalizeStr(v.destination)] || 0;
+        totalKm += retourKm;
+        html += `<p><strong>Retour de ${v.destination} :</strong> ${retourKm}km</p>`;
       }
     }
   }

@@ -537,9 +537,17 @@ btnPreview.addEventListener("click", () => {
     const normOrigine = normalizeStr(origine);
     const normDestination = normalizeStr(destination);
     const kmVal = kmMap[normOrigine]?.[normDestination] || 0;
+    const isDouane = (kmMap[normOrigine]?.[normDestination + "_DOUANE"] === true);
 
     if (type === "kilometrage") {
-      voyages.push({ id: i, type, origine, destination, km: kmVal });
+      voyages.push({
+        id: i,
+        type,
+        origine,
+        destination,
+        km: kmVal,
+        douane: isDouane
+      });
     } else {
       const dH = parseInt(data.get(`heure_debut_h_${i}`) || "0", 10);
       const dM = parseInt(data.get(`heure_debut_m_${i}`) || "0", 10);
@@ -547,53 +555,67 @@ btnPreview.addEventListener("click", () => {
       const fM = parseInt(data.get(`heure_fin_m_${i}`) || "0", 10);
       const duration = (fH * 60 + fM) - (dH * 60 + dM);
       if (duration > 0) totalMinutes += duration;
-      voyages.push({ id: i, type, origine, destination, km: 0 });
+      voyages.push({
+        id: i,
+        type,
+        origine,
+        destination,
+        h1: dH,
+        m1: dM,
+        h2: fH,
+        m2: fM
+      });
     }
   }
 
-  const lastHeureVimont = [...voyages].reverse().find(
-    v => v.type === "heure" && normalizeStr(v.origine) === "vimont"
-  );
+  const lastHeureVimont = [...voyages]
+    .reverse()
+    .find(v => v.type === "heure" && normalizeStr(v.origine) === "vimont");
 
   for (let i = 0; i < voyages.length; i++) {
     const v = voyages[i];
-
     if (v.type === "kilometrage") {
       let kmPayes = v.km;
-      let label = `${v.destination} - KM`;
-      let addPrime = true;
+      let label = `${v.destination || `Voyage ${v.id}`} - KM`;
+      let afficherPrime = true;
 
       const next = voyages[i + 1];
+      const isStansteadTransfer = normalizeStr(v.origine) === "st-basile" && normalizeStr(v.destination) === "stanstead"
+        && next?.type === "kilometrage"
+        && normalizeStr(next.origine) === "stanstead";
 
-      // Exception spéciale St-Basile -> Stanstead puis Stanstead -> autre
-      const isStbToStanstead = normalizeStr(v.origine) === "st-basile" && normalizeStr(v.destination) === "stanstead";
-      const isNextFromStanstead = normalizeStr(next?.origine) === "stanstead" && next?.type === "kilometrage";
-
-      if (isStbToStanstead && isNextFromStanstead) {
-        label += " (aller simple sans forfait)";
-        totalKm += kmPayes;
-        addPrime = false;
+      if (isStansteadTransfer) {
+        label += " (aller simple)";
+        afficherPrime = false;
       } else if (next?.type === "heure" && normalizeStr(next.origine) === "vimont") {
         label += " (aller simple)";
-        totalKm += kmPayes;
       } else {
         label += " (aller-retour)";
         kmPayes *= 2;
-        totalKm += kmPayes;
       }
 
-      if (addPrime) totalPrime += 60.85;
-
       html += `<p><strong>${label}:</strong> ${kmPayes}km</p>`;
+      totalKm += kmPayes;
+
+      if (!isStansteadTransfer) {
+        totalPrime += 60.85;
+      } else {
+        totalPrime += 0;
+      }
+
+      // Exception DOUANE
+      if (kmMap[normalizeStr(v.origine)]?.[normalizeStr(v.destination) + "_DOUANE"] === true) {
+        html += `<p class="text-muted small">+ $ Douane : 15.00$</p>`;
+        totalPrime += 15;
+      }
+
     } else {
-      const h = data.get(`heure_debut_h_${v.id}`), m = data.get(`heure_debut_m_${v.id}`);
-      const h2 = data.get(`heure_fin_h_${v.id}`), m2 = data.get(`heure_fin_m_${v.id}`);
-      html += `<p><strong>${v.destination} - Heure:</strong> ${h}h${m} → ${h2}h${m2}</p>`;
+      html += `<p><strong>${v.destination} - Heure:</strong> ${v.h1}h${v.m1.toString().padStart(2, "0")} → ${v.h2}h${v.m2.toString().padStart(2, "0")}</p>`;
 
       if (v === lastHeureVimont) {
         const retourKm = kmMap["st-basile"]?.[normalizeStr(v.destination)] || 0;
-        totalKm += retourKm;
         html += `<p><strong>Retour de ${v.destination} :</strong> ${retourKm}km</p>`;
+        totalKm += retourKm;
       }
     }
   }
@@ -606,12 +628,28 @@ btnPreview.addEventListener("click", () => {
 
   html += `<hr/><p><strong>KM Payés:</strong> ${totalKm}km</p>`;
   html += `<p><strong>Heures Payées:</strong> ${totalH}h${String(totalM).padStart(2, "0")}</p>`;
-  html += `<p><strong>Forfait:</strong> ${totalPrime.toFixed(2)}$</p>`;
+  html += `<p><strong>Forfaits & Primes:</strong> ${totalPrime.toFixed(2)}$</p>`;
   html += `<hr/><p><strong>Total payé estimé:</strong> ${montantFinal.toFixed(2)}$</p>`;
 
   resumeContent.innerHTML = html;
   formEl.classList.add("d-none");
   resumeContainer.classList.remove("d-none");
+
+  document.getElementById("btn-confirm").addEventListener("click", () => {
+    const formData = new FormData(document.getElementById("formulaire"));
+    const data = {};
+    formData.forEach((val, key) => data[key] = val);
+
+    fetch("https://script.google.com/macros/s/AKfycbyv98mLkkZmdKET1vQPXQlJ7DD6LxhpkJ2uWcbVSjDhGcdX8tsQ0LpjQKSBtI4tMTd4/exec", {
+      method: "POST",
+      mode: "no-cors",
+      body: JSON.stringify(data),
+      headers: { "Content-Type": "application/json" }
+    });
+
+    resumeContainer.classList.add("d-none");
+    document.getElementById("confirmationContainer").classList.remove("d-none");
+  });
 });
 
   document.getElementById("btn-confirm").addEventListener("click", () => {

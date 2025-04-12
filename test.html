@@ -353,12 +353,13 @@ function generateHeureHtml(id) {
   const non = document.getElementById(`non_${id}`);
 
   if (oui) {
-    oui.addEventListener("change", () => {
-      if (voyageCount < MAX_VOYAGES) {
-        addVoyageSection();
-      }
-    });
-  }
+  oui.addEventListener("change", () => {
+    const sectionSuivanteExiste = document.querySelector(`#details_${id + 1}`);
+    if (voyageCount < MAX_VOYAGES && !sectionSuivanteExiste) {
+      addVoyageSection();
+    }
+  });
+}
 
   if (non) {
     non.addEventListener("change", () => {

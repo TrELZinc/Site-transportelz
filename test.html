@@ -588,37 +588,29 @@ section.querySelectorAll('.fuel-toggle input[type="radio"]').forEach(input => {
   });
 });
 
-// Gestion Diesel
+// Interactions dynamiques (pour le champ "autre" + litres)
 const dieselRadios = section.querySelectorAll('input[name="diesel"]');
-const dieselTextInput = section.querySelector("#diesel_spec_direct");
+const dieselSpec = section.querySelector("#diesel_spec");
 const dieselLitres = section.querySelector("#litres_diesel_block");
 
-function updateDieselLitresVisibility() {
-  const selectedRadio = section.querySelector('input[name="diesel"]:checked');
-  const autreTexteRempli = dieselTextInput?.value.trim().length > 0;
+dieselRadios.forEach((r) => {
+  r.addEventListener("change", () => {
+    dieselSpec.classList.toggle("d-none", r.id !== "diesel_autre");
+    dieselLitres.classList.toggle("d-none", r.value === "non");
+  });
+});
 
-  const shouldShow = (selectedRadio && selectedRadio.value !== "non") || autreTexteRempli;
-  dieselLitres.classList.toggle("d-none", !shouldShow);
+  const ureeRadios = document.querySelectorAll('input[name="uree"]');
+  const ureeSpec = document.getElementById("uree_spec");
+  const ureeLitres = document.getElementById("litres_uree_block");
+
+  ureeRadios.forEach((r) => {
+    r.addEventListener("change", () => {
+      ureeSpec.classList.toggle("d-none", r.id !== "uree_autre");
+      ureeLitres.classList.toggle("d-none", r.value === "non");
+    });
+  });
 }
-
-dieselRadios.forEach(r => r.addEventListener("change", updateDieselLitresVisibility));
-dieselTextInput?.addEventListener("input", updateDieselLitresVisibility);
-
-// Gestion Urée
-const ureeRadios = section.querySelectorAll('input[name="uree"]');
-const ureeTextInput = section.querySelector("#uree_spec_direct");
-const ureeLitres = section.querySelector("#litres_uree_block");
-
-function updateUreeLitresVisibility() {
-  const selectedRadio = section.querySelector('input[name="uree"]:checked');
-  const autreTexteRempli = ureeTextInput?.value.trim().length > 0;
-
-  const shouldShow = (selectedRadio && selectedRadio.value !== "non") || autreTexteRempli;
-  ureeLitres.classList.toggle("d-none", !shouldShow);
-}
-
-ureeRadios.forEach(r => r.addEventListener("change", updateUreeLitresVisibility));
-ureeTextInput?.addEventListener("input", updateUreeLitresVisibility);
   </script>
   <!-- Résumé -->
 <div class="container py-4 d-none" id="resumeContainer">

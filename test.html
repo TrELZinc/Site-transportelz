@@ -332,20 +332,22 @@ function generateHeureHtml(id) {
 }
 
     function getSuiviHTML(id) {
-      return `
-        <div class="mb-3 mt-3">
-          <label class="form-label fw-bold text-uppercase">Avez-vous fait un autre voyage ensuite ?</label>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="autre_${id}" id="oui_${id}" value="oui" required />
-            <label class="form-check-label" for="oui_${id}">Oui</label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="autre_${id}" id="non_${id}" value="non" required />
-            <label class="form-check-label" for="non_${id}">Non</label>
-          </div>
-        </div>
-      `;
-    }
+  return `
+    <div class="mb-3 mt-3">
+      <label class="form-label fw-bold text-uppercase">Avez-vous fait un autre voyage ensuite ?</label>
+      <div class="btn-group-toggle w-100" data-toggle="buttons">
+        <label class="btn btn-outline-dark btn-lg w-100 mb-2 voyage-toggle" for="oui_${id}">
+          <input type="radio" class="d-none" name="autre_${id}" id="oui_${id}" value="oui" required>
+          Oui
+        </label>
+        <label class="btn btn-outline-dark btn-lg w-100 voyage-toggle" for="non_${id}">
+          <input type="radio" class="d-none" name="autre_${id}" id="non_${id}" value="non" required>
+          Non
+        </label>
+      </div>
+    </div>
+  `;
+}
 
     function setupSuiviListener(id) {
   const oui = document.getElementById(`oui_${id}`);

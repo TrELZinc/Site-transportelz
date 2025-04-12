@@ -588,48 +588,37 @@ section.querySelectorAll('.fuel-toggle input[type="radio"]').forEach(input => {
   });
 });
 
-// Interactions dynamiques (pour le champ "autre" + litres)
+// Gestion Diesel
 const dieselRadios = section.querySelectorAll('input[name="diesel"]');
-const dieselSpec = section.querySelector("#diesel_spec");
-const dieselLitres = section.querySelector("#litres_diesel_block");
-
 const dieselTextInput = section.querySelector("#diesel_spec_direct");
+const dieselLitres = section.querySelector("#litres_diesel_block");
 
 function updateDieselLitresVisibility() {
   const selectedRadio = section.querySelector('input[name="diesel"]:checked');
-  const autreTexteRempli = dieselTextInput && dieselTextInput.value.trim().length > 0;
+  const autreTexteRempli = dieselTextInput?.value.trim().length > 0;
 
   const shouldShow = (selectedRadio && selectedRadio.value !== "non") || autreTexteRempli;
   dieselLitres.classList.toggle("d-none", !shouldShow);
 }
 
-dieselRadios.forEach(r => {
-  r.addEventListener("change", updateDieselLitresVisibility);
-});
+dieselRadios.forEach(r => r.addEventListener("change", updateDieselLitresVisibility));
+dieselTextInput?.addEventListener("input", updateDieselLitresVisibility);
 
-if (dieselTextInput) {
-  dieselTextInput.addEventListener("input", updateDieselLitresVisibility);
-}
-
+// Gestion Urée
 const ureeRadios = section.querySelectorAll('input[name="uree"]');
 const ureeTextInput = section.querySelector("#uree_spec_direct");
 const ureeLitres = section.querySelector("#litres_uree_block");
 
 function updateUreeLitresVisibility() {
   const selectedRadio = section.querySelector('input[name="uree"]:checked');
-  const autreTexteRempli = ureeTextInput && ureeTextInput.value.trim().length > 0;
+  const autreTexteRempli = ureeTextInput?.value.trim().length > 0;
 
   const shouldShow = (selectedRadio && selectedRadio.value !== "non") || autreTexteRempli;
   ureeLitres.classList.toggle("d-none", !shouldShow);
 }
 
-ureeRadios.forEach(r => {
-  r.addEventListener("change", updateUreeLitresVisibility);
-});
-
-if (ureeTextInput) {
-  ureeTextInput.addEventListener("input", updateUreeLitresVisibility);
-}
+ureeRadios.forEach(r => r.addEventListener("change", updateUreeLitresVisibility));
+ureeTextInput?.addEventListener("input", updateUreeLitresVisibility);
   </script>
   <!-- Résumé -->
 <div class="container py-4 d-none" id="resumeContainer">

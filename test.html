@@ -119,6 +119,20 @@
   color: white;
   border-color: #cc0000;
 }
+
+.visually-enhanced-block {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 12px;
+  margin-top: 12px;
+}
+
+.visually-enhanced-block label {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
   </style>
 </head>
 <body>
@@ -474,9 +488,9 @@ radios.forEach((radio) => {
   <input type="text" class="form-control mt-2 d-none" id="diesel_spec" name="diesel_spec" placeholder="Autre station" />
 </div>
 <!-- Litres diesel -->
-<div class="mb-3 d-none" id="litres_diesel_block">
-  <label class="form-label">Inscrivez la quantité de litres (diesel)</label>
-  <input type="number" inputmode="numeric" class="form-control" name="litres_diesel" />
+<div class="mb-3 d-none visually-enhanced-block" id="litres_diesel_block">
+  <label class="form-label fw-bold">Inscrivez la quantité de litres (diesel)</label>
+  <input type="number" inputmode="numeric" class="form-control mt-2" name="litres_diesel" />
 </div>
 
 <!-- Urée -->
@@ -504,9 +518,9 @@ radios.forEach((radio) => {
 </div>
 
 <!-- Litres urée -->
-<div class="mb-3 d-none" id="litres_uree_block">
-  <label class="form-label">Inscrivez la quantité de litres (urée)</label>
-  <input type="number" inputmode="numeric" class="form-control" name="litres_uree" />
+<div class="mb-3 d-none visually-enhanced-block" id="litres_uree_block">
+  <label class="form-label fw-bold">Inscrivez la quantité de litres (urée)</label>
+  <input type="number" inputmode="numeric" class="form-control mt-2" name="litres_uree" />
 </div>
 
     <!-- Note -->

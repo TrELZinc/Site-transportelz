@@ -854,6 +854,14 @@ fetch("https://script.google.com/macros/s/AKfycbwcZZVPXv4p7kJkHx0CNl44ZVQYWNSz0-
   })
   .catch(err => console.error("❌ Erreur chargement:", err));
 
+
+document.querySelectorAll('input[list]').forEach(input => {
+  input.addEventListener('focus', () => {
+    setTimeout(() => {
+      input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300); // délai pour laisser le clavier apparaître
+  });
+});
 </script>
 
  

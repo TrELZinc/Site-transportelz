@@ -868,7 +868,7 @@ const montantFinal = montantKmFinal + montantHFinal + totalPrime;
 html += `<hr/><p><strong>KM Payés:</strong> ${totalKm}km</p>`;
 html += `<p><strong>Heures Payées:</strong> ${Math.floor(totalMinutes / 60)}h${String(totalMinutes % 60).padStart(2, "0")}</p>`;
 if (totalPrime > 60.85) {
-  html += `<p class="text-muted small">+ Prime Douane : 15.00$</p>`;
+  html += `<p><strong>Prime Douane:</strong> 15.00$</p>`;
 }
 html += `<p><strong>Forfait:</strong> 60.85$</p>`;
 

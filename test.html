@@ -706,30 +706,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const resumeContent = document.getElementById("resumeContent");
   const btnModifier = document.getElementById("btn-modifier");
 
-  if (!btnPreview) {
+  if (!) {
     console.error("⛔ Le bouton #btn-preview est introuvable dans le DOM !");
     return;
   }
 
 btnPreview.addEventListener("click", () => {
   const formEl = document.getElementById("formulaire");
-
   const formError = document.getElementById("formError");
 
-if (!formEl.checkValidity()) {
-  formEl.reportValidity();
-  formError.classList.remove("d-none");
-
-  // Optionnel : cache après 4 secondes
-  setTimeout(() => {
-    formError.classList.add("d-none");
-  }, 4000);
-
-  return;
-}
-
-// Si le formulaire est valide, on cache l'erreur si affichée
-formError.classList.add("d-none");
+  if (!formEl.checkValidity()) {
+    formEl.reportValidity();
+    formError.classList.remove("d-none");
+    setTimeout(() => formError.classList.add("d-none"), 4000);
+    return;
+  }
+  formError.classList.add("d-none");
 
   const data = new FormData(formEl);
   const chauffeur = data.get("nom");
@@ -738,7 +730,8 @@ formError.classList.add("d-none");
   let html = "";
   let totalMinutes = 0;
   let totalKm = 0;
-  let totalPrime = 0;
+  let montantForfait = 0;
+  let montantDouane = 0;
   let voyages = [];
 
   for (let i = 1; i <= 3; i++) {
@@ -750,17 +743,10 @@ formError.classList.add("d-none");
     const normOrigine = normalizeStr(origine);
     const normDestination = normalizeStr(destination);
     const kmVal = kmMap[normOrigine]?.[normDestination] || 0;
-    const isDouane = (kmMap[normOrigine]?.[normDestination + "_DOUANE"] === true);
+    const isDouane = kmMap[normOrigine]?.[normDestination + "_DOUANE"] === true;
 
     if (type === "kilometrage") {
-      voyages.push({
-        id: i,
-        type,
-        origine,
-        destination,
-        km: kmVal,
-        douane: isDouane
-      });
+      voyages.push({ id: i, type, origine, destination, km: kmVal, douane: isDouane });
     } else {
       const dH = parseInt(data.get(`heure_debut_h_${i}`) || "0", 10);
       const dM = parseInt(data.get(`heure_debut_m_${i}`) || "0", 10);
@@ -768,30 +754,20 @@ formError.classList.add("d-none");
       const fM = parseInt(data.get(`heure_fin_m_${i}`) || "0", 10);
       const duration = (fH * 60 + fM) - (dH * 60 + dM);
       if (duration > 0) totalMinutes += duration;
-      voyages.push({
-        id: i,
-        type,
-        origine,
-        destination,
-        h1: dH,
-        m1: dM,
-        h2: fH,
-        m2: fM
-      });
+      voyages.push({ id: i, type, origine, destination, h1: dH, m1: dM, h2: fH, m2: fM });
     }
   }
 
-  const lastHeureVimont = [...voyages]
-    .reverse()
-    .find(v => v.type === "heure" && normalizeStr(v.origine) === "vimont");
+  const lastHeureVimont = [...voyages].reverse().find(
+    v => v.type === "heure" && normalizeStr(v.origine) === "vimont"
+  );
 
   for (let i = 0; i < voyages.length; i++) {
     const v = voyages[i];
+
     if (v.type === "kilometrage") {
       let kmPayes = v.km;
       let label = `${v.destination || `Voyage ${v.id}`} - KM`;
-      let afficherPrime = true;
-
       const next = voyages[i + 1];
       const isStansteadTransfer = normalizeStr(v.origine) === "st-basile" && normalizeStr(v.destination) === "stanstead"
         && next?.type === "kilometrage"
@@ -799,7 +775,6 @@ formError.classList.add("d-none");
 
       if (isStansteadTransfer) {
         label += " (aller simple)";
-        afficherPrime = false;
       } else if (next?.type === "heure" && normalizeStr(next.origine) === "vimont") {
         label += " (aller simple)";
       } else {
@@ -810,27 +785,17 @@ formError.classList.add("d-none");
       html += `<p><strong>${label}:</strong> ${kmPayes}km</p>`;
       totalKm += kmPayes;
 
-      const primeDouane = v.douane ? 15 : 0;
+      // Ajout du forfait et douane uniquement une fois
+      if (!isStansteadTransfer) {
+        montantForfait = 60.85;
+      }
 
-if (!isStansteadTransfer) {
-  totalPrime += 60.85 + primeDouane;
-} else {
-  totalPrime += 0 + primeDouane;
-}
-
-if (!isStansteadTransfer) {
-  totalPrime += 60.85 + primeDouane;
-} else {
-  totalPrime += 0 + primeDouane;
-}
-
-
-
-
+      if (v.douane) {
+        montantDouane = 15;
+      }
 
     } else {
       html += `<p><strong>${v.destination} - Heure:</strong> ${v.h1}h${v.m1.toString().padStart(2, "0")} → ${v.h2}h${v.m2.toString().padStart(2, "0")}</p>`;
-
       if (v === lastHeureVimont) {
         const retourKm = kmMap["st-basile"]?.[normalizeStr(v.destination)] || 0;
         html += `<p><strong>Retour de ${v.destination} :</strong> ${retourKm}km</p>`;
@@ -839,55 +804,44 @@ if (!isStansteadTransfer) {
     }
   }
 
-// Recalcule après boucle complétée
-const totalH = Math.floor(totalMinutes / 60);
-const totalM = totalMinutes % 60;
-const montantKm = totalKm * taux.taux_km;
-const montantH = (totalMinutes / 60) * taux.taux_h;
+  // Recalculs
+  const ajustHr = parseFloat(document.getElementById("ajust_hr")?.value || "0");
+  const ajustKm = parseFloat(document.getElementById("ajust_km")?.value || "0");
+  const ajustRaison = document.getElementById("ajust_raison")?.value.trim();
 
-// Ajout des ajustements (avant montantFinal)
-const ajustHr = parseFloat(document.getElementById("ajust_hr")?.value || "0");
-const ajustKm = parseFloat(document.getElementById("ajust_km")?.value || "0");
-const ajustRaison = document.getElementById("ajust_raison")?.value.trim();
+  if ((ajustHr > 0 || ajustKm > 0) && ajustRaison.length === 0) {
+    alert("Merci d’ajouter une justification pour les ajustements manuels.");
+    return;
+  }
 
-if ((ajustHr > 0 || ajustKm > 0) && ajustRaison.length === 0) {
-  alert("Merci d’ajouter une justification pour les ajustements manuels.");
-  return;
-}
+  if (ajustKm > 0) totalKm += ajustKm;
+  if (ajustHr > 0) totalMinutes += ajustHr * 60;
 
-// Ajoute les valeurs aux totaux
-if (ajustKm > 0) totalKm += ajustKm;
-if (ajustHr > 0) totalMinutes += ajustHr * 60;
+  const montantKmFinal = totalKm * taux.taux_km;
+  const montantHFinal = (totalMinutes / 60) * taux.taux_h;
+  const montantFinal = montantKmFinal + montantHFinal + montantForfait + montantDouane;
 
-// Recalcule montant total avec ajouts
-const montantKmFinal = totalKm * taux.taux_km;
-const montantHFinal = (totalMinutes / 60) * taux.taux_h;
-const montantFinal = montantKmFinal + montantHFinal + totalPrime;
+  // Résumé final
+  html += `<hr/><p><strong>KM Payés:</strong> ${totalKm}km</p>`;
+  html += `<p><strong>Heures Payées:</strong> ${Math.floor(totalMinutes / 60)}h${String(totalMinutes % 60).padStart(2, "0")}</p>`;
+  if (montantDouane > 0) html += `<p><strong>Prime Douane:</strong> ${montantDouane.toFixed(2)}$</p>`;
+  if (montantForfait > 0) html += `<p><strong>Forfait:</strong> ${montantForfait.toFixed(2)}$</p>`;
+  if (ajustKm > 0) html += `<p><strong>Ajustement KM:</strong> +${ajustKm} km</p>`;
+  if (ajustHr > 0) html += `<p><strong>Ajustement heure:</strong> +${ajustHr} h</p>`;
+  if (ajustHr > 0 || ajustKm > 0) {
+    html += `<p class="text-muted"><strong>Justification:</strong> ${ajustRaison}</p>`;
+  }
+  html += `<hr/><p><strong>Total payé estimé:</strong> ${montantFinal.toFixed(2)}$</p>`;
 
-// Génération HTML
-html += `<hr/><p><strong>KM Payés:</strong> ${totalKm}km</p>`;
-html += `<p><strong>Heures Payées:</strong> ${Math.floor(totalMinutes / 60)}h${String(totalMinutes % 60).padStart(2, "0")}</p>`;
-if (totalPrime > 60.85) {
-  html += `<p><strong>Prime Douane:</strong> 15.00$</p>`;
-}
-html += `<p><strong>Forfait:</strong> 60.85$</p>`;
+  resumeContent.innerHTML = html;
+  formEl.classList.add("d-none");
+  resumeContainer.classList.remove("d-none");
 
-
-// Affiche les ajustements
-if (ajustKm > 0) {
-  html += `<p><strong>Ajustement KM:</strong> +${ajustKm} km</p>`;
-}
-if (ajustHr > 0) {
-  html += `<p><strong>Ajustement heure:</strong> +${ajustHr} h</p>`;
-}
-if (ajustHr > 0 || ajustKm > 0) {
-  html += `<p class="text-muted"><strong>Justification:</strong> ${ajustRaison}</p>`;
-}
-
-// Total final
-html += `<hr/><p><strong>Total payé estimé:</strong> ${montantFinal.toFixed(2)}$</p>`;
-
-resumeContent.innerHTML = html;
+  btnModifier.addEventListener("click", () => {
+    resumeContainer.classList.add("d-none");
+    formEl.classList.remove("d-none");
+  });
+});
 
   
   // -- LIVE UPDATE AJUSTEMENTS --

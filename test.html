@@ -595,31 +595,52 @@ section.querySelectorAll('.fuel-toggle input[type="radio"]').forEach(input => {
   });
 });
 
+// DIESEL
 const dieselRadios = section.querySelectorAll('input[name="diesel"]');
 const dieselLitres = section.querySelector("#litres_diesel_block");
 const dieselAutreInput = section.querySelector("#diesel_spec_direct");
 
+// Si on clique sur un bouton radio
+dieselRadios.forEach((radio) => {
+  radio.addEventListener("change", () => {
+    if (radio.checked && radio.value !== "non") {
+      dieselLitres.classList.remove("d-none");
+    } else if (radio.checked && radio.value === "non") {
+      dieselLitres.classList.add("d-none");
+    }
+  });
+});
+
+// Si on clique dans le champ Autre
 dieselAutreInput.addEventListener("focus", () => {
-  // Désélectionne tous les radios
   dieselRadios.forEach(r => {
     r.checked = false;
     r.closest('.fuel-toggle').classList.remove("active");
   });
-
-  // Affiche les litres obligatoirement
   dieselLitres.classList.remove("d-none");
 });
 
-  const ureeRadios = section.querySelectorAll('input[name="uree"]');
-  const ureeLitres = section.querySelector("#litres_uree_block");
-  const ureeAutreInput = section.querySelector("#uree_spec_direct");
+
+// URÉE
+const ureeRadios = section.querySelectorAll('input[name="uree"]');
+const ureeLitres = section.querySelector("#litres_uree_block");
+const ureeAutreInput = section.querySelector("#uree_spec_direct");
+
+ureeRadios.forEach((radio) => {
+  radio.addEventListener("change", () => {
+    if (radio.checked && radio.value !== "non") {
+      ureeLitres.classList.remove("d-none");
+    } else if (radio.checked && radio.value === "non") {
+      ureeLitres.classList.add("d-none");
+    }
+  });
+});
 
 ureeAutreInput.addEventListener("focus", () => {
   ureeRadios.forEach(r => {
     r.checked = false;
     r.closest('.fuel-toggle').classList.remove("active");
   });
-
   ureeLitres.classList.remove("d-none");
 });
 }

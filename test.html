@@ -182,6 +182,9 @@
 <body>
   <div class="container py-4">
     <h2 class="mb-4 text-center">Journal de travail</h2>
+    <div id="formError" class="alert alert-danger d-none" role="alert">
+    Merci de remplir tous les champs obligatoires avant de prévisualiser.
+    </div>
     <form id="formulaire" class="d-none">
       <div class="section-box">
         <div class="mb-3">
@@ -699,14 +702,21 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
+const formError = document.getElementById("formError");
+
 btnPreview.addEventListener("click", () => {
   const formEl = document.getElementById("formulaire");
 
   if (!formEl.checkValidity()) {
     formEl.reportValidity();
+    formError.classList.remove("d-none");
+    setTimeout(() => formError.classList.add("d-none"), 4000);
     return;
   }
 
+  formError.classList.add("d-none");
+  
+  
   const data = new FormData(formEl);
   const chauffeur = data.get("nom");
   const taux = tauxMap[chauffeur] || { taux_h: 0, taux_km: 0 };

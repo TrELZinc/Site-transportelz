@@ -819,24 +819,22 @@ function calculerResumeAvecAjustements() {
   const ajustKm = parseFloat(document.getElementById("ajust_km")?.value || "0");
   const ajustHeures = parseFloat(document.getElementById("ajust_hr")?.value || "0");
   const justification = document.getElementById("ajust_raison")?.value.trim();
-
   const tauxKm = taux.taux_km || 0;
   const tauxH = taux.taux_h || 0;
 
   let htmlAjust = "";
 
-  const bonusKm = ajustKm > 0 && justification ? ajustKm * tauxKm : 0;
-  const bonusH = ajustHeures > 0 && justification ? ajustHeures * tauxH : 0;
+  const bonusKm = ajustKm > 0 ? ajustKm * tauxKm : 0;
+  const bonusH = ajustHeures > 0 ? ajustHeures * tauxH : 0;
 
   if (bonusKm > 0 || bonusH > 0) {
     htmlAjust += `<hr/><p><strong>Ajustements manuels :</strong></p>`;
     if (bonusKm > 0) htmlAjust += `<p>+ ${ajustKm}km supplémentaires = ${(bonusKm).toFixed(2)}$</p>`;
     if (bonusH > 0) htmlAjust += `<p>+ ${ajustHeures}h supplémentaires = ${(bonusH).toFixed(2)}$</p>`;
-    htmlAjust += `<p class="text-muted small">Justification : ${justification}</p>`;
+    htmlAjust += `<p class="text-muted small">Justification : ${justification || '(non précisée)'}</p>`;
   }
 
   const totalFinal = montantKm + montantH + totalPrime + bonusKm + bonusH;
-
   resumeContent.innerHTML = html + htmlAjust +
     `<hr/><p><strong>Total payé estimé:</strong> ${totalFinal.toFixed(2)}$</p>`;
 }
@@ -869,6 +867,14 @@ function calculerResumeAvecAjustements() {
   });
 });
 
+const ajHr = parseFloat(document.getElementById("ajust_hr")?.value || "0");
+const ajKm = parseFloat(document.getElementById("ajust_km")?.value || "0");
+const ajRaison = document.getElementById("ajust_raison")?.value.trim();
+
+if ((ajHr > 0 || ajKm > 0) && !ajRaison) {
+  alert("Merci de fournir une justification pour les ajustements manuels.");
+  return;
+}
   document.getElementById("btn-confirm").addEventListener("click", () => {
     const formData = new FormData(document.getElementById("formulaire"));
     const data = {};

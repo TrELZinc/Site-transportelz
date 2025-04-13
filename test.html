@@ -869,10 +869,6 @@ const ajHr = parseFloat(document.getElementById("ajust_hr")?.value || "0");
 const ajKm = parseFloat(document.getElementById("ajust_km")?.value || "0");
 const ajRaison = document.getElementById("ajust_raison")?.value.trim();
 
-if ((ajHr > 0 || ajKm > 0) && !ajRaison) {
-  alert("Merci de fournir une justification pour les ajustements manuels.");
-  return;
-}
   document.getElementById("btn-confirm").addEventListener("click", () => {
     
     const ajHr = parseFloat(document.getElementById("ajust_hr")?.value || "0");

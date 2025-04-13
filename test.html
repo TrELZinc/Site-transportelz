@@ -819,8 +819,12 @@ if (!isStansteadTransfer) {
 }
 
 if (v.douane) {
+  html += `<p><strong>Forfait:</strong> 60.85$</p>`;
   html += `<p class="text-muted small">+ Prime Douane : 15.00$</p>`;
+} else {
+  html += `<p><strong>Forfait:</strong> 60.85$</p>`;
 }
+
 
 
 

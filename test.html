@@ -172,7 +172,11 @@
   outline: none;
   box-shadow: 0 0 0 0.1rem rgba(217, 83, 79, 0.25);
 }
-
+.autocomplete-list {
+  max-height: 150px;
+  overflow-y: auto;
+  min-height: 50px; /* <- clé pour éviter le collapse visuel */
+}
   </style>
 </head>
 <body>
@@ -365,7 +369,6 @@ if (!preview) {
       opt.addEventListener("click", () => {
   input.value = dest;
   listContainer.innerHTML = "";
-  listContainer.style.display = "none";
 
   // ⛔ Supprimer affichage si voyage à l'heure avec origine Vimont
   const voyageDiv = input.closest(".section-box");

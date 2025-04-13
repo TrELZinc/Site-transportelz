@@ -330,32 +330,33 @@ if (radio.value === "kilometrage") {
     });
   });
 }
-function setupAutocomplete(input, listContainer, origine) {
+
+    function setupAutocomplete(input, listContainer, origine) {
   let origineNorm = normalizeStr(origine);
 
-  // 🚦 Redirection Vimont vers St-Basile
   if (origineNorm === "vimont") {
     origineNorm = "st-basile";
   }
-  const dataOrigine = kmMap[origineNorm]; // cette ligne doit venir avant
-  const correspondants = getDestinationsPropres(dataOrigine, input);
-  
-input.addEventListener('focus', () => {
-  setTimeout(() => {
-    const rect = input.getBoundingClientRect();
-    window.scrollTo({
-      top: window.scrollY + rect.top - 100,
-      behavior: 'smooth'
-    });
-  }, 250); // après l’apparition du clavier
-});
+
+  const dataOrigine = kmMap[origineNorm]; // ✅ D'abord on extrait les données
+  if (!dataOrigine) return;
+
+  input.addEventListener('focus', () => {
+    setTimeout(() => {
+      const rect = input.getBoundingClientRect();
+      window.scrollTo({
+        top: window.scrollY + rect.top - 100,
+        behavior: 'smooth'
+      });
+    }, 250);
+  });
 
   let preview = input.parentNode.querySelector(".text-muted.mt-1");
-if (!preview) {
-  preview = document.createElement("div");
-  preview.className = "text-muted mt-1 small";
-  input.parentNode.appendChild(preview);
-}
+  if (!preview) {
+    preview = document.createElement("div");
+    preview.className = "text-muted mt-1 small";
+    input.parentNode.appendChild(preview);
+  }
 
   input.addEventListener("input", () => {
     const valeur = normalizeStr(input.value);
@@ -363,39 +364,30 @@ if (!preview) {
     listContainer.style.display = "none";
     preview.textContent = "";
 
-    if (!valeur || !dataOrigine) return;
-
-    const correspondants = Object.keys(dataOrigine).filter(dest =>
-      normalizeStr(dest).includes(valeur)
-    );
+    const correspondants = getDestinationsPropres(dataOrigine, input); // ✅ Appelé ici après dataOrigine
 
     if (correspondants.length === 0) return;
 
     correspondants.forEach(dest => {
-      const destNorm = normalizeStr(dest);
       const distanceKm = dataOrigine[dest];
-
       const opt = document.createElement("div");
       opt.className = "p-2 border-bottom";
       opt.style.cursor = "pointer";
       opt.textContent = dest;
 
       opt.addEventListener("click", () => {
-  input.value = dest;
-  listContainer.innerHTML = "";
+        input.value = dest;
+        listContainer.innerHTML = "";
 
-  // ⛔ Supprimer affichage si voyage à l'heure avec origine Vimont
-  const voyageDiv = input.closest(".section-box");
-  const origineSelect = voyageDiv?.querySelector("select[name^='origine_']");
-  const typeHeure = voyageDiv?.querySelector("input[type=radio][value=heure]")?.checked;
+        const voyageDiv = input.closest(".section-box");
+        const origineSelect = voyageDiv?.querySelector("select[name^='origine_']");
+        const typeHeure = voyageDiv?.querySelector("input[type=radio][value=heure]")?.checked;
+        const isHeureVimont = typeHeure && origineSelect?.value === "Vimont";
 
-  const isHeureVimont = typeHeure && origineSelect?.value === "Vimont";
-
-  preview.textContent = (!isHeureVimont && distanceKm !== undefined)
-    ? `Distance estimée : ${Math.round(distanceKm)} km`
-    : "";
-});
-
+        preview.textContent = (!isHeureVimont && distanceKm !== undefined)
+          ? `Distance estimée : ${Math.round(distanceKm)} km`
+          : "";
+      });
 
       listContainer.appendChild(opt);
     });
@@ -404,21 +396,20 @@ if (!preview) {
   });
 
   input.addEventListener("blur", () => {
-  setTimeout(() => {
-    const valeur = normalizeStr(input.value);
-    const distanceKm = dataOrigine?.[Object.keys(dataOrigine).find(d => normalizeStr(d) === valeur)];
+    setTimeout(() => {
+      const valeur = normalizeStr(input.value);
+      const distanceKm = dataOrigine?.[Object.keys(dataOrigine).find(d => normalizeStr(d) === valeur)];
 
-    const voyageDiv = input.closest(".section-box");
-    const origineSelect = voyageDiv?.querySelector("select[name^='origine_']");
-    const typeHeure = voyageDiv?.querySelector("input[type=radio][value=heure]")?.checked;
-    const isHeureVimont = typeHeure && origineSelect?.value === "Vimont";
+      const voyageDiv = input.closest(".section-box");
+      const origineSelect = voyageDiv?.querySelector("select[name^='origine_']");
+      const typeHeure = voyageDiv?.querySelector("input[type=radio][value=heure]")?.checked;
+      const isHeureVimont = typeHeure && origineSelect?.value === "Vimont";
 
-    preview.textContent = (!isHeureVimont && distanceKm !== undefined)
-      ? `Distance estimée : ${Math.round(distanceKm)} km`
-      : "";
-  }, 200);
-});
-
+      preview.textContent = (!isHeureVimont && distanceKm !== undefined)
+        ? `Distance estimée : ${Math.round(distanceKm)} km`
+        : "";
+    }, 200);
+  });
 
   document.addEventListener("click", (e) => {
     if (!listContainer.contains(e.target) && e.target !== input) {
@@ -426,7 +417,6 @@ if (!preview) {
     }
   });
 }
-
 
 
 function generateHeureHtml(id) {

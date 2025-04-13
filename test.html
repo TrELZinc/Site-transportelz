@@ -322,10 +322,14 @@ function setupAutocomplete(input, listContainer, origine) {
 
   const dataOrigine = kmMap[origineNorm];
   
-  input.addEventListener('focus', () => {
+input.addEventListener('focus', () => {
   setTimeout(() => {
-    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, 300); // temporisation pour laisser le clavier mobile se déployer
+    const rect = input.getBoundingClientRect();
+    window.scrollTo({
+      top: window.scrollY + rect.top - 100,
+      behavior: 'smooth'
+    });
+  }, 350); // après l’apparition du clavier
 });
 
   let preview = input.parentNode.querySelector(".text-muted.mt-1");

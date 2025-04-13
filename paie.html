@@ -210,7 +210,9 @@
       </div>
 
       <div id="voyageContainer"></div>
-
+<div id="formError" class="alert alert-danger d-none" role="alert">
+  Merci de remplir tous les champs obligatoires avant de prévisualiser.
+</div>
       <button type="button" class="btn btn-primary w-100 mt-3" id="btn-preview">Prévisualiser</button>
     </form>
   </div>
@@ -595,28 +597,54 @@ section.querySelectorAll('.fuel-toggle input[type="radio"]').forEach(input => {
   });
 });
 
-// Interactions dynamiques (pour le champ "autre" + litres)
+// DIESEL
 const dieselRadios = section.querySelectorAll('input[name="diesel"]');
-const dieselSpec = section.querySelector("#diesel_spec");
 const dieselLitres = section.querySelector("#litres_diesel_block");
+const dieselAutreInput = section.querySelector("#diesel_spec_direct");
 
-dieselRadios.forEach((r) => {
-  r.addEventListener("change", () => {
-    dieselSpec.classList.toggle("d-none", r.id !== "diesel_autre");
-    dieselLitres.classList.toggle("d-none", r.value === "non");
+// Si on clique sur un bouton radio
+dieselRadios.forEach((radio) => {
+  radio.addEventListener("change", () => {
+    if (radio.checked && radio.value !== "non") {
+      dieselLitres.classList.remove("d-none");
+    } else if (radio.checked && radio.value === "non") {
+      dieselLitres.classList.add("d-none");
+    }
   });
 });
 
-  const ureeRadios = document.querySelectorAll('input[name="uree"]');
-  const ureeSpec = document.getElementById("uree_spec");
-  const ureeLitres = document.getElementById("litres_uree_block");
-
-  ureeRadios.forEach((r) => {
-    r.addEventListener("change", () => {
-      ureeSpec.classList.toggle("d-none", r.id !== "uree_autre");
-      ureeLitres.classList.toggle("d-none", r.value === "non");
-    });
+// Si on clique dans le champ Autre
+dieselAutreInput.addEventListener("focus", () => {
+  dieselRadios.forEach(r => {
+    r.checked = false;
+    r.closest('.fuel-toggle').classList.remove("active");
   });
+  dieselLitres.classList.remove("d-none");
+});
+
+
+// URÉE
+const ureeRadios = section.querySelectorAll('input[name="uree"]');
+const ureeLitres = section.querySelector("#litres_uree_block");
+const ureeAutreInput = section.querySelector("#uree_spec_direct");
+
+ureeRadios.forEach((radio) => {
+  radio.addEventListener("change", () => {
+    if (radio.checked && radio.value !== "non") {
+      ureeLitres.classList.remove("d-none");
+    } else if (radio.checked && radio.value === "non") {
+      ureeLitres.classList.add("d-none");
+    }
+  });
+});
+
+ureeAutreInput.addEventListener("focus", () => {
+  ureeRadios.forEach(r => {
+    r.checked = false;
+    r.closest('.fuel-toggle').classList.remove("active");
+  });
+  ureeLitres.classList.remove("d-none");
+});
 }
   </script>
   <!-- Résumé -->
@@ -676,10 +704,22 @@ document.addEventListener("DOMContentLoaded", () => {
 btnPreview.addEventListener("click", () => {
   const formEl = document.getElementById("formulaire");
 
-  if (!formEl.checkValidity()) {
-    formEl.reportValidity();
-    return;
-  }
+  const formError = document.getElementById("formError");
+
+if (!formEl.checkValidity()) {
+  formEl.reportValidity();
+  formError.classList.remove("d-none");
+
+  // Optionnel : cache après 4 secondes
+  setTimeout(() => {
+    formError.classList.add("d-none");
+  }, 4000);
+
+  return;
+}
+
+// Si le formulaire est valide, on cache l'erreur si affichée
+formError.classList.add("d-none");
 
   const data = new FormData(formEl);
   const chauffeur = data.get("nom");

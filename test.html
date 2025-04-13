@@ -602,8 +602,11 @@ const dieselLitres = section.querySelector("#litres_diesel_block");
 
 dieselRadios.forEach((r) => {
   r.addEventListener("change", () => {
-    dieselSpec.classList.toggle("d-none", r.id !== "diesel_autre");
-    dieselLitres.classList.toggle("d-none", r.value === "non");
+    const isAutre = r.id === "diesel_autre";
+    dieselSpec.classList.toggle("d-none", !isAutre);
+    
+    // Affiche litres si c’est une option autre que "non"
+    dieselLitres.classList.toggle("d-none", r.value === "non" || (!r.checked && !isAutre));
   });
 });
 
@@ -611,12 +614,13 @@ dieselRadios.forEach((r) => {
   const ureeSpec = document.getElementById("uree_spec");
   const ureeLitres = document.getElementById("litres_uree_block");
 
-  ureeRadios.forEach((r) => {
-    r.addEventListener("change", () => {
-      ureeSpec.classList.toggle("d-none", r.id !== "uree_autre");
-      ureeLitres.classList.toggle("d-none", r.value === "non");
-    });
+ureeRadios.forEach((r) => {
+  r.addEventListener("change", () => {
+    const isAutre = r.id === "uree_autre";
+    ureeSpec.classList.toggle("d-none", !isAutre);
+    ureeLitres.classList.toggle("d-none", r.value === "non" || (!r.checked && !isAutre));
   });
+});
 }
   </script>
   <!-- Résumé -->

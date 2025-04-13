@@ -595,28 +595,22 @@ section.querySelectorAll('.fuel-toggle input[type="radio"]').forEach(input => {
   });
 });
 
-// Interactions dynamiques (pour le champ "autre" + litres)
 const dieselRadios = section.querySelectorAll('input[name="diesel"]');
-const dieselSpec = section.querySelector("#diesel_spec");
 const dieselLitres = section.querySelector("#litres_diesel_block");
 
-dieselRadios.forEach((r) => {
-  r.addEventListener("change", () => {
-    const isAutre = r.id === "diesel_autre";
-    dieselSpec.classList.toggle("d-none", !isAutre);
-    dieselLitres.classList.toggle("d-none", r.value !== "non");
+dieselRadios.forEach((radio) => {
+  radio.addEventListener("change", () => {
+    // Affiche les litres si la réponse est différente de "non"
+    dieselLitres.classList.toggle("d-none", radio.value === "non");
   });
 });
 
-  const ureeRadios = document.querySelectorAll('input[name="uree"]');
-  const ureeSpec = document.getElementById("uree_spec");
-  const ureeLitres = document.getElementById("litres_uree_block");
+  const ureeRadios = section.querySelectorAll('input[name="uree"]');
+const ureeLitres = section.querySelector("#litres_uree_block");
 
-ureeRadios.forEach((r) => {
-  r.addEventListener("change", () => {
-    const isAutre = r.id === "uree_autre";
-    ureeSpec.classList.toggle("d-none", !isAutre);
-    ureeLitres.classList.toggle("d-none", r.value !== "non");
+ureeRadios.forEach((radio) => {
+  radio.addEventListener("change", () => {
+    ureeLitres.classList.toggle("d-none", radio.value === "non");
   });
 });
 }

@@ -849,6 +849,10 @@ function calculerResumeAvecAjustements() {
   
   formEl.classList.add("d-none");
   resumeContainer.classList.remove("d-none");
+  btnModifier.addEventListener("click", () => {
+  resumeContainer.classList.add("d-none");
+  form.classList.remove("d-none");
+});
 
   document.getElementById("btn-confirm").addEventListener("click", () => {
     const formData = new FormData(document.getElementById("formulaire"));

@@ -1,53 +1,95 @@
-<!-- PROJET: Sommaire Paye Chauffeurs -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Sommaire Paye Chauffeur</title>
+  <title>Paye Chauffeur - Semaine</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
-    body { background-color: #f8f9fa; }
-    .week-container { display: flex; flex-direction: row; gap: 12px; overflow-x: auto; margin-bottom: 30px; }
-    .day-card {
-      flex: 1;
-      min-width: 240px;
+    body {
+      background: #f8f9fa;
+    }
+    .pastille {
       background: white;
-      border-radius: 8px;
+      border: 2px solid #dee2e6;
+      border-radius: 12px;
       padding: 16px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      min-width: 220px;
     }
-    .day-card h5 {
-      font-size: 1rem;
-      font-weight: bold;
+    .pastille h5 {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
     }
-    .editable { background-color: #fff3cd; padding: 4px; border-radius: 4px; }
+    .pastille .details {
+      font-size: 0.9rem;
+      line-height: 1.3;
+    }
+    .grid-week {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 12px;
+      overflow-x: auto;
+      margin-bottom: 2rem;
+    }
+    .summary-box {
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      padding: 1rem;
+      background: #ffffff;
+    }
+    .summary-box h5 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
   </style>
 </head>
 <body class="p-4">
+
   <div class="container">
-    <h3>Sommaire hebdomadaire chauffeur</h3>
-    
-    <div class="row mb-3">
-      <div class="col-md-3">
-        <label>Nom chauffeur</label>
-        <input type="text" id="chauffeur" class="form-control" placeholder="Ex: Jean Tremblay" />
+    <h2 class="mb-4">Semaine de paie - Visualisation</h2>
+
+    <!-- Sélection -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-4">
+        <label class="form-label">Nom du chauffeur</label>
+        <select id="chauffeurSelect" class="form-select">
+          <option value="">-- Choisir --</option>
+          <option value="Jean Tremblay">Jean Tremblay</option>
+          <option value="Marie Dubois">Marie Dubois</option>
+          <option value="Luc Desjardins">Luc Desjardins</option>
+        </select>
       </div>
-      <div class="col-md-3">
-        <label>Date du lundi</label>
-        <input type="date" id="dateLundi" class="form-control" />
+      <div class="col-md-4">
+        <label class="form-label">Date d'une journée de la semaine</label>
+        <input type="date" id="dateInput" class="form-control" />
       </div>
-      <div class="col-md-6 d-flex align-items-end gap-2">
-        <button class="btn btn-outline-secondary" onclick="chargerDepuisSheets()">Afficher depuis Google Sheets</button>
-        <button class="btn btn-outline-success" onclick="sauverDansFirebase()">Enregistrer dans Firebase</button>
-        <button class="btn btn-outline-primary" onclick="chargerDepuisFirebase()">Afficher Firebase</button>
+      <div class="col-md-4 d-flex align-items-end">
+        <button class="btn btn-primary w-100" onclick="loadSemaine()">Charger la semaine enregistrée</button>
       </div>
     </div>
 
-    <div id="weekDisplay" class="week-container"></div>
+    <!-- Pastilles -->
+    <div class="grid-week" id="pastillesContainer">
+      <!-- pastilles journalières générées ici -->
+    </div>
+
+    <!-- Sommaire -->
+    <div class="summary-box">
+      <h5>Totaux de la semaine</h5>
+      <p><strong>Kilomètres totaux :</strong> <span id="totalKm">0</span> km</p>
+      <p><strong>Heures totales :</strong> <span id="totalH">0h00</span></p>
+      <p><strong>Forfaits / Primes :</strong> <span id="totalPrime">0.00</span> $</p>
+    </div>
+
+    <div class="mt-4 d-flex gap-3">
+      <button class="btn btn-secondary" onclick="changerSemaine()">Changer la semaine</button>
+      <button class="btn btn-success" onclick="sauvegarderSemaine()">Enregistrer cette semaine dans Firebase</button>
+    </div>
   </div>
 
-  <!-- Firebase SDK compat -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script>
@@ -59,110 +101,77 @@
       messagingSenderId: "171788284751",
       appId: "1:171788284751:web:694f070d1cafe8b7c04b3a"
     };
-
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+  </script>
 
+  <!-- JS logique -->
+  <script>
     function getWeekDates(dateStr) {
-      const lundi = new Date(dateStr);
+      const date = new Date(dateStr);
+      const monday = new Date(date.setDate(date.getDate() - date.getDay() + 1));
       const dates = [];
       for (let i = 0; i < 7; i++) {
-        const d = new Date(lundi);
-        d.setDate(lundi.getDate() + i);
-        dates.push(d.toISOString().split('T')[0]);
+        const d = new Date(monday);
+        d.setDate(monday.getDate() + i);
+        dates.push(d.toISOString().split("T")[0]);
       }
       return dates;
     }
 
-    function afficherSemaine(data) {
-      const container = document.getElementById("weekDisplay");
-      container.innerHTML = "";
+    function loadSemaine() {
+      const chauffeur = document.getElementById("chauffeurSelect").value;
+      const date = document.getElementById("dateInput").value;
+      if (!chauffeur || !date) return alert("Sélectionnez un chauffeur et une date");
 
-      data.forEach(entry => {
-        const div = document.createElement("div");
-        div.className = "day-card";
+      const dates = getWeekDates(date);
+      document.getElementById("pastillesContainer").innerHTML = "";
 
-        div.innerHTML = `
-          <h5>${entry.date}</h5>
-          <p><strong>Origine:</strong> ${entry.origine}</p>
-          <p><strong>Destination:</strong> ${entry.destination}</p>
-          <p><strong>Type:</strong> ${entry.type}</p>
-          <p><strong>KM:</strong> <span contenteditable class="editable">${entry.km || 0}</span></p>
-          <p><strong>Heures:</strong> <span contenteditable class="editable">${entry.heure || 0}</span></p>
-        `;
-        container.appendChild(div);
+      let totalKm = 0, totalMin = 0, totalPrime = 0;
+
+      dates.forEach(day => {
+        db.collection("paye_semaine")
+          .where("chauffeur", "==", chauffeur)
+          .where("date", "==", day)
+          .limit(1)
+          .get()
+          .then(snapshot => {
+            if (!snapshot.empty) {
+              const data = snapshot.docs[0].data();
+              totalKm += data.km || 0;
+              totalMin += data.minutes || 0;
+              totalPrime += data.prime || 0;
+
+              const pastille = document.createElement("div");
+              pastille.className = "pastille";
+              pastille.innerHTML = `
+                <h5>${new Date(day).toLocaleDateString("fr-CA", { weekday: "long", day: "numeric", month: "short" })}</h5>
+                <div class="details">
+                  <div><strong>Destination:</strong> ${data.destination || "—"}</div>
+                  <div><strong>KM:</strong> ${data.km || 0}</div>
+                  <div><strong>Heures:</strong> ${Math.floor((data.minutes || 0) / 60)}h${String((data.minutes || 0) % 60).padStart(2, '0')}</div>
+                  <div><strong>Forfait:</strong> ${data.prime?.toFixed(2) || "0.00"} $</div>
+                </div>`;
+              document.getElementById("pastillesContainer").appendChild(pastille);
+              document.getElementById("totalKm").textContent = totalKm;
+              document.getElementById("totalH").textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2, '0')}`;
+              document.getElementById("totalPrime").textContent = totalPrime.toFixed(2);
+            }
+          });
       });
     }
 
-    // Placeholder : simulation données depuis Google Sheets
-    function chargerDepuisSheets() {
-      const chauffeur = document.getElementById("chauffeur").value;
-      const dateLundi = document.getElementById("dateLundi").value;
-      const dates = getWeekDates(dateLundi);
-
-      // Simule données journalières
-      const data = dates.map(d => ({
-        date: d,
-        origine: "St-Basile",
-        destination: "Montréal",
-        type: "kilométrage",
-        km: Math.floor(Math.random() * 300),
-        heure: 0
-      }));
-
-      afficherSemaine(data);
-      window._currentSemaine = data;
+    function changerSemaine() {
+      document.getElementById("dateInput").value = "";
+      document.getElementById("pastillesContainer").innerHTML = "";
+      document.getElementById("totalKm").textContent = "0";
+      document.getElementById("totalH").textContent = "0h00";
+      document.getElementById("totalPrime").textContent = "0.00";
     }
 
-    function sauverDansFirebase() {
-      if (!window._currentSemaine) return alert("Aucune donnée à enregistrer.");
-      const chauffeur = document.getElementById("chauffeur").value;
-      const semaineKey = document.getElementById("dateLundi").value;
-
-      // Lire les valeurs modifiées
-      const cards = document.querySelectorAll(".day-card");
-      const sauvegarde = [];
-
-      cards.forEach(card => {
-        const spans = card.querySelectorAll(".editable");
-        const km = parseFloat(spans[0].innerText || 0);
-        const heure = parseFloat(spans[1].innerText || 0);
-        const date = card.querySelector("h5").textContent;
-        const origine = card.querySelector("p:nth-child(2)").textContent.replace("Origine: ", "");
-        const destination = card.querySelector("p:nth-child(3)").textContent.replace("Destination: ", "");
-        const type = card.querySelector("p:nth-child(4)").textContent.replace("Type: ", "");
-
-        sauvegarde.push({ date, origine, destination, type, km, heure });
-      });
-
-      db.collection("paye_sommaire").add({
-        chauffeur,
-        semaine: semaineKey,
-        timestamp: new Date(),
-        jours: sauvegarde
-      }).then(() => {
-        alert("✅ Semaine enregistrée dans Firebase !");
-      });
-    }
-
-    function chargerDepuisFirebase() {
-      const chauffeur = document.getElementById("chauffeur").value;
-      const semaineKey = document.getElementById("dateLundi").value;
-
-      db.collection("paye_sommaire")
-        .where("chauffeur", "==", chauffeur)
-        .where("semaine", "==", semaineKey)
-        .orderBy("timestamp", "desc")
-        .limit(1)
-        .get()
-        .then(snapshot => {
-          if (!snapshot.empty) {
-            const data = snapshot.docs[0].data();
-            afficherSemaine(data.jours);
-          } else {
-            alert("📭 Aucune donnée trouvée pour cette semaine dans Firebase.");
-          }
-        });
+    function sauvegarderSemaine() {
+      alert("Fonction SAVE désactivée ici pour éviter d’écraser les données — à activer quand prêt.");
+      // Tu pourras copier la logique de sauvegarde depuis ton autre projet ici
     }
   </script>
 </body>

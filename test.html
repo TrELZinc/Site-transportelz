@@ -818,6 +818,11 @@ if (!isStansteadTransfer) {
   totalPrime += 0 + primeDouane;
 }
 
+if (v.douane) {
+  html += `<p class="text-muted small">+ Prime Douane : 15.00$</p>`;
+}
+
+
 
     } else {
       html += `<p><strong>${v.destination} - Heure:</strong> ${v.h1}h${v.m1.toString().padStart(2, "0")} → ${v.h2}h${v.m2.toString().padStart(2, "0")}</p>`;

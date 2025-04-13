@@ -604,9 +604,7 @@ dieselRadios.forEach((r) => {
   r.addEventListener("change", () => {
     const isAutre = r.id === "diesel_autre";
     dieselSpec.classList.toggle("d-none", !isAutre);
-    
-    // Affiche litres si c’est une option autre que "non"
-    dieselLitres.classList.toggle("d-none", r.value === "non" || (!r.checked && !isAutre));
+    dieselLitres.classList.toggle("d-none", r.value !== "non");
   });
 });
 
@@ -618,7 +616,7 @@ ureeRadios.forEach((r) => {
   r.addEventListener("change", () => {
     const isAutre = r.id === "uree_autre";
     ureeSpec.classList.toggle("d-none", !isAutre);
-    ureeLitres.classList.toggle("d-none", r.value === "non" || (!r.checked && !isAutre));
+    ureeLitres.classList.toggle("d-none", r.value !== "non");
   });
 });
 }

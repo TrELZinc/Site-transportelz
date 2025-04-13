@@ -3,138 +3,167 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Résumé Hebdomadaire Chauffeur</title>
+  <title>Sommaire des Payes</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
     body {
-      background-color: #f8f9fa;
-      color: #212529;
+      background: #f8f9fa;
     }
-    .card-day {
-      flex: 1;
-      min-width: 250px;
-      background: #ffffff;
-      border: 1px solid #dee2e6;
-      border-radius: 10px;
-      padding: 15px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.05);
-      transition: all 0.2s ease-in-out;
+    .pastille {
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 12px;
+      min-width: 160px;
+      height: 140px;
+      overflow-y: auto;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
-    .card-day:hover {
-      box-shadow: 0 0 12px rgba(0,0,0,0.1);
+    .pastille textarea {
+      width: 100%;
+      resize: vertical;
+      font-size: 0.85rem;
     }
-    .card-day h5 {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 10px;
-    }
-    .editable {
-      border: 1px dashed transparent;
-      padding: 4px 8px;
-      border-radius: 4px;
-    }
-    .editable:hover {
-      border-color: #ccc;
-      background-color: #f8f9fa;
-      cursor: pointer;
+    .driver-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 2rem;
+      align-items: flex-start;
     }
   </style>
 </head>
-<body>
-  <div class="container py-4">
-    <h2 class="text-center mb-4">Résumé Hebdomadaire</h2>
-    <form id="selection-form" class="row g-3 mb-4">
-      <div class="col-md-4">
-        <label class="form-label">Chauffeur</label>
-        <select id="chauffeurSelect" class="form-select" required>
-          <option value="">-- Choisir --</option>
-        </select>
-      </div>
-      <div class="col-md-4">
-        <label class="form-label">Date de début</label>
-        <input type="date" id="startDate" class="form-control" required />
-      </div>
-      <div class="col-md-4 d-flex align-items-end">
-        <button type="submit" class="btn btn-primary w-100">Afficher la semaine</button>
-      </div>
-    </form>
+<body class="container py-4">
 
-    <div id="week-summary" class="d-flex justify-content-between gap-3 flex-wrap"></div>
+  <h2 class="mb-4 text-center">Semaine de paie des chauffeurs</h2>
+
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <label class="form-label">Nom du chauffeur</label>
+      <select id="chauffeurSelect" class="form-select">
+        <option value="">-- Choisir --</option>
+        <option value="Mathieu">Mathieu</option>
+        <option value="Claude">Claude</option>
+        <option value="Simon">Simon</option>
+        <!-- Ajoute d'autres noms ici -->
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Date de début de semaine</label>
+      <input type="date" class="form-control" id="dateDebut" />
+    </div>
+    <div class="col-md-4 d-flex align-items-end">
+      <button class="btn btn-primary w-100" onclick="chargerSemaine()">Charger la semaine</button>
+    </div>
   </div>
 
+  <div id="semaineContainer"></div>
+
+  <div class="text-end mt-4">
+    <button class="btn btn-success" onclick="sauvegarder()">Enregistrer cette semaine</button>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
   <script>
-    const chauffeurSelect = document.getElementById("chauffeurSelect");
-    const form = document.getElementById("selection-form");
-    const summaryContainer = document.getElementById("week-summary");
+    const firebaseConfig = {
+      apiKey: "AIzaSyD4U85mokKXsAP1AdwClWtcbt8udZrwlAw",
+      authDomain: "sommaireelz.firebaseapp.com",
+      projectId: "sommaireelz",
+      storageBucket: "sommaireelz.firebasestorage.app",
+      messagingSenderId: "171788284751",
+      appId: "1:171788284751:web:694f070d1cafe8b7c04b3a"
+    };
 
-    // Exemple local de données chauffeurs
-    const chauffeurs = [
-      { nom: "Alex Tremblay", id: "alex" },
-      { nom: "Marc Gagnon", id: "marc" },
-      { nom: "Julie Lefebvre", id: "julie" }
-    ];
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const collectionName = "paye_chauffeurs";
 
-    // Mock data pour résumé jour
-    function getMockDayData(date, chauffeurId) {
-      return {
-        date,
-        chauffeurId,
-        km: Math.floor(Math.random() * 200),
-        heures: (Math.random() * 8).toFixed(2),
-        prime: 60.85,
-        note: ""
-      };
-    }
-
-    function getNextDays(startDate, count) {
-      const dates = [];
-      const base = new Date(startDate);
-      for (let i = 0; i < count; i++) {
-        const d = new Date(base);
-        d.setDate(base.getDate() + i);
-        dates.push(d.toISOString().split("T")[0]);
+    function getSemaine(dateStr) {
+      const base = new Date(dateStr);
+      const lundi = new Date(base.setDate(base.getDate() - base.getDay() + 1));
+      const jours = [];
+      for (let i = 0; i < 5; i++) {
+        const d = new Date(lundi);
+        d.setDate(lundi.getDate() + i);
+        jours.push(d.toISOString().split('T')[0]);
       }
-      return dates;
+      return jours;
     }
 
-    function createDayCard(dayData) {
-      const div = document.createElement("div");
-      div.className = "card-day";
+    function chargerSemaine() {
+      const chauffeur = document.getElementById("chauffeurSelect").value;
+      const dateDebut = document.getElementById("dateDebut").value;
+      if (!chauffeur || !dateDebut) {
+        alert("Veuillez sélectionner le chauffeur et la date.");
+        return;
+      }
 
-      div.innerHTML = `
-        <h5>${new Date(dayData.date).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "short" })}</h5>
-        <p><strong>KM:</strong> <span class="editable" contenteditable="true">${dayData.km}</span></p>
-        <p><strong>Heures:</strong> <span class="editable" contenteditable="true">${dayData.heures}</span></p>
-        <p><strong>Prime:</strong> <span class="editable" contenteditable="true">${dayData.prime}</span> $</p>
-        <p><strong>Note:</strong> <span class="editable" contenteditable="true">${dayData.note}</span></p>
-      `;
+      const jours = getSemaine(dateDebut);
+      const container = document.getElementById("semaineContainer");
+      container.innerHTML = "";
 
-      return div;
-    }
+      const row = document.createElement("div");
+      row.className = "driver-row";
 
-    // Init chauffeurs
-    chauffeurs.forEach(ch => {
-      const opt = document.createElement("option");
-      opt.value = ch.id;
-      opt.textContent = ch.nom;
-      chauffeurSelect.appendChild(opt);
-    });
+      jours.forEach(date => {
+        const div = document.createElement("div");
+        div.className = "pastille";
+        div.dataset.date = date;
 
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      summaryContainer.innerHTML = "";
+        div.innerHTML = `
+          <strong>${date}</strong>
+          <textarea placeholder="Résumé du jour" rows="6"></textarea>
+        `;
 
-      const chauffeurId = chauffeurSelect.value;
-      const start = document.getElementById("startDate").value;
-
-      if (!chauffeurId || !start) return;
-
-      const dates = getNextDays(start, 5);
-      dates.forEach(date => {
-        const data = getMockDayData(date, chauffeurId);
-        summaryContainer.appendChild(createDayCard(data));
+        row.appendChild(div);
       });
-    });
+
+      container.appendChild(row);
+
+      // Charger données existantes
+      db.collection(collectionName)
+        .where("chauffeur", "==", chauffeur)
+        .where("semaine", "==", jours[0])
+        .limit(1)
+        .get()
+        .then(snapshot => {
+          if (!snapshot.empty) {
+            const data = snapshot.docs[0].data();
+            row.querySelectorAll(".pastille").forEach((el, idx) => {
+              el.querySelector("textarea").value = data.jours[idx]?.texte || "";
+            });
+          }
+        });
+    }
+
+    function sauvegarder() {
+      const chauffeur = document.getElementById("chauffeurSelect").value;
+      const dateDebut = document.getElementById("dateDebut").value;
+      if (!chauffeur || !dateDebut) {
+        alert("Champs manquants !");
+        return;
+      }
+
+      const jours = getSemaine(dateDebut);
+      const resume = Array.from(document.querySelectorAll(".pastille")).map(p => ({
+        date: p.dataset.date,
+        texte: p.querySelector("textarea").value.trim()
+      }));
+
+      db.collection(collectionName).add({
+        chauffeur,
+        semaine: jours[0],
+        jours: resume,
+        timestamp: new Date()
+      }).then(() => {
+        alert("✅ Sauvegarde réussie !");
+      }).catch(err => {
+        console.error("Erreur Firebase :", err);
+        alert("❌ Erreur d’enregistrement Firebase.");
+      });
+    }
   </script>
 </body>
 </html>

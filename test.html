@@ -860,22 +860,6 @@ function calculerResumeAvecAjustements() {
   resumeContainer.classList.add("d-none");
   form.classList.remove("d-none");
 });
-
-  document.getElementById("btn-confirm").addEventListener("click", () => {
-    const formData = new FormData(document.getElementById("formulaire"));
-    const data = {};
-    formData.forEach((val, key) => data[key] = val);
-
-    fetch("https://script.google.com/macros/s/AKfycbyv98mLkkZmdKET1vQPXQlJ7DD6LxhpkJ2uWcbVSjDhGcdX8tsQ0LpjQKSBtI4tMTd4/exec", {
-      method: "POST",
-      mode: "no-cors",
-      body: JSON.stringify(data),
-      headers: { "Content-Type": "application/json" }
-    });
-
-    resumeContainer.classList.add("d-none");
-    document.getElementById("confirmationContainer").classList.remove("d-none");
-  });
 });
 
 const ajHr = parseFloat(document.getElementById("ajust_hr")?.value || "0");

@@ -932,6 +932,10 @@ const ajRaison = document.getElementById("ajust_raison")?.value.trim();
   const formData = new FormData(document.getElementById("formulaire"));
   const data = {};
   formData.forEach((val, key) => data[key] = val);
+// Ajouter manuellement les ajustements à l'objet data
+data["ajust_hr"] = document.getElementById("ajust_hr")?.value || "";
+data["ajust_km"] = document.getElementById("ajust_km")?.value || "";
+data["ajust_raison"] = document.getElementById("ajust_raison")?.value || "";
 
   fetch("https://script.google.com/macros/s/AKfycbyv98mLkkZmdKET1vQPXQlJ7DD6LxhpkJ2uWcbVSjDhGcdX8tsQ0LpjQKSBtI4tMTd4/exec", {
     method: "POST",

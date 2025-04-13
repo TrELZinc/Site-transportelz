@@ -812,17 +812,14 @@ formError.classList.add("d-none");
       html += `<p><strong>${label}:</strong> ${kmPayes}km</p>`;
       totalKm += kmPayes;
 
-      if (!isStansteadTransfer) {
-        totalPrime += 60.85;
-      } else {
-        totalPrime += 0;
-      }
+      const primeDouane = v.douane ? 15 : 0;
 
-      // Exception DOUANE
-      if (kmMap[normalizeStr(v.origine)]?.[normalizeStr(v.destination) + "_DOUANE"] === true) {
-        html += `<p class="text-muted small">+ $ Douane : 15.00$</p>`;
-        totalPrime += 15;
-      }
+if (!isStansteadTransfer) {
+  totalPrime += 60.85 + primeDouane;
+} else {
+  totalPrime += 0 + primeDouane;
+}
+
 
     } else {
       html += `<p><strong>${v.destination} - Heure:</strong> ${v.h1}h${v.m1.toString().padStart(2, "0")} → ${v.h2}h${v.m2.toString().padStart(2, "0")}</p>`;
@@ -835,43 +832,52 @@ formError.classList.add("d-none");
     }
   }
 
-  const totalH = Math.floor(totalMinutes / 60);
-  const totalM = totalMinutes % 60;
-  const montantKm = totalKm * taux.taux_km;
-  const montantH = (totalMinutes / 60) * taux.taux_h;
-  const montantFinal = montantKm + montantH + totalPrime;
+// Recalcule après boucle complétée
+const totalH = Math.floor(totalMinutes / 60);
+const totalM = totalMinutes % 60;
+const montantKm = totalKm * taux.taux_km;
+const montantH = (totalMinutes / 60) * taux.taux_h;
 
-  html += `<hr/><p><strong>KM Payés:</strong> ${totalKm}km</p>`;
-  html += `<p><strong>Heures Payées:</strong> ${totalH}h${String(totalM).padStart(2, "0")}</p>`;
-  html += `<p><strong>Forfaits & Primes:</strong> ${totalPrime.toFixed(2)}$</p>`;
-  html += `<hr/><p><strong>Total payé estimé:</strong> ${montantFinal.toFixed(2)}$</p>`;
-
+// Ajout des ajustements (avant montantFinal)
 const ajustHr = parseFloat(document.getElementById("ajust_hr")?.value || "0");
 const ajustKm = parseFloat(document.getElementById("ajust_km")?.value || "0");
 const ajustRaison = document.getElementById("ajust_raison")?.value.trim();
 
-// Vérifie justification si ajustement est ajouté
 if ((ajustHr > 0 || ajustKm > 0) && ajustRaison.length === 0) {
   alert("Merci d’ajouter une justification pour les ajustements manuels.");
   return;
 }
 
-// Ajout au résumé
+// Ajoute les valeurs aux totaux
+if (ajustKm > 0) totalKm += ajustKm;
+if (ajustHr > 0) totalMinutes += ajustHr * 60;
+
+// Recalcule montant total avec ajouts
+const montantKmFinal = totalKm * taux.taux_km;
+const montantHFinal = (totalMinutes / 60) * taux.taux_h;
+const montantFinal = montantKmFinal + montantHFinal + totalPrime;
+
+// Génération HTML
+html += `<hr/><p><strong>KM Payés:</strong> ${totalKm}km</p>`;
+html += `<p><strong>Heures Payées:</strong> ${Math.floor(totalMinutes / 60)}h${String(totalMinutes % 60).padStart(2, "0")}</p>`;
+html += `<p><strong>Forfait:</strong> 60.85$</p>`;
+
+// Affiche les ajustements
 if (ajustKm > 0) {
   html += `<p><strong>Ajustement KM:</strong> +${ajustKm} km</p>`;
-  totalKm += ajustKm;
 }
-
 if (ajustHr > 0) {
   html += `<p><strong>Ajustement heure:</strong> +${ajustHr} h</p>`;
-  totalMinutes += ajustHr * 60;
 }
-
 if (ajustHr > 0 || ajustKm > 0) {
   html += `<p class="text-muted"><strong>Justification:</strong> ${ajustRaison}</p>`;
 }
 
-  resumeContent.innerHTML = html;
+// Total final
+html += `<hr/><p><strong>Total payé estimé:</strong> ${montantFinal.toFixed(2)}$</p>`;
+
+resumeContent.innerHTML = html;
+
   
   // -- LIVE UPDATE AJUSTEMENTS --
 function calculerResumeAvecAjustements() {

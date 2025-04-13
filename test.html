@@ -337,8 +337,8 @@ function setupAutocomplete(input, listContainer, origine) {
   if (origineNorm === "vimont") {
     origineNorm = "st-basile";
   }
-
-  const dataOrigine = kmMap[origineNorm];
+  const dataOrigine = kmMap[origineNorm]; // cette ligne doit venir avant
+  const correspondants = getDestinationsPropres(dataOrigine, input);
   
 input.addEventListener('focus', () => {
   setTimeout(() => {
@@ -702,6 +702,14 @@ ureeAutreInput.addEventListener("focus", () => {
 </div>
 
 <script>
+
+  function getDestinationsPropres(dataOrigine, input) {
+  const val = normalizeStr(input.value);
+  return Object.keys(dataOrigine).filter(
+    key => !key.endsWith("_DOUANE") && normalizeStr(key).includes(val)
+  );
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const btnPreview = document.getElementById("btn-preview");
   const resumeContainer = document.getElementById("resumeContainer");

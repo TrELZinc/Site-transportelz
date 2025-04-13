@@ -1050,6 +1050,13 @@ document.querySelectorAll('input[list]').forEach(input => {
     }, 300); // délai pour laisser le clavier apparaître
   });
 });
+  console.log("→ Vérif douane", {
+  normOrig,
+  normDest,
+  hasDouaneKey: kmMap[normOrig]?.hasOwnProperty(`${normDest}_DOUANE`),
+  value: kmMap[normOrig]?.[`${normDest}_DOUANE`]
+});
+
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
  

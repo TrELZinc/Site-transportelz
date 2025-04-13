@@ -300,13 +300,12 @@ function addVoyageSection() {
         innerHTML += getSuiviHTML(id);
       }
 
-      container.innerHTML = innerHTML;
+            container.innerHTML = innerHTML;
       setupSuiviListener(id);
 
-      // ❗ Sélection des champs juste après le DOM update
-      const destinationInput = container.querySelector(`#destination_${id}`);
-      const listContainer = container.querySelector(`#autocomplete_${id}`);
-      const origineSelect = container.querySelector(`#origine_${id}`);
+      const destinationInput = section.querySelector(`#destination_${id}`);
+      const listContainer = section.querySelector(`#autocomplete_${id}`);
+      const origineSelect = section.querySelector(`#origine_${id}`);
 
       if (radio.value === "kilometrage") {
         const applyAutocomplete = () => {
@@ -315,14 +314,17 @@ function addVoyageSection() {
           setupAutocomplete(destinationInput, listContainer, sourceKey);
         };
 
+        // ❗ Important : bind l’autocomplete au chargement ET au changement d’origine
         applyAutocomplete();
         origineSelect.addEventListener("change", applyAutocomplete);
       } else {
         listContainer.style.display = "none";
         destinationInput.setAttribute("autocomplete", "off");
-        const preview = container.querySelector(".text-muted.mt-1");
+
+        const preview = destinationInput.parentNode.querySelector(".text-muted.mt-1");
         if (preview) preview.remove();
       }
+
     });
   });
 }

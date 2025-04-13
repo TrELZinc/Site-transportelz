@@ -617,6 +617,28 @@ dieselRadios.forEach((r) => {
   <div class="section-box">
     <h4 class="mb-3">Résumé de votre journée</h4>
     <div id="resumeContent"></div>
+    <div class="section-box mt-4" id="ajustementsSection">
+  <h5 class="mb-3">Ajustements manuels</h5>
+
+  <div class="row g-3">
+    <div class="col-12">
+      <label for="ajust_km" class="form-label">Kilomètres à ajouter</label>
+      <input type="number" class="form-control" id="ajust_km" placeholder="Ex: 12" />
+    </div>
+    <div class="col-12">
+      <label for="ajust_hr" class="form-label">Heures à ajouter</label>
+      <input type="number" step="0.25" class="form-control" id="ajust_hr" placeholder="Ex: 1.5" />
+    </div>
+    <div class="col-12">
+      <label for="ajust_fixe" class="form-label">Montant forfaitaire ($)</label>
+      <input type="number" step="0.01" class="form-control" id="ajust_fixe" placeholder="Ex: 30" />
+    </div>
+    <div class="col-12">
+      <label for="ajust_raison" class="form-label">Justification</label>
+      <textarea class="form-control" id="ajust_raison" rows="2" placeholder="Ex: Temps d'attente, arrêt exceptionnel..."></textarea>
+    </div>
+  </div>
+</div>
     <div class="d-flex justify-content-between mt-4">
       <button type="button" class="btn btn-secondary" id="btn-modifier">Modifier</button>
       <button type="button" class="btn btn-success" id="btn-confirm">Confirmer et envoyer</button>
@@ -765,6 +787,27 @@ btnPreview.addEventListener("click", () => {
   html += `<p><strong>Heures Payées:</strong> ${totalH}h${String(totalM).padStart(2, "0")}</p>`;
   html += `<p><strong>Forfaits & Primes:</strong> ${totalPrime.toFixed(2)}$</p>`;
   html += `<hr/><p><strong>Total payé estimé:</strong> ${montantFinal.toFixed(2)}$</p>`;
+
+// AJUSTEMENTS MANUELS
+const kmAjoute = parseFloat(document.getElementById("ajust_km")?.value || "0");
+const hrAjoute = parseFloat(document.getElementById("ajust_hr")?.value || "0");
+const montantFixe = parseFloat(document.getElementById("ajust_fixe")?.value || "0");
+const raison = document.getElementById("ajust_raison")?.value?.trim();
+
+if (kmAjoute || hrAjoute || montantFixe) {
+  const montantKm = kmAjoute * taux.taux_km;
+  const montantHr = hrAjoute * taux.taux_h;
+
+  totalKm += kmAjoute;
+  totalMinutes += hrAjoute * 60;
+  totalPrime += montantFixe;
+
+  html += `<hr/><p><strong>Ajustements manuels:</strong></p>`;
+  if (kmAjoute) html += `<p>+ ${kmAjoute} km (${montantKm.toFixed(2)}$)</p>`;
+  if (hrAjoute) html += `<p>+ ${hrAjoute} h (${montantHr.toFixed(2)}$)</p>`;
+  if (montantFixe) html += `<p>+ Forfait: ${montantFixe.toFixed(2)}$</p>`;
+  if (raison) html += `<p><em>Justification:</em> ${raison}</p>`;
+}
 
   resumeContent.innerHTML = html;
   formEl.classList.add("d-none");

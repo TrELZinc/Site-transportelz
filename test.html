@@ -275,7 +275,6 @@ function addVoyageSection() {
 
       const container = section.querySelector(`#details_${id}`);
 
-      // Génère HTML des champs dynamiques
       let innerHTML = `
         <div class="mb-3">
           <label class="form-label fw-bold text-uppercase">Origine</label>
@@ -300,7 +299,7 @@ function addVoyageSection() {
         innerHTML += getSuiviHTML(id);
       }
 
-            container.innerHTML = innerHTML;
+      container.innerHTML = innerHTML;
       setupSuiviListener(id);
 
       const destinationInput = section.querySelector(`#destination_${id}`);
@@ -309,12 +308,10 @@ function addVoyageSection() {
 
       if (radio.value === "kilometrage") {
         const applyAutocomplete = () => {
-          const origineVal = origineSelect.value.trim().toLowerCase();
-          const sourceKey = origineVal === "vimont" ? "st-basile" : origineVal;
-          setupAutocomplete(destinationInput, listContainer, sourceKey);
+          const sourceKey = normalizeStr(origineSelect.value);
+          setupAutocomplete(destinationInput, listContainer, sourceKey === "vimont" ? "st-basile" : sourceKey);
         };
 
-        // ❗ Important : bind l’autocomplete au chargement ET au changement d’origine
         applyAutocomplete();
         origineSelect.addEventListener("change", applyAutocomplete);
       } else {
@@ -324,9 +321,16 @@ function addVoyageSection() {
         const preview = destinationInput.parentNode.querySelector(".text-muted.mt-1");
         if (preview) preview.remove();
       }
-
     });
   });
+
+  // 🧪 Fix : Forcer l’activation du type kilométrage si précoché
+  setTimeout(() => {
+    const kmRadio = section.querySelector(`#km_${id}`);
+    if (kmRadio?.checked) {
+      kmRadio.dispatchEvent(new Event('change'));
+    }
+  }, 50);
 }
 
 

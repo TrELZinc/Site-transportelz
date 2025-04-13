@@ -47,6 +47,132 @@
       box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
       margin-bottom: 1.5rem;
     }
+.voyage-toggle {
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 0.75rem;
+  transition: all 0.2s ease-in-out;
+  border: 2px solid #ccc;
+  border-radius: 0.75rem;
+  cursor: pointer;
+}
+
+.voyage-toggle:hover {
+  background-color: #f8f9fa;
+  border-color: #cc0000;
+}
+
+.voyage-toggle.active {
+  background-color: #cc0000;
+  color: white;
+  border-color: #cc0000;
+}
+
+.form-check-input {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.form-check-label {
+  font-size: 1.05rem;
+  padding-left: 0.4rem;
+  cursor: pointer;
+}
+
+.form-check {
+  margin-bottom: 0.75rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease;
+}
+
+.form-check:hover {
+  background-color: #f8f9fa;
+}
+
+.fuel-check {
+  padding: 0.5rem 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+.fuel-toggle {
+  font-size: 0.875rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ced4da;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  text-align: left;
+  width: 100%;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.fuel-toggle:hover {
+  background-color: #f8f9fa;
+  border-color: #cc0000;
+}
+
+.fuel-toggle.active {
+  background-color: #cc0000;
+  color: white;
+  border-color: #cc0000;
+}
+
+.visually-enhanced-block {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 12px;
+  margin-top: 12px;
+}
+
+.visually-enhanced-block label {
+  font-weight: 600;
+  font-size: 1rem;
+}
+.fuel-toggle.autre-input {
+  padding: 0;
+  border: none;
+  margin-bottom: 10px;
+}
+
+.form-control-custom {
+  display: block;
+  width: 100%;
+  padding: 0.65rem 1rem;
+  font-size: 1rem;
+  font-family: inherit;
+  border: 1px solid #ced4da;
+  border-radius: 0.5rem;
+  background-color: white;
+  transition: all 0.2s ease-in-out;
+}
+
+.form-control-custom:focus {
+  outline: none;
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.15rem rgba(220, 53, 69, 0.25);
+}
+
+/* Style uniforme */
+.fuel-toggle.autre-input input[type="text"] {
+  height: 46px;
+  padding: 0.65rem 1rem;
+  font-size: 0.95rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ced4da;
+  width: 100%;
+}
+
+/* Focus actif en rouge */
+.fuel-toggle.autre-input input[type="text"]:focus {
+  border: 2px solid #d9534f;
+  outline: none;
+  box-shadow: 0 0 0 0.1rem rgba(217, 83, 79, 0.25);
+}
+
   </style>
 </head>
 <body>
@@ -59,9 +185,10 @@
           <input type="date" class="form-control" id="date" name="date" required />
         </div>
         <div class="mb-3">
+          <label for="nom" class="form-label fw-bold text-uppercase">Nom complet</label>
           <select class="form-select" id="nom" name="nom" required>
           <option value="">-- Sélectionner votre nom --</option>
-        </select>
+          </select>
         </div>
         <div class="mb-3">
           <label for="camion" class="form-label fw-bold text-uppercase">Numéro de camion</label>
@@ -76,23 +203,6 @@
             <option value="1703">Camion 1703</option>
             <option value="1803">Camion 1803</option>
           </select>
-        </div>
-        <div class="mb-3">
-          <label for="remorque" class="form-label fw-bold text-uppercase">Numéro de remorque</label>
-          <select class="form-select" id="remorque" name="remorque" required>
-            <option value="">-- Sélectionner --</option>
-            <option value="R001">Remorque 1505</option>
-            <option value="R002">Remorque 1605</option>
-            <option value="R003">Remorque 1805</option>
-            <option value="R004">Remorque 1905</option>
-            <option value="R005">Remorque 2205</option>
-            <option value="R006">Remorque 2405</option>
-            <option value="R007">Remorque 1906</option>
-            <option value="R008">Remorque 2006</option>
-            <option value="R009">Remorque 2506</option>
-            <option value="R010">Remorque 2706</option>
-          </select>
-        </div>
       </div>
 
       <div id="voyageContainer"></div>
@@ -134,77 +244,90 @@
     <h5 class="mb-3">Voyage ${id}</h5>
     <div class="mb-3">
       <label class="form-label fw-bold text-uppercase">Type de voyage</label>
-      <div class="form-check">
-        <input class="form-check-input" type="radio" name="type_voyage_${id}" id="km_${id}" value="kilometrage" required>
-        <label class="form-check-label" for="km_${id}">Voyage au kilométrage</label>
-      </div>
-      <div class="form-check">
-        <input class="form-check-input" type="radio" name="type_voyage_${id}" id="heure_${id}" value="heure" required>
-        <label class="form-check-label" for="heure_${id}">Voyage à l’heure</label>
+      <div class="btn-group-toggle w-100" data-toggle="buttons">
+        <label class="btn btn-outline-dark btn-lg w-100 mb-2 voyage-toggle" for="km_${id}">
+          <input type="radio" class="d-none" name="type_voyage_${id}" id="km_${id}" value="kilometrage" required>
+          Voyage au kilométrage
+        </label>
+        <label class="btn btn-outline-dark btn-lg w-100 voyage-toggle" for="heure_${id}">
+          <input type="radio" class="d-none" name="type_voyage_${id}" id="heure_${id}" value="heure" required>
+          Voyage à l’heure
+        </label>
       </div>
     </div>
     <div id="details_${id}"></div>
   `;
   voyageContainer.appendChild(section);
 
-  section.querySelectorAll(`input[name="type_voyage_${id}"]`).forEach((radio) => {
+  const radios = section.querySelectorAll(`input[name="type_voyage_${id}"]`);
+  radios.forEach((radio) => {
     radio.addEventListener("change", () => {
-      const container = section.querySelector(`#details_${id}`);
-      if (radio.value === "heure") {
-        container.innerHTML = `
-          <div class="mb-3">
-            <label class="form-label fw-bold text-uppercase">Origine</label>
-            <select class="form-select" name="origine_${id}" required>
-              <option value="St-Basile" selected>St-Basile</option>
-              <option value="Vimont">Vimont</option>
-              <option value="Stanstead">Stanstead</option>
-            </select>
-          </div>
-          <div class="mb-3">
-            <label class="form-label fw-bold text-uppercase">Destination</label>
-            <input type="text" class="form-control" name="destination_${id}" required />
-          </div>
-          ${generateHeureHtml(id)}
-          ${id < MAX_VOYAGES ? getSuiviHTML(id) : ''}
-        `;
-        setupSuiviListener(id);
-      } else {
-        container.innerHTML = `
-          <div class="mb-3">
-            <label class="form-label fw-bold text-uppercase">Origine</label>
-            <select class="form-select origine-select" name="origine_${id}" id="origine_${id}" required>
-              <option value="St-Basile" selected>St-Basile</option>
-              <option value="Vimont">Vimont</option>
-              <option value="Stanstead">Stanstead</option>
-            </select>
-          </div>
-          <div class="mb-3 position-relative">
-            <label class="form-label fw-bold text-uppercase">Ville de destination</label>
-            <input type="text" class="form-control destination-input" name="destination_${id}" id="destination_${id}" autocomplete="off" required />
-            <div class="autocomplete-list position-absolute bg-white border border-1 rounded shadow-sm z-3 w-100" id="autocomplete_${id}" style="display: none;"></div>
-          </div>
-          ${id < MAX_VOYAGES ? getSuiviHTML(id) : ''}
-        `;
-        setupSuiviListener(id);
-
-        const origineSelect = section.querySelector(`#origine_${id}`);
-        const destinationInput = section.querySelector(`#destination_${id}`);
-        const listContainer = section.querySelector(`#autocomplete_${id}`);
-
-        setupAutocomplete(destinationInput, listContainer, origineSelect.value.toLowerCase().trim());
-        origineSelect.addEventListener("change", () => {
-        setupAutocomplete(destinationInput, listContainer, origineSelect.value.toLowerCase().trim());
-        });
+      radios.forEach(r => r.closest("label").classList.remove("active"));
+      if (radio.checked) {
+        radio.closest("label").classList.add("active");
       }
+
+      const container = section.querySelector(`#details_${id}`);
+
+      // Champs communs
+      let innerHTML = `
+        <div class="mb-3">
+          <label class="form-label fw-bold text-uppercase">Origine</label>
+          <select class="form-select origine-select" name="origine_${id}" id="origine_${id}" required>
+            <option value="St-Basile" selected>St-Basile</option>
+            <option value="Vimont">Vimont</option>
+            <option value="Stanstead">Stanstead</option>
+          </select>
+        </div>
+        <div class="mb-3 position-relative">
+          <label class="form-label fw-bold text-uppercase">Ville de destination</label>
+          <input type="text" class="form-control destination-input" name="destination_${id}" id="destination_${id}" autocomplete="off" required />
+          <div class="autocomplete-list position-absolute bg-white border border-1 rounded shadow-sm z-3 w-100" id="autocomplete_${id}" style="display: none;"></div>
+        </div>
+      `;
+
+      if (radio.value === "heure") {
+        innerHTML += generateHeureHtml(id);
+      }
+
+      if (id < MAX_VOYAGES) {
+        innerHTML += getSuiviHTML(id);
+      }
+
+      container.innerHTML = innerHTML;
+      setupSuiviListener(id);
+
+      const origineSelect = section.querySelector(`#origine_${id}`);
+      const destinationInput = section.querySelector(`#destination_${id}`);
+      const listContainer = section.querySelector(`#autocomplete_${id}`);
+
+      const applyAutocomplete = () => {
+        const origineVal = origineSelect.value.trim().toLowerCase();
+        const sourceKey = origineVal === "vimont" ? "st-basile" : origineVal;
+        setupAutocomplete(destinationInput, listContainer, sourceKey);
+      };
+
+      applyAutocomplete();
+      origineSelect.addEventListener("change", applyAutocomplete);
     });
   });
 }
-
 function setupAutocomplete(input, listContainer, origine) {
-  const origineNorm = normalizeStr(origine);
-  let preview = document.createElement("div");
+  let origineNorm = normalizeStr(origine);
+
+  // 🚦 Redirection Vimont vers St-Basile
+  if (origineNorm === "vimont") {
+    origineNorm = "st-basile";
+  }
+
+  const dataOrigine = kmMap[origineNorm];
+
+  let preview = input.parentNode.querySelector(".text-muted.mt-1");
+if (!preview) {
+  preview = document.createElement("div");
   preview.className = "text-muted mt-1 small";
   input.parentNode.appendChild(preview);
+}
 
   input.addEventListener("input", () => {
     const valeur = normalizeStr(input.value);
@@ -212,42 +335,63 @@ function setupAutocomplete(input, listContainer, origine) {
     listContainer.style.display = "none";
     preview.textContent = "";
 
-    if (!valeur || !kmMap[origineNorm]) return;
+    if (!valeur || !dataOrigine) return;
 
-    const correspondants = Object.keys(kmMap[origineNorm]).filter(dest =>
+    const correspondants = Object.keys(dataOrigine).filter(dest =>
       normalizeStr(dest).includes(valeur)
     );
 
     if (correspondants.length === 0) return;
 
     correspondants.forEach(dest => {
+      const destNorm = normalizeStr(dest);
+      const distanceKm = dataOrigine[dest];
+
       const opt = document.createElement("div");
       opt.className = "p-2 border-bottom";
       opt.style.cursor = "pointer";
       opt.textContent = dest;
-      opt.addEventListener("click", () => {
-        input.value = dest;
-        listContainer.innerHTML = "";
-        listContainer.style.display = "none";
 
-        const destNorm = normalizeStr(dest);
-        const distanceKm = kmMap[origineNorm]?.[destNorm];
-        preview.textContent = distanceKm !== undefined ? `Distance estimée : ${distanceKm} km` : "Distance inconnue.";
-      });
+      opt.addEventListener("click", () => {
+  input.value = dest;
+  listContainer.innerHTML = "";
+  listContainer.style.display = "none";
+
+  // ⛔ Supprimer affichage si voyage à l'heure avec origine Vimont
+  const voyageDiv = input.closest(".section-box");
+  const origineSelect = voyageDiv?.querySelector("select[name^='origine_']");
+  const typeHeure = voyageDiv?.querySelector("input[type=radio][value=heure]")?.checked;
+
+  const isHeureVimont = typeHeure && origineSelect?.value === "Vimont";
+
+  preview.textContent = (!isHeureVimont && distanceKm !== undefined)
+    ? `Distance estimée : ${Math.round(distanceKm)} km`
+    : "";
+});
+
+
       listContainer.appendChild(opt);
     });
+
     listContainer.style.display = "block";
   });
 
   input.addEventListener("blur", () => {
   setTimeout(() => {
     const valeur = normalizeStr(input.value);
-    const distanceKm = kmMap[origineNorm]?.[valeur];
-    preview.textContent = distanceKm !== undefined
-      ? `Distance estimée : ${distanceKm} km`
+    const distanceKm = dataOrigine?.[Object.keys(dataOrigine).find(d => normalizeStr(d) === valeur)];
+
+    const voyageDiv = input.closest(".section-box");
+    const origineSelect = voyageDiv?.querySelector("select[name^='origine_']");
+    const typeHeure = voyageDiv?.querySelector("input[type=radio][value=heure]")?.checked;
+    const isHeureVimont = typeHeure && origineSelect?.value === "Vimont";
+
+    preview.textContent = (!isHeureVimont && distanceKm !== undefined)
+      ? `Distance estimée : ${Math.round(distanceKm)} km`
       : "";
   }, 200);
 });
+
 
   document.addEventListener("click", (e) => {
     if (!listContainer.contains(e.target) && e.target !== input) {
@@ -255,6 +399,7 @@ function setupAutocomplete(input, listContainer, origine) {
     }
   });
 }
+
 
 
 function generateHeureHtml(id) {
@@ -292,36 +437,62 @@ function generateHeureHtml(id) {
 }
 
     function getSuiviHTML(id) {
-      return `
-        <div class="mb-3 mt-3">
-          <label class="form-label fw-bold text-uppercase">Avez-vous fait un autre voyage ensuite ?</label>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="autre_${id}" id="oui_${id}" value="oui" required />
-            <label class="form-check-label" for="oui_${id}">Oui</label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="autre_${id}" id="non_${id}" value="non" required />
-            <label class="form-check-label" for="non_${id}">Non</label>
-          </div>
-        </div>
-      `;
-    }
+  return `
+    <div class="mb-3 mt-3">
+      <label class="form-label fw-bold text-uppercase">Avez-vous fait un autre voyage ensuite ?</label>
+      <div class="d-flex gap-2">
+  <label class="btn btn-outline-dark voyage-toggle flex-fill text-center" for="oui_${id}">
+    <input class="d-none" type="radio" name="autre_${id}" id="oui_${id}" value="oui" required />
+    Oui
+  </label>
+  <label class="btn btn-outline-dark voyage-toggle flex-fill text-center" for="non_${id}">
+    <input class="d-none" type="radio" name="autre_${id}" id="non_${id}" value="non" required />
+    Non
+  </label>
+</div>
+    </div>
+  `;
+}
 
     function setupSuiviListener(id) {
-      const oui = document.getElementById(`oui_${id}`);
-      const non = document.getElementById(`non_${id}`);
-      if (oui) {
-        oui.addEventListener("change", () => {
-          if (voyageCount < MAX_VOYAGES) {
-            addVoyageSection();
-          }
-        });
-      }
-      if (non) {
-        non.addEventListener("change", afficherSectionFinale);
-      }
-      if (voyageCount === MAX_VOYAGES) afficherSectionFinale();
+  const oui = document.getElementById(`oui_${id}`);
+  const non = document.getElementById(`non_${id}`);
+
+  if (oui) {
+  oui.addEventListener("change", () => {
+    const sectionSuivanteExiste = document.querySelector(`#details_${id + 1}`);
+    if (voyageCount < MAX_VOYAGES && !sectionSuivanteExiste) {
+      addVoyageSection();
     }
+  });
+}
+
+  if (non) {
+    non.addEventListener("change", () => {
+      // Supprimer les voyages suivants s’ils existent
+      while (voyageCount > id) {
+        const sectionToRemove = document.querySelector(`#voyageContainer .section-box:last-child`);
+        if (sectionToRemove) {
+          voyageContainer.removeChild(sectionToRemove);
+          voyageCount--;
+        }
+      }
+      afficherSectionFinale();
+    });
+  }
+const radios = document.querySelectorAll(`input[name="autre_${id}"]`);
+radios.forEach((radio) => {
+  radio.addEventListener("change", () => {
+    radios.forEach(r => r.closest("label").classList.remove("active"));
+    if (radio.checked) {
+      radio.closest("label").classList.add("active");
+    }
+  });
+});
+  if (voyageCount === MAX_VOYAGES) {
+    afficherSectionFinale();
+  }
+}
 
     function afficherSectionFinale() {
   const section = document.createElement("div");
@@ -329,65 +500,71 @@ function generateHeureHtml(id) {
   section.innerHTML = `
     <h5 class="mb-3">Fin du journal de bord</h5>
 
-    <!-- Diesel -->
-    <div class="mb-3">
-      <label class="form-label fw-bold text-uppercase">Avez-vous fait le plein de diesel ?</label>
-      <div class="form-check">
-        <input class="form-check-input" type="radio" name="diesel" value="non" id="diesel_non" required />
-        <label class="form-check-label" for="diesel_non">Non</label>
-      </div>
-      <div class="form-check">
-        <input class="form-check-input" type="radio" name="diesel" value="stbasile" id="diesel_stbasile" required />
-        <label class="form-check-label" for="diesel_stbasile">Oui, St Basile Transport</label>
-      </div>
-      <div class="form-check">
-        <input class="form-check-input" type="radio" name="diesel" value="esso" id="diesel_esso" required />
-        <label class="form-check-label" for="diesel_esso">Oui, ESSO Deschambault</label>
-      </div>
-      <div class="form-check">
-        <input class="form-check-input" type="radio" name="diesel" value="irving" id="diesel_irving" required />
-        <label class="form-check-label" for="diesel_irving">Oui, Irving USA</label>
-      </div>
-      <div class="form-check">
-        <input class="form-check-input" type="radio" name="diesel" value="autre" id="diesel_autre" required />
-        <label class="form-check-label" for="diesel_autre">Spécifiez</label>
-      </div>
-      <input type="text" class="form-control mt-2 d-none" id="diesel_spec" name="diesel_spec" placeholder="Autre station" />
+<!-- Diesel -->
+<div class="mb-3">
+  <label class="form-label fw-bold text-uppercase">Avez-vous fait le plein de diesel ?</label>
+  <div class="btn-group-toggle d-grid gap-2">
+    <label class="btn btn-outline-secondary fuel-toggle" for="diesel_non">
+      <input class="d-none" type="radio" name="diesel" id="diesel_non" value="non" required />
+      Non
+    </label>
+    <label class="btn btn-outline-secondary fuel-toggle" for="diesel_stbasile">
+      <input class="d-none" type="radio" name="diesel" id="diesel_stbasile" value="stbasile" required />
+      Oui, St Basile Transport
+    </label>
+    <label class="btn btn-outline-secondary fuel-toggle" for="diesel_esso">
+      <input class="d-none" type="radio" name="diesel" id="diesel_esso" value="esso" required />
+      Oui, ESSO Deschambault
+    </label>
+    <label class="btn btn-outline-secondary fuel-toggle" for="diesel_irving">
+      <input class="d-none" type="radio" name="diesel" id="diesel_irving" value="irving" required />
+      Oui, Irving USA
+    </label>
+    <div class="fuel-toggle autre-input">
+      <input
+        type="text"
+        class="form-control form-control-custom"
+        name="diesel_spec"
+        placeholder="Autre (inscrivez ici)"
+        id="diesel_spec_direct"
+      />
     </div>
+  </div>
+</div>
+<!-- Litres diesel -->
+<div class="mb-3 d-none visually-enhanced-block" id="litres_diesel_block">
+  <label class="form-label fw-bold">Inscrivez la quantité de litres (diesel)</label>
+  <input type="number" inputmode="numeric" class="form-control mt-2" name="litres_diesel" />
+</div>
 
-    <!-- Litres diesel -->
-    <div class="mb-3 d-none" id="litres_diesel_block">
-      <label class="form-label">Inscrivez la quantité de litres (diesel)</label>
-      <input type="number" inputmode="numeric" class="form-control" name="litres_diesel" />
+<!-- Urée -->
+<div class="mb-3">
+  <label class="form-label fw-bold text-uppercase">Avez-vous fait le plein d’urée ?</label>
+  <div class="btn-group-toggle d-grid gap-2">
+    <label class="btn btn-outline-secondary fuel-toggle" for="uree_non">
+      <input class="d-none" type="radio" name="uree" id="uree_non" value="non" required />
+      Non
+    </label>
+    <label class="btn btn-outline-secondary fuel-toggle" for="uree_elz">
+      <input class="d-none" type="radio" name="uree" id="uree_elz" value="garage_elz" required />
+      Oui, au garage ELZ
+    </label>
+    <div class="fuel-toggle autre-input">
+      <input
+        type="text"
+        class="form-control form-control-custom"
+        name="uree_spec"
+        placeholder="Autre (inscrivez ici)"
+        id="uree_spec_direct"
+      />
     </div>
-
-    <!-- Urée -->
-    <div class="mb-3">
-      <label class="form-label fw-bold text-uppercase">Avez-vous fait le plein d’urée ?</label>
-      <div class="form-check">
-        <input class="form-check-input" type="radio" name="uree" value="non" id="uree_non" required />
-        <label class="form-check-label" for="uree_non">Non</label>
-      </div>
-      <div class="form-check">
-        <input class="form-check-input" type="radio" name="uree" value="garage_elz" id="uree_elz" required />
-        <label class="form-check-label" for="uree_elz">Oui, au garage ELZ</label>
-      </div>
-      <div class="form-check">
-        <input class="form-check-input" type="radio" name="uree" value="garage_stb" id="uree_stb" required />
-        <label class="form-check-label" for="uree_stb">Oui, au garage St-Basile Transport</label>
-      </div>
-      <div class="form-check">
-        <input class="form-check-input" type="radio" name="uree" value="autre" id="uree_autre" required />
-        <label class="form-check-label" for="uree_autre">Spécifiez</label>
-      </div>
-      <input type="text" class="form-control mt-2 d-none" id="uree_spec" name="uree_spec" placeholder="Autre endroit" />
-    </div>
-
-    <!-- Litres urée -->
-    <div class="mb-3 d-none" id="litres_uree_block">
-      <label class="form-label">Inscrivez la quantité de litres (urée)</label>
-      <input type="number" inputmode="numeric" class="form-control" name="litres_uree" />
-    </div>
+  </div>
+</div>
+<!-- Litres urée -->
+<div class="mb-3 d-none visually-enhanced-block" id="litres_uree_block">
+  <label class="form-label fw-bold">Inscrivez la quantité de litres (urée)</label>
+  <input type="number" inputmode="numeric" class="form-control mt-2" name="litres_uree" />
+</div>
 
     <!-- Note -->
     <div class="mb-3">
@@ -396,19 +573,32 @@ function generateHeureHtml(id) {
     </div>
   `;
 
-  voyageContainer.appendChild(section);
+voyageContainer.appendChild(section);
 
-  // Interactions dynamiques
-  const dieselRadios = document.querySelectorAll('input[name="diesel"]');
-  const dieselSpec = document.getElementById("diesel_spec");
-  const dieselLitres = document.getElementById("litres_diesel_block");
-
-  dieselRadios.forEach((r) => {
-    r.addEventListener("change", () => {
-      dieselSpec.classList.toggle("d-none", r.id !== "diesel_autre");
-      dieselLitres.classList.toggle("d-none", r.value === "non");
+// Activation visuelle des boutons Diesel / Urée
+section.querySelectorAll('.fuel-toggle input[type="radio"]').forEach(input => {
+  input.addEventListener('change', () => {
+    const name = input.name;
+    section.querySelectorAll(`input[name="${name}"]`).forEach(el => {
+      el.closest('.fuel-toggle').classList.remove('active');
     });
+    if (input.checked) {
+      input.closest('.fuel-toggle').classList.add('active');
+    }
   });
+});
+
+// Interactions dynamiques (pour le champ "autre" + litres)
+const dieselRadios = section.querySelectorAll('input[name="diesel"]');
+const dieselSpec = section.querySelector("#diesel_spec");
+const dieselLitres = section.querySelector("#litres_diesel_block");
+
+dieselRadios.forEach((r) => {
+  r.addEventListener("change", () => {
+    dieselSpec.classList.toggle("d-none", r.id !== "diesel_autre");
+    dieselLitres.classList.toggle("d-none", r.value === "non");
+  });
+});
 
   const ureeRadios = document.querySelectorAll('input[name="uree"]');
   const ureeSpec = document.getElementById("uree_spec");
@@ -429,7 +619,7 @@ function generateHeureHtml(id) {
     <div id="resumeContent"></div>
     <div class="d-flex justify-content-between mt-4">
       <button type="button" class="btn btn-secondary" id="btn-modifier">Modifier</button>
-      <button type="submit" class="btn btn-success" id="btn-confirm">Confirmer et envoyer</button>
+      <button type="button" class="btn btn-success" id="btn-confirm">Confirmer et envoyer</button>
     </div>
   </div>
 </div>
@@ -455,66 +645,154 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  btnPreview.addEventListener("click", () => {
-    const formEl = document.getElementById("formulaire");
-    const data = new FormData(formEl);
-    let html = "";
-    const heures = {};
-    let totalMinutes = 0;
+btnPreview.addEventListener("click", () => {
+  const formEl = document.getElementById("formulaire");
 
-    for (const [key, value] of data.entries()) {
-      if (value.trim() === "") continue;
-      const heureMatch = key.match(/heure_(debut|fin)_([hm])_(\d+)/);
-      if (heureMatch) {
-        const [, type, part, id] = heureMatch;
-        heures[id] = heures[id] || { debut: {}, fin: {} };
-        heures[id][type][part] = value;
+  if (!formEl.checkValidity()) {
+    formEl.reportValidity();
+    return;
+  }
+
+  const data = new FormData(formEl);
+  const chauffeur = data.get("nom");
+  const taux = tauxMap[chauffeur] || { taux_h: 0, taux_km: 0 };
+
+  let html = "";
+  let totalMinutes = 0;
+  let totalKm = 0;
+  let totalPrime = 0;
+  let voyages = [];
+
+  for (let i = 1; i <= 3; i++) {
+    const type = data.get(`type_voyage_${i}`);
+    if (!type) continue;
+
+    const origine = data.get(`origine_${i}`);
+    const destination = data.get(`destination_${i}`);
+    const normOrigine = normalizeStr(origine);
+    const normDestination = normalizeStr(destination);
+    const kmVal = kmMap[normOrigine]?.[normDestination] || 0;
+    const isDouane = (kmMap[normOrigine]?.[normDestination + "_DOUANE"] === true);
+
+    if (type === "kilometrage") {
+      voyages.push({
+        id: i,
+        type,
+        origine,
+        destination,
+        km: kmVal,
+        douane: isDouane
+      });
+    } else {
+      const dH = parseInt(data.get(`heure_debut_h_${i}`) || "0", 10);
+      const dM = parseInt(data.get(`heure_debut_m_${i}`) || "0", 10);
+      const fH = parseInt(data.get(`heure_fin_h_${i}`) || "0", 10);
+      const fM = parseInt(data.get(`heure_fin_m_${i}`) || "0", 10);
+      const duration = (fH * 60 + fM) - (dH * 60 + dM);
+      if (duration > 0) totalMinutes += duration;
+      voyages.push({
+        id: i,
+        type,
+        origine,
+        destination,
+        h1: dH,
+        m1: dM,
+        h2: fH,
+        m2: fM
+      });
+    }
+  }
+
+  const lastHeureVimont = [...voyages]
+    .reverse()
+    .find(v => v.type === "heure" && normalizeStr(v.origine) === "vimont");
+
+  for (let i = 0; i < voyages.length; i++) {
+    const v = voyages[i];
+    if (v.type === "kilometrage") {
+      let kmPayes = v.km;
+      let label = `${v.destination || `Voyage ${v.id}`} - KM`;
+      let afficherPrime = true;
+
+      const next = voyages[i + 1];
+      const isStansteadTransfer = normalizeStr(v.origine) === "st-basile" && normalizeStr(v.destination) === "stanstead"
+        && next?.type === "kilometrage"
+        && normalizeStr(next.origine) === "stanstead";
+
+      if (isStansteadTransfer) {
+        label += " (aller simple)";
+        afficherPrime = false;
+      } else if (next?.type === "heure" && normalizeStr(next.origine) === "vimont") {
+        label += " (aller simple)";
       } else {
-        let label = key.replace(/_/g, " ").replace(/\d+$/, "").toUpperCase();
-        if (label === "AUTRE") label = "AUTRE VOYAGE";
-        html += `<p><strong>${label}:</strong> ${value}</p>`;
+        label += " (aller-retour)";
+        kmPayes *= 2;
+      }
+
+      html += `<p><strong>${label}:</strong> ${kmPayes}km</p>`;
+      totalKm += kmPayes;
+
+      if (!isStansteadTransfer) {
+        totalPrime += 60.85;
+      } else {
+        totalPrime += 0;
+      }
+
+      // Exception DOUANE
+      if (kmMap[normalizeStr(v.origine)]?.[normalizeStr(v.destination) + "_DOUANE"] === true) {
+        html += `<p class="text-muted small">+ $ Douane : 15.00$</p>`;
+        totalPrime += 15;
+      }
+
+    } else {
+      html += `<p><strong>${v.destination} - Heure:</strong> ${v.h1}h${v.m1.toString().padStart(2, "0")} → ${v.h2}h${v.m2.toString().padStart(2, "0")}</p>`;
+
+      if (v === lastHeureVimont) {
+        const retourKm = kmMap["st-basile"]?.[normalizeStr(v.destination)] || 0;
+        html += `<p><strong>Retour de ${v.destination} :</strong> ${retourKm}km</p>`;
+        totalKm += retourKm;
       }
     }
+  }
 
-    for (const [id, obj] of Object.entries(heures)) {
-      const dH = parseInt(obj.debut.h || "0", 10);
-      const dM = parseInt(obj.debut.m || "0", 10);
-      const fH = parseInt(obj.fin.h || "0", 10);
-      const fM = parseInt(obj.fin.m || "0", 10);
-      const debutStr = `${String(dH).padStart(2, "0")}h${String(dM).padStart(2, "0")}`;
-      const finStr = `${String(fH).padStart(2, "0")}h${String(fM).padStart(2, "0")}`;
-      html += `<p><strong>VOYAGE ${id} - HEURE DE DÉBUT:</strong> ${debutStr}</p>`;
-      html += `<p><strong>VOYAGE ${id} - HEURE DE FIN:</strong> ${finStr}</p>`;
-      let duration = (fH * 60 + fM) - (dH * 60 + dM);
-      if (duration < 0) duration = 0;
-      totalMinutes += duration;
-      const durH = Math.floor(duration / 60);
-      const durM = duration % 60;
-      html += `<p><strong>VOYAGE ${id} - DURÉE:</strong> ${durH}h${String(durM).padStart(2, "0")}</p>`;
-    }
+  const totalH = Math.floor(totalMinutes / 60);
+  const totalM = totalMinutes % 60;
+  const montantKm = totalKm * taux.taux_km;
+  const montantH = (totalMinutes / 60) * taux.taux_h;
+  const montantFinal = montantKm + montantH + totalPrime;
 
-    if (totalMinutes > 0) {
-      const h = Math.floor(totalMinutes / 60);
-      const m = totalMinutes % 60;
-      html += `<hr/><p><strong>TOTAL D'HEURES TRAVAILLÉES:</strong> ${h}h${String(m).padStart(2, "0")}</p>`;
-    }
+  html += `<hr/><p><strong>KM Payés:</strong> ${totalKm}km</p>`;
+  html += `<p><strong>Heures Payées:</strong> ${totalH}h${String(totalM).padStart(2, "0")}</p>`;
+  html += `<p><strong>Forfaits & Primes:</strong> ${totalPrime.toFixed(2)}$</p>`;
+  html += `<hr/><p><strong>Total payé estimé:</strong> ${montantFinal.toFixed(2)}$</p>`;
 
-    resumeContent.innerHTML = html;
-    formEl.classList.add("d-none");
-    resumeContainer.classList.remove("d-none");
-  });
-
-  btnModifier.addEventListener("click", () => {
-    resumeContainer.classList.add("d-none");
-    document.getElementById("formulaire").classList.remove("d-none");
-  });
+  resumeContent.innerHTML = html;
+  formEl.classList.add("d-none");
+  resumeContainer.classList.remove("d-none");
 
   document.getElementById("btn-confirm").addEventListener("click", () => {
     const formData = new FormData(document.getElementById("formulaire"));
     const data = {};
     formData.forEach((val, key) => data[key] = val);
 
-    fetch("https://script.google.com/macros/s/AKfycbxakbBK9TUcJ5gQQ4nL3vuDoGw2kt9zY3fMVb1tImOvnWNXdNb3kYIIGRh-VLp5dkNi/exec", {
+    fetch("https://script.google.com/macros/s/AKfycbyv98mLkkZmdKET1vQPXQlJ7DD6LxhpkJ2uWcbVSjDhGcdX8tsQ0LpjQKSBtI4tMTd4/exec", {
+      method: "POST",
+      mode: "no-cors",
+      body: JSON.stringify(data),
+      headers: { "Content-Type": "application/json" }
+    });
+
+    resumeContainer.classList.add("d-none");
+    document.getElementById("confirmationContainer").classList.remove("d-none");
+  });
+});
+
+  document.getElementById("btn-confirm").addEventListener("click", () => {
+    const formData = new FormData(document.getElementById("formulaire"));
+    const data = {};
+    formData.forEach((val, key) => data[key] = val);
+
+    fetch("https://script.google.com/macros/s/AKfycbyv98mLkkZmdKET1vQPXQlJ7DD6LxhpkJ2uWcbVSjDhGcdX8tsQ0LpjQKSBtI4tMTd4/exec", {
       method: "POST",
       mode: "no-cors",
       body: JSON.stringify(data),
@@ -526,17 +804,21 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 </script>
-
-
 <script>
-  let tauxMap = {}; // par nom chauffeur
-  let kmMap = {}; // origine -> destination -> km
+let tauxMap = {};
+let kmMap = {};
+let chauffeurCamionMap = {};
 
-  fetch("https://script.google.com/macros/s/AKfycbxakbBK9TUcJ5gQQ4nL3vuDoGw2kt9zY3fMVb1tImOvnWNXdNb3kYIIGRh-VLp5dkNi/exec")
-  .then((res) => res.json())
-  .then((data) => {
-  console.log("Réponse brute reçue du fetch :", data);
+fetch("https://script.google.com/macros/s/AKfycbwcZZVPXv4p7kJkHx0CNl44ZVQYWNSz0-ioMOOGXISdYJq2vKphWORzq3OxfvwA-1mX/exec")
+  .then(res => res.json())
+  .then(data => {
+    console.log("✅ Données reçues :", data);
+    console.table(data.chauffeurs); // 👀 Visualisation claire
 
+    const selectNom = document.getElementById("nom");
+    const selectCamion = document.getElementById("camion");
+
+    // 🔁 Création des maps
     tauxMap = data.chauffeurs.reduce((acc, el) => {
       acc[el.nom] = {
         taux_h: parseFloat(el.taux_h),
@@ -545,71 +827,86 @@ document.addEventListener("DOMContentLoaded", () => {
       return acc;
     }, {});
 
+    chauffeurCamionMap = data.chauffeurs.reduce((acc, el) => {
+      const nom = el["Nom Complet"] || el.nom || "";
+      const camion = (el["camion défaut"] || el["Camion défaut"] || el["camion défaut "] || "").trim();
+      if (nom) acc[nom] = camion;
+      return acc;
+    }, {});
+
+    // ✅ 🗺️ Construction de kmMap pour l'autocomplétion
     kmMap = data.km.reduce((acc, el) => {
-  const origine = (el.origine || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
-  const destination = (el.destination || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
-  const kmValue = parseFloat(el.kilometrage);
+  const origine = normalizeStr(el.origine);
+  const destination = normalizeStr(el.destination);
+  const distance = parseFloat(el.km);
+  const douane = (el.douane || "").toString().trim().toUpperCase();
 
   if (!acc[origine]) acc[origine] = {};
-  acc[origine][destination] = isNaN(kmValue) ? 0 : kmValue;
+
+  // Stocker la distance
+  acc[origine][destination] = isNaN(distance) ? 0 : distance;
+
+  // Stocker l'info douane en parallèle
+  if (douane === "OUI") {
+    acc[origine][`${destination}_DOUANE`] = true;
+  }
 
   return acc;
 }, {});
+    console.log("🗺️ kmMap bien construit :", kmMap);
 
-
-
-    // Autocomplétion déclenchée au focus
-    document.addEventListener("focusin", (e) => {
-      if (e.target.classList.contains("destination-input")) {
-        const input = e.target;
-        const section = input.closest(".section-box");
-        const origineSelect = section.querySelector('select[name^="origine_"]');
-        const origine = origineSelect?.value;
-        const datalistId = input.getAttribute("list");
-        const datalist = document.getElementById(datalistId);
-
-        if (!datalist || !origine) return;
-
-        datalist.innerHTML = ""; // Nettoyer
-
-        if (kmMap[origineNorm]) {
-  Object.keys(kmMap[origineNorm]).forEach((destination) => {
-    const option = document.createElement("option");
-    option.value = destination;
-    datalist.appendChild(option);
-  });
-}
-      }
+    // 🔽 Remplissage liste des chauffeurs
+    data.chauffeurs.forEach(chauffeur => {
+      const opt = document.createElement("option");
+      opt.value = chauffeur.nom;
+      opt.textContent = chauffeur.nom;
+      selectNom.appendChild(opt);
     });
 
-    // >>> APPEL ICI : tout est prêt, on peut construire le formulaire
+    // 🔁 Préselection du camion
+    function preselectCamionPourNom(nom) {
+      const camionNomComplet = chauffeurCamionMap[nom]; // ex. "Camion 1103"
+      if (!camionNomComplet) return;
+
+      const camionCode = camionNomComplet.replace(/\D/g, "");
+      const option = Array.from(selectCamion.options).find(
+        (opt) => opt.value === camionCode
+      );
+
+      if (option) {
+        selectCamion.value = option.value;
+        console.log(`🚚 Camion ${camionCode} présélectionné pour ${nom}`);
+      } else {
+        console.warn(`❗ Camion "${camionNomComplet}" (code ${camionCode}) introuvable pour ${nom}`);
+      }
+    }
+
+    selectNom.addEventListener("change", () => {
+      const nom = selectNom.value;
+      preselectCamionPourNom(nom);
+    });
+
+    if (selectNom.value) {
+      preselectCamionPourNom(selectNom.value);
+    }
+
+    // 🆙 Formulaire prêt
     addVoyageSection();
     document.getElementById("formulaire").classList.remove("d-none");
-document.getElementById("loader").style.display = "none";
+    document.getElementById("loader").style.display = "none";
   })
-  .catch((err) => console.error("Erreur chargement taux ou km:", err));
-  
+  .catch(err => console.error("❌ Erreur chargement:", err));
+
+
+document.querySelectorAll('input[list]').forEach(input => {
+  input.addEventListener('focus', () => {
+    setTimeout(() => {
+      input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300); // délai pour laisser le clavier apparaître
+  });
+});
 </script>
 
- <script>
-  fetch("https://script.google.com/macros/s/AKfycbxakbBK9TUcJ5gQQ4nL3vuDoGw2kt9zY3fMVb1tImOvnWNXdNb3kYIIGRh-VLp5dkNi/exec")
-    .then(res => res.json())
-    .then(data => {
-  console.log("Réponse brute reçue du fetch :", data);
-      const select = document.getElementById("nom");
-      if (data?.chauffeurs?.length) {
-        data.chauffeurs.forEach(chauffeur => {
-          const opt = document.createElement("option");
-          opt.value = chauffeur.nom;
-          opt.textContent = chauffeur.nom;
-          select.appendChild(opt);
-        });
-      } else {
-        console.warn("Aucun chauffeur trouvé dans la réponse.");
-      }
-    })
-    .catch(err => console.error("Erreur chargement chauffeurs:", err));
-</script>
  
 </body>
 </html>

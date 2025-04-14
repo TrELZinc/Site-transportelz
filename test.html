@@ -983,7 +983,7 @@ data["ajust_hr"] = document.getElementById("ajust_hr")?.value || "";
 data["ajust_km"] = document.getElementById("ajust_km")?.value || "";
 data["ajust_raison"] = document.getElementById("ajust_raison")?.value || "";
 
-  fetch("https://script.google.com/macros/s/AKfycbxmZ2SQdfQx7Q0YFGbZpyR1W392AxQQcgENi5XykXT1hnkib_ctC0VKRhv0-1Yam9Ah/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbyGDDt0IzAAq7175bpGOga8jiO590vLAu4ElxNABRkArTFFNhdxDqPM0u2TMTsJGKSc/exec", {
     method: "POST",
     mode: "no-cors",
     body: JSON.stringify(data),
@@ -1003,7 +1003,7 @@ let tauxMap = {};
 let kmMap = {};
 let chauffeurCamionMap = {};
 
-fetch("https://script.google.com/macros/s/AKfycbxmZ2SQdfQx7Q0YFGbZpyR1W392AxQQcgENi5XykXT1hnkib_ctC0VKRhv0-1Yam9Ah/exec")
+fetch("https://script.google.com/macros/s/AKfycbyGDDt0IzAAq7175bpGOga8jiO590vLAu4ElxNABRkArTFFNhdxDqPM0u2TMTsJGKSc/exec")
   .then(res => res.json())
   .then(data => {
     console.log("✅ Données reçues :", data);

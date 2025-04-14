@@ -175,6 +175,10 @@
   return d.toISOString().split("T")[0];
 }
 
+    function parseLocalDate(str) {
+  const [y, m, d] = str.split("-").map(Number);
+  return new Date(y, m - 1, d); // mois commence à 0
+}
 
     function changerSemaine() {
       document.getElementById("dateInput").value = "";

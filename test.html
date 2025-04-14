@@ -330,19 +330,29 @@ if (radio.value === "kilometrage") {
 
   applyAutocomplete();
   origineSelect.addEventListener("change", applyAutocomplete);
-} else {
-  // Désactive l’autocomplete et preview si c’est un voyage à l’heure
-  listContainer.style.display = "none";
-  destinationInput.removeEventListener("input", () => {});
-  destinationInput.removeEventListener("blur", () => {});
-  destinationInput.setAttribute("autocomplete", "off");
-
-  // Supprime le bloc de distance s’il existe
-  const preview = destinationInput.parentNode.querySelector(".text-muted.mt-1");
-  if (preview) preview.remove();
 }
-    });
-  });
+
+ else {
+  const origineVal = origineSelect.value.trim().toLowerCase();
+  const isVimont = origineVal === "vimont";
+
+  if (isVimont) {
+    const applyAutocomplete = () => {
+      const sourceKey = "st-basile"; // même source que pour Vimont
+      setupAutocomplete(destinationInput, listContainer, sourceKey);
+    };
+    applyAutocomplete();
+    origineSelect.addEventListener("change", applyAutocomplete);
+  } else {
+    // Sinon, désactive tout
+    listContainer.style.display = "none";
+    destinationInput.removeEventListener("input", () => {});
+    destinationInput.removeEventListener("blur", () => {});
+    destinationInput.setAttribute("autocomplete", "off");
+
+    const preview = destinationInput.parentNode.querySelector(".text-muted.mt-1");
+    if (preview) preview.remove();
+  }
 }
 
     function setupAutocomplete(input, listContainer, origine) {

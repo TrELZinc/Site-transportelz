@@ -177,6 +177,18 @@
   overflow-y: auto;
   min-height: 50px; /* <- clé pour éviter le collapse visuel */
 }
+.autocomplete-list.autocomplete-mobile {
+  position: fixed !important;
+  top: 20%;
+  left: 10%;
+  right: 10%;
+  max-height: 50vh;
+  z-index: 9999;
+  border: 2px solid #dc3545;
+  border-radius: 10px;
+  font-size: 1.15rem;
+  padding: 0.5rem;
+}
   </style>
 </head>
 <body>
@@ -391,7 +403,9 @@ if (radio.value === "kilometrage") {
 
       listContainer.appendChild(opt);
     });
-
+if (window.innerWidth < 768) {
+  listContainer.classList.add("autocomplete-mobile");
+}
     listContainer.style.display = "block";
   });
 

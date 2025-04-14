@@ -3,1120 +3,243 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Feuille de temps</title>
+  <title>Paye Chauffeur - Semaine</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
-    .form-label {
-  font-weight: 600;
-  font-size: 1rem;
-}
-.mb-3 {
-  margin-bottom: 1.25rem;
-}
-.autocomplete-list div:hover {
-  background-color: #f0f0f0;
-}
     body {
-      background-color: #f8f9fa;
-      color: #212529;
+      background: #f8f9fa;
     }
-    .form-label,
-    .form-check-label {
-      color: #212529;
+    .pastille {
+      background: white;
+      border: 2px solid #dee2e6;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      min-width: 220px;
     }
-    .form-control,
-    .form-select {
-      background-color: #ffffff;
-      color: #212529;
-      border: 1px solid #ced4da;
+    .pastille h5 {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
     }
-    .btn-primary {
-      background-color: #cc0000;
-      border: none;
+    .pastille .details {
+      font-size: 0.9rem;
+      line-height: 1.3;
     }
-    .btn-primary:hover {
-      background-color: #ff0000;
+    .grid-week {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 12px;
+      overflow-x: auto;
+      margin-bottom: 2rem;
     }
-    .container {
-      max-width: 540px;
-    }
-    .section-box {
-      background-color: #ffffff;
+    .summary-box {
+      border: 2px solid #ccc;
       border-radius: 8px;
-      padding: 20px;
-      box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
-      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: #e6f4ea;
     }
-.voyage-toggle {
-  font-weight: 600;
-  font-size: 1.1rem;
-  padding: 0.75rem;
-  transition: all 0.2s ease-in-out;
-  border: 2px solid #ccc;
-  border-radius: 0.75rem;
-  cursor: pointer;
-}
-
-.voyage-toggle:hover {
-  background-color: #f8f9fa;
-  border-color: #cc0000;
-}
-
-.voyage-toggle.active {
-  background-color: #cc0000;
-  color: white;
-  border-color: #cc0000;
-}
-
-.form-check-input {
-  width: 1.25rem;
-  height: 1.25rem;
-}
-
-.form-check-label {
-  font-size: 1.05rem;
-  padding-left: 0.4rem;
-  cursor: pointer;
-}
-
-.form-check {
-  margin-bottom: 0.75rem;
-  padding: 0.4rem 0.75rem;
-  border-radius: 0.5rem;
-  transition: background-color 0.2s ease;
-}
-
-.form-check:hover {
-  background-color: #f8f9fa;
-}
-
-.fuel-check {
-  padding: 0.5rem 1rem;
-  border: 1px solid #e0e0e0;
-  border-radius: 0.6rem;
-  margin-bottom: 0.5rem;
-}
-.fuel-toggle {
-  font-size: 0.875rem;
-  padding: 0.35rem 0.75rem;
-  border-radius: 0.5rem;
-  border: 1px solid #ced4da;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  text-align: left;
-  width: 100%;
-  display: block;
-  margin-bottom: 4px;
-}
-
-.fuel-toggle:hover {
-  background-color: #f8f9fa;
-  border-color: #cc0000;
-}
-
-.fuel-toggle.active {
-  background-color: #cc0000;
-  color: white;
-  border-color: #cc0000;
-}
-
-.visually-enhanced-block {
-  background-color: #f8f9fa;
-  border: 1px solid #dee2e6;
-  border-radius: 6px;
-  padding: 12px;
-  margin-top: 12px;
-}
-
-.visually-enhanced-block label {
-  font-weight: 600;
-  font-size: 1rem;
-}
-.fuel-toggle.autre-input {
-  padding: 0;
-  border: none;
-  margin-bottom: 10px;
-}
-
-.form-control-custom {
-  display: block;
-  width: 100%;
-  padding: 0.65rem 1rem;
-  font-size: 1rem;
-  font-family: inherit;
-  border: 1px solid #ced4da;
-  border-radius: 0.5rem;
-  background-color: white;
-  transition: all 0.2s ease-in-out;
-}
-
-.form-control-custom:focus {
-  outline: none;
-  border-color: #dc3545;
-  box-shadow: 0 0 0 0.15rem rgba(220, 53, 69, 0.25);
-}
-
-/* Style uniforme */
-.fuel-toggle.autre-input input[type="text"] {
-  height: 46px;
-  padding: 0.65rem 1rem;
-  font-size: 0.95rem;
-  border-radius: 0.5rem;
-  border: 1px solid #ced4da;
-  width: 100%;
-}
-
-/* Focus actif en rouge */
-.fuel-toggle.autre-input input[type="text"]:focus {
-  border: 2px solid #d9534f;
-  outline: none;
-  box-shadow: 0 0 0 0.1rem rgba(217, 83, 79, 0.25);
-}
-.autocomplete-list {
-  max-height: 160px; /* ~4 lignes selon padding */
-  overflow-y: auto;
-  border-radius: 8px;
-  padding: 0.25rem 0;
-  scroll-behavior: smooth;
-}
-
-.autocomplete-list div {
-  padding: 10px 16px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.15s ease;
-}
-
-.autocomplete-list div:active,
-.autocomplete-list div:hover {
-  background-color: #f8d7da;
-}
+    .summary-box h5 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
   </style>
 </head>
-<body>
-  <div class="container py-4">
-    <h2 class="mb-4 text-center">Feuille de temps</h2>
-    <form id="formulaire" class="d-none">
-      <div class="section-box">
-        <div class="mb-3">
-          <label for="date" class="form-label fw-bold text-uppercase">Date</label>
-          <input type="date" class="form-control" id="date" name="date" required />
-        </div>
-        <div class="mb-3">
-          <label for="nom" class="form-label fw-bold text-uppercase">Nom complet</label>
-          <select class="form-select" id="nom" name="nom" required>
-          <option value="">-- Sélectionner votre nom --</option>
-          </select>
-        </div>
-        <div class="mb-3">
-          <label for="camion" class="form-label fw-bold text-uppercase">Numéro de camion</label>
-          <select class="form-select" id="camion" name="camion" required>
-            <option value="">-- Sélectionner --</option>
-            <option value="1103">Camion 1103</option>
-            <option value="1202">Camion 1202</option>
-            <option value="1303">Camion 1303</option>
-            <option value="1404">Camion 1404</option>
-            <option value="1502">Camion 1502</option>
-            <option value="1603">Camion 1603</option>
-            <option value="1703">Camion 1703</option>
-            <option value="1803">Camion 1803</option>
-          </select>
-      </div>
+<body class="p-4">
 
-      <div id="voyageContainer"></div>
-<div id="formError" class="alert alert-danger d-none" role="alert">
-  Merci de remplir tous les champs obligatoires avant de prévisualiser.
-</div>
-      <button type="button" class="btn btn-primary w-100 mt-3" id="btn-preview">Prévisualiser</button>
-    </form>
+  <div class="container">
+    <h2 class="mb-4">Semaine de paie - Visualisation</h2>
+
+    <!-- Sélection -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-4">
+        <label class="form-label">Nom du chauffeur</label>
+        <select id="chauffeurSelect" class="form-select">
+        <option value="">-- Choisir --</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Date d'une journée de la semaine</label>
+        <input type="date" id="dateInput" class="form-control" />
+      </div>
+      <div class="col-md-4 d-flex align-items-end">
+        <button class="btn btn-primary w-100" onclick="loadSemaine()">Charger la semaine enregistrée</button>
+      </div>
+    </div>
+
+    <!-- Pastilles -->
+    <div class="grid-week" id="pastillesContainer">
+      <!-- pastilles journalières générées ici -->
+    </div>
+
+    <!-- Sommaire -->
+    <div class="summary-box">
+      <h5>Totaux de la semaine</h5>
+      <p><strong>Kilomètres totaux :</strong> <span id="totalKm">0</span> km</p>
+      <p><strong>Heures totales :</strong> <span id="totalH">0h00</span></p>
+      <p><strong>Forfaits / Primes :</strong> <span id="totalPrime">0.00</span> $</p>
+    </div>
+
+    <div class="mt-4 d-flex gap-3">
+      <button class="btn btn-secondary" onclick="changerSemaine()">Changer la semaine</button>
+      <button class="btn btn-success" onclick="sauvegarderSemaine()">Enregistrer cette semaine dans Firebase</button>
+    </div>
   </div>
-<div id="loader" class="text-center py-5">
-  <div class="spinner-border text-danger" role="status">
-    <span class="visually-hidden">Chargement...</span>
-  </div>
-  <p class="mt-3">Chargement du formulaire...</p>
-</div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script>
-    let voyages = []; // GLOBAL
-    function normalizeStr(str) {
-    return (str || "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // ❗ corrige ici : sans l'échappement mal placé
-    .toLowerCase()
-    .trim();
-}
-
-    
-    const form = document.getElementById("formulaire");
-    const voyageContainer = document.getElementById("voyageContainer");
-    let voyageCount = 0;
-    const MAX_VOYAGES = 3;
-
-
-function addVoyageSection() {
-  if (voyageCount >= MAX_VOYAGES) return;
-  voyageCount++;
-  const id = voyageCount;
-
-  const section = document.createElement("div");
-  section.className = "section-box";
-  section.innerHTML = `
-    <h5 class="mb-3">Voyage ${id}</h5>
-    <div class="mb-3">
-      <label class="form-label fw-bold text-uppercase">Type de voyage</label>
-      <div class="btn-group-toggle w-100" data-toggle="buttons">
-        <label class="btn btn-outline-dark btn-lg w-100 mb-2 voyage-toggle" for="km_${id}">
-          <input type="radio" class="d-none" name="type_voyage_${id}" id="km_${id}" value="kilometrage" required>
-          Voyage au kilométrage
-        </label>
-        <label class="btn btn-outline-dark btn-lg w-100 voyage-toggle" for="heure_${id}">
-          <input type="radio" class="d-none" name="type_voyage_${id}" id="heure_${id}" value="heure" required>
-          Voyage à l’heure
-        </label>
-      </div>
-    </div>
-    <div id="details_${id}"></div>
-  `;
-  voyageContainer.appendChild(section);
-
-  const radios = section.querySelectorAll(`input[name="type_voyage_${id}"]`);
-  radios.forEach((radio) => {
-    radio.addEventListener("change", () => {
-      radios.forEach(r => r.closest("label").classList.remove("active"));
-      if (radio.checked) {
-        radio.closest("label").classList.add("active");
-      }
-
-      const container = section.querySelector(`#details_${id}`);
-
-      // Champs communs
-      let innerHTML = `
-        <div class="mb-3">
-          <label class="form-label fw-bold text-uppercase">Origine</label>
-          <select class="form-select origine-select" name="origine_${id}" id="origine_${id}" required>
-            <option value="St-Basile" selected>St-Basile</option>
-            <option value="Vimont">Vimont</option>
-            <option value="Stanstead">Stanstead</option>
-          </select>
-        </div>
-        <div class="mb-3 position-relative">
-          <label class="form-label fw-bold text-uppercase">Ville de destination</label>
-          <input type="text" class="form-control destination-input" name="destination_${id}" id="destination_${id}" autocomplete="off" required />
-          <div class="autocomplete-list position-absolute bg-white border border-1 rounded shadow-sm z-3 w-100" id="autocomplete_${id}" style="display: none;"></div>
-        </div>
-      `;
-
-      if (radio.value === "heure") {
-        innerHTML += generateHeureHtml(id);
-      }
-
-      if (id < MAX_VOYAGES) {
-        innerHTML += getSuiviHTML(id);
-      }
-
-      container.innerHTML = innerHTML;
-      setupSuiviListener(id);
-
-      const destinationInput = section.querySelector(`#destination_${id}`);
-      const listContainer = section.querySelector(`#autocomplete_${id}`);
-      const origineSelect = section.querySelector(`#origine_${id}`);
-
-      if (radio.value === "kilometrage") {
-        const applyAutocomplete = () => {
-          const origineVal = origineSelect.value.trim().toLowerCase();
-          const sourceKey = origineVal === "vimont" ? "st-basile" : origineVal;
-          setupAutocomplete(destinationInput, listContainer, sourceKey);
-        };
-
-        applyAutocomplete();
-        origineSelect.addEventListener("change", applyAutocomplete);
-      } else {
-  const applyAutocomplete = () => {
-    const origineVal = origineSelect.value.trim().toLowerCase();
-    const isVimont = origineVal === "vimont";
-
-    if (isVimont) {
-      setupAutocomplete(destinationInput, listContainer, "st-basile");
-    } else {
-      listContainer.innerHTML = "";
-      listContainer.style.display = "none";
-      destinationInput.value = "";
-      destinationInput.removeEventListener("input", () => {});
-      destinationInput.removeEventListener("blur", () => {});
-      const preview = destinationInput.parentNode.querySelector(".text-muted.mt-1");
-      if (preview) preview.remove();
-    }
-  };
-
-  applyAutocomplete();
-  origineSelect.addEventListener("change", applyAutocomplete);
-}
-    });
-  });
-}
-
-function setupAutocomplete(input, listContainer, origine) {
-  let origineNorm = normalizeStr(origine);
-  if (origineNorm === "vimont") origineNorm = "st-basile";
-
-  const dataOrigine = kmMap[origineNorm];
-  if (!dataOrigine) return;
-
-  input.addEventListener('focus', () => {
-    setTimeout(() => {
-      const rect = input.getBoundingClientRect();
-      window.scrollTo({
-        top: window.scrollY + rect.top - 100,
-        behavior: 'smooth'
-      });
-    }, 250);
-  });
-
-  let preview = input.parentNode.querySelector(".text-muted.mt-1");
-  if (!preview) {
-    preview = document.createElement("div");
-    preview.className = "text-muted mt-1 small";
-    input.parentNode.appendChild(preview);
-  }
-
-  input.addEventListener("input", () => {
-    const valeur = normalizeStr(input.value);
-    listContainer.innerHTML = "";
-    listContainer.style.display = "none";
-    preview.textContent = "";
-
-    const correspondants = getDestinationsPropres(dataOrigine, input).slice(0, 4); // max 4 suggestions
-    if (correspondants.length === 0) return;
-
-    correspondants.forEach(dest => {
-      const distanceKm = dataOrigine[dest];
-      const opt = document.createElement("div");
-      opt.className = "p-2 border-bottom";
-      opt.style.cursor = "pointer";
-      opt.textContent = dest;
-
-      opt.addEventListener("mousedown", (e) => {
-        e.preventDefault();
-        input.value = dest;
-        listContainer.innerHTML = "";
-        listContainer.style.display = "none";
-
-        const voyageDiv = input.closest(".section-box");
-        const origineSelect = voyageDiv?.querySelector("select[name^='origine_']");
-        const typeHeure = voyageDiv?.querySelector("input[type=radio][value=heure]")?.checked;
-        const isHeureVimont = typeHeure && origineSelect?.value === "Vimont";
-
-        preview.textContent = (!isHeureVimont && distanceKm !== undefined)
-          ? `Distance estimée : ${Math.round(distanceKm)} km`
-          : "";
-      });
-
-      listContainer.appendChild(opt);
-    });
-
-    listContainer.style.display = "block";
-  });
-
-  input.addEventListener("blur", () => {
-    setTimeout(() => {
-      const valeur = normalizeStr(input.value);
-      const distanceKm = dataOrigine?.[Object.keys(dataOrigine).find(d => normalizeStr(d) === valeur)];
-
-      const voyageDiv = input.closest(".section-box");
-      const origineSelect = voyageDiv?.querySelector("select[name^='origine_']");
-      const typeHeure = voyageDiv?.querySelector("input[type=radio][value=heure]")?.checked;
-      const isHeureVimont = typeHeure && origineSelect?.value === "Vimont";
-
-      preview.textContent = (!isHeureVimont && distanceKm !== undefined)
-        ? `Distance estimée : ${Math.round(distanceKm)} km`
-        : "";
-    }, 200);
-  });
-
-  document.addEventListener("click", (e) => {
-    if (!listContainer.contains(e.target) && e.target !== input) {
-      listContainer.style.display = "none";
-    }
-  });
-}
-
-
-function generateHeureHtml(id) {
-  return `
-    <div class="mb-3">
-      <label class="form-label fw-bold text-uppercase">Heure de début</label>
-      <div class="d-flex gap-2">
-        <select class="form-select" name="heure_debut_h_${id}" required>
-          ${Array.from({length: 24}, (_, i) => `<option value="${String(i).padStart(2, '0')}">${String(i).padStart(2, '0')}</option>`).join('')}
-        </select>
-        <select class="form-select" name="heure_debut_m_${id}" required>
-          <option value="00">00</option>
-          <option value="15">15</option>
-          <option value="30">30</option>
-          <option value="45">45</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="mb-3">
-      <label class="form-label fw-bold text-uppercase">Heure de fin</label>
-      <div class="d-flex gap-2">
-        <select class="form-select" name="heure_fin_h_${id}" required>
-          ${Array.from({length: 24}, (_, i) => `<option value="${String(i).padStart(2, '0')}">${String(i).padStart(2, '0')}</option>`).join('')}
-        </select>
-        <select class="form-select" name="heure_fin_m_${id}" required>
-          <option value="00">00</option>
-          <option value="15">15</option>
-          <option value="30">30</option>
-          <option value="45">45</option>
-        </select>
-      </div>
-    </div>
-  `;
-}
-
-    function getSuiviHTML(id) {
-  return `
-    <div class="mb-3 mt-3">
-      <label class="form-label fw-bold text-uppercase">Avez-vous fait un autre voyage ensuite ?</label>
-      <div class="d-flex gap-2">
-  <label class="btn btn-outline-dark voyage-toggle flex-fill text-center" for="oui_${id}">
-    <input class="d-none" type="radio" name="autre_${id}" id="oui_${id}" value="oui" required />
-    Oui
-  </label>
-  <label class="btn btn-outline-dark voyage-toggle flex-fill text-center" for="non_${id}">
-    <input class="d-none" type="radio" name="autre_${id}" id="non_${id}" value="non" required />
-    Non
-  </label>
-</div>
-    </div>
-  `;
-}
-
-    function setupSuiviListener(id) {
-  const oui = document.getElementById(`oui_${id}`);
-  const non = document.getElementById(`non_${id}`);
-
-  if (oui) {
-  oui.addEventListener("change", () => {
-    const sectionSuivanteExiste = document.querySelector(`#details_${id + 1}`);
-    if (voyageCount < MAX_VOYAGES && !sectionSuivanteExiste) {
-      addVoyageSection();
-    }
-  });
-}
-
-  if (non) {
-    non.addEventListener("change", () => {
-      // Supprimer les voyages suivants s’ils existent
-      while (voyageCount > id) {
-        const sectionToRemove = document.querySelector(`#voyageContainer .section-box:last-child`);
-        if (sectionToRemove) {
-          voyageContainer.removeChild(sectionToRemove);
-          voyageCount--;
-        }
-      }
-      afficherSectionFinale();
-    });
-  }
-const radios = document.querySelectorAll(`input[name="autre_${id}"]`);
-radios.forEach((radio) => {
-  radio.addEventListener("change", () => {
-    radios.forEach(r => r.closest("label").classList.remove("active"));
-    if (radio.checked) {
-      radio.closest("label").classList.add("active");
-    }
-  });
-});
-  if (voyageCount === MAX_VOYAGES) {
-    afficherSectionFinale();
-  }
-}
-
-    function afficherSectionFinale() {
-  const section = document.createElement("div");
-  section.className = "section-box";
-  section.innerHTML = `
-    <h5 class="mb-3">Fin du journal de bord</h5>
-
-<!-- Diesel -->
-<div class="mb-3">
-  <label class="form-label fw-bold text-uppercase">Avez-vous fait le plein de diesel ?</label>
-  <div class="btn-group-toggle d-grid gap-2">
-    <label class="btn btn-outline-secondary fuel-toggle" for="diesel_non">
-      <input class="d-none" type="radio" name="diesel" id="diesel_non" value="non" required />
-      Non
-    </label>
-    <label class="btn btn-outline-secondary fuel-toggle" for="diesel_stbasile">
-      <input class="d-none" type="radio" name="diesel" id="diesel_stbasile" value="stbasile" required />
-      Oui, St Basile Transport
-    </label>
-    <label class="btn btn-outline-secondary fuel-toggle" for="diesel_esso">
-      <input class="d-none" type="radio" name="diesel" id="diesel_esso" value="esso" required />
-      Oui, ESSO Deschambault
-    </label>
-    <label class="btn btn-outline-secondary fuel-toggle" for="diesel_irving">
-      <input class="d-none" type="radio" name="diesel" id="diesel_irving" value="irving" required />
-      Oui, Irving USA
-    </label>
-    <div class="fuel-toggle autre-input">
-      <input
-        type="text"
-        class="form-control form-control-custom"
-        name="diesel_spec"
-        placeholder="Autre (inscrivez ici)"
-        id="diesel_spec_direct"
-      />
-    </div>
-  </div>
-</div>
-<!-- Litres diesel -->
-<div class="mb-3 d-none visually-enhanced-block" id="litres_diesel_block">
-  <label class="form-label fw-bold">Inscrivez la quantité de litres (diesel)</label>
-  <input type="number" inputmode="numeric" class="form-control mt-2" name="litres_diesel" />
-</div>
-
-<!-- Urée -->
-<div class="mb-3">
-  <label class="form-label fw-bold text-uppercase">Avez-vous fait le plein d’urée ?</label>
-  <div class="btn-group-toggle d-grid gap-2">
-    <label class="btn btn-outline-secondary fuel-toggle" for="uree_non">
-      <input class="d-none" type="radio" name="uree" id="uree_non" value="non" required />
-      Non
-    </label>
-    <label class="btn btn-outline-secondary fuel-toggle" for="uree_elz">
-      <input class="d-none" type="radio" name="uree" id="uree_elz" value="garage_elz" required />
-      Oui, au garage ELZ
-    </label>
-    <div class="fuel-toggle autre-input">
-      <input
-        type="text"
-        class="form-control form-control-custom"
-        name="uree_spec"
-        placeholder="Autre (inscrivez ici)"
-        id="uree_spec_direct"
-      />
-    </div>
-  </div>
-</div>
-<!-- Litres urée -->
-<div class="mb-3 d-none visually-enhanced-block" id="litres_uree_block">
-  <label class="form-label fw-bold">Inscrivez la quantité de litres (urée)</label>
-  <input type="number" inputmode="numeric" class="form-control mt-2" name="litres_uree" />
-</div>
-  `;
-
-voyageContainer.appendChild(section);
-
-// Activation visuelle des boutons Diesel / Urée
-section.querySelectorAll('.fuel-toggle input[type="radio"]').forEach(input => {
-  input.addEventListener('change', () => {
-    const name = input.name;
-    section.querySelectorAll(`input[name="${name}"]`).forEach(el => {
-      el.closest('.fuel-toggle').classList.remove('active');
-    });
-    if (input.checked) {
-      input.closest('.fuel-toggle').classList.add('active');
-    }
-  });
-});
-
-// DIESEL
-const dieselRadios = section.querySelectorAll('input[name="diesel"]');
-const dieselLitres = section.querySelector("#litres_diesel_block");
-const dieselAutreInput = section.querySelector("#diesel_spec_direct");
-
-// Si on clique sur un bouton radio
-dieselRadios.forEach((radio) => {
-  radio.addEventListener("change", () => {
-    if (radio.checked && radio.value !== "non") {
-      dieselLitres.classList.remove("d-none");
-    } else if (radio.checked && radio.value === "non") {
-      dieselLitres.classList.add("d-none");
-    }
-  });
-});
-
-// Si on clique dans le champ Autre
-dieselAutreInput.addEventListener("focus", () => {
-  dieselRadios.forEach(r => {
-    r.checked = false;
-    r.closest('.fuel-toggle').classList.remove("active");
-  });
-  dieselLitres.classList.remove("d-none");
-});
-
-
-// URÉE
-const ureeRadios = section.querySelectorAll('input[name="uree"]');
-const ureeLitres = section.querySelector("#litres_uree_block");
-const ureeAutreInput = section.querySelector("#uree_spec_direct");
-
-ureeRadios.forEach((radio) => {
-  radio.addEventListener("change", () => {
-    if (radio.checked && radio.value !== "non") {
-      ureeLitres.classList.remove("d-none");
-    } else if (radio.checked && radio.value === "non") {
-      ureeLitres.classList.add("d-none");
-    }
-  });
-});
-
-ureeAutreInput.addEventListener("focus", () => {
-  ureeRadios.forEach(r => {
-    r.checked = false;
-    r.closest('.fuel-toggle').classList.remove("active");
-  });
-  ureeLitres.classList.remove("d-none");
-});
-}
+    const firebaseConfig = {
+      apiKey: "AIzaSyD4U85mokKXsAP1AdwClWtcbt8udZrwlAw",
+      authDomain: "sommaireelz.firebaseapp.com",
+      projectId: "sommaireelz",
+      storageBucket: "sommaireelz.firebasestorage.app",
+      messagingSenderId: "171788284751",
+      appId: "1:171788284751:web:694f070d1cafe8b7c04b3a"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
   </script>
-  <!-- Résumé -->
-<div class="container py-4 d-none" id="resumeContainer">
-  <div class="section-box">
-    <h4 class="mb-3">Résumé de votre journée</h4>
-    <div id="resumeContent"></div>
-    <!-- Ajustements manuels -->
-<div class="section-box mt-3">
-  <button class="btn btn-outline-secondary w-100 mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#ajustementsCollapse">
-    + Ajouter des ajustements manuels
-  </button>
 
-  <div class="collapse" id="ajustementsCollapse">
-    <div class="mb-3">
-      <label for="ajust_hr" class="form-label">Heures supplémentaires</label>
-      <input type="number" step="0.25" min="0" class="form-control" id="ajust_hr" placeholder="Ex: 1.5" />
-    </div>
-    <div class="mb-3">
-      <label for="ajust_km" class="form-label">Kilomètres supplémentaires</label>
-      <input type="number" step="1" min="0" class="form-control" id="ajust_km" placeholder="Ex: 12" />
-    </div>
-    <div class="mb-3">
-      <label for="ajust_raison" class="form-label">Justification</label>
-      <textarea class="form-control" id="ajust_raison" rows="2" placeholder="Obligatoire si ajustement ajouté"></textarea>
-    </div>
-  </div>
-</div>
-    <div class="d-flex justify-content-between mt-4">
-      <button type="button" class="btn btn-secondary" id="btn-modifier">Modifier</button>
-      <button type="button" class="btn btn-success" id="btn-confirm">Confirmer et envoyer</button>
-    </div>
-  </div>
-</div>
+  <!-- JS logique -->
+  <script>
 
-<!-- Confirmation après envoi -->
-<div class="container py-4 d-none" id="confirmationContainer">
-  <div class="section-box text-center">
-    <h4 class="mb-3 text-success">Formulaire envoyé 🎉</h4>
-    <p>Merci pour votre envoi. Vos données ont été enregistrées avec succès.</p>
-    <button class="btn btn-primary mt-3" onclick="window.location.reload()">Remplir un nouveau formulaire</button>
-  </div>
-</div>
+    async function loadSemaine() {
+  const chauffeur = document.getElementById("chauffeurSelect").value;
+  const inputDate = document.getElementById("dateInput").value;
+  if (!chauffeur || !inputDate) return alert("Sélectionnez un chauffeur et une date.");
 
-<script>
+  const lundi = getWeekMonday(inputDate);
+  const tauxMap = await fetchTauxChauffeurs();
+  const taux = tauxMap[chauffeur];
+  if (!taux) return alert("Taux non trouvés pour ce chauffeur.");
 
-  function getDestinationsPropres(dataOrigine, input) {
-  const val = normalizeStr(input.value);
-  return Object.keys(dataOrigine).filter(
-    key => !key.endsWith("_DOUANE") && normalizeStr(key).includes(val)
-  );
-}
+  const semaineData = await fetchSemaineData(chauffeur, lundi);
+  const container = document.getElementById("pastillesContainer");
+  container.innerHTML = "";
 
-document.addEventListener("DOMContentLoaded", () => {
-  const btnPreview = document.getElementById("btn-preview");
-  const resumeContainer = document.getElementById("resumeContainer");
-  const resumeContent = document.getElementById("resumeContent");
-  const btnModifier = document.getElementById("btn-modifier");
+  let totalKm = 0, totalMin = 0, totalPrime = 0;
 
-  if (!btnPreview) {
-    console.error("⛔ Le bouton #btn-preview est introuvable dans le DOM !");
-    return;
-  }
-
-btnPreview.addEventListener("click", () => {
-  const formEl = document.getElementById("formulaire");
-
-  const formError = document.getElementById("formError");
-
-if (!formEl.checkValidity()) {
-  formEl.reportValidity();
-  formError.classList.remove("d-none");
-
-  // Optionnel : cache après 4 secondes
-  setTimeout(() => {
-    formError.classList.add("d-none");
-  }, 4000);
-
-  return;
-}
-
-// Si le formulaire est valide, on cache l'erreur si affichée
-formError.classList.add("d-none");
-
-  const data = new FormData(formEl);
-  const chauffeur = data.get("nom");
-  const taux = tauxMap[chauffeur] || { taux_h: 0, taux_km: 0 };
-
-  let html = "";
-  let totalMinutes = 0;
-  let totalKm = 0;
-  let totalPrime = 0;
-  voyages = [];
-
-  for (let i = 1; i <= 3; i++) {
-    const type = data.get(`type_voyage_${i}`);
-    if (!type) continue;
-
-    const origine = data.get(`origine_${i}`);
-    const destination = data.get(`destination_${i}`);
-    const normOrigine = normalizeStr(origine);
-    const normDestination = normalizeStr(destination);
-    const kmVal = kmMap[normOrigine]?.[normDestination] || 0;
-    const isDouane = (kmMap[normOrigine]?.[normDestination + "_DOUANE"] === true);
-
-    if (type === "kilometrage") {
-      voyages.push({
-        id: i,
-        type,
-        origine,
-        destination,
-        km: kmVal,
-        douane: isDouane
-      });
-    } else {
-      const dH = parseInt(data.get(`heure_debut_h_${i}`) || "0", 10);
-      const dM = parseInt(data.get(`heure_debut_m_${i}`) || "0", 10);
-      const fH = parseInt(data.get(`heure_fin_h_${i}`) || "0", 10);
-      const fM = parseInt(data.get(`heure_fin_m_${i}`) || "0", 10);
-      const duration = (fH * 60 + fM) - (dH * 60 + dM);
-      if (duration > 0) totalMinutes += duration;
-      voyages.push({
-        id: i,
-        type,
-        origine,
-        destination,
-        h1: dH,
-        m1: dM,
-        h2: fH,
-        m2: fM
-      });
-    }
-  }
-
-  const lastHeureVimont = [...voyages]
-    .reverse()
-    .find(v => v.type === "heure" && normalizeStr(v.origine) === "vimont");
-
-for (let i = 0; i < voyages.length; i++) {
-  const v = voyages[i];
-  if (v.type === "kilometrage") {
-    let kmPayes = v.km;
-    let label = `${v.destination || `Voyage ${v.id}`} - KM`;
-
-    const next = voyages[i + 1];
-    const isStansteadTransfer = normalizeStr(v.origine) === "st-basile" &&
-                                normalizeStr(v.destination) === "stanstead" &&
-                                next?.type === "kilometrage" &&
-                                normalizeStr(next.origine) === "stanstead";
-
-    const isRetourStanstead = normalizeStr(v.origine) === "stanstead" &&
-                              normalizeStr(v.destination) === "st-basile";
-
-    let afficherPrime = true;
-
-    if (isRetourStanstead) {
-      label += " (aller simple retour de Stanstead)";
-      afficherPrime = false; // pas de prime
-      // pas de double km non plus
-    } else if (isStansteadTransfer) {
-      label += " (aller simple)";
-      afficherPrime = false;
-    } else if (next?.type === "heure" && normalizeStr(next.origine) === "vimont") {
-      label += " (aller simple)";
-    } else {
-      label += " (aller-retour)";
-      kmPayes *= 2;
-    }
-
-    html += `<p><strong>${label}:</strong> ${kmPayes}km</p>`;
-    totalKm += kmPayes;
-
-    if (afficherPrime) {
-  totalPrime += parametresMap.prime_forfait;
-}
-
-
-    // Prime douane, uniquement si pas déjà payée
-    if (v.douane && !voyages.some(vv => vv.id < v.id && vv.douane)) {
-  totalPrime += parametresMap.prime_douane;
-}
-
-
-  } else {
-    html += `<p><strong>${v.destination} - Heure:</strong> ${v.h1}h${v.m1.toString().padStart(2, "0")} → ${v.h2}h${v.m2.toString().padStart(2, "0")}</p>`;
-
-    if (v === lastHeureVimont) {
-      const retourKm = kmMap["st-basile"]?.[normalizeStr(v.destination)] || 0;
-      html += `<p><strong>Retour de ${v.destination} :</strong> ${retourKm}km</p>`;
-      totalKm += retourKm;
-    }
-  }
-}
-
-
-
-// Recalcule après boucle complétée
-const totalH = Math.floor(totalMinutes / 60);
-const totalM = totalMinutes % 60;
-const montantKm = totalKm * taux.taux_km;
-const montantH = (totalMinutes / 60) * taux.taux_h;
-
-// Ajout des ajustements (avant montantFinal)
-const ajustHr = parseFloat(document.getElementById("ajust_hr")?.value || "0");
-const ajustKm = parseFloat(document.getElementById("ajust_km")?.value || "0");
-const ajustRaison = document.getElementById("ajust_raison")?.value.trim();
-
-if ((ajustHr > 0 || ajustKm > 0) && ajustRaison.length === 0) {
-  alert("Merci d’ajouter une justification pour les ajustements manuels.");
-  return;
-}
-
-// Ajoute les valeurs aux totaux
-if (ajustKm > 0) totalKm += ajustKm;
-if (ajustHr > 0) totalMinutes += ajustHr * 60;
-
-
-// Recalcule montant total avec ajouts
-const montantKmFinal = totalKm * taux.taux_km;
-const montantHFinal = (totalMinutes / 60) * taux.taux_h;
-const montantFinal = montantKmFinal + montantHFinal + totalPrime;
-
-// Génération HTML
-html += `<hr/><p><strong>KM Payés:</strong> ${totalKm}km</p>`;
-html += `<p><strong>Heures Payées:</strong> ${Math.floor(totalMinutes / 60)}h${String(totalMinutes % 60).padStart(2, "0")}</p>`;
-if (totalPrime >= parametresMap.prime_forfait) {
-  html += `<p><strong>Forfait:</strong> ${parametresMap.prime_forfait.toFixed(2)}$</p>`;
-}
-if (voyages.some(v => v.douane)) {
-  html += `<p><strong>Prime Douane:</strong> ${parametresMap.prime_douane.toFixed(2)}$</p>`;
-}
-
-
-// Affiche les ajustements
-if (ajustKm > 0) {
-  html += `<p><strong>Ajustement KM:</strong> +${ajustKm} km</p>`;
-}
-if (ajustHr > 0) {
-  html += `<p><strong>Ajustement heure:</strong> +${ajustHr} h</p>`;
-}
-if (ajustHr > 0 || ajustKm > 0) {
-  html += `<p class="text-muted"><strong>Justification:</strong> ${ajustRaison}</p>`;
-}
-
-// Total final
-html += `<hr/><p><strong>Total payé estimé:</strong> ${montantFinal.toFixed(2)}$</p>`;
-
-resumeContent.innerHTML = html;
-
-  
-  // -- LIVE UPDATE AJUSTEMENTS --
-function calculerResumeAvecAjustements() {
-  const ajustKm = parseFloat(document.getElementById("ajust_km")?.value || "0");
-  const ajustHeures = parseFloat(document.getElementById("ajust_hr")?.value || "0");
-  const justification = document.getElementById("ajust_raison")?.value.trim();
-  const tauxKm = taux.taux_km || 0;
-  const tauxH = taux.taux_h || 0;
-
-  let htmlAjust = "";
-
-  const bonusKm = ajustKm > 0 ? ajustKm * tauxKm : 0;
-  const bonusH = ajustHeures > 0 ? ajustHeures * tauxH : 0;
-
-  if (bonusKm > 0 || bonusH > 0) {
-    htmlAjust += `<hr/><p><strong>Ajustements manuels :</strong></p>`;
-    if (bonusKm > 0) htmlAjust += `<p>+ ${ajustKm}km supplémentaires = ${(bonusKm).toFixed(2)}$</p>`;
-    if (bonusH > 0) htmlAjust += `<p>+ ${ajustHeures}h supplémentaires = ${(bonusH).toFixed(2)}$</p>`;
-    htmlAjust += `<p class="text-muted small">Justification : ${justification || '(non précisée)'}</p>`;
-  }
-
-  const totalFinal = montantKm + montantH + totalPrime + bonusKm + bonusH;
-  resumeContent.innerHTML = html + htmlAjust +
-    `<hr/><p><strong>Total payé estimé:</strong> ${totalFinal.toFixed(2)}$</p>`;
-}
-
-// Réagir aux changements en live
-["ajust_hr", "ajust_km", "ajust_raison"].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) {
-    el.addEventListener("input", calculerResumeAvecAjustements);
-  }
-});
-  
-  formEl.classList.add("d-none");
-  resumeContainer.classList.remove("d-none");
-  btnModifier.addEventListener("click", () => {
-  resumeContainer.classList.add("d-none");
-  form.classList.remove("d-none");
-});
-});
-
-const ajHr = parseFloat(document.getElementById("ajust_hr")?.value || "0");
-const ajKm = parseFloat(document.getElementById("ajust_km")?.value || "0");
-const ajRaison = document.getElementById("ajust_raison")?.value.trim();
-
-  document.getElementById("btn-confirm").addEventListener("click", () => {
-  const ajustHr = parseFloat(document.getElementById("ajust_hr")?.value || "0");
-  const ajustKm = parseFloat(document.getElementById("ajust_km")?.value || "0");
-  const ajustRaison = document.getElementById("ajust_raison")?.value.trim();
-
-  // Bloquer l’envoi s’il manque la justification
-  if ((ajustHr > 0 || ajustKm > 0) && ajustRaison.length === 0) {
-    alert("Merci d’ajouter une justification pour les ajustements manuels.");
-    return; // <-- ❗ Stoppe ici
-  }
-
-  const formData = new FormData(document.getElementById("formulaire"));
-  const data = {};
-  formData.forEach((val, key) => data[key] = val);
-// Ajouter manuellement les ajustements à l'objet data
-data["ajust_hr"] = document.getElementById("ajust_hr")?.value || "";
-data["ajust_km"] = document.getElementById("ajust_km")?.value || "";
-data["ajust_raison"] = document.getElementById("ajust_raison")?.value || "";
-
-data["prime_forfait"] = voyages.some(v =>
-  v.type === "kilometrage" &&
-  !(normalizeStr(v.origine) === "st-basile" && normalizeStr(v.destination) === "stanstead")
-) ? parametresMap.prime_forfait : 0;
-
-data["prime_douane"] = voyages.some(v => v.douane) ? parametresMap.prime_douane : 0;
-
-
-
-  fetch("https://script.google.com/macros/s/AKfycbxkIdLvTHQ0JREJ9AAXNLFo1E5T7Ou63TAFZh9izuo198Ii2wxGvmYzTQswbacP_4tK/exec", {
-    method: "POST",
-    mode: "no-cors",
-    body: JSON.stringify(data),
-    headers: { "Content-Type": "application/json" }
+  const grouped = {};
+  semaineData.forEach(item => {
+    if (!grouped[item.date]) grouped[item.date] = [];
+    grouped[item.date].push(item);
   });
 
-  resumeContainer.classList.add("d-none");
-  document.getElementById("confirmationContainer").classList.remove("d-none");
-});
-});
-  
-  let parametresMap = { prime_forfait: 60.85, prime_douane: 15 }; // Valeurs par défaut
-
-</script>
-<script>
-let tauxMap = {};
-let kmMap = {};
-let  = {};
-
-fetch("https://script.google.com/macros/s/AKfycbxkIdLvTHQ0JREJ9AAXNLFo1E5T7Ou63TAFZh9izuo198Ii2wxGvmYzTQswbacP_4tK/exec")
-  .then(res => res.json())
-  .then(data => {
-    console.log("✅ Données reçues :", data);
-    console.table(data.chauffeurs); // 👀 Visualisation claire
-    parametresMap = data.parametres || parametresMap;
-    console.log("💰 Paramètres reçus :", parametresMap);
-
-    const selectNom = document.getElementById("nom");
-    const selectCamion = document.getElementById("camion");
-
-    // 🔁 Création des maps
-    tauxMap = data.chauffeurs.reduce((acc, el) => {
-      acc[el.nom] = {
-        taux_h: parseFloat(el.taux_h),
-        taux_km: parseFloat(el.taux_km),
-      };
-      return acc;
-    }, {});
-
-    chauffeurCamionMap = data.chauffeurs.reduce((acc, el) => {
-  const nom = el.nom || "";
-  const camion = el.camion?.trim() || "";
-  if (nom) acc[nom] = camion;
-  return acc;
-}, {});
-
-
-    // ✅ 🗺️ Construction de kmMap pour l'autocomplétion
-    kmMap = data.km.reduce((acc, el) => {
-  const origine = normalizeStr(el.origine);
-  const destination = normalizeStr(el.destination);
-  const distance = parseFloat(el.km);
-  const douane = (el.douane || "").toString().trim().toUpperCase();
-
-  if (!acc[origine]) acc[origine] = {};
-
-  // Stocker la distance
-  acc[origine][destination] = isNaN(distance) ? 0 : distance;
-
-  // Stocker l'info douane en parallèle
-  if (douane === "OUI") {
-    acc[origine][`${destination}_DOUANE`] = true;
-  }
-
-  return acc;
-}, {});
-    console.log("🗺️ kmMap bien construit :", kmMap);
-
-    // 🔽 Remplissage liste des chauffeurs
-    data.chauffeurs.forEach(chauffeur => {
-      const opt = document.createElement("option");
-      opt.value = chauffeur.nom;
-      opt.textContent = chauffeur.nom;
-      selectNom.appendChild(opt);
+  Object.keys(grouped).forEach(date => {
+    const div = document.createElement("div");
+    div.className = "pastille";
+    div.innerHTML = `<h5>${parseLocalDate(date).toLocaleDateString("fr-CA", { weekday: 'long', day: 'numeric', month: 'short' })}</h5><div class="details"></div>`;
+    
+    const details = div.querySelector(".details");
+    grouped[date].forEach(voyage => {
+      if (voyage.type === "kilometrage" || voyage.type === "retour") {
+        details.innerHTML += `<div><strong>KM:</strong> ${voyage.km} (${voyage.origine} → ${voyage.destination})</div>`;
+        totalKm += voyage.km;
+        totalPrime += voyage.prime || 0;
+      }
+      if (voyage.type === "heure") {
+        const h = Math.floor(voyage.minutes / 60);
+        const m = voyage.minutes % 60;
+        details.innerHTML += `<div><strong>Heures:</strong> ${h}h${String(m).padStart(2, '0')} (${voyage.origine} → ${voyage.destination})</div>`;
+        totalMin += voyage.minutes;
+      }
     });
 
-    // 🔁 Préselection du camion
-  function preselectCamionPourNom(nom) {
-  const camionNomComplet = chauffeurCamionMap[nom]; // ex. "Camion 1103"
-  if (!camionNomComplet) return;
-
-  const camionCode = camionNomComplet.replace(/\D/g, ""); // Extrait "1103"
-  const option = Array.from(selectCamion.options).find(
-    (opt) => opt.value === camionCode
-  );
-
-  if (option) {
-    selectCamion.value = option.value;
-    console.log(`🚚 Camion ${camionCode} présélectionné pour ${nom}`);
-  } else {
-    console.warn(`❗ Camion "${camionNomComplet}" (code ${camionCode}) introuvable pour ${nom}`);
-  }
-}
-
-selectNom.addEventListener("change", () => {
-  const nom = selectNom.value;
-  preselectCamionPourNom(nom);
-});
-
-// Au chargement si déjà pré-sélectionné
-if (selectNom.value) {
-  preselectCamionPourNom(selectNom.value);
-}
-
-
-    // 🆙 Formulaire prêt
-    addVoyageSection();
-    document.getElementById("formulaire").classList.remove("d-none");
-    document.getElementById("loader").style.display = "none";
-  })
-  .catch(err => console.error("❌ Erreur chargement:", err));
-
-
-document.querySelectorAll('input[list]').forEach(input => {
-  input.addEventListener('focus', () => {
-    setTimeout(() => {
-      input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 300); // délai pour laisser le clavier apparaître
+    container.appendChild(div);
   });
+
+  const totalH = Math.floor(totalMin / 60);
+  const totalM = totalMin % 60;
+  const totalPayable = (totalKm * taux.taux_km) + (totalMin / 60 * taux.taux_h) + totalPrime;
+
+  document.getElementById("totalKm").textContent = totalKm;
+  document.getElementById("totalH").textContent = `${totalH}h${String(totalM).padStart(2, '0')}`;
+  document.getElementById("totalPrime").textContent = totalPrime.toFixed(2);
+
+  const summary = document.querySelector(".summary-box");
+  const existing = summary.querySelector("p:last-child");
+  if (existing) existing.remove();
+  const montantEl = document.createElement("p");
+  montantEl.innerHTML = `<strong>Montant total estimé :</strong> <span class="text-success fw-bold">${totalPayable.toFixed(2)} $</span>`;
+  summary.appendChild(montantEl);
+}
+
+  function getWeekMonday(dateStr) {
+  const parts = dateStr.split("-");
+  const d = new Date(parts[0], parts[1] - 1, parts[2]); // YYYY, MM-1, DD
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1); // lundi
+  d.setDate(diff);
+  return d.toISOString().split("T")[0];
+}
+
+    function parseLocalDate(str) {
+  const [y, m, d] = str.split("-").map(Number);
+  return new Date(y, m - 1, d); // mois commence à 0
+}
+
+    function changerSemaine() {
+      document.getElementById("dateInput").value = "";
+      document.getElementById("pastillesContainer").innerHTML = "";
+      document.getElementById("totalKm").textContent = "0";
+      document.getElementById("totalH").textContent = "0h00";
+      document.getElementById("totalPrime").textContent = "0.00";
+    }
+
+    function sauvegarderSemaine() {
+      alert("Fonction SAVE désactivée ici pour éviter d’écraser les données — à activer quand prêt.");
+      // Tu pourras copier la logique de sauvegarde depuis ton autre projet ici
+    }
+  </script>
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbzVBkhW38q4hcHhnGp8Dlkh6BbViw-zNEd0DikdaLX9dDnf5dbx3GhEcOd8o0010Rq-/exec";
+
+// Récupère les données de la semaine (pastilles journalières)
+async function fetchSemaineData(chauffeur, lundi) {
+  const url = `${API_URL}?chauffeur=${encodeURIComponent(chauffeur)}&lundi=${lundi}`;
+  const res = await fetch(url);
+  return await res.json(); // tableau [{ date, km, minutes, prime, ... }]
+}
+
+// Récupère la map des taux par chauffeur
+async function fetchTauxChauffeurs() {
+  const response = await fetch(API_URL);
+  const json = await response.json();
+
+  const tauxMap = {};
+  json.chauffeurs.forEach(chauffeur => {
+    tauxMap[chauffeur.nom] = {
+      taux_km: parseFloat(chauffeur.taux_km),
+      taux_h: parseFloat(chauffeur.taux_h)
+    };
+  });
+
+  return tauxMap;
+}
+</script>
+<script>
+async function chargerChauffeursDansSelect() {
+  const response = await fetch(API_URL);
+  const json = await response.json();
+
+  const select = document.getElementById("chauffeurSelect");
+  json.chauffeurs.forEach(chauffeur => {
+    const opt = document.createElement("option");
+    opt.value = chauffeur.nom;
+    opt.textContent = chauffeur.nom;
+    select.appendChild(opt);
+  });
+}
+
+  document.addEventListener("DOMContentLoaded", () => {
+  chargerChauffeursDansSelect();
 });
- 
+  
+  console.log(document.getElementById("totalKm")); // doit afficher <span>…</span>
 
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
- 
+
 </body>
 </html>

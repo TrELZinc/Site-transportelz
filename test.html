@@ -331,26 +331,26 @@ function addVoyageSection() {
         applyAutocomplete();
         origineSelect.addEventListener("change", applyAutocomplete);
       } else {
-        const origineVal = origineSelect.value.trim().toLowerCase();
-        const isVimont = origineVal === "vimont";
+  const applyAutocomplete = () => {
+    const origineVal = origineSelect.value.trim().toLowerCase();
+    const isVimont = origineVal === "vimont";
 
-        if (isVimont) {
-          const applyAutocomplete = () => {
-            const sourceKey = "st-basile";
-            setupAutocomplete(destinationInput, listContainer, sourceKey);
-          };
-          applyAutocomplete();
-          origineSelect.addEventListener("change", applyAutocomplete);
-        } else {
-          listContainer.style.display = "none";
-          destinationInput.removeEventListener("input", () => {});
-          destinationInput.removeEventListener("blur", () => {});
-          destinationInput.setAttribute("autocomplete", "off");
+    if (isVimont) {
+      setupAutocomplete(destinationInput, listContainer, "st-basile");
+    } else {
+      listContainer.innerHTML = "";
+      listContainer.style.display = "none";
+      destinationInput.value = "";
+      destinationInput.removeEventListener("input", () => {});
+      destinationInput.removeEventListener("blur", () => {});
+      const preview = destinationInput.parentNode.querySelector(".text-muted.mt-1");
+      if (preview) preview.remove();
+    }
+  };
 
-          const preview = destinationInput.parentNode.querySelector(".text-muted.mt-1");
-          if (preview) preview.remove();
-        }
-      }
+  applyAutocomplete();
+  origineSelect.addEventListener("change", applyAutocomplete);
+}
     });
   });
 }

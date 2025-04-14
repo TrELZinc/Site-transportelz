@@ -1033,11 +1033,11 @@ fetch("https://script.google.com/macros/s/AKfycbyGDDt0IzAAq7175bpGOga8jiO590vLAu
     }, {});
 
     chauffeurCamionMap = data.chauffeurs.reduce((acc, el) => {
-      const nom = el["Nom Complet"] || el.nom || "";
-      const camion = (el["camion défaut"] || el["Camion défaut"] || el["camion défaut "] || "").trim();
-      if (nom) acc[nom] = camion;
-      return acc;
-    }, {});
+  const nom = el["Nom Complet"] || el.nom || "";
+  const camion = (el["camion défaut"] || el["Camion défaut"] || el["camion défaut "] || "").trim();
+  if (nom) acc[nom] = camion;
+  return acc;
+}, {});
 
     // ✅ 🗺️ Construction de kmMap pour l'autocomplétion
     kmMap = data.km.reduce((acc, el) => {
@@ -1069,31 +1069,33 @@ fetch("https://script.google.com/macros/s/AKfycbyGDDt0IzAAq7175bpGOga8jiO590vLAu
     });
 
     // 🔁 Préselection du camion
-    function preselectCamionPourNom(nom) {
-      const camionNomComplet = chauffeurCamionMap[nom]; // ex. "Camion 1103"
-      if (!camionNomComplet) return;
+  function preselectCamionPourNom(nom) {
+  const camionNomComplet = chauffeurCamionMap[nom]; // ex. "Camion 1103"
+  if (!camionNomComplet) return;
 
-      const camionCode = camionNomComplet.replace(/\D/g, "");
-      const option = Array.from(selectCamion.options).find(
-        (opt) => opt.value === camionCode
-      );
+  const camionCode = camionNomComplet.replace(/\D/g, ""); // Extrait "1103"
+  const option = Array.from(selectCamion.options).find(
+    (opt) => opt.value === camionCode
+  );
 
-      if (option) {
-        selectCamion.value = option.value;
-        console.log(`🚚 Camion ${camionCode} présélectionné pour ${nom}`);
-      } else {
-        console.warn(`❗ Camion "${camionNomComplet}" (code ${camionCode}) introuvable pour ${nom}`);
-      }
-    }
+  if (option) {
+    selectCamion.value = option.value;
+    console.log(`🚚 Camion ${camionCode} présélectionné pour ${nom}`);
+  } else {
+    console.warn(`❗ Camion "${camionNomComplet}" (code ${camionCode}) introuvable pour ${nom}`);
+  }
+}
 
-    selectNom.addEventListener("change", () => {
-      const nom = selectNom.value;
-      preselectCamionPourNom(nom);
-    });
+selectNom.addEventListener("change", () => {
+  const nom = selectNom.value;
+  preselectCamionPourNom(nom);
+});
 
-    if (selectNom.value) {
-      preselectCamionPourNom(selectNom.value);
-    }
+// Au chargement si déjà pré-sélectionné
+if (selectNom.value) {
+  preselectCamionPourNom(selectNom.value);
+}
+
 
     // 🆙 Formulaire prêt
     addVoyageSection();

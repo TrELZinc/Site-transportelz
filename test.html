@@ -132,43 +132,54 @@
   document.getElementById("pastillesContainer").innerHTML = "";
 
   let totalKm = 0, totalMin = 0, totalPrime = 0;
+  let promises = [];
 
-      dates.forEach(day => {
-        db.collection("paye_semaine")
-          .where("chauffeur", "==", chauffeur)
-          .where("date", "==", day)
-          .limit(1)
-          .get()
-          .then(snapshot => {
-            if (!snapshot.empty) {
-              const data = snapshot.docs[0].data();
-              totalKm += data.km || 0;
-              totalMin += data.minutes || 0;
-              totalPrime += data.prime || 0;
+  dates.forEach(day => {
+    const p = db.collection("paye_semaine")
+      .where("chauffeur", "==", chauffeur)
+      .where("date", "==", day)
+      .limit(1)
+      .get()
+      .then(snapshot => {
+        if (!snapshot.empty) {
+          const data = snapshot.docs[0].data();
+          totalKm += data.km || 0;
+          totalMin += data.minutes || 0;
+          totalPrime += data.prime || 0;
 
-              const pastille = document.createElement("div");
-              pastille.className = "pastille";
-              pastille.innerHTML = `
-                <h5>${new Date(day).toLocaleDateString("fr-CA", { weekday: "long", day: "numeric", month: "short" })}</h5>
-                <div class="details">
-                  <div><strong>Destination:</strong> ${data.destination || "—"}</div>
-                  <div><strong>KM:</strong> ${data.km || 0}</div>
-                  <div><strong>Heures:</strong> ${Math.floor((data.minutes || 0) / 60)}h${String((data.minutes || 0) % 60).padStart(2, '0')}</div>
-                  <div><strong>Forfait:</strong> ${data.prime?.toFixed(2) || "0.00"} $</div>
-                </div>`;
-            document.getElementById("totalKm").textContent = totalKm;
-  document.getElementById("totalH").textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2, '0')}`;
-  document.getElementById("totalPrime").textContent = totalPrime.toFixed(2);
-
-  // Affiche le montant total estimé
-  const summary = document.querySelector(".summary-box");
-  const montantEl = document.createElement("p");
-  montantEl.innerHTML = `<strong>Montant total estimé :</strong> <span class="text-success fw-bold">${totalPayable.toFixed(2)} $</span>`;
-  summary.appendChild(montantEl);
-}
-          });
+          const pastille = document.createElement("div");
+          pastille.className = "pastille";
+          pastille.innerHTML = `
+            <h5>${new Date(day).toLocaleDateString("fr-CA", { weekday: "long", day: "numeric", month: "short" })}</h5>
+            <div class="details">
+              <div><strong>Destination:</strong> ${data.destination || "—"}</div>
+              <div><strong>KM:</strong> ${data.km || 0}</div>
+              <div><strong>Heures:</strong> ${Math.floor((data.minutes || 0) / 60)}h${String((data.minutes || 0) % 60).padStart(2, '0')}</div>
+              <div><strong>Forfait:</strong> ${data.prime?.toFixed(2) || "0.00"} $</div>
+            </div>`;
+          document.getElementById("pastillesContainer").appendChild(pastille);
+        }
       });
-    }
+
+    promises.push(p);
+  });
+
+  Promise.all(promises).then(() => {
+    // Une fois TOUTES les journées chargées
+    document.getElementById("totalKm").textContent = totalKm;
+    document.getElementById("totalH").textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2, '0')}`;
+    document.getElementById("totalPrime").textContent = totalPrime.toFixed(2);
+
+    const montantKm = totalKm * taux.taux_km;
+    const montantHeures = (totalMin / 60) * taux.taux_h;
+    const totalPayable = montantKm + montantHeures + totalPrime;
+
+    const summary = document.querySelector(".summary-box");
+    const montantEl = document.createElement("p");
+    montantEl.innerHTML = `<strong>Montant total estimé :</strong> <span class="text-success fw-bold">${totalPayable.toFixed(2)} $</span>`;
+    summary.appendChild(montantEl);
+  });
+}
 
     function changerSemaine() {
       document.getElementById("dateInput").value = "";

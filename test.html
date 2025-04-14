@@ -129,14 +129,16 @@ async function loadSemaine() {
       if (voyage.type === "kilometrage" || voyage.type === "retour") {
         details.innerHTML += `<div><strong>KM:</strong> ${voyage.km} (${voyage.origine} → ${voyage.destination})</div>`;
         totalKm += voyage.km;
-        if (voyage.prime === 60.85) {
-          totalForfait += 60.85;
-          details.innerHTML += `<div class="text-success">+ Forfait: 60.85 $</div>`;
-        }
-        if (voyage.prime === 15) {
-          totalDouane += 15;
-          details.innerHTML += `<div class="text-success">+ Prime douane: 15.00 $</div>`;
-        }
+        const prime = parseFloat(voyage.prime);
+        if (!isNaN(prime)) {
+        if (Math.abs(prime - 60.85) < 0.01) {
+    totalForfait += 60.85;
+    details.innerHTML += `<div class="text-success">+ Forfait: 60.85 $</div>`;
+  } else if (Math.abs(prime - 15) < 0.01) {
+    totalDouane += 15;
+    details.innerHTML += `<div class="text-success">+ Prime douane: 15.00 $</div>`;
+  }
+}
       }
       if (voyage.type === "heure") {
         const h = Math.floor(voyage.minutes / 60);

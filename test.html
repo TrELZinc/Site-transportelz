@@ -159,6 +159,8 @@
   document.getElementById("totalPrime").textContent = totalPrime.toFixed(2);
 
   const summary = document.querySelector(".summary-box");
+  const existing = summary.querySelector("p:last-child");
+  if (existing) existing.remove();
   const montantEl = document.createElement("p");
   montantEl.innerHTML = `<strong>Montant total estimé :</strong> <span class="text-success fw-bold">${totalPayable.toFixed(2)} $</span>`;
   summary.appendChild(montantEl);

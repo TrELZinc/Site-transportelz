@@ -167,12 +167,14 @@
 }
 
   function getWeekMonday(dateStr) {
-  const d = new Date(dateStr);
+  const parts = dateStr.split("-");
+  const d = new Date(parts[0], parts[1] - 1, parts[2]); // YYYY, MM-1, DD
   const day = d.getDay();
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Lundi
-  const monday = new Date(d.setDate(diff));
-  return monday.toISOString().split("T")[0];
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1); // lundi
+  d.setDate(diff);
+  return d.toISOString().split("T")[0];
 }
+
 
     function changerSemaine() {
       document.getElementById("dateInput").value = "";
@@ -188,7 +190,7 @@
     }
   </script>
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbz9JnA8RtpKjKepSbbwFaRT7WISqMBCyhBL38C2TDTY8gYVLxMM1IE1pzXtu2MGpBB3/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbysNFKLRbGD3YxojimnlsXhytRGtPjDOZ5CQvkEV0nrP_0TxbgO_Gq7oS4QpyCNOUY/exec";
 
 // Récupère les données de la semaine (pastilles journalières)
 async function fetchSemaineData(chauffeur, lundi) {

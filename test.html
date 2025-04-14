@@ -1010,7 +1010,7 @@ data["prime_douane"] = voyages.some(v => v.douane) ? parametresMap.prime_douane 
 <script>
 let tauxMap = {};
 let kmMap = {};
-let chauffeurCamionMap = {};
+let  = {};
 
 fetch("https://script.google.com/macros/s/AKfycbxkIdLvTHQ0JREJ9AAXNLFo1E5T7Ou63TAFZh9izuo198Ii2wxGvmYzTQswbacP_4tK/exec")
   .then(res => res.json())
@@ -1033,11 +1033,12 @@ fetch("https://script.google.com/macros/s/AKfycbxkIdLvTHQ0JREJ9AAXNLFo1E5T7Ou63T
     }, {});
 
     chauffeurCamionMap = data.chauffeurs.reduce((acc, el) => {
-  const nom = el["Nom Complet"] || el.nom || "";
-  const camion = (el["camion défaut"] || el["Camion défaut"] || el["camion défaut "] || "").trim();
+  const nom = el.nom || "";
+  const camion = el.camion?.trim() || "";
   if (nom) acc[nom] = camion;
   return acc;
 }, {});
+
 
     // ✅ 🗺️ Construction de kmMap pour l'autocomplétion
     kmMap = data.km.reduce((acc, el) => {

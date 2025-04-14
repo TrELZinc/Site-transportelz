@@ -882,9 +882,6 @@ if ((ajustHr > 0 || ajustKm > 0) && ajustRaison.length === 0) {
 // Ajoute les valeurs aux totaux
 if (ajustKm > 0) totalKm += ajustKm;
 if (ajustHr > 0) totalMinutes += ajustHr * 60;
-  if (!isStansteadTransfer && !isRetourStanstead) {
-  totalPrime += 60.85;
-}
 
 
 // Recalcule montant total avec ajouts

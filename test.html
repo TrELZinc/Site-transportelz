@@ -813,20 +813,11 @@ formError.classList.add("d-none");
       const primeDouane = v.douane ? 15 : 0;
 
 if (!isStansteadTransfer) {
-  totalPrime += 60.85 + primeDouane;
-} else {
-  totalPrime += 0 + primeDouane;
+  totalPrime += 60.85;
 }
-
-if (!isStansteadTransfer) {
-  totalPrime += 60.85 + primeDouane;
-} else {
-  totalPrime += 0 + primeDouane;
+if (v.douane && !voyages.some(vv => vv.id < v.id && vv.douane)) {
+  totalPrime += 15; // 1 seule fois si une douane détectée
 }
-
-
-
-
 
     } else {
       html += `<p><strong>${v.destination} - Heure:</strong> ${v.h1}h${v.m1.toString().padStart(2, "0")} → ${v.h2}h${v.m2.toString().padStart(2, "0")}</p>`;
@@ -867,11 +858,12 @@ const montantFinal = montantKmFinal + montantHFinal + totalPrime;
 // Génération HTML
 html += `<hr/><p><strong>KM Payés:</strong> ${totalKm}km</p>`;
 html += `<p><strong>Heures Payées:</strong> ${Math.floor(totalMinutes / 60)}h${String(totalMinutes % 60).padStart(2, "0")}</p>`;
-if (totalPrime > 60.85) {
+if (totalPrime >= 60.85) {
+  html += `<p><strong>Forfait:</strong> 60.85$</p>`;
+}
+if (voyages.some(v => v.douane)) {
   html += `<p><strong>Prime Douane:</strong> 15.00$</p>`;
 }
-html += `<p><strong>Forfait:</strong> 60.85$</p>`;
-
 
 // Affiche les ajustements
 if (ajustKm > 0) {

@@ -195,7 +195,7 @@
 </head>
 <body>
   <div class="container py-4">
-    <h2 class="mb-4 text-center">Journal de travail</h2>
+    <h2 class="mb-4 text-center">Feuille de temps</h2>
     <form id="formulaire" class="d-none">
       <div class="section-box">
         <div class="mb-3">
@@ -237,9 +237,9 @@
   <p class="mt-3">Chargement du formulaire...</p>
 </div>
   <script>
-    
+    let voyages = []; // GLOBAL
     function normalizeStr(str) {
-  return (str || "")
+    return (str || "")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "") // ❗ corrige ici : sans l'échappement mal placé
     .toLowerCase()
@@ -761,7 +761,7 @@ formError.classList.add("d-none");
   let totalMinutes = 0;
   let totalKm = 0;
   let totalPrime = 0;
-  let voyages = [];
+  voyages = [];
 
   for (let i = 1; i <= 3; i++) {
     const type = data.get(`type_voyage_${i}`);
@@ -983,7 +983,16 @@ data["ajust_hr"] = document.getElementById("ajust_hr")?.value || "";
 data["ajust_km"] = document.getElementById("ajust_km")?.value || "";
 data["ajust_raison"] = document.getElementById("ajust_raison")?.value || "";
 
-  fetch("https://script.google.com/macros/s/AKfycbx2mqKDbY3TXB25rmSR_7J3QjNe5nRG9MFevHZPgWLOJe9pyt2pJfUBAypuogul1Uw8/exec", {
+data["prime_forfait"] = voyages.some(v =>
+  v.type === "kilometrage" &&
+  !(normalizeStr(v.origine) === "st-basile" && normalizeStr(v.destination) === "stanstead")
+) ? parametresMap.prime_forfait : 0;
+
+data["prime_douane"] = voyages.some(v => v.douane) ? parametresMap.prime_douane : 0;
+
+
+
+  fetch("https://script.google.com/macros/s/AKfycbxkIdLvTHQ0JREJ9AAXNLFo1E5T7Ou63TAFZh9izuo198Ii2wxGvmYzTQswbacP_4tK/exec", {
     method: "POST",
     mode: "no-cors",
     body: JSON.stringify(data),
@@ -1001,9 +1010,9 @@ data["ajust_raison"] = document.getElementById("ajust_raison")?.value || "";
 <script>
 let tauxMap = {};
 let kmMap = {};
-let chauffeurCamionMap = {};
+let  = {};
 
-fetch("https://script.google.com/macros/s/AKfycbx2mqKDbY3TXB25rmSR_7J3QjNe5nRG9MFevHZPgWLOJe9pyt2pJfUBAypuogul1Uw8/exec")
+fetch("https://script.google.com/macros/s/AKfycbxkIdLvTHQ0JREJ9AAXNLFo1E5T7Ou63TAFZh9izuo198Ii2wxGvmYzTQswbacP_4tK/exec")
   .then(res => res.json())
   .then(data => {
     console.log("✅ Données reçues :", data);
@@ -1024,11 +1033,12 @@ fetch("https://script.google.com/macros/s/AKfycbx2mqKDbY3TXB25rmSR_7J3QjNe5nRG9M
     }, {});
 
     chauffeurCamionMap = data.chauffeurs.reduce((acc, el) => {
-      const nom = el["Nom Complet"] || el.nom || "";
-      const camion = (el["camion défaut"] || el["Camion défaut"] || el["camion défaut "] || "").trim();
-      if (nom) acc[nom] = camion;
-      return acc;
-    }, {});
+  const nom = el.nom || "";
+  const camion = el.camion?.trim() || "";
+  if (nom) acc[nom] = camion;
+  return acc;
+}, {});
+
 
     // ✅ 🗺️ Construction de kmMap pour l'autocomplétion
     kmMap = data.km.reduce((acc, el) => {
@@ -1060,31 +1070,33 @@ fetch("https://script.google.com/macros/s/AKfycbx2mqKDbY3TXB25rmSR_7J3QjNe5nRG9M
     });
 
     // 🔁 Préselection du camion
-    function preselectCamionPourNom(nom) {
-      const camionNomComplet = chauffeurCamionMap[nom]; // ex. "Camion 1103"
-      if (!camionNomComplet) return;
+  function preselectCamionPourNom(nom) {
+  const camionNomComplet = chauffeurCamionMap[nom]; // ex. "Camion 1103"
+  if (!camionNomComplet) return;
 
-      const camionCode = camionNomComplet.replace(/\D/g, "");
-      const option = Array.from(selectCamion.options).find(
-        (opt) => opt.value === camionCode
-      );
+  const camionCode = camionNomComplet.replace(/\D/g, ""); // Extrait "1103"
+  const option = Array.from(selectCamion.options).find(
+    (opt) => opt.value === camionCode
+  );
 
-      if (option) {
-        selectCamion.value = option.value;
-        console.log(`🚚 Camion ${camionCode} présélectionné pour ${nom}`);
-      } else {
-        console.warn(`❗ Camion "${camionNomComplet}" (code ${camionCode}) introuvable pour ${nom}`);
-      }
-    }
+  if (option) {
+    selectCamion.value = option.value;
+    console.log(`🚚 Camion ${camionCode} présélectionné pour ${nom}`);
+  } else {
+    console.warn(`❗ Camion "${camionNomComplet}" (code ${camionCode}) introuvable pour ${nom}`);
+  }
+}
 
-    selectNom.addEventListener("change", () => {
-      const nom = selectNom.value;
-      preselectCamionPourNom(nom);
-    });
+selectNom.addEventListener("change", () => {
+  const nom = selectNom.value;
+  preselectCamionPourNom(nom);
+});
 
-    if (selectNom.value) {
-      preselectCamionPourNom(selectNom.value);
-    }
+// Au chargement si déjà pré-sélectionné
+if (selectNom.value) {
+  preselectCamionPourNom(selectNom.value);
+}
+
 
     // 🆙 Formulaire prêt
     addVoyageSection();

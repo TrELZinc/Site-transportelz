@@ -982,8 +982,14 @@ const ajRaison = document.getElementById("ajust_raison")?.value.trim();
 data["ajust_hr"] = document.getElementById("ajust_hr")?.value || "";
 data["ajust_km"] = document.getElementById("ajust_km")?.value || "";
 data["ajust_raison"] = document.getElementById("ajust_raison")?.value || "";
-data["prime_forfait"] = totalPrime >= parametresMap.prime_forfait ? parametresMap.prime_forfait : 0;
+
+data["prime_forfait"] = voyages.some(v =>
+  v.type === "kilometrage" &&
+  !(normalizeStr(v.origine) === "st-basile" && normalizeStr(v.destination) === "stanstead")
+) ? parametresMap.prime_forfait : 0;
+
 data["prime_douane"] = voyages.some(v => v.douane) ? parametresMap.prime_douane : 0;
+
 
 
   fetch("https://script.google.com/macros/s/AKfycbyGDDt0IzAAq7175bpGOga8jiO590vLAu4ElxNABRkArTFFNhdxDqPM0u2TMTsJGKSc/exec", {

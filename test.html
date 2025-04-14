@@ -190,7 +190,7 @@
     }
   </script>
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbysNFKLRbGD3YxojimnlsXhytRGtPjDOZ5CQvkEV0nrP_0TxbgO_Gq7oS4QpyCNOUY/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzBr9cjL8KBfCqe5994CCKikzRcuJCWWCK_aJgConnUvHrhojAwrJYJggEJ_Y_SfoX1/exec";
 
 // Récupère les données de la semaine (pastilles journalières)
 async function fetchSemaineData(chauffeur, lundi) {
@@ -233,6 +233,8 @@ async function chargerChauffeursDansSelect() {
   chargerChauffeursDansSelect();
 });
   
+  console.log(document.getElementById("totalKm")); // doit afficher <span>…</span>
+
 </script>
 
 </body>

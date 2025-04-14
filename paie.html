@@ -173,15 +173,29 @@
   box-shadow: 0 0 0 0.1rem rgba(217, 83, 79, 0.25);
 }
 .autocomplete-list {
-  max-height: 150px;
+  max-height: 160px; /* ~4 lignes selon padding */
   overflow-y: auto;
-  min-height: 50px; /* <- clé pour éviter le collapse visuel */
+  border-radius: 8px;
+  padding: 0.25rem 0;
+  scroll-behavior: smooth;
+}
+
+.autocomplete-list div {
+  padding: 10px 16px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.autocomplete-list div:active,
+.autocomplete-list div:hover {
+  background-color: #f8d7da;
 }
   </style>
 </head>
 <body>
   <div class="container py-4">
-    <h2 class="mb-4 text-center">Journal de travail</h2>
+    <h2 class="mb-4 text-center">Feuille de temps</h2>
     <form id="formulaire" class="d-none">
       <div class="section-box">
         <div class="mb-3">
@@ -239,7 +253,7 @@
     const MAX_VOYAGES = 3;
 
 
-    function addVoyageSection() {
+function addVoyageSection() {
   if (voyageCount >= MAX_VOYAGES) return;
   voyageCount++;
   const id = voyageCount;
@@ -304,41 +318,48 @@
       setupSuiviListener(id);
 
       const destinationInput = section.querySelector(`#destination_${id}`);
-const listContainer = section.querySelector(`#autocomplete_${id}`);
-const origineSelect = section.querySelector(`#origine_${id}`);
+      const listContainer = section.querySelector(`#autocomplete_${id}`);
+      const origineSelect = section.querySelector(`#origine_${id}`);
 
-if (radio.value === "kilometrage") {
+      if (radio.value === "kilometrage") {
+        const applyAutocomplete = () => {
+          const origineVal = origineSelect.value.trim().toLowerCase();
+          const sourceKey = origineVal === "vimont" ? "st-basile" : origineVal;
+          setupAutocomplete(destinationInput, listContainer, sourceKey);
+        };
+
+        applyAutocomplete();
+        origineSelect.addEventListener("change", applyAutocomplete);
+      } else {
   const applyAutocomplete = () => {
     const origineVal = origineSelect.value.trim().toLowerCase();
-    const sourceKey = origineVal === "vimont" ? "st-basile" : origineVal;
-    setupAutocomplete(destinationInput, listContainer, sourceKey);
+    const isVimont = origineVal === "vimont";
+
+    if (isVimont) {
+      setupAutocomplete(destinationInput, listContainer, "st-basile");
+    } else {
+      listContainer.innerHTML = "";
+      listContainer.style.display = "none";
+      destinationInput.value = "";
+      destinationInput.removeEventListener("input", () => {});
+      destinationInput.removeEventListener("blur", () => {});
+      const preview = destinationInput.parentNode.querySelector(".text-muted.mt-1");
+      if (preview) preview.remove();
+    }
   };
 
   applyAutocomplete();
   origineSelect.addEventListener("change", applyAutocomplete);
-} else {
-  // Désactive l’autocomplete et preview si c’est un voyage à l’heure
-  listContainer.style.display = "none";
-  destinationInput.removeEventListener("input", () => {});
-  destinationInput.removeEventListener("blur", () => {});
-  destinationInput.setAttribute("autocomplete", "off");
-
-  // Supprime le bloc de distance s’il existe
-  const preview = destinationInput.parentNode.querySelector(".text-muted.mt-1");
-  if (preview) preview.remove();
 }
     });
   });
 }
 
-    function setupAutocomplete(input, listContainer, origine) {
+function setupAutocomplete(input, listContainer, origine) {
   let origineNorm = normalizeStr(origine);
+  if (origineNorm === "vimont") origineNorm = "st-basile";
 
-  if (origineNorm === "vimont") {
-    origineNorm = "st-basile";
-  }
-
-  const dataOrigine = kmMap[origineNorm]; // ✅ D'abord on extrait les données
+  const dataOrigine = kmMap[origineNorm];
   if (!dataOrigine) return;
 
   input.addEventListener('focus', () => {
@@ -364,8 +385,7 @@ if (radio.value === "kilometrage") {
     listContainer.style.display = "none";
     preview.textContent = "";
 
-    const correspondants = getDestinationsPropres(dataOrigine, input); // ✅ Appelé ici après dataOrigine
-
+    const correspondants = getDestinationsPropres(dataOrigine, input).slice(0, 4); // max 4 suggestions
     if (correspondants.length === 0) return;
 
     correspondants.forEach(dest => {
@@ -375,9 +395,11 @@ if (radio.value === "kilometrage") {
       opt.style.cursor = "pointer";
       opt.textContent = dest;
 
-      opt.addEventListener("click", () => {
+      opt.addEventListener("mousedown", (e) => {
+        e.preventDefault();
         input.value = dest;
         listContainer.innerHTML = "";
+        listContainer.style.display = "none";
 
         const voyageDiv = input.closest(".section-box");
         const origineSelect = voyageDiv?.querySelector("select[name^='origine_']");

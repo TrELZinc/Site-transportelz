@@ -130,7 +130,7 @@
   Object.keys(grouped).forEach(date => {
     const div = document.createElement("div");
     div.className = "pastille";
-    div.innerHTML = `<h5>${new Date(date).toLocaleDateString("fr-CA", { weekday: 'long', day: 'numeric', month: 'short' })}</h5><div class="details"></div>`;
+    div.innerHTML = `<h5>${parseLocalDate(date).toLocaleDateString("fr-CA", { weekday: 'long', day: 'numeric', month: 'short' })}</h5><div class="details"></div>`;
     
     const details = div.querySelector(".details");
     grouped[date].forEach(voyage => {

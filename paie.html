@@ -195,7 +195,7 @@
 </head>
 <body>
   <div class="container py-4">
-    <h2 class="mb-4 text-center">Feuille de temps</h2>
+    <h2 class="mb-4 text-center">Journal de travail</h2>
     <form id="formulaire" class="d-none">
       <div class="section-box">
         <div class="mb-3">
@@ -842,13 +842,15 @@ for (let i = 0; i < voyages.length; i++) {
     totalKm += kmPayes;
 
     if (afficherPrime) {
-      totalPrime += 60.85;
-    }
+  totalPrime += parametresMap.prime_forfait;
+}
+
 
     // Prime douane, uniquement si pas déjà payée
     if (v.douane && !voyages.some(vv => vv.id < v.id && vv.douane)) {
-      totalPrime += 15;
-    }
+  totalPrime += parametresMap.prime_douane;
+}
+
 
   } else {
     html += `<p><strong>${v.destination} - Heure:</strong> ${v.h1}h${v.m1.toString().padStart(2, "0")} → ${v.h2}h${v.m2.toString().padStart(2, "0")}</p>`;
@@ -892,12 +894,13 @@ const montantFinal = montantKmFinal + montantHFinal + totalPrime;
 // Génération HTML
 html += `<hr/><p><strong>KM Payés:</strong> ${totalKm}km</p>`;
 html += `<p><strong>Heures Payées:</strong> ${Math.floor(totalMinutes / 60)}h${String(totalMinutes % 60).padStart(2, "0")}</p>`;
-if (totalPrime >= 60.85) {
-  html += `<p><strong>Forfait:</strong> 60.85$</p>`;
+if (totalPrime >= parametresMap.prime_forfait) {
+  html += `<p><strong>Forfait:</strong> ${parametresMap.prime_forfait.toFixed(2)}$</p>`;
 }
 if (voyages.some(v => v.douane)) {
-  html += `<p><strong>Prime Douane:</strong> 15.00$</p>`;
+  html += `<p><strong>Prime Douane:</strong> ${parametresMap.prime_douane.toFixed(2)}$</p>`;
 }
+
 
 // Affiche les ajustements
 if (ajustKm > 0) {
@@ -980,7 +983,7 @@ data["ajust_hr"] = document.getElementById("ajust_hr")?.value || "";
 data["ajust_km"] = document.getElementById("ajust_km")?.value || "";
 data["ajust_raison"] = document.getElementById("ajust_raison")?.value || "";
 
-  fetch("https://script.google.com/macros/s/AKfycbzqTNNpTHrqs4U9oSJw5VhJV1MgLMsGRobztvDsBK4Sms3MLfrYeN3-vOtaFjIhjUCT/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbx2mqKDbY3TXB25rmSR_7J3QjNe5nRG9MFevHZPgWLOJe9pyt2pJfUBAypuogul1Uw8/exec", {
     method: "POST",
     mode: "no-cors",
     body: JSON.stringify(data),
@@ -991,17 +994,22 @@ data["ajust_raison"] = document.getElementById("ajust_raison")?.value || "";
   document.getElementById("confirmationContainer").classList.remove("d-none");
 });
 });
+  
+  let parametresMap = { prime_forfait: 60.85, prime_douane: 15 }; // Valeurs par défaut
+
 </script>
 <script>
 let tauxMap = {};
 let kmMap = {};
 let chauffeurCamionMap = {};
 
-fetch("https://script.google.com/macros/s/AKfycbzqTNNpTHrqs4U9oSJw5VhJV1MgLMsGRobztvDsBK4Sms3MLfrYeN3-vOtaFjIhjUCT/exec")
+fetch("https://script.google.com/macros/s/AKfycbx2mqKDbY3TXB25rmSR_7J3QjNe5nRG9MFevHZPgWLOJe9pyt2pJfUBAypuogul1Uw8/exec")
   .then(res => res.json())
   .then(data => {
     console.log("✅ Données reçues :", data);
     console.table(data.chauffeurs); // 👀 Visualisation claire
+    parametresMap = data.parametres || parametresMap;
+    console.log("💰 Paramètres reçus :", parametresMap);
 
     const selectNom = document.getElementById("nom");
     const selectCamion = document.getElementById("camion");

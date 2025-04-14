@@ -93,69 +93,68 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbzVBkhW38q4hcHhnGp8Dlkh6BbViw-zNEd0DikdaLX9dDnf5dbx3GhEcOd8o0010Rq-/exec";
 
     async function loadSemaine() {
-      const chauffeur = document.getElementById("chauffeurSelect").value;
-      const inputDate = document.getElementById("dateInput").value;
-      if (!chauffeur || !inputDate) return alert("Sélectionnez un chauffeur et une date.");
+  const chauffeur = document.getElementById("chauffeurSelect").value;
+  const inputDate = document.getElementById("dateInput").value;
+  if (!chauffeur || !inputDate) return alert("Sélectionnez un chauffeur et une date.");
 
-      const lundi = getWeekMonday(inputDate);
-      const tauxMap = await fetchTauxChauffeurs();
-      const taux = tauxMap[chauffeur];
-      if (!taux) return alert("Taux non trouvés pour ce chauffeur.");
+  const lundi = getWeekMonday(inputDate);
+  const tauxMap = await fetchTauxChauffeurs();
+  const taux = tauxMap[chauffeur];
+  if (!taux) return alert("Taux non trouvés pour ce chauffeur.");
 
-      const semaineData = await fetchSemaineData(chauffeur, lundi);
-      const container = document.getElementById("pastillesContainer");
-      container.innerHTML = "";
+  const semaineData = await fetchSemaineData(chauffeur, lundi);
+  const container = document.getElementById("pastillesContainer");
+  container.innerHTML = "";
 
-      let totalKm = 0, totalMin = 0, totalForfait = 0, totalDouane = 0;
+  let totalKm = 0, totalMin = 0, totalForfait = 0, totalDouane = 0;
 
-      const grouped = {};
-      semaineData.forEach(item => {
-        if (!grouped[item.date]) grouped[item.date] = [];
-        grouped[item.date].push(item);
-      });
+  const grouped = {};
+  semaineData.forEach(item => {
+    if (!grouped[item.date]) grouped[item.date] = [];
+    grouped[item.date].push(item);
+  });
 
-      Object.keys(grouped).forEach(date => {
-        const div = document.createElement("div");
-        div.className = "pastille";
-        div.innerHTML = `<h5>${parseLocalDate(date).toLocaleDateString("fr-CA", { weekday: 'long', day: 'numeric', month: 'short' })}</h5><div class="details"></div>`;
+  Object.keys(grouped).forEach(date => {
+    const div = document.createElement("div");
+    div.className = "pastille";
+    div.innerHTML = `<h5>${parseLocalDate(date).toLocaleDateString("fr-CA", { weekday: 'long', day: 'numeric', month: 'short' })}</h5><div class="details"></div>`;
+    
+    const details = div.querySelector(".details");
+    grouped[date].forEach(voyage => {
+      if (voyage.type === "kilometrage" || voyage.type === "retour") {
+        details.innerHTML += `<div><strong>KM:</strong> ${voyage.km} (${voyage.origine} → ${voyage.destination})</div>`;
+        totalKm += voyage.km;
 
-        const details = div.querySelector(".details");
-        grouped[date].forEach(voyage => {
-          if (voyage.type === "kilometrage" || voyage.type === "retour") {
-            details.innerHTML += `<div><strong>KM:</strong> ${voyage.km} (${voyage.origine} → ${voyage.destination})</div>`;
-            totalKm += voyage.km;
+        if (voyage.prime && voyage.prime > 0) {
+          details.innerHTML += `<div class="text-success">+ Prime: ${voyage.prime.toFixed(2)} $</div>`;
+          if (voyage.prime === 60.85) totalForfait += 60.85;
+          else if (voyage.prime === 15) totalDouane += 15;
+        }
+      }
 
-            if (voyage.prime) {
-              if (voyage.prime === 60.85) {
-                totalForfait += 60.85;
-                details.innerHTML += `<div class="text-success">+ Forfait: 60.85 $</div>`;
-              } else if (voyage.prime === 15) {
-                totalDouane += 15;
-                details.innerHTML += `<div class="text-info">+ Douane: 15.00 $</div>`;
-              }
-            }
-          }
-          if (voyage.type === "heure") {
-            const h = Math.floor(voyage.minutes / 60);
-            const m = voyage.minutes % 60;
-            details.innerHTML += `<div><strong>Heures:</strong> ${h}h${String(m).padStart(2, '0')} (${voyage.origine} → ${voyage.destination})</div>`;
-            totalMin += voyage.minutes;
-          }
-        });
+      if (voyage.type === "heure") {
+        const h = Math.floor(voyage.minutes / 60);
+        const m = voyage.minutes % 60;
+        details.innerHTML += `<div><strong>Heures:</strong> ${h}h${String(m).padStart(2, '0')} (${voyage.origine} → ${voyage.destination})</div>`;
+        totalMin += voyage.minutes;
+      }
+    });
 
-        container.appendChild(div);
-      });
+    container.appendChild(div);
+  });
 
-      const totalPrimeVal = totalForfait + totalDouane;
-      const totalPayable = (totalKm * taux.taux_km) + (totalMin / 60 * taux.taux_h) + totalPrimeVal;
+  const totalH = Math.floor(totalMin / 60);
+  const totalM = totalMin % 60;
+  const totalPrimeVal = totalForfait + totalDouane;
+  const totalPayable = (totalKm * taux.taux_km) + (totalMin / 60 * taux.taux_h) + totalPrimeVal;
 
-      document.getElementById("totalKm").textContent = totalKm;
-      document.getElementById("totalH").textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2, '0')}`;
-      document.getElementById("totalForfait").textContent = totalForfait.toFixed(2);
-      document.getElementById("totalDouane").textContent = totalDouane.toFixed(2);
-      document.getElementById("totalPrime").textContent = totalPrimeVal.toFixed(2);
-      document.getElementById("totalMontant").textContent = `${totalPayable.toFixed(2)} $`;
-    }
+  document.getElementById("totalKm").textContent = totalKm;
+  document.getElementById("totalH").textContent = `${totalH}h${String(totalM).padStart(2, '0')}`;
+  document.getElementById("totalForfait").textContent = totalForfait.toFixed(2);
+  document.getElementById("totalDouane").textContent = totalDouane.toFixed(2);
+  document.getElementById("totalPrime").textContent = totalPrimeVal.toFixed(2);
+  document.getElementById("totalMontant").textContent = `${totalPayable.toFixed(2)} $`;
+}
 
     async function fetchSemaineData(chauffeur, lundi) {
       const res = await fetch(`${API_URL}?chauffeur=${encodeURIComponent(chauffeur)}&lundi=${lundi}`);

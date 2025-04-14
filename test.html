@@ -195,27 +195,31 @@
     }
   </script>
 <script>
-  async function fetchTauxChauffeurs() {
-    const url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTcInEzmgjQHLhoFTkgPJzJ9e2gGs6OgTLkqXf7LxSW62S-1WOBNzbQL9vjYR7KEfyy-dOnr1_hrUQE/pub?output=csv'; // Remplace TON_ID par l'ID de ta feuille
-    const response = await fetch(url);
-    const data = await response.text();
-    const rows = data.split('\n').slice(1); // Ignore l'en-tête
-    const tauxMap = {};
+const API_URL = "https://script.google.com/macros/s/AKfycbwjCCABnX6-lOaRAmUCZ2bMWbWWwEkIVZNPiD75qw5di13U6v3CfdF4bepAxT5snv_Y/exec";
 
-    rows.forEach(row => {
-      const [nom, tauxKm, tauxH] = row.split(',');
-      if (nom && tauxKm && tauxH) {
-        tauxMap[nom.trim()] = {
-          taux_km: parseFloat(tauxKm),
-          taux_h: parseFloat(tauxH)
-        };
-      }
-    });
+// Récupère les données de la semaine (pastilles journalières)
+async function fetchSemaineData(chauffeur, lundi) {
+  const url = `${API_URL}?chauffeur=${encodeURIComponent(chauffeur)}&lundi=${lundi}`;
+  const res = await fetch(url);
+  return await res.json(); // tableau [{ date, km, minutes, prime, ... }]
+}
 
-    return tauxMap;
-  }
+// Récupère la map des taux par chauffeur
+async function fetchTauxChauffeurs() {
+  const response = await fetch(API_URL);
+  const json = await response.json();
+
+  const tauxMap = {};
+  json.chauffeurs.forEach(chauffeur => {
+    tauxMap[chauffeur.nom] = {
+      taux_km: parseFloat(chauffeur.taux_km),
+      taux_h: parseFloat(chauffeur.taux_h)
+    };
+  });
+
+  return tauxMap;
+}
 </script>
 
-  
 </body>
 </html>

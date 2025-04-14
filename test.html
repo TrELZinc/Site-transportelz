@@ -55,10 +55,7 @@
       <div class="col-md-4">
         <label class="form-label">Nom du chauffeur</label>
         <select id="chauffeurSelect" class="form-select">
-          <option value="">-- Choisir --</option>
-          <option value="Jean Tremblay">Jean Tremblay</option>
-          <option value="Marie Dubois">Marie Dubois</option>
-          <option value="Luc Desjardins">Luc Desjardins</option>
+        <option value="">-- Choisir --</option>
         </select>
       </div>
       <div class="col-md-4">
@@ -219,6 +216,25 @@ async function fetchTauxChauffeurs() {
 
   return tauxMap;
 }
+</script>
+<script>
+async function chargerChauffeursDansSelect() {
+  const response = await fetch(API_URL);
+  const json = await response.json();
+
+  const select = document.getElementById("chauffeurSelect");
+  json.chauffeurs.forEach(chauffeur => {
+    const opt = document.createElement("option");
+    opt.value = chauffeur.nom;
+    opt.textContent = chauffeur.nom;
+    select.appendChild(opt);
+  });
+}
+
+  document.addEventListener("DOMContentLoaded", () => {
+  chargerChauffeursDansSelect();
+});
+  
 </script>
 
 </body>

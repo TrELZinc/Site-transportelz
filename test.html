@@ -253,7 +253,7 @@
     const MAX_VOYAGES = 3;
 
 
-    function addVoyageSection() {
+function addVoyageSection() {
   if (voyageCount >= MAX_VOYAGES) return;
   voyageCount++;
   const id = voyageCount;
@@ -318,44 +318,44 @@
       setupSuiviListener(id);
 
       const destinationInput = section.querySelector(`#destination_${id}`);
-const listContainer = section.querySelector(`#autocomplete_${id}`);
-const origineSelect = section.querySelector(`#origine_${id}`);
+      const listContainer = section.querySelector(`#autocomplete_${id}`);
+      const origineSelect = section.querySelector(`#origine_${id}`);
 
-if (radio.value === "kilometrage") {
-  const applyAutocomplete = () => {
-    const origineVal = origineSelect.value.trim().toLowerCase();
-    const sourceKey = origineVal === "vimont" ? "st-basile" : origineVal;
-    setupAutocomplete(destinationInput, listContainer, sourceKey);
-  };
+      if (radio.value === "kilometrage") {
+        const applyAutocomplete = () => {
+          const origineVal = origineSelect.value.trim().toLowerCase();
+          const sourceKey = origineVal === "vimont" ? "st-basile" : origineVal;
+          setupAutocomplete(destinationInput, listContainer, sourceKey);
+        };
 
-  applyAutocomplete();
-  origineSelect.addEventListener("change", applyAutocomplete);
+        applyAutocomplete();
+        origineSelect.addEventListener("change", applyAutocomplete);
+      } else {
+        const origineVal = origineSelect.value.trim().toLowerCase();
+        const isVimont = origineVal === "vimont";
+
+        if (isVimont) {
+          const applyAutocomplete = () => {
+            const sourceKey = "st-basile";
+            setupAutocomplete(destinationInput, listContainer, sourceKey);
+          };
+          applyAutocomplete();
+          origineSelect.addEventListener("change", applyAutocomplete);
+        } else {
+          listContainer.style.display = "none";
+          destinationInput.removeEventListener("input", () => {});
+          destinationInput.removeEventListener("blur", () => {});
+          destinationInput.setAttribute("autocomplete", "off");
+
+          const preview = destinationInput.parentNode.querySelector(".text-muted.mt-1");
+          if (preview) preview.remove();
+        }
+      }
+    });
+  });
 }
 
- else {
-  const origineVal = origineSelect.value.trim().toLowerCase();
-  const isVimont = origineVal === "vimont";
-
-  if (isVimont) {
-    const applyAutocomplete = () => {
-      const sourceKey = "st-basile"; // même source que pour Vimont
-      setupAutocomplete(destinationInput, listContainer, sourceKey);
-    };
-    applyAutocomplete();
-    origineSelect.addEventListener("change", applyAutocomplete);
-  } else {
-    // Sinon, désactive tout
-    listContainer.style.display = "none";
-    destinationInput.removeEventListener("input", () => {});
-    destinationInput.removeEventListener("blur", () => {});
-    destinationInput.setAttribute("autocomplete", "off");
-
-    const preview = destinationInput.parentNode.querySelector(".text-muted.mt-1");
-    if (preview) preview.remove();
-  }
-}
-
-    function setupAutocomplete(input, listContainer, origine) {
+function setupAutocomplete(input, listContainer, origine) {
   let origineNorm = normalizeStr(origine);
   if (origineNorm === "vimont") origineNorm = "st-basile";
 
@@ -386,7 +386,6 @@ if (radio.value === "kilometrage") {
     preview.textContent = "";
 
     const correspondants = getDestinationsPropres(dataOrigine, input).slice(0, 4); // max 4 suggestions
-
     if (correspondants.length === 0) return;
 
     correspondants.forEach(dest => {
@@ -397,7 +396,7 @@ if (radio.value === "kilometrage") {
       opt.textContent = dest;
 
       opt.addEventListener("mousedown", (e) => {
-        e.preventDefault(); // évite que blur masque la liste avant le clic
+        e.preventDefault();
         input.value = dest;
         listContainer.innerHTML = "";
         listContainer.style.display = "none";

@@ -807,24 +807,30 @@ formError.classList.add("d-none");
     .reverse()
     .find(v => v.type === "heure" && normalizeStr(v.origine) === "vimont");
 
-  for (let i = 0; i < voyages.length; i++) {
+for (let i = 0; i < voyages.length; i++) {
   const v = voyages[i];
   if (v.type === "kilometrage") {
     let kmPayes = v.km;
     let label = `${v.destination || `Voyage ${v.id}`} - KM`;
 
     const next = voyages[i + 1];
-    const isStansteadTransfer = normalizeStr(v.origine) === "st-basile" && normalizeStr(v.destination) === "stanstead"
-      && next?.type === "kilometrage"
-      && normalizeStr(next.origine) === "stanstead";
+    const isStansteadTransfer = normalizeStr(v.origine) === "st-basile" &&
+                                normalizeStr(v.destination) === "stanstead" &&
+                                next?.type === "kilometrage" &&
+                                normalizeStr(next.origine) === "stanstead";
 
-    const isRetourStanstead = normalizeStr(v.origine) === "stanstead" && normalizeStr(v.destination) === "st-basile";
+    const isRetourStanstead = normalizeStr(v.origine) === "stanstead" &&
+                              normalizeStr(v.destination) === "st-basile";
+
+    let afficherPrime = true;
 
     if (isRetourStanstead) {
       label += " (aller simple retour de Stanstead)";
-      // pas de double km ni de prime
+      afficherPrime = false; // pas de prime
+      // pas de double km non plus
     } else if (isStansteadTransfer) {
       label += " (aller simple)";
+      afficherPrime = false;
     } else if (next?.type === "heure" && normalizeStr(next.origine) === "vimont") {
       label += " (aller simple)";
     } else {
@@ -835,12 +841,11 @@ formError.classList.add("d-none");
     html += `<p><strong>${label}:</strong> ${kmPayes}km</p>`;
     totalKm += kmPayes;
 
-    // Ajouter le forfait de 60.85$ seulement si ce n'est pas un aller simple Stanstead (aller ou retour)
-    if (!isStansteadTransfer && !isRetourStanstead) {
+    if (afficherPrime) {
       totalPrime += 60.85;
     }
 
-    // Douane : une seule fois
+    // Prime douane, uniquement si pas déjà payée
     if (v.douane && !voyages.some(vv => vv.id < v.id && vv.douane)) {
       totalPrime += 15;
     }
@@ -855,6 +860,7 @@ formError.classList.add("d-none");
     }
   }
 }
+
 
 
 // Recalcule après boucle complétée

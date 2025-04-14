@@ -808,49 +808,54 @@ formError.classList.add("d-none");
     .find(v => v.type === "heure" && normalizeStr(v.origine) === "vimont");
 
   for (let i = 0; i < voyages.length; i++) {
-    const v = voyages[i];
-    if (v.type === "kilometrage") {
-      let kmPayes = v.km;
-      let label = `${v.destination || `Voyage ${v.id}`} - KM`;
-      let afficherPrime = true;
+  const v = voyages[i];
+  if (v.type === "kilometrage") {
+    let kmPayes = v.km;
+    let label = `${v.destination || `Voyage ${v.id}`} - KM`;
 
-      const next = voyages[i + 1];
-      const isStansteadTransfer = normalizeStr(v.origine) === "st-basile" && normalizeStr(v.destination) === "stanstead"
-        && next?.type === "kilometrage"
-        && normalizeStr(next.origine) === "stanstead";
+    const next = voyages[i + 1];
+    const isStansteadTransfer = normalizeStr(v.origine) === "st-basile" && normalizeStr(v.destination) === "stanstead"
+      && next?.type === "kilometrage"
+      && normalizeStr(next.origine) === "stanstead";
 
-      if (isStansteadTransfer) {
-        label += " (aller simple)";
-        afficherPrime = false;
-      } else if (next?.type === "heure" && normalizeStr(next.origine) === "vimont") {
-        label += " (aller simple)";
-      } else {
-        label += " (aller-retour)";
-        kmPayes *= 2;
-      }
+    const isRetourStanstead = normalizeStr(v.origine) === "stanstead" && normalizeStr(v.destination) === "st-basile";
 
-      html += `<p><strong>${label}:</strong> ${kmPayes}km</p>`;
-      totalKm += kmPayes;
-
-      const primeDouane = v.douane ? 15 : 0;
-
-if (!isStansteadTransfer) {
-  totalPrime += 60.85;
-}
-if (v.douane && !voyages.some(vv => vv.id < v.id && vv.douane)) {
-  totalPrime += 15; // 1 seule fois si une douane détectée
-}
-
+    if (isRetourStanstead) {
+      label += " (aller simple retour de Stanstead)";
+      // pas de double km ni de prime
+    } else if (isStansteadTransfer) {
+      label += " (aller simple)";
+    } else if (next?.type === "heure" && normalizeStr(next.origine) === "vimont") {
+      label += " (aller simple)";
     } else {
-      html += `<p><strong>${v.destination} - Heure:</strong> ${v.h1}h${v.m1.toString().padStart(2, "0")} → ${v.h2}h${v.m2.toString().padStart(2, "0")}</p>`;
+      label += " (aller-retour)";
+      kmPayes *= 2;
+    }
 
-      if (v === lastHeureVimont) {
-        const retourKm = kmMap["st-basile"]?.[normalizeStr(v.destination)] || 0;
-        html += `<p><strong>Retour de ${v.destination} :</strong> ${retourKm}km</p>`;
-        totalKm += retourKm;
-      }
+    html += `<p><strong>${label}:</strong> ${kmPayes}km</p>`;
+    totalKm += kmPayes;
+
+    // Ajouter le forfait de 60.85$ seulement si ce n'est pas un aller simple Stanstead (aller ou retour)
+    if (!isStansteadTransfer && !isRetourStanstead) {
+      totalPrime += 60.85;
+    }
+
+    // Douane : une seule fois
+    if (v.douane && !voyages.some(vv => vv.id < v.id && vv.douane)) {
+      totalPrime += 15;
+    }
+
+  } else {
+    html += `<p><strong>${v.destination} - Heure:</strong> ${v.h1}h${v.m1.toString().padStart(2, "0")} → ${v.h2}h${v.m2.toString().padStart(2, "0")}</p>`;
+
+    if (v === lastHeureVimont) {
+      const retourKm = kmMap["st-basile"]?.[normalizeStr(v.destination)] || 0;
+      html += `<p><strong>Retour de ${v.destination} :</strong> ${retourKm}km</p>`;
+      totalKm += retourKm;
     }
   }
+}
+
 
 // Recalcule après boucle complétée
 const totalH = Math.floor(totalMinutes / 60);
@@ -871,6 +876,10 @@ if ((ajustHr > 0 || ajustKm > 0) && ajustRaison.length === 0) {
 // Ajoute les valeurs aux totaux
 if (ajustKm > 0) totalKm += ajustKm;
 if (ajustHr > 0) totalMinutes += ajustHr * 60;
+  if (!isStansteadTransfer && !isRetourStanstead) {
+  totalPrime += 60.85;
+}
+
 
 // Recalcule montant total avec ajouts
 const montantKmFinal = totalKm * taux.taux_km;

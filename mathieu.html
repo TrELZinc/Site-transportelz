@@ -55,10 +55,7 @@
       <div class="col-md-4">
         <label class="form-label">Nom du chauffeur</label>
         <select id="chauffeurSelect" class="form-select">
-          <option value="">-- Choisir --</option>
-          <option value="Jean Tremblay">Jean Tremblay</option>
-          <option value="Marie Dubois">Marie Dubois</option>
-          <option value="Luc Desjardins">Luc Desjardins</option>
+        <option value="">-- Choisir --</option>
         </select>
       </div>
       <div class="col-md-4">
@@ -107,59 +104,81 @@
 
   <!-- JS logique -->
   <script>
-    function getWeekDates(dateStr) {
-      const date = new Date(dateStr);
-      const monday = new Date(date.setDate(date.getDate() - date.getDay() + 1));
-      const dates = [];
-      for (let i = 0; i < 7; i++) {
-        const d = new Date(monday);
-        d.setDate(monday.getDate() + i);
-        dates.push(d.toISOString().split("T")[0]);
+
+    async function loadSemaine() {
+  const chauffeur = document.getElementById("chauffeurSelect").value;
+  const inputDate = document.getElementById("dateInput").value;
+  if (!chauffeur || !inputDate) return alert("Sélectionnez un chauffeur et une date.");
+
+  const lundi = getWeekMonday(inputDate);
+  const tauxMap = await fetchTauxChauffeurs();
+  const taux = tauxMap[chauffeur];
+  if (!taux) return alert("Taux non trouvés pour ce chauffeur.");
+
+  const semaineData = await fetchSemaineData(chauffeur, lundi);
+  const container = document.getElementById("pastillesContainer");
+  container.innerHTML = "";
+
+  let totalKm = 0, totalMin = 0, totalPrime = 0;
+
+  const grouped = {};
+  semaineData.forEach(item => {
+    if (!grouped[item.date]) grouped[item.date] = [];
+    grouped[item.date].push(item);
+  });
+
+  Object.keys(grouped).forEach(date => {
+    const div = document.createElement("div");
+    div.className = "pastille";
+    div.innerHTML = `<h5>${parseLocalDate(date).toLocaleDateString("fr-CA", { weekday: 'long', day: 'numeric', month: 'short' })}</h5><div class="details"></div>`;
+    
+    const details = div.querySelector(".details");
+    grouped[date].forEach(voyage => {
+      if (voyage.type === "kilometrage" || voyage.type === "retour") {
+        details.innerHTML += `<div><strong>KM:</strong> ${voyage.km} (${voyage.origine} → ${voyage.destination})</div>`;
+        totalKm += voyage.km;
+        totalPrime += voyage.prime || 0;
       }
-      return dates;
-    }
+      if (voyage.type === "heure") {
+        const h = Math.floor(voyage.minutes / 60);
+        const m = voyage.minutes % 60;
+        details.innerHTML += `<div><strong>Heures:</strong> ${h}h${String(m).padStart(2, '0')} (${voyage.origine} → ${voyage.destination})</div>`;
+        totalMin += voyage.minutes;
+      }
+    });
 
-    function loadSemaine() {
-      const chauffeur = document.getElementById("chauffeurSelect").value;
-      const date = document.getElementById("dateInput").value;
-      if (!chauffeur || !date) return alert("Sélectionnez un chauffeur et une date");
+    container.appendChild(div);
+  });
 
-      const dates = getWeekDates(date);
-      document.getElementById("pastillesContainer").innerHTML = "";
+  const totalH = Math.floor(totalMin / 60);
+  const totalM = totalMin % 60;
+  const totalPayable = (totalKm * taux.taux_km) + (totalMin / 60 * taux.taux_h) + totalPrime;
 
-      let totalKm = 0, totalMin = 0, totalPrime = 0;
+  document.getElementById("totalKm").textContent = totalKm;
+  document.getElementById("totalH").textContent = `${totalH}h${String(totalM).padStart(2, '0')}`;
+  document.getElementById("totalPrime").textContent = totalPrime.toFixed(2);
 
-      dates.forEach(day => {
-        db.collection("paye_semaine")
-          .where("chauffeur", "==", chauffeur)
-          .where("date", "==", day)
-          .limit(1)
-          .get()
-          .then(snapshot => {
-            if (!snapshot.empty) {
-              const data = snapshot.docs[0].data();
-              totalKm += data.km || 0;
-              totalMin += data.minutes || 0;
-              totalPrime += data.prime || 0;
+  const summary = document.querySelector(".summary-box");
+  const existing = summary.querySelector("p:last-child");
+  if (existing) existing.remove();
+  const montantEl = document.createElement("p");
+  montantEl.innerHTML = `<strong>Montant total estimé :</strong> <span class="text-success fw-bold">${totalPayable.toFixed(2)} $</span>`;
+  summary.appendChild(montantEl);
+}
 
-              const pastille = document.createElement("div");
-              pastille.className = "pastille";
-              pastille.innerHTML = `
-                <h5>${new Date(day).toLocaleDateString("fr-CA", { weekday: "long", day: "numeric", month: "short" })}</h5>
-                <div class="details">
-                  <div><strong>Destination:</strong> ${data.destination || "—"}</div>
-                  <div><strong>KM:</strong> ${data.km || 0}</div>
-                  <div><strong>Heures:</strong> ${Math.floor((data.minutes || 0) / 60)}h${String((data.minutes || 0) % 60).padStart(2, '0')}</div>
-                  <div><strong>Forfait:</strong> ${data.prime?.toFixed(2) || "0.00"} $</div>
-                </div>`;
-              document.getElementById("pastillesContainer").appendChild(pastille);
-              document.getElementById("totalKm").textContent = totalKm;
-              document.getElementById("totalH").textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2, '0')}`;
-              document.getElementById("totalPrime").textContent = totalPrime.toFixed(2);
-            }
-          });
-      });
-    }
+  function getWeekMonday(dateStr) {
+  const parts = dateStr.split("-");
+  const d = new Date(parts[0], parts[1] - 1, parts[2]); // YYYY, MM-1, DD
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1); // lundi
+  d.setDate(diff);
+  return d.toISOString().split("T")[0];
+}
+
+    function parseLocalDate(str) {
+  const [y, m, d] = str.split("-").map(Number);
+  return new Date(y, m - 1, d); // mois commence à 0
+}
 
     function changerSemaine() {
       document.getElementById("dateInput").value = "";
@@ -174,5 +193,53 @@
       // Tu pourras copier la logique de sauvegarde depuis ton autre projet ici
     }
   </script>
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbzVBkhW38q4hcHhnGp8Dlkh6BbViw-zNEd0DikdaLX9dDnf5dbx3GhEcOd8o0010Rq-/exec";
+
+// Récupère les données de la semaine (pastilles journalières)
+async function fetchSemaineData(chauffeur, lundi) {
+  const url = `${API_URL}?chauffeur=${encodeURIComponent(chauffeur)}&lundi=${lundi}`;
+  const res = await fetch(url);
+  return await res.json(); // tableau [{ date, km, minutes, prime, ... }]
+}
+
+// Récupère la map des taux par chauffeur
+async function fetchTauxChauffeurs() {
+  const response = await fetch(API_URL);
+  const json = await response.json();
+
+  const tauxMap = {};
+  json.chauffeurs.forEach(chauffeur => {
+    tauxMap[chauffeur.nom] = {
+      taux_km: parseFloat(chauffeur.taux_km),
+      taux_h: parseFloat(chauffeur.taux_h)
+    };
+  });
+
+  return tauxMap;
+}
+</script>
+<script>
+async function chargerChauffeursDansSelect() {
+  const response = await fetch(API_URL);
+  const json = await response.json();
+
+  const select = document.getElementById("chauffeurSelect");
+  json.chauffeurs.forEach(chauffeur => {
+    const opt = document.createElement("option");
+    opt.value = chauffeur.nom;
+    opt.textContent = chauffeur.nom;
+    select.appendChild(opt);
+  });
+}
+
+  document.addEventListener("DOMContentLoaded", () => {
+  chargerChauffeursDansSelect();
+});
+  
+  console.log(document.getElementById("totalKm")); // doit afficher <span>…</span>
+
+</script>
+
 </body>
 </html>

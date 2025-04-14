@@ -173,21 +173,23 @@
   box-shadow: 0 0 0 0.1rem rgba(217, 83, 79, 0.25);
 }
 .autocomplete-list {
-  max-height: 150px;
+  max-height: 160px; /* ~4 lignes selon padding */
   overflow-y: auto;
-  min-height: 50px; /* <- clé pour éviter le collapse visuel */
+  border-radius: 8px;
+  padding: 0.25rem 0;
+  scroll-behavior: smooth;
 }
-.autocomplete-list.autocomplete-mobile {
-  position: fixed !important;
-  top: 20%;
-  left: 10%;
-  right: 10%;
-  max-height: 50vh;
-  z-index: 9999;
-  border: 2px solid #dc3545;
-  border-radius: 10px;
-  font-size: 1.15rem;
-  padding: 0.5rem;
+
+.autocomplete-list div {
+  padding: 10px 16px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.autocomplete-list div:active,
+.autocomplete-list div:hover {
+  background-color: #f8d7da;
 }
   </style>
 </head>
@@ -345,12 +347,9 @@ if (radio.value === "kilometrage") {
 
     function setupAutocomplete(input, listContainer, origine) {
   let origineNorm = normalizeStr(origine);
+  if (origineNorm === "vimont") origineNorm = "st-basile";
 
-  if (origineNorm === "vimont") {
-    origineNorm = "st-basile";
-  }
-
-  const dataOrigine = kmMap[origineNorm]; // ✅ D'abord on extrait les données
+  const dataOrigine = kmMap[origineNorm];
   if (!dataOrigine) return;
 
   input.addEventListener('focus', () => {
@@ -376,7 +375,7 @@ if (radio.value === "kilometrage") {
     listContainer.style.display = "none";
     preview.textContent = "";
 
-    const correspondants = getDestinationsPropres(dataOrigine, input); // ✅ Appelé ici après dataOrigine
+    const correspondants = getDestinationsPropres(dataOrigine, input).slice(0, 4); // max 4 suggestions
 
     if (correspondants.length === 0) return;
 
@@ -387,9 +386,11 @@ if (radio.value === "kilometrage") {
       opt.style.cursor = "pointer";
       opt.textContent = dest;
 
-      opt.addEventListener("click", () => {
+      opt.addEventListener("mousedown", (e) => {
+        e.preventDefault(); // évite que blur masque la liste avant le clic
         input.value = dest;
         listContainer.innerHTML = "";
+        listContainer.style.display = "none";
 
         const voyageDiv = input.closest(".section-box");
         const origineSelect = voyageDiv?.querySelector("select[name^='origine_']");
@@ -403,9 +404,7 @@ if (radio.value === "kilometrage") {
 
       listContainer.appendChild(opt);
     });
-if (window.innerWidth < 768) {
-  listContainer.classList.add("autocomplete-mobile");
-}
+
     listContainer.style.display = "block";
   });
 

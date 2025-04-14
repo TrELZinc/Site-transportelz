@@ -237,9 +237,9 @@
   <p class="mt-3">Chargement du formulaire...</p>
 </div>
   <script>
-    
+    let voyages = []; // GLOBAL
     function normalizeStr(str) {
-  return (str || "")
+    return (str || "")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "") // ❗ corrige ici : sans l'échappement mal placé
     .toLowerCase()
@@ -761,7 +761,7 @@ formError.classList.add("d-none");
   let totalMinutes = 0;
   let totalKm = 0;
   let totalPrime = 0;
-  let voyages = [];
+  voyages = [];
 
   for (let i = 1; i <= 3; i++) {
     const type = data.get(`type_voyage_${i}`);

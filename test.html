@@ -119,15 +119,19 @@
       return dates;
     }
 
-    function loadSemaine() {
-      const chauffeur = document.getElementById("chauffeurSelect").value;
-      const date = document.getElementById("dateInput").value;
-      if (!chauffeur || !date) return alert("Sélectionnez un chauffeur et une date");
+    async function loadSemaine() {
+  const chauffeur = document.getElementById("chauffeurSelect").value;
+  const date = document.getElementById("dateInput").value;
+  if (!chauffeur || !date) return alert("Sélectionnez un chauffeur et une date");
 
-      const dates = getWeekDates(date);
-      document.getElementById("pastillesContainer").innerHTML = "";
+  const tauxMap = await fetchTauxChauffeurs();
+  const taux = tauxMap[chauffeur];
+  if (!taux) return alert("Taux non trouvés pour ce chauffeur");
 
-      let totalKm = 0, totalMin = 0, totalPrime = 0;
+  const dates = getWeekDates(date);
+  document.getElementById("pastillesContainer").innerHTML = "";
+
+  let totalKm = 0, totalMin = 0, totalPrime = 0;
 
       dates.forEach(day => {
         db.collection("paye_semaine")
@@ -152,11 +156,16 @@
                   <div><strong>Heures:</strong> ${Math.floor((data.minutes || 0) / 60)}h${String((data.minutes || 0) % 60).padStart(2, '0')}</div>
                   <div><strong>Forfait:</strong> ${data.prime?.toFixed(2) || "0.00"} $</div>
                 </div>`;
-              document.getElementById("pastillesContainer").appendChild(pastille);
-              document.getElementById("totalKm").textContent = totalKm;
-              document.getElementById("totalH").textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2, '0')}`;
-              document.getElementById("totalPrime").textContent = totalPrime.toFixed(2);
-            }
+            document.getElementById("totalKm").textContent = totalKm;
+  document.getElementById("totalH").textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2, '0')}`;
+  document.getElementById("totalPrime").textContent = totalPrime.toFixed(2);
+
+  // Affiche le montant total estimé
+  const summary = document.querySelector(".summary-box");
+  const montantEl = document.createElement("p");
+  montantEl.innerHTML = `<strong>Montant total estimé :</strong> <span class="text-success fw-bold">${totalPayable.toFixed(2)} $</span>`;
+  summary.appendChild(montantEl);
+}
           });
       });
     }
@@ -174,5 +183,28 @@
       // Tu pourras copier la logique de sauvegarde depuis ton autre projet ici
     }
   </script>
+<script>
+  async function fetchTauxChauffeurs() {
+    const url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTcInEzmgjQHLhoFTkgPJzJ9e2gGs6OgTLkqXf7LxSW62S-1WOBNzbQL9vjYR7KEfyy-dOnr1_hrUQE/pub?output=csv'; // Remplace TON_ID par l'ID de ta feuille
+    const response = await fetch(url);
+    const data = await response.text();
+    const rows = data.split('\n').slice(1); // Ignore l'en-tête
+    const tauxMap = {};
+
+    rows.forEach(row => {
+      const [nom, tauxKm, tauxH] = row.split(',');
+      if (nom && tauxKm && tauxH) {
+        tauxMap[nom.trim()] = {
+          taux_km: parseFloat(tauxKm),
+          taux_h: parseFloat(tauxH)
+        };
+      }
+    });
+
+    return tauxMap;
+  }
+</script>
+
+  
 </body>
 </html>

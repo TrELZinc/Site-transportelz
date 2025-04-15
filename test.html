@@ -210,22 +210,21 @@ async function loadSemaine() {
     }
   });
 
+  totalKm += jourKm;
+  totalMin += jourMin;
+  totalForfait += jourForfait;
+  totalDouane += jourDouane;
+  totalPrime += jourPrime;
+
   const montantJour = (jourKm * taux.taux_km) + (jourMin / 60 * taux.taux_h) + jourPrime;
 
-const hJour = Math.floor(jourMin / 60);
-const mJour = jourMin % 60;
+  // Footer journalier
+  const footer = document.createElement("div");
+  footer.className = "mt-2 fw-bold text-end text-success";
+  footer.textContent = `Total jour : ${montantJour.toFixed(2)} $`;
 
-const ligneDetail = `${jourKm} km × ${taux.taux_km.toFixed(2)} $ + ${hJour}h${String(mJour).padStart(2, '0')} × ${taux.taux_h.toFixed(2)} $ + ${jourPrime.toFixed(2)} $ de primes`;
-
-const footer = document.createElement("div");
-footer.className = "mt-2 text-end";
-footer.innerHTML = `
-  <div class="fw-bold text-success">Total jour : ${montantJour.toFixed(2)} $</div>
-  <div class="text-muted small fst-italic">${ligneDetail}</div>
-`;
-
-div.appendChild(footer);
-container.appendChild(div);
+  div.appendChild(footer);
+  container.appendChild(div);
 });
 
 // Résumé global

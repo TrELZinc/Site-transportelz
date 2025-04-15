@@ -246,6 +246,8 @@ totalPrime += jourPrime;
   footer.className = "mt-2 fw-bold text-end text-success";
   footer.textContent = `Total jour : ${montantJour.toFixed(2)} $`;
 
+  div.appendChild(footer);
+  container.appendChild(div);
 
 // Ici, après la boucle :
 const totalMontant = (totalKm * taux.taux_km) + (totalMin / 60 * taux.taux_h) + totalPrime;

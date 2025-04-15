@@ -7,19 +7,26 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
     body { background: #f8f9fa; }
+      .pastille {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        background: white;
+        border: 2px solid #dee2e6;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        min-width: 220px;
+        height: 100%; /* facultatif si tu veux qu'elles soient égales */
+      }
     .pastille {
-      background: white;
-      border: 2px solid #dee2e6;
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 1rem;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-      min-width: 240px;
-      min-height: 200px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
     }
+
+
     .pastille h5 { font-size: 1.1rem; margin-bottom: 0.5rem; text-transform: capitalize; }
     .pastille .details { font-size: 0.9rem; line-height: 1.3; }
     .grid-week {
@@ -150,55 +157,73 @@ async function loadSemaine() {
   });
 
   Object.entries(grouped).forEach(([date, voyages]) => {
-    console.log("📆 JOUR :", date, voyages);
-    const div = document.createElement("div");
-    div.className = "pastille";
-    const parts = date.split("-");
-    const jsDate = new Date(parts[0], parts[1] - 1, parts[2]);
-    const dateAffich = jsDate.toLocaleDateString("fr-CA", { weekday: 'long', day: 'numeric', month: 'short' });
-    div.innerHTML = `<h5>${dateAffich}</h5><div class="details"></div>`;
-    const details = div.querySelector(".details");
+  console.log("📆 JOUR :", date, voyages);
 
-    let jourKm = 0, jourMin = 0, jourForfait = 0, jourDouane = 0, jourPrime = 0;
+  const div = document.createElement("div");
+  div.className = "pastille";
 
-    voyages.forEach(v => {
-      if (v.type === "kilometrage" || v.type === "retour") {
-        details.innerHTML += `<div><strong>KM:</strong> ${v.km} (${v.origine} → ${v.destination})</div>`;
-        jourKm += v.km;
-        if (v.prime_forfait > 0) {
-          details.innerHTML += `<div class="text-success small">+ Forfait ${v.prime_forfait.toFixed(2)} $</div>`;
-          jourForfait += v.prime_forfait;
-        }
-        if (v.prime_douane > 0) {
-          details.innerHTML += `<div class="text-info small">+ Douane ${v.prime_douane.toFixed(2)} $</div>`;
-          jourDouane += v.prime_douane;
-        }
-        jourPrime += v.prime;
+  const parts = date.split("-");
+  const jsDate = new Date(parts[0], parts[1] - 1, parts[2]);
+  const dateAffich = jsDate.toLocaleDateString("fr-CA", { weekday: 'long', day: 'numeric', month: 'short' });
+  div.innerHTML = `<h5>${dateAffich}</h5><div class="details"></div>`;
+
+  const details = div.querySelector(".details");
+
+  let jourKm = 0, jourMin = 0, jourForfait = 0, jourDouane = 0, jourPrime = 0;
+
+  voyages.forEach(v => {
+    if (v.type === "kilometrage" || v.type === "retour") {
+      details.innerHTML += `<div><strong>KM:</strong> ${v.km} (${v.origine} → ${v.destination})</div>`;
+      jourKm += v.km;
+
+      if (v.prime_forfait && v.prime_forfait > 0) {
+        details.innerHTML += `<div class="text-success small">+ Forfait ${v.prime_forfait.toFixed(2)} $</div>`;
+        jourForfait += v.prime_forfait;
       }
-      if (v.type === "heure") {
-        const h = Math.floor(v.minutes / 60);
-        const m = v.minutes % 60;
-        details.innerHTML += `<div><strong>Heure:</strong> ${h}h${String(m).padStart(2,'0')} (${v.origine} → ${v.destination})</div>`;
-        jourMin += v.minutes;
-      }
-    });
 
-    totalKm += jourKm;
-    totalMin += jourMin;
-    totalForfait += jourForfait;
-    totalDouane += jourDouane;
-    totalPrime += jourPrime;
-    container.appendChild(div);
+      if (v.prime_douane && v.prime_douane > 0) {
+        details.innerHTML += `<div class="text-info small">+ Douane ${v.prime_douane.toFixed(2)} $</div>`;
+        jourDouane += v.prime_douane;
+      }
+
+      jourPrime += v.prime || 0;
+    }
+
+    if (v.type === "heure") {
+      const h = Math.floor(v.minutes / 60);
+      const m = v.minutes % 60;
+      details.innerHTML += `<div><strong>Heure:</strong> ${h}h${String(m).padStart(2,'0')} (${v.origine} → ${v.destination})</div>`;
+      jourMin += v.minutes;
+    }
   });
 
-  const totalMontant = (totalKm * taux.taux_km) + (totalMin / 60 * taux.taux_h) + totalPrime;
-  document.getElementById("totalKm").textContent = totalKm;
-  document.getElementById("totalH").textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2,'0')}`;
-  document.getElementById("totalForfait").textContent = totalForfait.toFixed(2);
-  document.getElementById("totalDouane").textContent = totalDouane.toFixed(2);
-  document.getElementById("totalPrime").textContent = totalPrime.toFixed(2);
-  document.getElementById("totalMontant").textContent = `${totalMontant.toFixed(2)} $`;
-}
+  totalKm += jourKm;
+  totalMin += jourMin;
+  totalForfait += jourForfait;
+  totalDouane += jourDouane;
+  totalPrime += jourPrime;
+
+  const montantJour = (jourKm * taux.taux_km) + (jourMin / 60 * taux.taux_h) + jourPrime;
+
+  // Footer journalier
+  const footer = document.createElement("div");
+  footer.className = "mt-2 fw-bold text-end text-success";
+  footer.textContent = `Total jour : ${montantJour.toFixed(2)} $`;
+
+  div.appendChild(footer);
+  container.appendChild(div);
+});
+
+// Résumé global
+const totalMontant = (totalKm * taux.taux_km) + (totalMin / 60 * taux.taux_h) + totalPrime;
+
+document.getElementById("totalKm").textContent = totalKm;
+document.getElementById("totalH").textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2,'0')}`;
+document.getElementById("totalForfait").textContent = totalForfait.toFixed(2);
+document.getElementById("totalDouane").textContent = totalDouane.toFixed(2);
+document.getElementById("totalPrime").textContent = totalPrime.toFixed(2);
+document.getElementById("totalMontant").textContent = `${totalMontant.toFixed(2)} $`;
+
 
 function sauvegarderSemaine() {
   alert("Fonction de sauvegarde activée (Firebase). Implémentation personnalisable.");

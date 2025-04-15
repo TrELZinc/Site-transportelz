@@ -124,12 +124,23 @@ async function fetchTauxChauffeurs() {
   return map;
 }
 
+function getWeekMonday(dateStr) {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
+  const dayOfWeek = date.getDay(); // 0 = dimanche, 1 = lundi, ..., 6 = samedi
+  const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+  date.setDate(date.getDate() + mondayOffset);
+  return date.toISOString().split("T")[0];
+}
+
 async function loadSemaine() {
   const chauffeur = document.getElementById("chauffeurSelect").value;
   const inputDate = document.getElementById("dateInput").value;
   if (!chauffeur || !inputDate) return alert("Sélectionnez un chauffeur et une date.");
 
   const lundi = getWeekMonday(inputDate);
+  console.log("📅 Lundi de la semaine sélectionnée :", lundi); // Debug pour confirmation
+
   const tauxMap = await fetchTauxChauffeurs(); // charge aussi les primes
   const taux = tauxMap[chauffeur];
   if (!taux) return alert("Taux non trouvés pour ce chauffeur.");
@@ -146,6 +157,9 @@ async function loadSemaine() {
     if (!grouped[item.date]) grouped[item.date] = [];
     grouped[item.date].push(item);
   });
+
+}
+
 
   Object.entries(grouped).forEach(([date, voyages]) => {
     const div = document.createElement("div");

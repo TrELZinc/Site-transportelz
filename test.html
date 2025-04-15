@@ -130,67 +130,71 @@ async function loadSemaine() {
   if (!chauffeur || !inputDate) return alert("Sélectionnez un chauffeur et une date.");
 
   const lundi = getWeekMonday(inputDate);
-  const tauxMap = await fetchTauxChauffeurs();
+  const tauxMap = await fetchTauxChauffeurs(); // charge aussi les primes
   const taux = tauxMap[chauffeur];
-  const data = await fetchSemaineData(chauffeur, lundi);
+  if (!taux) return alert("Taux non trouvés pour ce chauffeur.");
 
+  const semaineData = await fetchSemaineData(chauffeur, lundi);
   const container = document.getElementById("pastillesContainer");
   container.innerHTML = "";
 
   let totalKm = 0, totalMin = 0, totalForfait = 0, totalDouane = 0, totalPrime = 0;
 
+  // Grouper les voyages par date
   const grouped = {};
-  data.forEach(d => {
-    if (!grouped[d.date]) grouped[d.date] = [];
-    grouped[d.date].push(d);
+  semaineData.forEach(item => {
+    if (!grouped[item.date]) grouped[item.date] = [];
+    grouped[item.date].push(item);
   });
 
-  Object.keys(grouped).forEach(date => {
+  Object.entries(grouped).forEach(([date, voyages]) => {
     const div = document.createElement("div");
     div.className = "pastille";
-    const jour = parseLocalDate(date);
-    div.innerHTML = `<h5>${jour.toLocaleDateString("fr-CA", { weekday: 'long', day: 'numeric', month: 'short' })}</h5><div class="details"></div>`;
+    div.innerHTML = `<h5>${parseLocalDate(date).toLocaleDateString("fr-CA", { weekday: 'long', day: 'numeric', month: 'short' })}</h5><div class="details"></div>`;
+    
     const details = div.querySelector(".details");
 
-    grouped[date].forEach(v => {
-      if (v.type === "kilometrage" || v.type === "retour") {
-        totalKm += v.km;
-        details.innerHTML += `<div><strong>KM:</strong> ${v.km} (${v.origine} → ${v.destination})</div>`;
-        const prime = parseFloat(v.prime || 0);
-        if (prime > 0) {
-          if (Math.abs(prime - primeForfait) < 0.01) {
-            totalForfait += prime;
-            details.innerHTML += `<div class="text-success">+ Forfait: ${prime.toFixed(2)} $</div>`;
-          } else if (Math.abs(prime - primeDouane) < 0.01) {
-            totalDouane += prime;
-            details.innerHTML += `<div class="text-info">+ Prime douane: ${prime.toFixed(2)} $</div>`;
-          } else {
-            totalPrime += prime;
-            details.innerHTML += `<div class="text-warning">+ Prime: ${prime.toFixed(2)} $</div>`;
-          }
-        }
+    voyages.forEach(voyage => {
+      if (voyage.type === "kilometrage" || voyage.type === "retour") {
+        details.innerHTML += `<div><strong>KM:</strong> ${voyage.km} (${voyage.origine} → ${voyage.destination})</div>`;
+        totalKm += voyage.km;
       }
 
-      if (v.type === "heure") {
-        const h = Math.floor(v.minutes / 60);
-        const m = v.minutes % 60;
-        totalMin += v.minutes;
-        details.innerHTML += `<div><strong>Heures:</strong> ${h}h${String(m).padStart(2, '0')} (${v.origine} → ${v.destination})</div>`;
+      if (voyage.type === "heure") {
+        const h = Math.floor(voyage.minutes / 60);
+        const m = voyage.minutes % 60;
+        details.innerHTML += `<div><strong>Heures:</strong> ${h}h${String(m).padStart(2, '0')} (${voyage.origine} → ${voyage.destination})</div>`;
+        totalMin += voyage.minutes;
+      }
+
+      // Affichage des primes
+      const prime = parseFloat(voyage.prime);
+      if (!isNaN(prime) && prime > 0) {
+        if (Math.abs(prime - primeForfait) < 0.01) {
+          details.innerHTML += `<div class="text-success">+ Forfait: ${prime.toFixed(2)} $</div>`;
+          totalForfait += prime;
+        } else if (Math.abs(prime - primeDouane) < 0.01) {
+          details.innerHTML += `<div class="text-info">+ Prime douane: ${prime.toFixed(2)} $</div>`;
+          totalDouane += prime;
+        } else {
+          details.innerHTML += `<div class="text-secondary">+ Prime: ${prime.toFixed(2)} $</div>`;
+        }
+        totalPrime += prime;
       }
     });
 
     container.appendChild(div);
   });
 
-  const primeTotal = totalForfait + totalDouane + totalPrime;
-  const montant = (totalKm * taux.taux_km) + (totalMin / 60 * taux.taux_h) + primeTotal;
+  // Résumé hebdo
+  const totalPayable = (totalKm * taux.taux_km) + (totalMin / 60 * taux.taux_h) + totalPrime;
 
   document.getElementById("totalKm").textContent = totalKm;
   document.getElementById("totalH").textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2, '0')}`;
   document.getElementById("totalForfait").textContent = totalForfait.toFixed(2);
   document.getElementById("totalDouane").textContent = totalDouane.toFixed(2);
-  document.getElementById("totalPrime").textContent = primeTotal.toFixed(2);
-  document.getElementById("totalMontant").textContent = `${montant.toFixed(2)} $`;
+  document.getElementById("totalPrime").textContent = totalPrime.toFixed(2);
+  document.getElementById("totalMontant").textContent = `${totalPayable.toFixed(2)} $`;
 }
 
 function changerSemaine() {

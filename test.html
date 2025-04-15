@@ -91,7 +91,7 @@
 </script>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbwyp3xm3MrEuPjvKjn3OQ8C5GyOuOUon7mYLY36J1sMyMglVRFXJnIulSJVQvOikZ90/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwl4e3NBOwFMTE9-Kp2YuYkEbcwC3NslONowyeMBTiNFc7zjkGFheNoXmqipC3sbNvE/exec";
 
 let primeDouane = 15;
 let primeForfait = 60.85;
@@ -172,7 +172,7 @@ async function loadSemaine() {
     
     const details = div.querySelector(".details");
 
-    voyages.forEach(voyage => {
+voyages.forEach(voyage => {
   if (voyage.type === "kilometrage" || voyage.type === "retour") {
     details.innerHTML += `<div><strong>KM:</strong> ${voyage.km} (${voyage.origine} → ${voyage.destination})</div>`;
     totalKm += voyage.km;
@@ -185,20 +185,19 @@ async function loadSemaine() {
     totalMin += voyage.minutes;
   }
 
-  const prime = parseFloat(voyage.prime);
-  if (!isNaN(prime) && prime > 0) {
-    if (Math.abs(prime - primeForfait) < 0.01) {
-      details.innerHTML += `<div class="text-success">+ Forfait: ${prime.toFixed(2)} $</div>`;
-      totalForfait += prime;
-    } else if (Math.abs(prime - primeDouane) < 0.01) {
-      details.innerHTML += `<div class="text-info">+ Prime douane: ${prime.toFixed(2)} $</div>`;
-      totalDouane += prime;
-    } else {
-      details.innerHTML += `<div class="text-secondary">+ Prime: ${prime.toFixed(2)} $</div>`;
-    }
-    totalPrime += prime;
+  if (voyage.prime_forfait && voyage.prime_forfait > 0) {
+    details.innerHTML += `<div class="text-success">+ Forfait: ${voyage.prime_forfait.toFixed(2)} $</div>`;
+    totalForfait += voyage.prime_forfait;
+    totalPrime += voyage.prime_forfait;
+  }
+
+  if (voyage.prime_douane && voyage.prime_douane > 0) {
+    details.innerHTML += `<div class="text-info">+ Prime douane: ${voyage.prime_douane.toFixed(2)} $</div>`;
+    totalDouane += voyage.prime_douane;
+    totalPrime += voyage.prime_douane;
   }
 });
+
 
 
     container.appendChild(div);

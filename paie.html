@@ -845,12 +845,6 @@ for (let i = 0; i < voyages.length; i++) {
   totalPrime += parametresMap.prime_forfait;
 }
 
-
-    if (v.douane) {
-  totalPrime += parametresMap.prime_douane;
-  }
-
-
   } else {
     html += `<p><strong>${v.destination} - Heure:</strong> ${v.h1}h${v.m1.toString().padStart(2, "0")} → ${v.h2}h${v.m2.toString().padStart(2, "0")}</p>`;
 
@@ -860,6 +854,11 @@ for (let i = 0; i < voyages.length; i++) {
       totalKm += retourKm;
     }
   }
+}
+   // ✅ Nouveau comptage correct des primes douanes
+const nbPrimesDouane = voyages.filter(v => v.douane).length;
+if (nbPrimesDouane > 0) {
+  totalPrime += nbPrimesDouane * parametresMap.prime_douane;
 }
 
 

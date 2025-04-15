@@ -108,16 +108,17 @@ async function loadSemaine() {
   if (!taux) return alert("Taux non trouvés pour ce chauffeur.");
 
   const semaineData = await fetchSemaineData(chauffeur, lundi);
-  const container = document.getElementById("pastillesContainer");
-  container.innerHTML = "";
+const container = document.getElementById("pastillesContainer");
+container.innerHTML = "";
 
-  let totalKm = 0, totalMin = 0, totalForfait = 0, totalDouane = 0, totalPrime = 0;
+let totalKm = 0, totalMin = 0, totalForfait = 0, totalDouane = 0, totalPrime = 0;
 
-  const grouped = {};
-  semaineData.forEach(item => {
-    if (!grouped[item.date]) grouped[item.date] = [];
-    grouped[item.date].push(item);
-  });
+const grouped = {};
+semaineData.forEach(item => {
+  if (!grouped[item.date]) grouped[item.date] = [];
+  grouped[item.date].push(item);
+});
+
 
   Object.keys(grouped).forEach(date => {
     const jour = parseLocalDate(date);

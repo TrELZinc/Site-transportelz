@@ -147,6 +147,7 @@ async function loadSemaine() {
   });
 
   Object.entries(grouped).forEach(([date, voyages]) => {
+    console.log("📆 JOUR :", date, voyages);
     const div = document.createElement("div");
     div.className = "pastille";
     const parts = date.split("-");

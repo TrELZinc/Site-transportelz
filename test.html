@@ -187,9 +187,12 @@ async function loadSemaine() {
     }
   let jourKm = 0, jourMin = 0, jourForfait = 0, jourDouane = 0, jourPrime = 0;
 
-voyages.forEach(voyage => {
+voyages.forEach((voyage, index) => {
+  const voyageNum = index + 1;
+  let bloc = `<div class="fw-bold mt-2">Voyage ${voyageNum} :</div>`;
+
   if (voyage.type === "kilometrage" || voyage.type === "retour") {
-    details.innerHTML += `<div><strong>KM:</strong> ${voyage.km} (${voyage.origine} → ${voyage.destination})</div>`;
+    bloc += `<div><strong>KM:</strong> ${voyage.km} (${voyage.origine} → ${voyage.destination})</div>`;
     jourKm += voyage.km;
 
     const forfait = voyage.prime_forfait || 0;
@@ -202,9 +205,11 @@ voyages.forEach(voyage => {
   if (voyage.type === "heure") {
     const h = Math.floor(voyage.minutes / 60);
     const m = voyage.minutes % 60;
-    details.innerHTML += `<div><strong>Heures:</strong> ${h}h${String(m).padStart(2, '0')} (${voyage.origine} → ${voyage.destination})</div>`;
+    bloc += `<div><strong>Heures:</strong> ${h}h${String(m).padStart(2, '0')} (${voyage.origine} → ${voyage.destination})</div>`;
     jourMin += voyage.minutes;
   }
+
+  details.innerHTML += bloc;
 });
 
 // Afficher forfait et douane une fois à la fin du bloc

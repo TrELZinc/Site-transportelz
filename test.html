@@ -198,26 +198,29 @@ voyages.forEach((voyage, idx) => {
   details.innerHTML += `<div class="mb-1">(${voyage.origine} → ${voyage.destination})</div>`;
 
   if (voyage.type === "kilometrage" || voyage.type === "retour") {
-    details.innerHTML += `<div><strong>KM:</strong> ${voyage.km}</div>`;
-    jourKm += voyage.km;
-    const forfait = voyage.prime_forfait || 0;
-    const douane = voyage.prime_douane || 0;
-    jourForfait += forfait;
-    jourDouane += douane;
-    jourPrime += forfait + douane;
+    details.innerHTML += `
+      <div><strong>KM:</strong> <input type="number" class="form-control form-control-sm mt-1" value="${voyage.km}" data-type="km" data-idx="${idx}" /></div>
+    `;
   }
 
   if (voyage.type === "heure") {
     const h = Math.floor(voyage.minutes / 60);
     const m = voyage.minutes % 60;
-    details.innerHTML += `<div><strong>Heures:</strong> ${h}h${String(m).padStart(2, '0')}</div>`;
-    jourMin += voyage.minutes;
-    const forfait = voyage.prime_forfait || 0;
-    const douane = voyage.prime_douane || 0;
-    jourForfait += forfait;
-    jourDouane += douane;
-    jourPrime += forfait + douane;
+    details.innerHTML += `
+      <div><strong>Heures:</strong> 
+        <input type="number" class="form-control form-control-sm d-inline w-25" value="${h}" data-type="heure-h" data-idx="${idx}" /> h 
+        <input type="number" class="form-control form-control-sm d-inline w-25" value="${m}" data-type="heure-m" data-idx="${idx}" /> m
+      </div>
+    `;
   }
+
+  const forfait = voyage.prime_forfait || 0;
+  const douane = voyage.prime_douane || 0;
+
+  details.innerHTML += `
+    <div><strong>Forfait:</strong> <input type="number" class="form-control form-control-sm" value="${forfait.toFixed(2)}" data-type="forfait" data-idx="${idx}" /></div>
+    <div><strong>Douane:</strong> <input type="number" class="form-control form-control-sm" value="${douane.toFixed(2)}" data-type="douane" data-idx="${idx}" /></div>
+  `;
 
   if (idx < voyages.length - 1) {
     details.innerHTML += `<hr class="my-2">`;
@@ -248,14 +251,66 @@ totalPrime += jourPrime;
 });
 
 // Résumé global
-const totalMontant = (totalKm * taux.taux_km) + (totalMin / 60 * taux.taux_h) + totalPrime;
+  // Résumé global
+  const totalMontant = (totalKm * taux.taux_km) + (totalMin / 60 * taux.taux_h) + totalPrime;
 
-document.getElementById("totalKm").textContent = totalKm;
-document.getElementById("totalH").textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2,'0')}`;
-document.getElementById("totalForfait").textContent = totalForfait.toFixed(2);
-document.getElementById("totalDouane").textContent = totalDouane.toFixed(2);
-document.getElementById("totalPrime").textContent = totalPrime.toFixed(2);
-document.getElementById("totalMontant").textContent = `${totalMontant.toFixed(2)} $`;
+  document.getElementById("totalKm").textContent = totalKm;
+  document.getElementById("totalH").textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2,'0')}`;
+  document.getElementById("totalForfait").textContent = totalForfait.toFixed(2);
+  document.getElementById("totalDouane").textContent = totalDouane.toFixed(2);
+  document.getElementById("totalPrime").textContent = totalPrime.toFixed(2);
+  document.getElementById("totalMontant").textContent = `${totalMontant.toFixed(2)} $`;
+
+  // Écoute tous les champs modifiables
+  container.querySelectorAll("input").forEach(input => {
+    input.addEventListener("input", () => recalculerTotaux(taux));
+  });
+  
+  
+function recalculerTotaux(taux) {
+  let totalKm = 0, totalMin = 0, totalForfait = 0, totalDouane = 0, totalPrime = 0;
+
+  document.querySelectorAll(".pastille").forEach(pastille => {
+    let jourKm = 0, jourMin = 0, jourForfait = 0, jourDouane = 0;
+
+    const inputs = pastille.querySelectorAll("input");
+    const voyages = {};
+
+    inputs.forEach(input => {
+      const idx = input.dataset.idx;
+      const type = input.dataset.type;
+      if (!voyages[idx]) voyages[idx] = {};
+      voyages[idx][type] = parseFloat(input.value) || 0;
+    });
+
+    Object.values(voyages).forEach(v => {
+      jourKm += v.km || 0;
+      jourMin += ((v["heure-h"] || 0) * 60) + (v["heure-m"] || 0);
+      jourForfait += v.forfait || 0;
+      jourDouane += v.douane || 0;
+    });
+
+    const jourPrime = jourForfait + jourDouane;
+    const montantJour = (jourKm * taux.taux_km) + (jourMin / 60 * taux.taux_h) + jourPrime;
+
+    pastille.querySelector(".text-end.text-success").textContent = `Total jour : ${montantJour.toFixed(2)} $`;
+
+    // Totaux globaux
+    totalKm += jourKm;
+    totalMin += jourMin;
+    totalForfait += jourForfait;
+    totalDouane += jourDouane;
+    totalPrime += jourPrime;
+  });
+
+  const totalMontant = (totalKm * taux.taux_km) + (totalMin / 60 * taux.taux_h) + totalPrime;
+
+  document.getElementById("totalKm").textContent = totalKm;
+  document.getElementById("totalH").textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2, '0')}`;
+  document.getElementById("totalForfait").textContent = totalForfait.toFixed(2);
+  document.getElementById("totalDouane").textContent = totalDouane.toFixed(2);
+  document.getElementById("totalPrime").textContent = totalPrime.toFixed(2);
+  document.getElementById("totalMontant").textContent = `${totalMontant.toFixed(2)} $`;
 }
 
 function sauvegarderSemaine() {

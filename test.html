@@ -167,9 +167,9 @@ async function loadSemaine() {
     grouped[item.date].push(item);
   });
 
-  Object.entries(grouped).forEach(([date, voyages]) => {
-    .sort(([dateA], [dateB]) => new Date(dateA) - new Date(dateB))
-    .forEach(([date, voyages]) => {
+  Object.entries(grouped)
+  .sort(([dateA], [dateB]) => new Date(dateA) - new Date(dateB))
+  .forEach(([date, voyages]) => {
   
   console.log("📆 JOUR :", date, voyages);
 

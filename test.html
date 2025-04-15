@@ -246,26 +246,27 @@ totalPrime += jourPrime;
   footer.className = "mt-2 fw-bold text-end text-success";
   footer.textContent = `Total jour : ${montantJour.toFixed(2)} $`;
 
-  div.appendChild(footer);
-  container.appendChild(div);
-});
-
-// Résumé global
-  // Résumé global
-  const totalMontant = (totalKm * taux.taux_km) + (totalMin / 60 * taux.taux_h) + totalPrime;
-
-  document.getElementById("totalKm").textContent = totalKm;
-  document.getElementById("totalH").textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2,'0')}`;
-  document.getElementById("totalForfait").textContent = totalForfait.toFixed(2);
-  document.getElementById("totalDouane").textContent = totalDouane.toFixed(2);
-  document.getElementById("totalPrime").textContent = totalPrime.toFixed(2);
-  document.getElementById("totalMontant").textContent = `${totalMontant.toFixed(2)} $`;
-
-  // Écoute tous les champs modifiables
-  container.querySelectorAll("input").forEach(input => {
-    input.addEventListener("input", () => recalculerTotaux(taux));
+  Object.entries(grouped)
+  .sort(([dateA], [dateB]) => new Date(dateA) - new Date(dateB))
+  .forEach(([date, voyages]) => {
+    // ... ton code de pastilles ici ...
+    container.appendChild(div);
   });
-  
+
+// Ici, après la boucle :
+const totalMontant = (totalKm * taux.taux_km) + (totalMin / 60 * taux.taux_h) + totalPrime;
+
+document.getElementById("totalKm").textContent = totalKm;
+document.getElementById("totalH").textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2,'0')}`;
+document.getElementById("totalForfait").textContent = totalForfait.toFixed(2);
+document.getElementById("totalDouane").textContent = totalDouane.toFixed(2);
+document.getElementById("totalPrime").textContent = totalPrime.toFixed(2);
+document.getElementById("totalMontant").textContent = `${totalMontant.toFixed(2)} $`;
+
+// Activation du recalcul à la volée
+container.querySelectorAll("input").forEach(input => {
+  input.addEventListener("input", () => recalculerTotaux(taux));
+});
   
 function recalculerTotaux(taux) {
   let totalKm = 0, totalMin = 0, totalForfait = 0, totalDouane = 0, totalPrime = 0;

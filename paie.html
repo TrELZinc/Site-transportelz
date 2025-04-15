@@ -846,10 +846,9 @@ for (let i = 0; i < voyages.length; i++) {
 }
 
 
-    // Prime douane, uniquement si pas déjà payée
-    if (v.douane && !voyages.some(vv => vv.id < v.id && vv.douane)) {
+    if (v.douane) {
   totalPrime += parametresMap.prime_douane;
-}
+  }
 
 
   } else {

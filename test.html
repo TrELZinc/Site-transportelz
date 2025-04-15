@@ -135,6 +135,7 @@ async function loadSemaine() {
   if (!taux) return alert("Taux non trouvés pour ce chauffeur.");
 
   const semaineData = await fetchSemaineData(chauffeur, lundi);
+  console.log("📦 Données reçues du serveur :", semaineData);
   const container = document.getElementById("pastillesContainer");
   container.innerHTML = "";
 

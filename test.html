@@ -94,14 +94,8 @@ let primeForfait = 0;
 
 function parseLocalDate(str) {
   const [y, m, d] = str.split("-").map(Number);
-  const date = new Date(y, m - 1, d);
-  date.setHours(12, 0, 0, 0); // ✅ Sécurité anti UTC glitch
-  return date;
+  return new Date(y, m - 1, d); // SANS UTC – utiliser fuseau local
 }
-
-
-
-
 
 function getWeekMonday(dateStr) {
   const date = new Date(dateStr);

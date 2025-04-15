@@ -246,12 +246,6 @@ totalPrime += jourPrime;
   footer.className = "mt-2 fw-bold text-end text-success";
   footer.textContent = `Total jour : ${montantJour.toFixed(2)} $`;
 
-  Object.entries(grouped)
-  .sort(([dateA], [dateB]) => new Date(dateA) - new Date(dateB))
-  .forEach(([date, voyages]) => {
-    // ... ton code de pastilles ici ...
-    container.appendChild(div);
-  });
 
 // Ici, après la boucle :
 const totalMontant = (totalKm * taux.taux_km) + (totalMin / 60 * taux.taux_h) + totalPrime;

@@ -184,48 +184,47 @@ async function loadSemaine() {
     }
   let jourKm = 0, jourMin = 0, jourForfait = 0, jourDouane = 0, jourPrime = 0;
 
-  let jourKm = 0, jourMin = 0, jourForfait = 0, jourDouane = 0, jourPrime = 0;
+  voyages.forEach(v => {
+    if (v.type === "kilometrage" || v.type === "retour") {
+      details.innerHTML += `<div><strong>KM:</strong> ${v.km} (${v.origine} → ${v.destination})</div>`;
+      jourKm += v.km;
 
-voyages.forEach(voyage => {
-  if (voyage.type === "kilometrage" || voyage.type === "retour") {
-    details.innerHTML += `<div><strong>KM:</strong> ${voyage.km} (${voyage.origine} → ${voyage.destination})</div>`;
-    jourKm += voyage.km;
+      if (v.prime_forfait && v.prime_forfait > 0) {
+        details.innerHTML += `<div class="text-success small">+ Forfait ${v.prime_forfait.toFixed(2)} $</div>`;
+        jourForfait += v.prime_forfait;
+      }
 
-    const forfait = voyage.prime_forfait || 0;
-    const douane = voyage.prime_douane || 0;
-    jourForfait += forfait;
-    jourDouane += douane;
-    jourPrime += forfait + douane;
-  }
+      if (v.prime_douane && v.prime_douane > 0) {
+        details.innerHTML += `<div class="text-info small">+ Douane ${v.prime_douane.toFixed(2)} $</div>`;
+        jourDouane += v.prime_douane;
+      }
 
-  if (voyage.type === "heure") {
-    const h = Math.floor(voyage.minutes / 60);
-    const m = voyage.minutes % 60;
-    details.innerHTML += `<div><strong>Heures:</strong> ${h}h${String(m).padStart(2, '0')} (${voyage.origine} → ${voyage.destination})</div>`;
-    jourMin += voyage.minutes;
-  }
-});
+      jourPrime += v.prime || 0;
+    }
 
-// Afficher forfait et douane une fois à la fin du bloc
-details.innerHTML += `<div><strong>Forfait:</strong> ${jourForfait.toFixed(2)} $</div>`;
-details.innerHTML += `<div><strong>Douane:</strong> ${jourDouane.toFixed(2)} $</div>`;
-
-// Totaux globaux
-totalKm += jourKm;
-totalMin += jourMin;
-totalForfait += jourForfait;
-totalDouane += jourDouane;
-totalPrime += jourPrime;
+    if (v.type === "heure") {
+      const h = Math.floor(v.minutes / 60);
+      const m = v.minutes % 60;
+      details.innerHTML += `<div><strong>Heure:</strong> ${h}h${String(m).padStart(2,'0')} (${v.origine} → ${v.destination})</div>`;
+      jourMin += v.minutes;
+    }
+  });
 
   const montantJour = (jourKm * taux.taux_km) + (jourMin / 60 * taux.taux_h) + jourPrime;
 
-  // Footer journalier
-  const footer = document.createElement("div");
-  footer.className = "mt-2 fw-bold text-end text-success";
-  footer.textContent = `Total jour : ${montantJour.toFixed(2)} $`;
+const hJour = Math.floor(jourMin / 60);
+const mJour = jourMin % 60;
 
-  div.appendChild(footer);
-  container.appendChild(div);
+const ligneDetail = `${jourKm} km × ${taux.taux_km.toFixed(2)} $ + ${hJour}h${String(mJour).padStart(2, '0')} × ${taux.taux_h.toFixed(2)} $ + ${jourPrime.toFixed(2)} $ de primes`;
+
+const footer = document.createElement("div");
+footer.className = "mt-2 text-end";
+footer.innerHTML = `
+  <div class="fw-bold text-success">Total jour : ${montantJour.toFixed(2)} $</div>
+  <div class="text-muted small fst-italic">${ligneDetail}</div>
+`;
+
+div.appendChild(footer);
 });
 
 // Résumé global

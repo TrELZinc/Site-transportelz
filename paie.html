@@ -896,8 +896,9 @@ html += `<p><strong>Heures Payées:</strong> ${Math.floor(totalMinutes / 60)}h${
 if (totalPrime >= parametresMap.prime_forfait) {
   html += `<p><strong>Forfait:</strong> ${parametresMap.prime_forfait.toFixed(2)}$</p>`;
 }
-if (voyages.some(v => v.douane)) {
-  html += `<p><strong>Prime Douane:</strong> ${parametresMap.prime_douane.toFixed(2)}$</p>`;
+
+if (nbPrimesDouane > 0) {
+  html += `<p><strong>Prime Douane (${nbPrimesDouane}x):</strong> ${(nbPrimesDouane * parametresMap.prime_douane).toFixed(2)}$</p>`;
 }
 
 

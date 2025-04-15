@@ -87,45 +87,10 @@
   const db = firebase.firestore();
 </script>
 <script>
-  
 const API_URL = "https://script.google.com/macros/s/AKfycbzdi5rFRhLmGvrxF1xiVsDXXe67bgiQH4DU0Qc-FFcIwcBjRirfxSrzjQQ2Nn19UsY2/exec";
 
-async function fetchTauxChauffeurs() {
-  try {
-    const res = await fetch(API_URL, {
-      method: "GET",
-      mode: "cors"
-    });
-
-    if (!res.ok) throw new Error("Erreur HTTP: " + res.status);
-
-    const json = await res.json();
-    console.log("✅ Données reçues :", json);
-
-    primeDouane = parseFloat(json.parametres.prime_douane);
-    primeForfait = parseFloat(json.parametres.prime_forfait);
-
-    const map = {};
-    json.chauffeurs.forEach(c => {
-      map[c.nom] = {
-        taux_km: parseFloat(c.taux_km),
-        taux_h: parseFloat(c.taux_h)
-      };
-    });
-    return map;
-
-  } catch (error) {
-    console.error("❌ Erreur fetch taux chauffeurs :", error.message);
-    alert("Erreur de chargement des données depuis Google Sheets.");
-    return {};
-  }
-}
-
-
-
-
-  let primeDouane = 0;
-  let primeForfait = 0;
+let primeDouane = 0;
+let primeForfait = 0;
 
 function parseLocalDate(str) {
   const [y, m, d] = str.split("-").map(Number);
@@ -248,5 +213,6 @@ document.addEventListener("DOMContentLoaded", () => {
   chargerChauffeursDansSelect();
 });
 </script>
+
 </body>
 </html>

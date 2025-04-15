@@ -3,28 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Paye Chauffeur - Semaine</title>
+  <title>Vue Hebdomadaire - Administration</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
     body { background: #f8f9fa; }
     .pastille {
-  background: white;
-  border: 2px solid #dee2e6;
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 1rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-  min-width: 220px;
-  min-height: 180px; /* 💡 augmentation en hauteur */
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-    .pastille h5 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+      background: white;
+      border: 2px solid #dee2e6;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      min-width: 240px;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .pastille h5 { font-size: 1.1rem; margin-bottom: 0.5rem; text-transform: capitalize; }
     .pastille .details { font-size: 0.9rem; line-height: 1.3; }
     .grid-week {
-      display: flex; flex-wrap: nowrap; gap: 12px;
+      display: flex; flex-wrap: nowrap; gap: 16px;
       overflow-x: auto; margin-bottom: 2rem;
     }
     .summary-box {
@@ -33,13 +32,12 @@
       padding: 1rem;
       background: #e6f4ea;
     }
-    .summary-box h5 { font-size: 1.2rem; margin-bottom: 1rem; }
+    .badge-prime { font-size: 0.75rem; margin-left: 0.4rem; }
   </style>
 </head>
 <body class="p-4">
-
 <div class="container">
-  <h2 class="mb-4">Semaine de paie - Visualisation</h2>
+  <h2 class="mb-4">Vue hebdomadaire - Paie Chauffeurs</h2>
 
   <div class="row g-3 mb-4">
     <div class="col-md-4">
@@ -49,29 +47,28 @@
       </select>
     </div>
     <div class="col-md-4">
-      <label class="form-label">Date d'une journée de la semaine</label>
+      <label class="form-label">Date de la semaine</label>
       <input type="date" id="dateInput" class="form-control" />
     </div>
     <div class="col-md-4 d-flex align-items-end">
-      <button class="btn btn-primary w-100" onclick="loadSemaine()">Charger la semaine enregistrée</button>
+      <button class="btn btn-primary w-100" onclick="loadSemaine()">Charger la semaine</button>
     </div>
   </div>
 
   <div class="grid-week" id="pastillesContainer"></div>
 
   <div class="summary-box">
-    <h5>Totaux de la semaine</h5>
-    <p><strong>Kilomètres totaux :</strong> <span id="totalKm">0</span> km</p>
-    <p><strong>Heures totales :</strong> <span id="totalH">0h00</span></p>
+    <h5>Récapitulatif de la semaine</h5>
+    <p><strong>Kilomètres :</strong> <span id="totalKm">0</span> km</p>
+    <p><strong>Heures :</strong> <span id="totalH">0h00</span></p>
     <p><strong>Total forfaits :</strong> <span id="totalForfait">0.00</span> $</p>
     <p><strong>Total primes douane :</strong> <span id="totalDouane">0.00</span> $</p>
     <p><strong>Total primes :</strong> <span id="totalPrime">0.00</span> $</p>
-    <p><strong>Montant total estimé :</strong> <span id="totalMontant" class="text-success fw-bold">0.00 $</span></p>
+    <p><strong>Montant estimé :</strong> <span id="totalMontant" class="text-success fw-bold">0.00 $</span></p>
   </div>
 
-  <div class="mt-4 d-flex gap-3">
-    <button class="btn btn-secondary" onclick="changerSemaine()">Changer la semaine</button>
-    <button class="btn btn-success" onclick="sauvegarderSemaine()">Enregistrer cette semaine dans Firebase</button>
+  <div class="mt-4 text-end">
+    <button class="btn btn-success" onclick="sauvegarderSemaine()">Sauvegarder dans Firebase</button>
   </div>
 </div>
 
@@ -82,16 +79,15 @@
     apiKey: "AIzaSyD4U85mokKXsAP1AdwClWtcbt8udZrwlAw",
     authDomain: "sommaireelz.firebaseapp.com",
     projectId: "sommaireelz",
-    storageBucket: "sommaireelz.firebasestorage.app",
+    storageBucket: "sommaireelz.appspot.com",
     messagingSenderId: "171788284751",
     appId: "1:171788284751:web:694f070d1cafe8b7c04b3a"
   };
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 </script>
-
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycby_1NkjEbiMysj5LkTimK6xwlvFHqxmhcGnEXcxDWQDAt6wgftIgzp-j8PqjYB4xQAp/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwraWkcO0oH93tjEFd_IhubGSeI76P6t-q6Ni_bAWiSb7R1ak5TuKxelPXyhBSVSR22/exec";
 
 let primeDouane = 15;
 let primeForfait = 60.85;
@@ -102,11 +98,11 @@ function parseLocalDate(str) {
 }
 
 function getWeekMonday(dateStr) {
-  const d = new Date(dateStr);
-  const day = d.getDay();
+  const date = new Date(dateStr);
+  const day = date.getDay();
   const mondayOffset = day === 0 ? -6 : 1 - day;
-  d.setDate(d.getDate() + mondayOffset);
-  return d.toISOString().split("T")[0];
+  date.setDate(date.getDate() + mondayOffset);
+  return date.toISOString().split("T")[0];
 }
 
 async function fetchSemaineData(chauffeur, lundi) {
@@ -118,7 +114,6 @@ async function fetchSemaineData(chauffeur, lundi) {
 async function fetchTauxChauffeurs() {
   const res = await fetch(API_URL);
   const json = await res.json();
-
   primeDouane = parseFloat(json.parametres.prime_douane);
   primeForfait = parseFloat(json.parametres.prime_forfait);
 
@@ -129,24 +124,13 @@ async function fetchTauxChauffeurs() {
   return map;
 }
 
-function getWeekMonday(dateStr) {
-  const [year, month, day] = dateStr.split("-").map(Number);
-  const date = new Date(year, month - 1, day);
-  const dayOfWeek = date.getDay(); // 0 = dimanche, 1 = lundi, ..., 6 = samedi
-  const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-  date.setDate(date.getDate() + mondayOffset);
-  return date.toISOString().split("T")[0];
-}
-
 async function loadSemaine() {
   const chauffeur = document.getElementById("chauffeurSelect").value;
   const inputDate = document.getElementById("dateInput").value;
   if (!chauffeur || !inputDate) return alert("Sélectionnez un chauffeur et une date.");
 
   const lundi = getWeekMonday(inputDate);
-  console.log("📅 Lundi de la semaine sélectionnée :", lundi); // Debug pour confirmation
-
-  const tauxMap = await fetchTauxChauffeurs(); // charge aussi les primes
+  const tauxMap = await fetchTauxChauffeurs();
   const taux = tauxMap[chauffeur];
   if (!taux) return alert("Taux non trouvés pour ce chauffeur.");
 
@@ -155,75 +139,62 @@ async function loadSemaine() {
   container.innerHTML = "";
 
   let totalKm = 0, totalMin = 0, totalForfait = 0, totalDouane = 0, totalPrime = 0;
-
-  // Grouper les voyages par date
   const grouped = {};
   semaineData.forEach(item => {
     if (!grouped[item.date]) grouped[item.date] = [];
     grouped[item.date].push(item);
   });
 
-
-
   Object.entries(grouped).forEach(([date, voyages]) => {
     const div = document.createElement("div");
     div.className = "pastille";
-    div.innerHTML = `<h5>${parseLocalDate(date).toLocaleDateString("fr-CA", { weekday: 'long', day: 'numeric', month: 'short' })}</h5><div class="details"></div>`;
-    
+    const dateAffich = parseLocalDate(date).toLocaleDateString("fr-CA", { weekday: 'long', day: 'numeric', month: 'short' });
+    div.innerHTML = `<h5>${dateAffich}</h5><div class="details"></div>`;
     const details = div.querySelector(".details");
 
-voyages.forEach(voyage => {
-  if (voyage.type === "kilometrage" || voyage.type === "retour") {
-    details.innerHTML += `<div><strong>KM:</strong> ${voyage.km} (${voyage.origine} → ${voyage.destination})</div>`;
-    totalKm += voyage.km;
-  }
+    let jourKm = 0, jourMin = 0, jourForfait = 0, jourDouane = 0, jourPrime = 0;
 
-  if (voyage.type === "heure") {
-    const h = Math.floor(voyage.minutes / 60);
-    const m = voyage.minutes % 60;
-    details.innerHTML += `<div><strong>Heures:</strong> ${h}h${String(m).padStart(2, '0')} (${voyage.origine} → ${voyage.destination})</div>`;
-    totalMin += voyage.minutes;
-  }
+    voyages.forEach(v => {
+      if (v.type === "kilometrage" || v.type === "retour") {
+        details.innerHTML += `<div><strong>KM:</strong> ${v.km} (${v.origine} → ${v.destination})</div>`;
+        jourKm += v.km;
+        if (v.prime_forfait > 0) {
+          details.innerHTML += `<div class="text-success small">+ Forfait ${v.prime_forfait.toFixed(2)} $</div>`;
+          jourForfait += v.prime_forfait;
+        }
+        if (v.prime_douane > 0) {
+          details.innerHTML += `<div class="text-info small">+ Douane ${v.prime_douane.toFixed(2)} $</div>`;
+          jourDouane += v.prime_douane;
+        }
+        jourPrime += v.prime;
+      }
+      if (v.type === "heure") {
+        const h = Math.floor(v.minutes / 60);
+        const m = v.minutes % 60;
+        details.innerHTML += `<div><strong>Heure:</strong> ${h}h${String(m).padStart(2,'0')} (${v.origine} → ${v.destination})</div>`;
+        jourMin += v.minutes;
+      }
+    });
 
-  if (voyage.prime_forfait && voyage.prime_forfait > 0) {
-    details.innerHTML += `<div class="text-success">+ Forfait: ${voyage.prime_forfait.toFixed(2)} $</div>`;
-    totalForfait += voyage.prime_forfait;
-    totalPrime += voyage.prime_forfait;
-  }
-
-  if (voyage.prime_douane && voyage.prime_douane > 0) {
-    details.innerHTML += `<div class="text-info">+ Prime douane: ${voyage.prime_douane.toFixed(2)} $</div>`;
-    totalDouane += voyage.prime_douane;
-    totalPrime += voyage.prime_douane;
-  }
-});
-
-
-
+    totalKm += jourKm;
+    totalMin += jourMin;
+    totalForfait += jourForfait;
+    totalDouane += jourDouane;
+    totalPrime += jourPrime;
     container.appendChild(div);
   });
 
-  // Résumé hebdo
-  const totalPayable = (totalKm * taux.taux_km) + (totalMin / 60 * taux.taux_h) + totalPrime;
-
+  const totalMontant = (totalKm * taux.taux_km) + (totalMin / 60 * taux.taux_h) + totalPrime;
   document.getElementById("totalKm").textContent = totalKm;
-  document.getElementById("totalH").textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2, '0')}`;
+  document.getElementById("totalH").textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2,'0')}`;
   document.getElementById("totalForfait").textContent = totalForfait.toFixed(2);
   document.getElementById("totalDouane").textContent = totalDouane.toFixed(2);
   document.getElementById("totalPrime").textContent = totalPrime.toFixed(2);
-  document.getElementById("totalMontant").textContent = `${totalPayable.toFixed(2)} $`;
-}
-
-function changerSemaine() {
-  document.getElementById("dateInput").value = "";
-  document.getElementById("pastillesContainer").innerHTML = "";
-  ["totalKm", "totalH", "totalForfait", "totalDouane", "totalPrime", "totalMontant"].forEach(id => {
-    document.getElementById(id).textContent = id === "totalH" ? "0h00" : "0.00";
-  });
+  document.getElementById("totalMontant").textContent = `${totalMontant.toFixed(2)} $`;
 }
 
 function sauvegarderSemaine() {
-  alert("Fonction SAVE désactivée ici.");
+  alert("Fonction de sauvegarde activée (Firebase). Implémentation personnalisable.");
 }
 
 async function chargerChauffeursDansSelect() {

@@ -92,9 +92,36 @@ let primeDouane = 15;
 let primeForfait = 60.85;
 
 function parseLocalDate(str) {
-  if (!str) return new Date();
   const [y, m, d] = str.split("-").map(Number);
   return new Date(y, m - 1, d);
+}
+
+function getWeekMonday(dateStr) {
+  const d = new Date(dateStr);
+  const day = d.getDay();
+  const mondayOffset = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + mondayOffset);
+  return d.toISOString().split("T")[0];
+}
+
+async function fetchSemaineData(chauffeur, lundi) {
+  const url = `${API_URL}?chauffeur=${encodeURIComponent(chauffeur)}&lundi=${lundi}`;
+  const res = await fetch(url);
+  return await res.json();
+}
+
+async function fetchTauxChauffeurs() {
+  const res = await fetch(API_URL);
+  const json = await res.json();
+
+  primeDouane = parseFloat(json.parametres.prime_douane);
+  primeForfait = parseFloat(json.parametres.prime_forfait);
+
+  const map = {};
+  json.chauffeurs.forEach(c => {
+    map[c.nom] = { taux_km: parseFloat(c.taux_km), taux_h: parseFloat(c.taux_h) };
+  });
+  return map;
 }
 
 async function loadSemaine() {
@@ -105,124 +132,87 @@ async function loadSemaine() {
   const lundi = getWeekMonday(inputDate);
   const tauxMap = await fetchTauxChauffeurs();
   const taux = tauxMap[chauffeur];
-  if (!taux) return alert("Taux non trouvés pour ce chauffeur.");
+  const data = await fetchSemaineData(chauffeur, lundi);
 
-  const semaineData = await fetchSemaineData(chauffeur, lundi);
-const container = document.getElementById("pastillesContainer");
-container.innerHTML = "";
+  const container = document.getElementById("pastillesContainer");
+  container.innerHTML = "";
 
-let totalKm = 0, totalMin = 0, totalForfait = 0, totalDouane = 0, totalPrime = 0;
+  let totalKm = 0, totalMin = 0, totalForfait = 0, totalDouane = 0, totalPrime = 0;
 
-const grouped = {};
-semaineData.forEach(item => {
-  if (!grouped[item.date]) grouped[item.date] = [];
-  grouped[item.date].push(item);
-});
-
+  const grouped = {};
+  data.forEach(d => {
+    if (!grouped[d.date]) grouped[d.date] = [];
+    grouped[d.date].push(d);
+  });
 
   Object.keys(grouped).forEach(date => {
-    const jour = parseLocalDate(date);
     const div = document.createElement("div");
     div.className = "pastille";
+    const jour = parseLocalDate(date);
     div.innerHTML = `<h5>${jour.toLocaleDateString("fr-CA", { weekday: 'long', day: 'numeric', month: 'short' })}</h5><div class="details"></div>`;
     const details = div.querySelector(".details");
 
-    grouped[date].forEach(voyage => {
-      if (voyage.type === "kilometrage" || voyage.type === "retour") {
-        details.innerHTML += `<div><strong>KM:</strong> ${voyage.km} (${voyage.origine} → ${voyage.destination})</div>`;
-        totalKm += voyage.km;
-
-        const prime = parseFloat(voyage.prime);
-        if (!isNaN(prime) && prime > 0) {
+    grouped[date].forEach(v => {
+      if (v.type === "kilometrage" || v.type === "retour") {
+        totalKm += v.km;
+        details.innerHTML += `<div><strong>KM:</strong> ${v.km} (${v.origine} → ${v.destination})</div>`;
+        const prime = parseFloat(v.prime || 0);
+        if (prime > 0) {
           if (Math.abs(prime - primeForfait) < 0.01) {
-            details.innerHTML += `<div class="text-success">+ Forfait: ${primeForfait.toFixed(2)} $</div>`;
-            totalForfait += primeForfait;
+            totalForfait += prime;
+            details.innerHTML += `<div class="text-success">+ Forfait: ${prime.toFixed(2)} $</div>`;
           } else if (Math.abs(prime - primeDouane) < 0.01) {
-            details.innerHTML += `<div class="text-info">+ Prime douane: ${primeDouane.toFixed(2)} $</div>`;
-            totalDouane += primeDouane;
+            totalDouane += prime;
+            details.innerHTML += `<div class="text-info">+ Prime douane: ${prime.toFixed(2)} $</div>`;
           } else {
-            details.innerHTML += `<div class="text-secondary">+ Prime: ${prime.toFixed(2)} $</div>`;
+            totalPrime += prime;
+            details.innerHTML += `<div class="text-warning">+ Prime: ${prime.toFixed(2)} $</div>`;
           }
-          totalPrime += prime;
         }
       }
 
-      if (voyage.type === "heure") {
-        const h = Math.floor(voyage.minutes / 60);
-        const m = voyage.minutes % 60;
-        details.innerHTML += `<div><strong>Heures:</strong> ${h}h${String(m).padStart(2, '0')} (${voyage.origine} → ${voyage.destination})</div>`;
-        totalMin += voyage.minutes;
+      if (v.type === "heure") {
+        const h = Math.floor(v.minutes / 60);
+        const m = v.minutes % 60;
+        totalMin += v.minutes;
+        details.innerHTML += `<div><strong>Heures:</strong> ${h}h${String(m).padStart(2, '0')} (${v.origine} → ${v.destination})</div>`;
       }
     });
 
     container.appendChild(div);
   });
 
-  const totalPayable = (totalKm * taux.taux_km) + (totalMin / 60 * taux.taux_h) + totalPrime;
+  const primeTotal = totalForfait + totalDouane + totalPrime;
+  const montant = (totalKm * taux.taux_km) + (totalMin / 60 * taux.taux_h) + primeTotal;
 
   document.getElementById("totalKm").textContent = totalKm;
   document.getElementById("totalH").textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2, '0')}`;
   document.getElementById("totalForfait").textContent = totalForfait.toFixed(2);
   document.getElementById("totalDouane").textContent = totalDouane.toFixed(2);
-  document.getElementById("totalPrime").textContent = totalPrime.toFixed(2);
-  document.getElementById("totalMontant").textContent = `${totalPayable.toFixed(2)} $`;
-}
-
-function getWeekMonday(dateStr) {
-  const parts = dateStr.split("-");
-  const d = new Date(parts[0], parts[1] - 1, parts[2]);
-  const day = d.getDay();
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-  d.setDate(diff);
-  return d.toISOString().split("T")[0];
+  document.getElementById("totalPrime").textContent = primeTotal.toFixed(2);
+  document.getElementById("totalMontant").textContent = `${montant.toFixed(2)} $`;
 }
 
 function changerSemaine() {
   document.getElementById("dateInput").value = "";
   document.getElementById("pastillesContainer").innerHTML = "";
-  document.getElementById("totalKm").textContent = "0";
-  document.getElementById("totalH").textContent = "0h00";
-  document.getElementById("totalPrime").textContent = "0.00";
-  document.getElementById("totalForfait").textContent = "0.00";
-  document.getElementById("totalDouane").textContent = "0.00";
-  document.getElementById("totalMontant").textContent = "0.00 $";
+  ["totalKm", "totalH", "totalForfait", "totalDouane", "totalPrime", "totalMontant"].forEach(id => {
+    document.getElementById(id).textContent = id === "totalH" ? "0h00" : "0.00";
+  });
 }
 
 function sauvegarderSemaine() {
-  alert("Fonction SAVE désactivée ici pour éviter d’écraser les données.");
-}
-
-async function fetchSemaineData(chauffeur, lundi) {
-  const url = `${API_URL}?chauffeur=${encodeURIComponent(chauffeur)}&lundi=${lundi}`;
-  const res = await fetch(url);
-  return await res.json();
-}
-
-async function fetchTauxChauffeurs() {
-  const response = await fetch(API_URL);
-  const json = await response.json();
-
-  primeDouane = parseFloat(json.parametres.prime_douane);
-  primeForfait = parseFloat(json.parametres.prime_forfait);
-
-  const tauxMap = {};
-  json.chauffeurs.forEach(chauffeur => {
-    tauxMap[chauffeur.nom] = {
-      taux_km: parseFloat(chauffeur.taux_km),
-      taux_h: parseFloat(chauffeur.taux_h)
-    };
-  });
-  return tauxMap;
+  alert("Fonction SAVE désactivée ici.");
 }
 
 async function chargerChauffeursDansSelect() {
   const response = await fetch(API_URL);
   const json = await response.json();
   const select = document.getElementById("chauffeurSelect");
-  json.chauffeurs.forEach(chauffeur => {
+  json.chauffeurs.forEach(c => {
     const opt = document.createElement("option");
-    opt.value = chauffeur.nom;
-    opt.textContent = chauffeur.nom;
+    opt.value = c.nom;
+    opt.textContent = c.nom;
     select.appendChild(opt);
   });
 }
@@ -231,6 +221,5 @@ document.addEventListener("DOMContentLoaded", () => {
   chargerChauffeursDansSelect();
 });
 </script>
-
 </body>
 </html>

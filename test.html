@@ -196,30 +196,17 @@ voyages.forEach((voyage, index) => {
     bloc += `<div><strong>KM:</strong> ${voyage.km}</div>`;
     jourKm += voyage.km;
 
-    const forfait = voyage.prime_forfait || 0;
-    const douane = voyage.prime_douane || 0;
-    bloc += `<div><strong>Forfait:</strong> ${forfait.toFixed(2)} $</div>`;
-    bloc += `<div><strong>Douane:</strong> ${douane.toFixed(2)} $</div>`;
-
-    jourForfait += forfait;
-    jourDouane += douane;
-    jourPrime += forfait + douane;
-
   } else if (voyage.type === "heure") {
     const h = Math.floor(voyage.minutes / 60);
     const m = voyage.minutes % 60;
     bloc += `<div><strong>Heures:</strong> ${h}h${String(m).padStart(2, '0')}</div>`;
-
-    const forfait = voyage.prime_forfait || 0;
-    const douane = voyage.prime_douane || 0;
-    bloc += `<div><strong>Forfait:</strong> ${forfait.toFixed(2)} $</div>`;
-    bloc += `<div><strong>Douane:</strong> ${douane.toFixed(2)} $</div>`;
-
     jourMin += voyage.minutes;
-    jourForfait += forfait;
-    jourDouane += douane;
-    jourPrime += forfait + douane;
   }
+
+  // Cumule les primes ici
+  jourForfait += voyage.prime_forfait || 0;
+  jourDouane += voyage.prime_douane || 0;
+  jourPrime += voyage.prime || 0;
 
   details.innerHTML += bloc;
 });

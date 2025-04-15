@@ -98,12 +98,14 @@ function parseLocalDate(str) {
 }
 
 function getWeekMonday(dateStr) {
-  const date = new Date(dateStr);
-  const day = date.getDay();
-  const mondayOffset = day === 0 ? -6 : 1 - day;
+  const [year, month, day] = dateStr.split("-").map(Number);
+  const date = new Date(year, month - 1, day); // ← Ceci respecte le fuseau local
+  const dayOfWeek = date.getDay(); // 0=dimanche, 1=lundi, ..., 6=samedi
+  const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
   date.setDate(date.getDate() + mondayOffset);
   return date.toISOString().split("T")[0];
 }
+
 
 async function fetchSemaineData(chauffeur, lundi) {
   const url = `${API_URL}?chauffeur=${encodeURIComponent(chauffeur)}&lundi=${lundi}`;

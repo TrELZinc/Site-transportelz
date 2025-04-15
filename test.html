@@ -26,6 +26,12 @@
       .grid-week {
         align-items: stretch;
       }
+      
+      .separator {
+  border-top: 1px solid #dee2e6;
+  margin: 8px 0;
+}
+
 .badge {
   display: inline-block;
   padding: 0.35em 0.65em;
@@ -187,32 +193,39 @@ async function loadSemaine() {
     }
   let jourKm = 0, jourMin = 0, jourForfait = 0, jourDouane = 0, jourPrime = 0;
 
-voyages.forEach((voyage, index) => {
-  const voyageNum = index + 1;
-  let bloc = `<div class="fw-bold mt-2">Voyage ${voyageNum} :</div>`;
-  bloc += `<div class="mb-1">(${voyage.origine} → ${voyage.destination})</div>`;
+voyages.forEach((voyage, idx) => {
+  details.innerHTML += `<div class="fw-bold mb-1">Voyage ${idx + 1} :</div>`;
+  details.innerHTML += `<div class="mb-1">(${voyage.origine} → ${voyage.destination})</div>`;
 
   if (voyage.type === "kilometrage" || voyage.type === "retour") {
-    bloc += `<div><strong>KM:</strong> ${voyage.km}</div>`;
+    details.innerHTML += `<div><strong>KM:</strong> ${voyage.km}</div>`;
     jourKm += voyage.km;
-
-  } else if (voyage.type === "heure") {
-    const h = Math.floor(voyage.minutes / 60);
-    const m = voyage.minutes % 60;
-    bloc += `<div><strong>Heures:</strong> ${h}h${String(m).padStart(2, '0')}</div>`;
-    jourMin += voyage.minutes;
+    const forfait = voyage.prime_forfait || 0;
+    const douane = voyage.prime_douane || 0;
+    jourForfait += forfait;
+    jourDouane += douane;
+    jourPrime += forfait + douane;
   }
 
-  // Cumule les primes ici
-  jourForfait += voyage.prime_forfait || 0;
-  jourDouane += voyage.prime_douane || 0;
-  jourPrime += voyage.prime || 0;
+  if (voyage.type === "heure") {
+    const h = Math.floor(voyage.minutes / 60);
+    const m = voyage.minutes % 60;
+    details.innerHTML += `<div><strong>Heures:</strong> ${h}h${String(m).padStart(2, '0')}</div>`;
+    jourMin += voyage.minutes;
+    const forfait = voyage.prime_forfait || 0;
+    const douane = voyage.prime_douane || 0;
+    jourForfait += forfait;
+    jourDouane += douane;
+    jourPrime += forfait + douane;
+  }
 
-  details.innerHTML += bloc;
+  if (idx < voyages.length - 1) {
+    details.innerHTML += `<hr class="my-2">`;
+  }
 });
 
-
-// Afficher forfait et douane une fois à la fin du bloc
+// Primes regroupées à la fin
+details.innerHTML += `<hr class="my-2">`;
 details.innerHTML += `<div><strong>Forfait:</strong> ${jourForfait.toFixed(2)} $</div>`;
 details.innerHTML += `<div><strong>Douane:</strong> ${jourDouane.toFixed(2)} $</div>`;
 

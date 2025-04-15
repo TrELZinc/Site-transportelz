@@ -190,27 +190,40 @@ async function loadSemaine() {
 voyages.forEach((voyage, index) => {
   const voyageNum = index + 1;
   let bloc = `<div class="fw-bold mt-2">Voyage ${voyageNum} :</div>`;
+  bloc += `<div class="mb-1">(${voyage.origine} → ${voyage.destination})</div>`;
 
   if (voyage.type === "kilometrage" || voyage.type === "retour") {
-    bloc += `<div><strong>KM:</strong> ${voyage.km} (${voyage.origine} → ${voyage.destination})</div>`;
+    bloc += `<div><strong>KM:</strong> ${voyage.km}</div>`;
     jourKm += voyage.km;
 
     const forfait = voyage.prime_forfait || 0;
     const douane = voyage.prime_douane || 0;
+    bloc += `<div><strong>Forfait:</strong> ${forfait.toFixed(2)} $</div>`;
+    bloc += `<div><strong>Douane:</strong> ${douane.toFixed(2)} $</div>`;
+
+    jourForfait += forfait;
+    jourDouane += douane;
+    jourPrime += forfait + douane;
+
+  } else if (voyage.type === "heure") {
+    const h = Math.floor(voyage.minutes / 60);
+    const m = voyage.minutes % 60;
+    bloc += `<div><strong>Heures:</strong> ${h}h${String(m).padStart(2, '0')}</div>`;
+
+    const forfait = voyage.prime_forfait || 0;
+    const douane = voyage.prime_douane || 0;
+    bloc += `<div><strong>Forfait:</strong> ${forfait.toFixed(2)} $</div>`;
+    bloc += `<div><strong>Douane:</strong> ${douane.toFixed(2)} $</div>`;
+
+    jourMin += voyage.minutes;
     jourForfait += forfait;
     jourDouane += douane;
     jourPrime += forfait + douane;
   }
 
-  if (voyage.type === "heure") {
-    const h = Math.floor(voyage.minutes / 60);
-    const m = voyage.minutes % 60;
-    bloc += `<div><strong>Heures:</strong> ${h}h${String(m).padStart(2, '0')} (${voyage.origine} → ${voyage.destination})</div>`;
-    jourMin += voyage.minutes;
-  }
-
   details.innerHTML += bloc;
 });
+
 
 // Afficher forfait et douane une fois à la fin du bloc
 details.innerHTML += `<div><strong>Forfait:</strong> ${jourForfait.toFixed(2)} $</div>`;

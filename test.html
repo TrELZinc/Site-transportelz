@@ -89,9 +89,36 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbzVBkhW38q4hcHhnGp8Dlkh6BbViw-zNEd0DikdaLX9dDnf5dbx3GhEcOd8o0010Rq-/exec";
 
 function parseLocalDate(str) {
-  if (!str) return new Date();
   const [y, m, d] = str.split("-").map(Number);
   return new Date(y, m - 1, d);
+}
+
+function getWeekMonday(dateStr) {
+  const parts = dateStr.split("-");
+  const d = new Date(parts[0], parts[1] - 1, parts[2]);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  d.setDate(diff);
+  return d.toISOString().split("T")[0];
+}
+
+async function fetchSemaineData(chauffeur, lundi) {
+  const url = `${API_URL}?chauffeur=${encodeURIComponent(chauffeur)}&lundi=${lundi}`;
+  const res = await fetch(url);
+  return await res.json();
+}
+
+async function fetchTauxChauffeurs() {
+  const res = await fetch(API_URL);
+  const json = await res.json();
+  const tauxMap = {};
+  json.chauffeurs.forEach(ch => {
+    tauxMap[ch.nom] = {
+      taux_km: parseFloat(ch.taux_km),
+      taux_h: parseFloat(ch.taux_h)
+    };
+  });
+  return tauxMap;
 }
 
 async function loadSemaine() {
@@ -102,15 +129,7 @@ async function loadSemaine() {
   const lundi = getWeekMonday(inputDate);
   const tauxMap = await fetchTauxChauffeurs();
   const taux = tauxMap[chauffeur];
-  if (!taux) return alert("Taux non trouvés pour ce chauffeur.");
-
   const semaineData = await fetchSemaineData(chauffeur, lundi);
-  console.log("Semaine reçue:", semaineData);
-  const container = document.getElementById("pastillesContainer");
-  container.innerHTML = "";
-
-  let totalKm = 0, totalMin = 0;
-  let totalForfait = 0, totalDouane = 0;
 
   const grouped = {};
   semaineData.forEach(item => {
@@ -118,27 +137,36 @@ async function loadSemaine() {
     grouped[item.date].push(item);
   });
 
+  let totalKm = 0, totalMin = 0, totalForfait = 0, totalDouane = 0;
+
+  const container = document.getElementById("pastillesContainer");
+  container.innerHTML = "";
+
   Object.keys(grouped).forEach(date => {
     const jour = parseLocalDate(date);
     const div = document.createElement("div");
     div.className = "pastille";
     div.innerHTML = `<h5>${jour.toLocaleDateString("fr-CA", { weekday: 'long', day: 'numeric', month: 'short' })}</h5><div class="details"></div>`;
-
+    
     const details = div.querySelector(".details");
+
     grouped[date].forEach(voyage => {
       if (voyage.type === "kilometrage" || voyage.type === "retour") {
         details.innerHTML += `<div><strong>KM:</strong> ${voyage.km} (${voyage.origine} → ${voyage.destination})</div>`;
         totalKm += voyage.km;
+
         const prime = parseFloat(voyage.prime);
-        if (!isNaN(prime)) {
-        if (Math.abs(prime - 60.85) < 0.01) {
-    totalForfait += 60.85;
-    details.innerHTML += `<div class="text-success">+ Forfait: 60.85 $</div>`;
-  } else if (Math.abs(prime - 15) < 0.01) {
-    totalDouane += 15;
-    details.innerHTML += `<div class="text-success">+ Prime douane: 15.00 $</div>`;
-  }
-}
+        if (!isNaN(prime) && prime > 0) {
+          if (Math.abs(prime - 60.85) < 0.01) {
+            details.innerHTML += `<div class="text-success">+ Forfait: 60.85 $</div>`;
+            totalForfait += 60.85;
+          } else if (Math.abs(prime - 15) < 0.01) {
+            details.innerHTML += `<div class="text-info">+ Prime douane: 15.00 $</div>`;
+            totalDouane += 15;
+          } else {
+            details.innerHTML += `<div class="text-secondary">+ Prime: ${prime.toFixed(2)} $</div>`;
+          }
+        }
       }
       if (voyage.type === "heure") {
         const h = Math.floor(voyage.minutes / 60);
@@ -162,15 +190,6 @@ async function loadSemaine() {
   document.getElementById("totalMontant").textContent = `${totalPayable.toFixed(2)} $`;
 }
 
-function getWeekMonday(dateStr) {
-  const parts = dateStr.split("-");
-  const d = new Date(parts[0], parts[1] - 1, parts[2]);
-  const day = d.getDay();
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-  d.setDate(diff);
-  return d.toISOString().split("T")[0];
-}
-
 function changerSemaine() {
   document.getElementById("dateInput").value = "";
   document.getElementById("pastillesContainer").innerHTML = "";
@@ -186,33 +205,14 @@ function sauvegarderSemaine() {
   alert("Fonction SAVE désactivée ici pour éviter d’écraser les données — à activer quand prêt.");
 }
 
-async function fetchSemaineData(chauffeur, lundi) {
-  const url = `${API_URL}?chauffeur=${encodeURIComponent(chauffeur)}&lundi=${lundi}`;
-  const res = await fetch(url);
-  return await res.json();
-}
-
-async function fetchTauxChauffeurs() {
-  const response = await fetch(API_URL);
-  const json = await response.json();
-  const tauxMap = {};
-  json.chauffeurs.forEach(chauffeur => {
-    tauxMap[chauffeur.nom] = {
-      taux_km: parseFloat(chauffeur.taux_km),
-      taux_h: parseFloat(chauffeur.taux_h)
-    };
-  });
-  return tauxMap;
-}
-
 async function chargerChauffeursDansSelect() {
-  const response = await fetch(API_URL);
-  const json = await response.json();
+  const res = await fetch(API_URL);
+  const json = await res.json();
   const select = document.getElementById("chauffeurSelect");
-  json.chauffeurs.forEach(chauffeur => {
+  json.chauffeurs.forEach(ch => {
     const opt = document.createElement("option");
-    opt.value = chauffeur.nom;
-    opt.textContent = chauffeur.nom;
+    opt.value = ch.nom;
+    opt.textContent = ch.nom;
     select.appendChild(opt);
   });
 }

@@ -148,7 +148,9 @@ async function loadSemaine() {
   Object.entries(grouped).forEach(([date, voyages]) => {
     const div = document.createElement("div");
     div.className = "pastille";
-    const dateAffich = parseLocalDate(date).toLocaleDateString("fr-CA", { weekday: 'long', day: 'numeric', month: 'short' });
+    const parts = date.split("-");
+    const jsDate = new Date(parts[0], parts[1] - 1, parts[2]);
+    const dateAffich = jsDate.toLocaleDateString("fr-CA", { weekday: 'long', day: 'numeric', month: 'short' });
     div.innerHTML = `<h5>${dateAffich}</h5><div class="details"></div>`;
     const details = div.querySelector(".details");
 

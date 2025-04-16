@@ -245,12 +245,6 @@ details.innerHTML += `<hr class="my-2">`;
 details.innerHTML += `<div><strong>Forfait:</strong> ${jourForfait.toFixed(2)} $</div>`;
 details.innerHTML += `<div><strong>Douane:</strong> ${jourDouane.toFixed(2)} $</div>`;
 
-// Totaux globaux
-totalKm += jourKm;
-totalMin += jourMin;
-totalForfait += jourForfait;
-totalDouane += jourDouane;
-totalPrime += jourPrime;
 
   const montantJour = (jourKm * taux.taux_km) + (jourMin / 60 * taux.taux_h) + jourPrime;
 

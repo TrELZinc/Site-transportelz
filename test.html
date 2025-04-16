@@ -67,8 +67,9 @@
     <div class="col-md-4">
       <label class="form-label">Nom du chauffeur</label>
       <select id="chauffeurSelect" class="form-select">
-        <option value="">-- Choisir --</option>
+      <option value="">-- Choisir --</option>
       </select>
+      <div id="chauffeurTauxBox" class="mt-2"></div>
     </div>
     <div class="col-md-4">
       <label class="form-label">Date de la semaine</label>
@@ -158,6 +159,12 @@ async function loadSemaine() {
   const tauxMap = await fetchTauxChauffeurs();
   const taux = tauxMap[chauffeur];
   if (!taux) return alert("Taux non trouvés pour ce chauffeur.");
+  const tauxBox = document.getElementById("chauffeurTauxBox");
+  tauxBox.innerHTML = `
+  <div class="alert alert-info py-2 px-3 mb-0 rounded-pill d-inline-block">
+    <strong>Taux:</strong> ${taux.taux_km.toFixed(2)} $/km &nbsp; | &nbsp; ${taux.taux_h.toFixed(2)} $/h
+  </div>
+`;
 
   const semaineData = await fetchSemaineData(chauffeur, lundi);
   console.log("📤 Requête envoyée à l'API avec :", chauffeur, lundi);

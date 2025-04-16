@@ -89,6 +89,7 @@
     <p><strong>Total forfaits :</strong> <span id="totalForfait">0.00</span> $</p>
     <p><strong>Total primes douane :</strong> <span id="totalDouane">0.00</span> $</p>
     <p><strong>Montant estimé :</strong> <span id="totalMontant" class="text-success fw-bold">0.00 $</span></p>
+    <p id="ajustementsRecap" class="text-muted fst-italic small"></p>
    <div class="mt-4 p-3 bg-white border rounded">
   <h6 class="text-muted mb-3">Ajustements manuels</h6>
   <div class="row g-3">
@@ -289,20 +290,26 @@ totalDouane += jourDouane;
   container.appendChild(div);
 });
 
-// Résumé global
-// Ajustements manuels
 const ajustKm = parseFloat(document.getElementById("ajustKm").value) || 0;
 const ajustH = parseFloat(document.getElementById("ajustH").value) || 0;
 const ajustForfait = parseFloat(document.getElementById("ajustForfait").value) || 0;
 const ajustBonus = parseFloat(document.getElementById("ajustBonus").value) || 0;
 
 const montantAjuste =
-  ((totalKm - ajustKm) * taux.taux_km) +
-  ((totalMin / 60 - ajustH) * taux.taux_h) +
-  (totalForfait - ajustForfait) +
+  ((totalKm + ajustKm) * taux.taux_km) +
+  ((totalMin / 60 + ajustH) * taux.taux_h) +
+  (totalForfait + ajustForfait) +
   totalDouane +
   ajustBonus;
+  
+const recap = [];
+if (ajustKm !== 0) recap.push(`${ajustKm > 0 ? "+" : ""}${ajustKm} km`);
+if (ajustH !== 0) recap.push(`${ajustH > 0 ? "+" : ""}${ajustH} h`);
+if (ajustForfait !== 0) recap.push(`${ajustForfait > 0 ? "+" : ""}${ajustForfait.toFixed(2)} $ forfait`);
+if (ajustBonus !== 0) recap.push(`${ajustBonus > 0 ? "+" : ""}${ajustBonus.toFixed(2)} $ bonus`);
 
+document.getElementById("ajustementsRecap").textContent =
+  recap.length ? `Ajustements appliqués : ${recap.join(", ")}` : "";
 
 document.getElementById("totalKm").textContent = totalKm;
 document.getElementById("totalH").textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2,'0')}`;

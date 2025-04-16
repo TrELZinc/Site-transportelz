@@ -290,6 +290,8 @@ totalKm += jourKm;
 totalMin += jourMin;
 totalForfait += jourForfait;
 totalDouane += jourDouane;
+jourPrime += forfait + douane;
+
 
   const montantJour = (jourKm * taux.taux_km) + (jourMin / 60 * taux.taux_h) + jourPrime;
 

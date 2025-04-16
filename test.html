@@ -274,10 +274,18 @@ document.getElementById("totalDouane").textContent = totalDouane.toFixed(2);
 document.getElementById("totalPrime").textContent = totalPrime.toFixed(2);
 document.getElementById("totalMontant").textContent = `${totalMontant.toFixed(2)} $`;
 
-// Activation du recalcul à la volée
- container.querySelectorAll(".editable").forEach(el => {
-  el.addEventListener("input", () => recalculerTotaux(taux));
-});
+// ✅ Après avoir injecté tout le HTML (à la fin de loadSemaine)
+setTimeout(() => {
+  document.querySelectorAll(".editable").forEach(el => {
+    el.addEventListener("input", () => {
+      el.textContent = el.textContent.replace(/[^0-9.,]/g, '');
+      recalculerTotaux(taux);
+    });
+  });
+
+  // ✅ Lance le premier calcul après ajout de tous les éléments
+  recalculerTotaux(taux);
+}, 0);
   }
   
   

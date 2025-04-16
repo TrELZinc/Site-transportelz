@@ -19,21 +19,20 @@
 
     body { background: #f8f9fa; }
     
-        .pastille {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      background: white;
-      border: 2px solid #dee2e6;
-      border-radius: 12px;
-      padding: 16px;
-      min-width: 220px;
-      flex: 1 0 220px;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
+       .pastille {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: white;
+  border: 2px solid #dee2e6;
+  border-radius: 12px;
+  padding: 16px;
+  min-width: 220px;
+  flex: 1 0 220px;
+  min-height: 420px; /* 🔥 fixe la hauteur minimale */
+  box-sizing: border-box;
+}
+
       .pastille .details div {
         margin-bottom: 4px;
       }

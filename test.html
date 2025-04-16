@@ -208,38 +208,47 @@ async function loadSemaine() {
   let jourKm = 0, jourMin = 0, jourForfait = 0, jourDouane = 0, jourPrime = 0;
 
 voyages.forEach((voyage, idx) => {
+  // Détection de "Stansted"
   if (voyage.origine && voyage.origine.toLowerCase().includes("stanstead")) {
     nbVoyagesStansted++;
   }
 
+  // Affichage de l’en-tête du voyage
   details.innerHTML += `<div class="fw-bold mb-1">Voyage ${idx + 1} :</div>`;
   details.innerHTML += `<div class="mb-1">(${voyage.origine} → ${voyage.destination})</div>`;
 
+  // KM
   if (voyage.type === "kilometrage" || voyage.type === "retour") {
+    const km = parseFloat(voyage.km) || 0;
+    jourKm += km;
     details.innerHTML += `
-      <div><strong>KM:</strong> <span class="editable" contenteditable="true" data-type="km" data-idx="${idx}">${voyage.km}</span> km</div>
+      <div><strong>KM:</strong> <span class="editable" contenteditable="true" data-type="km" data-idx="${idx}">${km}</span> km</div>
     `;
-    jourKm += parseFloat(voyage.km) || 0; // ✅ seulement ici
   }
 
+  // Heures
   if (voyage.type === "heure") {
     const h = Math.floor(voyage.minutes / 60);
     const m = voyage.minutes % 60;
+    jourMin += parseFloat(voyage.minutes) || 0;
     details.innerHTML += `
       <div><strong>Heures:</strong> 
         <span class="editable" contenteditable="true" data-type="heure-h" data-idx="${idx}">${h}</span> h 
         <span class="editable" contenteditable="true" data-type="heure-m" data-idx="${idx}">${m}</span> m
       </div>
     `;
-    jourMin += parseFloat(voyage.minutes) || 0; // ✅ seulement ici
   }
 
-  const forfait = voyage.prime_forfait || 0;
-  const douane = voyage.prime_douane || 0;
+  // Primes
+  const forfait = parseFloat(voyage.prime_forfait) || 0;
+  const douane = parseFloat(voyage.prime_douane) || 0;
   jourForfait += forfait;
   jourDouane += douane;
-  jourPrime = jourForfait + jourDouane;
-});
+
+  details.innerHTML += `
+    <div><strong>Forfait:</strong> <span class="editable" contenteditable="true" data-type="forfait" data-idx="${idx}">${forfait.toFixed(2)}</span> $</div>
+    <div><strong>Douane:</strong> <span class="editable" contenteditable="true" data-type="douane" data-idx="${idx}">${douane.toFixed(2)}</span> $</div>
+  `;
 
   if (idx < voyages.length - 1) {
     details.innerHTML += `<hr class="my-2">`;

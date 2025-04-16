@@ -241,12 +241,6 @@ voyages.forEach((voyage, idx) => {
   jourPrime = jourForfait + jourDouane;
 });
 
-
-  details.innerHTML += `
-  <div><strong>Forfait:</strong> <span class="editable" contenteditable="true" data-type="forfait" data-idx="${idx}">${forfait.toFixed(2)}</span> $</div>
-  <div><strong>Douane:</strong> <span class="editable" contenteditable="true" data-type="douane" data-idx="${idx}">${douane.toFixed(2)}</span> $</div>
-  `;
-
   if (idx < voyages.length - 1) {
     details.innerHTML += `<hr class="my-2">`;
   }

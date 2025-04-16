@@ -56,30 +56,34 @@
       padding: 1rem;
       background: #e6f4ea;
     }
+    #chauffeurTauxBox {
+  display: flex;
+  justify-content: flex-end;
+}
+
     .badge-prime { font-size: 0.75rem; margin-left: 0.4rem; }
   </style>
 </head>
 <body class="p-4">
 <div class="container">
-  <h2 class="mb-4">Vue hebdomadaire - Paie Chauffeurs</h2>
-
-  <div class="row g-3 mb-4">
-    <div class="col-md-4">
-      <label class="form-label">Nom du chauffeur</label>
-      <select id="chauffeurSelect" class="form-select">
+<div class="d-flex flex-wrap justify-content-between align-items-end mb-4 gap-3">
+  <div class="flex-grow-1">
+    <label class="form-label">Nom du chauffeur</label>
+    <select id="chauffeurSelect" class="form-select">
       <option value="">-- Choisir --</option>
-      </select>
-      <div id="chauffeurTauxBox" class="mt-2"></div>
-    </div>
-    <div class="col-md-4">
-      <label class="form-label">Date de la semaine</label>
-      <input type="date" id="dateInput" class="form-control" />
-    </div>
-    <div class="col-md-4 d-flex align-items-end">
-      <button class="btn btn-primary w-100" onclick="loadSemaine()">Charger la semaine</button>
-    </div>
+    </select>
   </div>
-
+  <div>
+    <label class="form-label">Date de la semaine</label>
+    <input type="date" id="dateInput" class="form-control" />
+  </div>
+  <div>
+    <button class="btn btn-primary mt-2 mt-md-0" onclick="loadSemaine()">Charger la semaine</button>
+  </div>
+</div>
+<div id="chauffeurTauxBox" class="mb-4">
+  <!-- injecté dynamiquement par JS -->
+</div>
   <div class="grid-week" id="pastillesContainer"></div>
 
   <div class="summary-box">
@@ -301,6 +305,7 @@ const montantAjuste =
   (totalForfait + ajustForfait) +
   totalDouane +
   ajustBonus;
+
   
 const recap = [];
 if (ajustKm !== 0) recap.push(`${ajustKm > 0 ? "+" : ""}${ajustKm} km`);

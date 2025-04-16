@@ -198,14 +198,25 @@ voyages.forEach((voyage, idx) => {
   details.innerHTML += `<div class="mb-1">(${voyage.origine} → ${voyage.destination})</div>`;
 
   if (voyage.type === "kilometrage" || voyage.type === "retour") {
-    details.innerHTML += `<div><strong>KM:</strong> ${voyage.km}</div>`;
-    jourKm += voyage.km;
-    const forfait = voyage.prime_forfait || 0;
-    const douane = voyage.prime_douane || 0;
-    jourForfait += forfait;
-    jourDouane += douane;
-    jourPrime += forfait + douane;
+  const km = parseFloat(voyage.km) || 0;
+  jourKm += km;
+
+  let forfait = parseFloat(voyage.prime_forfait) || 0;
+  const douane = parseFloat(voyage.prime_douane) || 0;
+
+  // Annulation du forfait si origine = Vimont
+  if (voyage.origine?.toLowerCase().includes("vimont")) {
+    forfait = 0;
   }
+
+  jourForfait += forfait;
+  jourDouane += douane;
+  jourPrime += forfait + douane;
+
+  details.innerHTML += `<div><strong>KM:</strong> ${km}</div>`;
+  details.innerHTML += `<div><strong>Forfait:</strong> ${forfait.toFixed(2)} $</div>`;
+  details.innerHTML += `<div><strong>Douane:</strong> ${douane.toFixed(2)} $</div>`;
+}
 
   if (voyage.type === "heure") {
     const h = Math.floor(voyage.minutes / 60);

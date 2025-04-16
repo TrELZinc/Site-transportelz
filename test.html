@@ -22,6 +22,17 @@
       .pastille .details div {
         margin-bottom: 4px;
       }
+
+    .date-header {
+      font-weight: 600;
+      font-size: 1rem;
+      color: #333;
+      background-color: #f1f1f1;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+
       .grid-week {
       display: flex;
       flex-wrap: nowrap;
@@ -229,7 +240,7 @@ async function loadSemaine() {
   const parts = date.split("-");
   const jsDate = new Date(parts[0], parts[1] - 1, parts[2]);
   const dateAffich = jsDate.toLocaleDateString("fr-CA", { weekday: 'long', day: 'numeric', month: 'short' });
-  div.innerHTML = `<h5>${dateAffich}</h5><div class="details"></div>`;
+  div.innerHTML = `<div class="date-header text-center mb-3">${dateAffich}</div><div class="details"></div>`;
 
   const details = div.querySelector(".details");
      if (voyages.length === 0) {

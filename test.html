@@ -56,19 +56,6 @@
       padding: 1rem;
       background: #e6f4ea;
     }
-    
-    .editable {
-  display: inline-block;
-  min-width: 40px;
-  padding: 1px 4px;
-  border-bottom: 1px dashed #ccc;
-  cursor: text;
-}
-.editable:focus {
-  background: #fff8e1;
-  outline: none;
-}
-
     .badge-prime { font-size: 0.75rem; margin-left: 0.4rem; }
   </style>
 </head>
@@ -128,7 +115,6 @@ const API_URL = "https://script.google.com/macros/s/AKfycbzH1D5uFJTvh23ZhrIrw9qV
 
 let primeDouane = 0;
 let primeForfait = 0;
-let primeStanstedBonus = 0;
 
 function parseLocalDate(str) {
   const [y, m, d] = str.split("-").map(Number);
@@ -208,50 +194,32 @@ async function loadSemaine() {
   let jourKm = 0, jourMin = 0, jourForfait = 0, jourDouane = 0, jourPrime = 0;
 
 voyages.forEach((voyage, idx) => {
-  // Détection de "Stansted"
-  if (voyage.origine && voyage.origine.toLowerCase().includes("stanstead")) {
-    nbVoyagesStansted++;
-  }
-
-  // Affichage de l’en-tête du voyage
   details.innerHTML += `<div class="fw-bold mb-1">Voyage ${idx + 1} :</div>`;
   details.innerHTML += `<div class="mb-1">(${voyage.origine} → ${voyage.destination})</div>`;
 
-  // KM
   if (voyage.type === "kilometrage" || voyage.type === "retour") {
-    const km = parseFloat(voyage.km) || 0;
-    jourKm += km;
-    details.innerHTML += `
-      <div><strong>KM:</strong> <span class="editable" contenteditable="true" data-type="km" data-idx="${idx}">${km}</span> km</div>
-    `;
+    details.innerHTML += `<div><strong>KM:</strong> ${voyage.km}</div>`;
+    jourKm += voyage.km;
+    const forfait = voyage.prime_forfait || 0;
+    const douane = voyage.prime_douane || 0;
+    jourForfait += forfait;
+    jourDouane += douane;
+    jourPrime += forfait + douane;
   }
 
-  // Heures
   if (voyage.type === "heure") {
     const h = Math.floor(voyage.minutes / 60);
     const m = voyage.minutes % 60;
-    jourMin += parseFloat(voyage.minutes) || 0;
-    details.innerHTML += `
-      <div><strong>Heures:</strong> 
-        <span class="editable" contenteditable="true" data-type="heure-h" data-idx="${idx}">${h}</span> h 
-        <span class="editable" contenteditable="true" data-type="heure-m" data-idx="${idx}">${m}</span> m
-      </div>
-    `;
+    details.innerHTML += `<div><strong>Heures:</strong> ${h}h${String(m).padStart(2, '0')}</div>`;
+    jourMin += voyage.minutes;
+    const forfait = voyage.prime_forfait || 0;
+    const douane = voyage.prime_douane || 0;
+    if (!(voyage.type === "heure" && voyage.origine?.toLowerCase().includes("vimont"))) {
+    jourForfait += forfait;
   }
-
-  // Primes
-  const forfait = parseFloat(voyage.prime_forfait) || 0;
-  const douane = parseFloat(voyage.prime_douane) || 0;
-  const jourPrime = jourForfait + jourDouane;
-  const montantJour = (jourKm * taux.taux_km) + (jourMin / 60 * taux.taux_h) + jourPrime;
-
-  jourForfait += forfait;
-  jourDouane += douane;
-
-  details.innerHTML += `
-    <div><strong>Forfait:</strong> <span class="editable" contenteditable="true" data-type="forfait" data-idx="${idx}">${forfait.toFixed(2)}</span> $</div>
-    <div><strong>Douane:</strong> <span class="editable" contenteditable="true" data-type="douane" data-idx="${idx}">${douane.toFixed(2)}</span> $</div>
-  `;
+    jourDouane += douane;
+    jourPrime += forfait + douane;
+  }
 
   if (idx < voyages.length - 1) {
     details.innerHTML += `<hr class="my-2">`;
@@ -263,13 +231,14 @@ details.innerHTML += `<hr class="my-2">`;
 details.innerHTML += `<div><strong>Forfait:</strong> ${jourForfait.toFixed(2)} $</div>`;
 details.innerHTML += `<div><strong>Douane:</strong> ${jourDouane.toFixed(2)} $</div>`;
 
-
-  const montantJour = (jourKm * taux.taux_km) + (jourMin / 60 * taux.taux_h) + jourPrime;
+// Totaux globaux
 totalKm += jourKm;
 totalMin += jourMin;
 totalForfait += jourForfait;
 totalDouane += jourDouane;
 totalPrime += jourPrime;
+
+  const montantJour = (jourKm * taux.taux_km) + (jourMin / 60 * taux.taux_h) + jourPrime;
 
   // Footer journalier
   const footer = document.createElement("div");
@@ -278,17 +247,10 @@ totalPrime += jourPrime;
 
   div.appendChild(footer);
   container.appendChild(div);
-    });
-  
+});
 
-let primeStanstedBonus = 0;
-if (nbVoyagesStansted >= 5) {
-  primeStanstedBonus = 300;
-  totalPrime += primeStanstedBonus;
-}
-
+// Résumé global
 const totalMontant = (totalKm * taux.taux_km) + (totalMin / 60 * taux.taux_h) + totalPrime;
-
 
 document.getElementById("totalKm").textContent = totalKm;
 document.getElementById("totalH").textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2,'0')}`;
@@ -296,92 +258,6 @@ document.getElementById("totalForfait").textContent = totalForfait.toFixed(2);
 document.getElementById("totalDouane").textContent = totalDouane.toFixed(2);
 document.getElementById("totalPrime").textContent = totalPrime.toFixed(2);
 document.getElementById("totalMontant").textContent = `${totalMontant.toFixed(2)} $`;
-
-// ✅ Après avoir injecté tout le HTML (à la fin de loadSemaine)
-setTimeout(() => {
-  document.querySelectorAll(".editable").forEach(el => {
-    el.addEventListener("input", () => {
-      el.textContent = el.textContent.replace(/[^0-9.,]/g, '');
-      recalculerTotaux(taux);
-    });
-  });
-
-  // ✅ Lance le premier calcul après ajout de tous les éléments
-  recalculerTotaux(taux);
-}, 0);
-  }
-  
-  
-function recalculerTotaux(taux) {
-  if (!taux || typeof taux.taux_km !== "number" || typeof taux.taux_h !== "number") {
-    console.warn("❌ Paramètres de taux invalides :", taux);
-    return;
-  }
-
-  let totalKm = 0, totalMin = 0, totalForfait = 0, totalDouane = 0, totalPrime = 0;
-  let nbVoyagesStansted = 0;
-
-  document.querySelectorAll(".pastille").forEach(pastille => {
-    let jourKm = 0, jourMin = 0, jourForfait = 0, jourDouane = 0;
-    const voyages = {};
-
-    const inputs = pastille.querySelectorAll(".editable");
-    inputs.forEach(input => {
-      const idx = input.dataset.idx;
-      const type = input.dataset.type;
-      if (!idx || !type) return;
-
-      if (!voyages[idx]) voyages[idx] = {};
-      voyages[idx][type] = parseFloat(input.textContent) || 0;
-    });
-
-    Object.entries(voyages).forEach(([_, v]) => {
-      jourKm += v.km || 0;
-      jourMin += ((v["heure-h"] || 0) * 60) + (v["heure-m"] || 0);
-      jourForfait += v.forfait || 0;
-      jourDouane += v.douane || 0;
-    });
-
-    // Compter les voyages Stanstead visibles dans le texte
-    const texte = pastille.textContent.toLowerCase();
-    nbVoyagesStansted += (texte.match(/stanstead/g) || []).length;
-
-    const jourPrime = jourForfait + jourDouane;
-    const montantJour = (jourKm * taux.taux_km) + (jourMin / 60 * taux.taux_h) + jourPrime;
-
-    const totalElem = pastille.querySelector(".text-end.text-success");
-    if (totalElem) totalElem.textContent = `Total jour : ${montantJour.toFixed(2)} $`;
-
-    totalKm += jourKm;
-    totalMin += jourMin;
-    totalForfait += jourForfait;
-    totalDouane += jourDouane;
-    totalPrime += jourPrime;
-  });
-
-  // Bonus Stanstead 5 voyages et plus
-  primeStanstedBonus = nbVoyagesStansted >= 5 ? 300 : 0;
-  totalPrime += primeStanstedBonus;
-
-  const totalMontant = (totalKm * taux.taux_km) + (totalMin / 60 * taux.taux_h) + totalPrime;
-
-  document.getElementById("totalKm").textContent = totalKm;
-  document.getElementById("totalH").textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2, '0')}`;
-  document.getElementById("totalForfait").textContent = totalForfait.toFixed(2);
-  document.getElementById("totalDouane").textContent = totalDouane.toFixed(2);
-  document.getElementById("totalPrime").textContent = totalPrime.toFixed(2);
-  document.getElementById("totalMontant").textContent = `${totalMontant.toFixed(2)} $`;
-
-  // Afficher bonus dans le résumé si applicable
-  const summaryBox = document.querySelector(".summary-box");
-  const existingBonus = summaryBox.querySelector(".prime-stanstead");
-  if (existingBonus) existingBonus.remove();
-  if (primeStanstedBonus > 0) {
-    const bonusEl = document.createElement("p");
-    bonusEl.classList.add("prime-stanstead");
-    bonusEl.innerHTML = `<strong>Prime Stanstead (5 voyages +):</strong> <span class="text-success">${primeStanstedBonus.toFixed(2)} $</span>`;
-    summaryBox.appendChild(bonusEl);
-  }
 }
 
 function sauvegarderSemaine() {

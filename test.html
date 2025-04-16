@@ -229,6 +229,8 @@ voyages.forEach((voyage, idx) => {
 
   const forfait = voyage.prime_forfait || 0;
   const douane = voyage.prime_douane || 0;
+  jourForfait += forfait;
+  jourDouane  += douane;
 
   details.innerHTML += `
   <div><strong>Forfait:</strong> <span class="editable" contenteditable="true" data-type="forfait" data-idx="${idx}">${forfait.toFixed(2)}</span> $</div>

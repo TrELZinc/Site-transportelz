@@ -56,6 +56,19 @@
       padding: 1rem;
       background: #e6f4ea;
     }
+    
+    .editable {
+  display: inline-block;
+  min-width: 40px;
+  padding: 1px 4px;
+  border-bottom: 1px dashed #ccc;
+  cursor: text;
+}
+.editable:focus {
+  background: #fff8e1;
+  outline: none;
+}
+
     .badge-prime { font-size: 0.75rem; margin-left: 0.4rem; }
   </style>
 </head>
@@ -199,7 +212,7 @@ voyages.forEach((voyage, idx) => {
 
   if (voyage.type === "kilometrage" || voyage.type === "retour") {
     details.innerHTML += `
-      <div><strong>KM:</strong> <input type="number" class="form-control form-control-sm mt-1" value="${voyage.km}" data-type="km" data-idx="${idx}" /></div>
+      <div><strong>KM:</strong> <span class="editable" contenteditable="true" data-type="km" data-idx="${idx}">${voyage.km}</span> km</div>
     `;
   }
 
@@ -207,10 +220,10 @@ voyages.forEach((voyage, idx) => {
     const h = Math.floor(voyage.minutes / 60);
     const m = voyage.minutes % 60;
     details.innerHTML += `
-      <div><strong>Heures:</strong> 
-        <input type="number" class="form-control form-control-sm d-inline w-25" value="${h}" data-type="heure-h" data-idx="${idx}" /> h 
-        <input type="number" class="form-control form-control-sm d-inline w-25" value="${m}" data-type="heure-m" data-idx="${idx}" /> m
-      </div>
+    <div><strong>Heures:</strong> 
+    <span class="editable" contenteditable="true" data-type="heure-h" data-idx="${idx}">${h}</span> h 
+    <span class="editable" contenteditable="true" data-type="heure-m" data-idx="${idx}">${m}</span> m
+</div>
     `;
   }
 
@@ -218,8 +231,8 @@ voyages.forEach((voyage, idx) => {
   const douane = voyage.prime_douane || 0;
 
   details.innerHTML += `
-    <div><strong>Forfait:</strong> <input type="number" class="form-control form-control-sm" value="${forfait.toFixed(2)}" data-type="forfait" data-idx="${idx}" /></div>
-    <div><strong>Douane:</strong> <input type="number" class="form-control form-control-sm" value="${douane.toFixed(2)}" data-type="douane" data-idx="${idx}" /></div>
+  <div><strong>Forfait:</strong> <span class="editable" contenteditable="true" data-type="forfait" data-idx="${idx}">${forfait.toFixed(2)}</span> $</div>
+  <div><strong>Douane:</strong> <span class="editable" contenteditable="true" data-type="douane" data-idx="${idx}">${douane.toFixed(2)}</span> $</div>
   `;
 
   if (idx < voyages.length - 1) {
@@ -262,8 +275,8 @@ document.getElementById("totalPrime").textContent = totalPrime.toFixed(2);
 document.getElementById("totalMontant").textContent = `${totalMontant.toFixed(2)} $`;
 
 // Activation du recalcul à la volée
-container.querySelectorAll("input").forEach(input => {
-  input.addEventListener("input", () => recalculerTotaux(taux));
+  container.querySelectorAll(".editable").forEach(el => {
+  el.addEventListener("input", () => recalculerTotaux(taux));
 });
   }
   

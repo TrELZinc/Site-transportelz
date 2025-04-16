@@ -204,7 +204,6 @@ voyages.forEach((voyage, idx) => {
   let forfait = parseFloat(voyage.prime_forfait) || 0;
   const douane = parseFloat(voyage.prime_douane) || 0;
 
-  // Annulation du forfait si origine = Vimont
   if (voyage.origine?.toLowerCase().includes("vimont")) {
     forfait = 0;
   }
@@ -215,29 +214,34 @@ voyages.forEach((voyage, idx) => {
 
   details.innerHTML += `<div><strong>KM:</strong> ${km}</div>`;
   details.innerHTML += `<div><strong>Forfait:</strong> ${forfait.toFixed(2)} $</div>`;
-
   if (douane > 0) {
-  details.innerHTML += `<div><strong>Douane:</strong> ${douane.toFixed(2)} $</div>`;
+    details.innerHTML += `<div><strong>Douane:</strong> ${douane.toFixed(2)} $</div>`;
+  }
 }
 
-  if (voyage.type === "heure") {
-    const h = Math.floor(voyage.minutes / 60);
-    const m = voyage.minutes % 60;
-    details.innerHTML += `<div><strong>Heures:</strong> ${h}h${String(m).padStart(2, '0')}</div>`;
-    jourMin += voyage.minutes;
-    const forfait = voyage.prime_forfait || 0;
-    const douane = voyage.prime_douane || 0;
-    if (!(voyage.type === "heure" && voyage.origine?.toLowerCase().includes("vimont"))) {
-    jourForfait += forfait;
-  }
-    jourDouane += douane;
-    jourPrime += forfait + douane;
+if (voyage.type === "heure") {
+  const h = Math.floor(voyage.minutes / 60);
+  const m = voyage.minutes % 60;
+  const minutes = parseFloat(voyage.minutes) || 0;
+  jourMin += minutes;
+
+  let forfait = parseFloat(voyage.prime_forfait) || 0;
+  const douane = parseFloat(voyage.prime_douane) || 0;
+
+  if (voyage.origine?.toLowerCase().includes("vimont")) {
+    forfait = 0;
   }
 
-  if (idx < voyages.length - 1) {
-    details.innerHTML += `<hr class="my-2">`;
+  jourForfait += forfait;
+  jourDouane += douane;
+  jourPrime += forfait + douane;
+
+  details.innerHTML += `<div><strong>Heures:</strong> ${h}h${String(m).padStart(2, '0')}</div>`;
+  details.innerHTML += `<div><strong>Forfait:</strong> ${forfait.toFixed(2)} $</div>`;
+  if (douane > 0) {
+    details.innerHTML += `<div><strong>Douane:</strong> ${douane.toFixed(2)} $</div>`;
   }
-});
+}
 
 // Totaux globaux
 totalKm += jourKm;

@@ -204,6 +204,14 @@ async function loadSemaine() {
     if (!grouped[item.date]) grouped[item.date] = [];
     grouped[item.date].push(item);
   });
+  
+  // Forcer l'ajout de tous les jours de lundi à vendredi même sans données
+  for (let i = 0; i < 5; i++) {
+    const jour = new Date(lundi);
+    jour.setDate(jour.getDate() + i);
+    const dateKey = jour.toISOString().split("T")[0];
+    if (!grouped[dateKey]) grouped[dateKey] = [];
+  }
 
   Object.entries(grouped)
   .sort(([dateA], [dateB]) => new Date(dateA) - new Date(dateB))

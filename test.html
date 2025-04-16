@@ -275,7 +275,7 @@ document.getElementById("totalPrime").textContent = totalPrime.toFixed(2);
 document.getElementById("totalMontant").textContent = `${totalMontant.toFixed(2)} $`;
 
 // Activation du recalcul à la volée
-  container.querySelectorAll(".editable").forEach(el => {
+ container.querySelectorAll(".editable").forEach(el => {
   el.addEventListener("input", () => recalculerTotaux(taux));
 });
   }
@@ -292,7 +292,7 @@ function recalculerTotaux(taux) {
   document.querySelectorAll(".pastille").forEach(pastille => {
     let jourKm = 0, jourMin = 0, jourForfait = 0, jourDouane = 0;
 
-    const inputs = pastille.querySelectorAll("input");
+    const inputs = pastille.querySelectorAll(".editable");
     const voyages = {};
 
     inputs.forEach(input => {
@@ -302,7 +302,7 @@ function recalculerTotaux(taux) {
       if (!idx || !type) return; // Sécurité anti undefined
 
       if (!voyages[idx]) voyages[idx] = {};
-      voyages[idx][type] = parseFloat(input.value) || 0;
+      voyages[idx][type] = parseFloat(input.textContent) || 0;
     });
 
     Object.values(voyages).forEach(v => {

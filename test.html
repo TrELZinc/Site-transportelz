@@ -358,14 +358,15 @@ function recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane) {
   const ajustBonus = parseFloat(document.getElementById("ajustBonus").value) || 0;
 
   const montantAjuste =
-    ((totalKm - ajustKm) * taux.taux_km) +
-    ((totalMin / 60 - ajustH) * taux.taux_h) +
-    (totalForfait - ajustForfait) +
+    ((totalKm + ajustKm) * taux.taux_km) +
+    ((totalMin / 60 + ajustH) * taux.taux_h) +
+    (totalForfait + ajustForfait) +
     totalDouane +
     ajustBonus;
 
   document.getElementById("totalMontant").textContent = `${montantAjuste.toFixed(2)} $`;
 }
+
 
 document.addEventListener("DOMContentLoaded", () => {
   chargerChauffeursDansSelect();

@@ -472,16 +472,24 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
   function genererPDF() {
-  const element = document.querySelector(".container"); // toute la page visible
+  const element = document.querySelector(".container");
   const opt = {
-    margin:       0.5,
-    filename:     'paie_chauffeur.pdf',
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2 },
-    jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    margin: 0.5,
+    filename: 'paie_chauffeur.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
   };
 
-  html2pdf().set(opt).from(element).save();
+  try {
+    html2pdf().set(opt).from(element).save().catch(() => {
+      console.warn("html2pdf échoué, fallback vers print()");
+      window.print();
+    });
+  } catch (e) {
+    console.error("Erreur PDF, fallback vers impression:", e);
+    window.print();
+  }
 }
 
 </script>

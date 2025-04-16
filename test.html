@@ -89,6 +89,27 @@
     <p><strong>Total forfaits :</strong> <span id="totalForfait">0.00</span> $</p>
     <p><strong>Total primes douane :</strong> <span id="totalDouane">0.00</span> $</p>
     <p><strong>Montant estimé :</strong> <span id="totalMontant" class="text-success fw-bold">0.00 $</span></p>
+    <div class="mt-4 p-3 bg-white border rounded">
+  <h6 class="text-muted mb-3">Ajustements manuels</h6>
+  <div class="row g-3">
+    <div class="col-md-3">
+      <label class="form-label">KM à soustraire</label>
+      <input type="number" id="ajustKm" class="form-control" value="0">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Heures à soustraire</label>
+      <input type="number" step="0.25" id="ajustH" class="form-control" value="0">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Forfaits à soustraire</label>
+      <input type="number" step="0.01" id="ajustForfait" class="form-control" value="0">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Bonus/Vacances à ajouter</label>
+      <input type="number" step="0.01" id="ajustBonus" class="form-control" value="0">
+    </div>
+  </div>
+</div>
   </div>
 
   <div class="mt-4 text-end">
@@ -269,13 +290,27 @@ totalDouane += jourDouane;
 });
 
 // Résumé global
-const totalMontant = (totalKm * taux.taux_km) + (totalMin / 60 * taux.taux_h) + totalForfait + totalDouane;
+// Ajustements manuels
+const ajustKm = parseFloat(document.getElementById("ajustKm").value) || 0;
+const ajustH = parseFloat(document.getElementById("ajustH").value) || 0;
+const ajustForfait = parseFloat(document.getElementById("ajustForfait").value) || 0;
+const ajustBonus = parseFloat(document.getElementById("ajustBonus").value) || 0;
+
+const montantAjuste =
+  ((totalKm - ajustKm) * taux.taux_km) +
+  ((totalMin / 60 - ajustH) * taux.taux_h) +
+  (totalForfait - ajustForfait) +
+  totalDouane +
+  ajustBonus;
+
 
 document.getElementById("totalKm").textContent = totalKm;
 document.getElementById("totalH").textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2,'0')}`;
 document.getElementById("totalForfait").textContent = totalForfait.toFixed(2);
 document.getElementById("totalDouane").textContent = totalDouane.toFixed(2);
 document.getElementById("totalMontant").textContent = `${totalMontant.toFixed(2)} $`;
+
+
 }
 
 function sauvegarderSemaine() {
@@ -308,6 +343,9 @@ async function chargerChauffeursDansSelect() {
 
 document.addEventListener("DOMContentLoaded", () => {
   chargerChauffeursDansSelect();
+  ["ajustKm", "ajustH", "ajustForfait", "ajustBonus"].forEach(id => {
+  document.getElementById(id).addEventListener("input", () => loadSemaine());
+});
 });
 </script>
 

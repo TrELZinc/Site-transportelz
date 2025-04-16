@@ -265,6 +265,8 @@ document.getElementById("totalMontant").textContent = `${totalMontant.toFixed(2)
 container.querySelectorAll("input").forEach(input => {
   input.addEventListener("input", () => recalculerTotaux(taux));
 });
+  }
+  
   
 function recalculerTotaux(taux) {
   if (!taux || typeof taux.taux_km !== "number" || typeof taux.taux_h !== "number") {

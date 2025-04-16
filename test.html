@@ -253,6 +253,11 @@ details.innerHTML += `<div><strong>Douane:</strong> ${jourDouane.toFixed(2)} $</
 
 
   const montantJour = (jourKm * taux.taux_km) + (jourMin / 60 * taux.taux_h) + jourPrime;
+totalKm += jourKm;
+totalMin += jourMin;
+totalForfait += jourForfait;
+totalDouane += jourDouane;
+totalPrime += jourPrime;
 
   // Footer journalier
   const footer = document.createElement("div");

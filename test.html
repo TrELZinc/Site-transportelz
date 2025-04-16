@@ -269,7 +269,7 @@ totalDouane += jourDouane;
 });
 
 // Résumé global
-const totalMontant = (totalKm * taux.taux_km) + (totalMin / 60 * taux.taux_h) + totalPrime;
+const totalMontant = (totalKm * taux.taux_km) + (totalMin / 60 * taux.taux_h) + totalForfait + totalDouane;
 
 document.getElementById("totalKm").textContent = totalKm;
 document.getElementById("totalH").textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2,'0')}`;

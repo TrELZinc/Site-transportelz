@@ -23,6 +23,12 @@
         margin-bottom: 4px;
       }
 
+    #totalMontantAjuste {
+    font-size: 1.1rem;
+    border-radius: 8px;
+  }
+
+
     .date-header {
       font-weight: 600;
       font-size: 1rem;
@@ -107,7 +113,9 @@
     <p><strong>Heures :</strong> <span id="totalH">0h00</span></p>
     <p><strong>Total forfaits :</strong> <span id="totalForfait">0.00</span> $</p>
     <p><strong>Total primes douane :</strong> <span id="totalDouane">0.00</span> $</p>
-    <p><strong>Montant estimé :</strong> <span id="totalMontant" class="text-success fw-bold">0.00 $</span></p>
+    <p><strong>Montant estimé (avant ajustements) :</strong> <span id="totalMontant" class="fw-bold text-dark">0.00 $</span></p>
+    <p><strong>Montant avec ajustements :</strong> <span id="totalMontantAjuste" class="fw-bold text-success">0.00 $</span></p>
+
     <p id="ajustementsRecap" class="text-muted fst-italic small"></p>
    <div class="mt-4 p-3 bg-white border rounded">
   <h6 class="text-muted mb-3">Ajustements manuels</h6>
@@ -341,6 +349,15 @@ const montantAjuste =
   (totalForfait + ajustForfait) +
   totalDouane +
   ajustBonus;
+  
+document.getElementById("totalMontant").textContent = `${(
+  totalKm * taux.taux_km +
+  (totalMin / 60) * taux.taux_h +
+  totalForfait +
+  totalDouane
+).toFixed(2)} $`;
+
+document.getElementById("totalMontantAjuste").textContent = `${montantAjuste.toFixed(2)} $`;
 
   
 const recap = [];
@@ -349,8 +366,14 @@ if (ajustH !== 0) recap.push(`${ajustH > 0 ? "+" : ""}${ajustH} h`);
 if (ajustForfait !== 0) recap.push(`${ajustForfait > 0 ? "+" : ""}${ajustForfait.toFixed(2)} $ forfait`);
 if (ajustBonus !== 0) recap.push(`${ajustBonus > 0 ? "+" : ""}${ajustBonus.toFixed(2)} $ bonus`);
 
-document.getElementById("ajustementsRecap").textContent =
-  recap.length ? `Ajustements appliqués : ${recap.join(", ")}` : "";
+const recapText = recap.length ? `Ajustements appliqués : ${recap.join(", ")}` : "";
+document.getElementById("ajustementsRecap").innerHTML = recapText;
+
+if (recap.length && montantBrut !== montantAjuste) {
+  document.getElementById("ajustementsRecap").innerHTML +=
+    ' <span class="badge bg-success ms-2">Ajustements appliqués</span>';
+}
+
 
 document.getElementById("totalKm").textContent = totalKm;
 document.getElementById("totalH").textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2,'0')}`;
@@ -393,6 +416,12 @@ function recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane) {
   const ajustForfait = parseFloat(document.getElementById("ajustForfait").value) || 0;
   const ajustBonus = parseFloat(document.getElementById("ajustBonus").value) || 0;
 
+  const montantBrut =
+    (totalKm * taux.taux_km) +
+    (totalMin / 60 * taux.taux_h) +
+    totalForfait +
+    totalDouane;
+
   const montantAjuste =
     ((totalKm + ajustKm) * taux.taux_km) +
     ((totalMin / 60 + ajustH) * taux.taux_h) +
@@ -400,8 +429,10 @@ function recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane) {
     totalDouane +
     ajustBonus;
 
-  document.getElementById("totalMontant").textContent = `${montantAjuste.toFixed(2)} $`;
+  document.getElementById("totalMontant").textContent = `${montantBrut.toFixed(2)} $`;
+  document.getElementById("totalMontantAjuste").textContent = `${montantAjuste.toFixed(2)} $`;
 }
+
 
 
 document.addEventListener("DOMContentLoaded", () => {

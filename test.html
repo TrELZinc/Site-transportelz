@@ -267,6 +267,11 @@ container.querySelectorAll("input").forEach(input => {
 });
   
 function recalculerTotaux(taux) {
+  if (!taux || typeof taux.taux_km !== "number" || typeof taux.taux_h !== "number") {
+    console.warn("❌ Paramètres de taux invalides :", taux);
+    return;
+  }
+
   let totalKm = 0, totalMin = 0, totalForfait = 0, totalDouane = 0, totalPrime = 0;
 
   document.querySelectorAll(".pastille").forEach(pastille => {
@@ -278,6 +283,9 @@ function recalculerTotaux(taux) {
     inputs.forEach(input => {
       const idx = input.dataset.idx;
       const type = input.dataset.type;
+
+      if (!idx || !type) return; // Sécurité anti undefined
+
       if (!voyages[idx]) voyages[idx] = {};
       voyages[idx][type] = parseFloat(input.value) || 0;
     });
@@ -292,9 +300,9 @@ function recalculerTotaux(taux) {
     const jourPrime = jourForfait + jourDouane;
     const montantJour = (jourKm * taux.taux_km) + (jourMin / 60 * taux.taux_h) + jourPrime;
 
-    pastille.querySelector(".text-end.text-success").textContent = `Total jour : ${montantJour.toFixed(2)} $`;
+    const totalElem = pastille.querySelector(".text-end.text-success");
+    if (totalElem) totalElem.textContent = `Total jour : ${montantJour.toFixed(2)} $`;
 
-    // Totaux globaux
     totalKm += jourKm;
     totalMin += jourMin;
     totalForfait += jourForfait;

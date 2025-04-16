@@ -215,6 +215,8 @@ voyages.forEach((voyage, idx) => {
 
   details.innerHTML += `<div><strong>KM:</strong> ${km}</div>`;
   details.innerHTML += `<div><strong>Forfait:</strong> ${forfait.toFixed(2)} $</div>`;
+
+  if (douane > 0) {
   details.innerHTML += `<div><strong>Douane:</strong> ${douane.toFixed(2)} $</div>`;
 }
 

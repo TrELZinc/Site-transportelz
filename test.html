@@ -244,7 +244,11 @@ async function loadSemaine() {
 
   const details = div.querySelector(".details");
      if (voyages.length === 0) {
-      details.innerHTML = `<span class="badge bg-warning text-dark">Aucune donnée ce jour-là</span>`;
+      details.innerHTML = `
+      <div class="no-data text-center">
+        <span class="badge bg-warning text-dark">Aucune donnée ce jour-là</span>
+      </div>
+    `;
     }
   let jourKm = 0, jourMin = 0, jourForfait = 0, jourDouane = 0, jourPrime = 0;
 

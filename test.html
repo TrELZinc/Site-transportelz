@@ -535,9 +535,6 @@ const montantBrut =
   totalForfait +
   totalDouane;
 
-
-
-
 const montantAjuste =
   ((totalKm + ajustKm) * taux.taux_km) +
   ((totalMin / 60 + ajustH) * taux.taux_h) +
@@ -592,11 +589,6 @@ if (elBrut) elBrut.textContent = `${montantBrut.toFixed(2)} $`;
 const elAjuste = document.querySelector("#Ajuste");
 if (elAjuste) elAjuste.textContent = `${montantAjuste.toFixed(2)} $`;
 
-
-
-
-// ➤ Mise à jour du résumé et pastilles d'impression
-recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane);
 
 const allPastilles = [...document.querySelectorAll(".pastille")];
 const summary = document.querySelector(".print-summary");

@@ -711,8 +711,9 @@ function getAjustements() {
       el.removeEventListener("change", recalculHandler);
       
       // Ajouter de nouveaux écouteurs
-      el.addEventListener("input", recalculHandler);
-      el.addEventListener("change", recalculHandler);
+      el.addEventListener("input", loadSemaine);
+      el.addEventListener("change", loadSemaine);
+
       
       console.log(`Écouteur installé sur ${id}`);
     } else {

@@ -234,19 +234,19 @@ body {
   <div class="row g-3">
     <div class="col-md-3">
       <label class="form-label">KM ajustés</label>
-      <input type="number" id="ajustKm" class="form-control" value="0">
+      <input type="number" id="ajustKmInput" class="form-control" value="0">
     </div>
     <div class="col-md-3">
       <label class="form-label">Heures ajustées</label>
-      <input type="number" step="0.25" id="ajustH" class="form-control" value="0">
+      <input type="number" step="0.25" id="ajustHInput" class="form-control" value="0">
     </div>
     <div class="col-md-3">
       <label class="form-label">Forfaits ajustés</label>
-      <input type="number" step="0.01" id="ajustForfait" class="form-control" value="0">
+      <input type="number" step="0.01" id="ajustForfaitInput" class="form-control" value="0">
     </div>
     <div class="col-md-3">
       <label class="form-label">Bonus / Vacances</label>
-      <input type="number" step="0.01" id="ajustBonus" class="form-control" value="0">
+      <input type="number" step="0.01" id="ajustBonusInput" class="form-control" value="0">
     </div>
   </div>
 </div>
@@ -647,10 +647,11 @@ async function chargerChauffeursDansSelect() {
 
 function recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane) {
   // Récupérer EXPLICITEMENT les valeurs d'ajustement depuis les éléments HTML
-  const ajustKmEl = document.getElementById("ajustKm");
-  const ajustHEl = document.getElementById("ajustH");
-  const ajustForfaitEl = document.getElementById("ajustForfait");
-  const ajustBonusEl = document.getElementById("ajustBonus");
+  const ajustKmEl = document.getElementById("ajustKmInput");
+  const ajustHEl = document.getElementById("ajustHInput");
+  const ajustForfaitEl = document.getElementById("ajustForfaitInput");
+  const ajustBonusEl = document.getElementById("ajustBonusInput");
+
   
   // Convertir en nombres et gérer les cas où la valeur est vide
   const ajustKm = ajustKmEl ? parseFloat(ajustKmEl.value) || 0 : 0;
@@ -713,7 +714,7 @@ function recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane) {
   function setupAjustementListeners() {
   console.log("Configuration des écouteurs d'ajustement");
   
-  const ajustIds = ["ajustKm", "ajustH", "ajustForfait", "ajustBonus"];
+  const ajustIds = ["ajustKmInput", "ajustHInput", "ajustForfaitInput", "ajustBonusInput"];
   
   ajustIds.forEach(id => {
     const el = document.getElementById(id);

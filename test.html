@@ -564,10 +564,11 @@ if (ajustBonus !== 0) recap.push(`${ajustBonus > 0 ? "+" : ""}${ajustBonus.toFix
 const recapText = recap.length ? `Ajustements appliqués : ${recap.join(", ")}` : "";
 document.getElementById("ajustementsRecap").innerHTML = recapText;
 
-if (recap.length && montantBrut !== montantAjuste) {
+if (recap.length) {
   document.getElementById("ajustementsRecap").innerHTML +=
     ' <span class="badge bg-success ms-2">Ajustements appliqués</span>';
 }
+
 
 // ➤ Totaux affichés
 const elKm = document.getElementById("totalKm");

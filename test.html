@@ -485,27 +485,40 @@ totalDouane += jourDouane;
 
 
 
-  const montantJour = (jourKm * taux.taux_km) + (jourMin / 60 * taux.taux_h) + jourPrime;
+  // ➤ Calcul du montant journalier
+const montantJour =
+  (jourKm * taux.taux_km) +
+  (jourMin / 60 * taux.taux_h) +
+  jourPrime;
 
-  // Footer journalier
-  const footer = document.createElement("div");
-  footer.className = "mt-2 fw-bold text-success text-center";
-  footer.textContent = `Total jour : ${montantJour.toFixed(2)} $`;
+// ➤ Ajout du footer "Total jour"
+const footer = document.createElement("div");
+footer.className = "mt-2 fw-bold text-success text-center";
+footer.textContent = `Total jour : ${montantJour.toFixed(2)} $`;
+div.appendChild(footer);
 
-  div.appendChild(footer);
-  if (index < 3) {
-  page1.appendChild(div);
+// ➤ Clonage dans pastilles d'impression (page1/page2)
+const pastilleClone = div.cloneNode(true);
+if (index < 3) {
+  page1.appendChild(pastilleClone);
 } else {
-  page2.appendChild(div);
+  page2.appendChild(pastilleClone);
 }
 index++;
 
-});
-
+// -----------------------------------
+// ➤ Récapitulatif avec ajustements
+// -----------------------------------
 const ajustKm = parseFloat(document.getElementById("ajustKm").value) || 0;
 const ajustH = parseFloat(document.getElementById("ajustH").value) || 0;
 const ajustForfait = parseFloat(document.getElementById("ajustForfait").value) || 0;
 const ajustBonus = parseFloat(document.getElementById("ajustBonus").value) || 0;
+
+const montantBrut =
+  (totalKm * taux.taux_km) +
+  (totalMin / 60 * taux.taux_h) +
+  totalForfait +
+  totalDouane;
 
 const montantAjuste =
   ((totalKm + ajustKm) * taux.taux_km) +
@@ -513,25 +526,15 @@ const montantAjuste =
   (totalForfait + ajustForfait) +
   totalDouane +
   ajustBonus;
-  
-document.getElementById("totalMontant").textContent = `${(
-  totalKm * taux.taux_km +
-  (totalMin / 60) * taux.taux_h +
-  totalForfait +
-  totalDouane
-).toFixed(2)} $`;
 
+document.getElementById("totalMontant").textContent = `${montantBrut.toFixed(2)} $`;
 document.getElementById("totalMontantAjuste").textContent = `${montantAjuste.toFixed(2)} $`;
 
+// ➤ Ligne d'ajustement : visible ou non
 const ligneAjustement = document.getElementById("montantAjusteLigne");
+ligneAjustement.style.display = (ajustKm || ajustH || ajustForfait || ajustBonus) ? "block" : "none";
 
-if (ajustKm !== 0 || ajustH !== 0 || ajustForfait !== 0 || ajustBonus !== 0) {
-  ligneAjustement.style.display = "block";
-} else {
-  ligneAjustement.style.display = "none";
-}
-
-  
+// ➤ Récap texte des ajustements
 const recap = [];
 if (ajustKm !== 0) recap.push(`${ajustKm > 0 ? "+" : ""}${ajustKm} km`);
 if (ajustH !== 0) recap.push(`${ajustH > 0 ? "+" : ""}${ajustH} h`);
@@ -546,18 +549,18 @@ if (recap.length && montantBrut !== montantAjuste) {
     ' <span class="badge bg-success ms-2">Ajustements appliqués</span>';
 }
 
-
+// ➤ Totaux affichés
 document.getElementById("totalKm").textContent = totalKm;
-document.getElementById("totalH").textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2,'0')}`;
+document.getElementById("totalH").textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2, '0')}`;
 document.getElementById("totalForfait").textContent = totalForfait.toFixed(2);
 document.getElementById("totalDouane").textContent = totalDouane.toFixed(2);
-recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane);
 
+// ➤ Mise à jour du résumé et pastilles d'impression
+recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane);
 
 const allPastilles = [...document.querySelectorAll(".pastille")];
 const summary = document.querySelector(".print-summary");
 
-// vider avant
 page1.innerHTML = "";
 page2.innerHTML = "";
 summary.innerHTML = document.querySelector(".summary-box.no-print").innerHTML;
@@ -570,7 +573,7 @@ allPastilles.forEach((el, idx) => {
     page2.appendChild(clone);
   }
 });
-}
+
 
 function sauvegarderSemaine() {
   alert("Fonction de sauvegarde activée (Firebase). Implémentation personnalisable.");

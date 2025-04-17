@@ -646,41 +646,63 @@ async function chargerChauffeursDansSelect() {
 }
 
 function recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane) {
+  // Récupérer les valeurs d'ajustement
   const ajustKm = parseFloat(document.getElementById("ajustKm").value) || 0;
   const ajustH = parseFloat(document.getElementById("ajustH").value) || 0;
-  const ajustForfait = parseFloat(document.getElementById("ajustForfait").value) || 0;
+  const ajustForfait = parseFloat(document.getElementById("ajustForfait").value) || 0; 
   const ajustBonus = parseFloat(document.getElementById("ajustBonus").value) || 0;
 
-  // Calcul du montant brut (sans ajustements)
-  const montantBrut =
+  console.log("Recalcul avec:", {taux, totalKm, totalMin, totalForfait, totalDouane, ajustKm, ajustH, ajustForfait, ajustBonus});
+
+  // Calcul du montant brut (avant ajustements)
+  const montantBrut = 
     (totalKm * taux.taux_km) +
-    (totalMin / 60 * taux.taux_h) +
+    ((totalMin / 60) * taux.taux_h) +
     totalForfait +
     totalDouane;
 
-  // Calcul du montant ajusté (à partir des valeurs de base)
-  const montantAjuste =
+  // Calcul du montant ajusté
+  const montantAjuste = 
     ((totalKm + ajustKm) * taux.taux_km) +
-    ((totalMin / 60 + ajustH) * taux.taux_h) +
+    (((totalMin / 60) + ajustH) * taux.taux_h) +
     (totalForfait + ajustForfait) +
-    totalDouane +
+    totalDouane + 
     ajustBonus;
 
+  console.log("Montants calculés:", {montantBrut, montantAjuste});
+
+  // Affichage des montants
   const elMontant = document.getElementById("totalMontant");
   const elAjuste = document.getElementById("Ajuste");
 
   if (elMontant) elMontant.textContent = `${montantBrut.toFixed(2)} $`;
   if (elAjuste) elAjuste.textContent = `${montantAjuste.toFixed(2)} $`;
 
-  // Affichage de la ligne d'ajustement
+  // Gestion de l'affichage de la ligne d'ajustement
   const elLigne = document.getElementById("montantAjusteLigne");
-  if (ajustKm || ajustH || ajustForfait || ajustBonus) {
+  
+  if (ajustKm !== 0 || ajustH !== 0 || ajustForfait !== 0 || ajustBonus !== 0) {
+    console.log("Affichage de la ligne d'ajustement");
     elLigne.style.display = "block";
   } else {
     elLigne.style.display = "none";
   }
-}
 
+  // Mise à jour du récapitulatif des ajustements
+  const recap = [];
+  if (ajustKm !== 0) recap.push(`${ajustKm > 0 ? "+" : ""}${ajustKm} km`);
+  if (ajustH !== 0) recap.push(`${ajustH > 0 ? "+" : ""}${ajustH} h`);
+  if (ajustForfait !== 0) recap.push(`${ajustForfait > 0 ? "+" : ""}${ajustForfait.toFixed(2)} $ forfait`);
+  if (ajustBonus !== 0) recap.push(`${ajustBonus > 0 ? "+" : ""}${ajustBonus.toFixed(2)} $ bonus`);
+
+  const recapText = recap.length ? `Ajustements appliqués : ${recap.join(", ")}` : "";
+  document.getElementById("ajustementsRecap").innerHTML = recapText;
+
+  if (recap.length) {
+    document.getElementById("ajustementsRecap").innerHTML +=
+      ' <span class="badge bg-success ms-2">Ajustements appliqués</span>';
+  }
+}
 document.addEventListener("DOMContentLoaded", () => {
   chargerChauffeursDansSelect();
   ["ajustKm", "ajustH", "ajustForfait", "ajustBonus"].forEach(id => {

@@ -151,7 +151,7 @@ body {
   margin-bottom: 4px;
 }
 
-#totalMontantAjuste {
+#Ajuste {
   font-size: 1.1rem;
   border-radius: 8px;
 }
@@ -265,8 +265,9 @@ body {
       <p><strong>Montant total :</strong> <span id="totalMontant" class="fw-bold text-dark">0.00 $</span></p>
       <p id="montantAjusteLigne" style="display: none;">
         <strong>Montant avec ajustements :</strong> 
-        <span id="totalMontantAjuste" class="fw-bold text-success">0.00 $</span>
+        <span id="Ajuste" class="fw-bold text-success">0.00 $</span>
       </p>
+
 
     <p id="ajustementsRecap" class="text-muted fst-italic small"></p>
    <div class="mt-4 p-3 bg-white border rounded">
@@ -314,7 +315,7 @@ body {
   const db = firebase.firestore();
 </script>
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbzH1D5uFJTvh23ZhrIrw9qVqP6oy5Xgir9E-eyvLyuB09iOtqKt7c3Z1RrMFlgluvcM/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbyNCeOMXPM8v-eG_X_x56RgninO1LWAMNAOZyQ7mHPUY22KyDvCd8_2HeDUh-E07v7C/exec";
 
 let primeDouane = 0;
 let primeForfait = 0;
@@ -375,7 +376,7 @@ async function loadSemaine() {
   const container = document.getElementById("pastillesContainer");
   container.innerHTML = "";
 
-  let totalKm = 0, totalMin = 0, totalForfait = 0, totalDouane = 0, totalPrime = 0;
+  let totalKm = 0, totalMin = 0, totalForfait = 0, totalDouane = 0;
   const grouped = {};
   semaineData.forEach(item => {
     if (!grouped[item.date]) grouped[item.date] = [];
@@ -399,7 +400,10 @@ let index = 0;
   Object.entries(grouped)
   .sort(([dateA], [dateB]) => new Date(dateA) - new Date(dateB))
   .forEach(([date, voyages]) => {
-  
+  let jourAjustKm = 0;
+  let jourAjustMin = 0;
+  let jourAjustRaison = "";
+
   console.log("📆 JOUR :", date, voyages);
 
   const div = document.createElement("div");
@@ -427,6 +431,23 @@ voyages.forEach((voyage, idx) => {
   details.innerHTML += `<div class="fw-bold mb-1">Voyage ${idx + 1} :</div>`;
   details.innerHTML += `<div class="mb-1">(${voyage.origine} → ${voyage.destination})</div>`;
 
+        // ➤ Ajustements manuels importés depuis la feuille
+      const parsedAjustHr = parseFloat((voyage.ajust_hr ?? 0).toString().replace(",", "."));
+      const parsedAjustKm = parseFloat((voyage.ajust_km ?? 0).toString().replace(",", "."));
+
+
+    
+    if (!isNaN(parsedAjustKm)) {
+      jourAjustKm += parsedAjustKm;
+    }
+    if (!isNaN(parsedAjustHr)) {
+      jourAjustMin += parsedAjustHr * 60;
+    }
+
+    if (voyage.ajust_raison && !jourAjustRaison) {
+      jourAjustRaison = voyage.ajust_raison;
+    }
+  
   if (voyage.type === "kilometrage" || voyage.type === "retour") {
     const km = parseFloat(voyage.km) || 0;
     jourKm += km;
@@ -460,7 +481,7 @@ voyages.forEach((voyage, idx) => {
     if (voyage.origine?.toLowerCase().includes("vimont")) {
       forfait = 0;
     }
-
+   
     jourForfait += forfait;
     jourDouane += douane;
 
@@ -475,7 +496,8 @@ voyages.forEach((voyage, idx) => {
     details.innerHTML += `<hr class="my-2">`;
   }
 
-  jourPrime += forfait + douane; // ✅ ici ça marche maintenant
+  jourPrime += forfait + douane; 
+
 });
 
 // Limite visuelle pour impression (si trop de voyages)
@@ -483,19 +505,38 @@ if (voyages.length > 6) {
   details.innerHTML += `<div class="text-muted small mt-2">(contenu tronqué pour impression)</div>`;
 }
 
-// Totaux globaux
+jourKm += jourAjustKm;
+jourMin += jourAjustMin;
+
 totalKm += jourKm;
 totalMin += jourMin;
 totalForfait += jourForfait;
 totalDouane += jourDouane;
 
 
+// ➤ Affichage des ajustements dans la pastille
+if (jourAjustKm > 0 || jourAjustMin > 0) {
+  let ajustementTexte = `<div class="text-primary"><strong>Ajustement:</strong> `;
+  if (jourAjustKm > 0) ajustementTexte += `+${jourAjustKm} km `;
+  if (jourAjustMin > 0) {
+    const h = Math.floor(jourAjustMin / 60);
+    const m = Math.round(jourAjustMin % 60);
+    ajustementTexte += `+${h}h${String(m).padStart(2, '0')}`;
+  }
+  ajustementTexte += `</div>`;
+  details.innerHTML += ajustementTexte;
+}
 
-  // ➤ Calcul du montant journalier
+if (jourAjustRaison) {
+  details.innerHTML += `<div class="text-muted small fst-italic">📝 ${jourAjustRaison}</div>`;
+}
+
 const montantJour =
   (jourKm * taux.taux_km) +
   (jourMin / 60 * taux.taux_h) +
-  jourPrime;
+  jourForfait +
+  jourDouane;
+
 
 // ➤ Ajout du footer "Total jour"
 const footer = document.createElement("div");
@@ -517,12 +558,26 @@ const ajustKm = parseFloat(document.getElementById("ajustKm").value) || 0;
 const ajustH = parseFloat(document.getElementById("ajustH").value) || 0;
 const ajustForfait = parseFloat(document.getElementById("ajustForfait").value) || 0;
 const ajustBonus = parseFloat(document.getElementById("ajustBonus").value) || 0;
+  
+let ajustMinFeuille = 0;
+let ajustKmFeuille = 0;
+
+// On boucle sur toutes les données (déjà parsées dans `semaineData`)
+semaineData.forEach(voyage => {
+  const extraHr = parseFloat((voyage.ajust_hr || "0").toString().replace(",", ".")) || 0;
+  const extraKm = parseFloat((voyage.ajust_km || "0").toString().replace(",", ".")) || 0;
+  ajustMinFeuille += extraHr * 60;
+  ajustKmFeuille += extraKm;
+});
 
 const montantBrut =
-  (totalKm * taux.taux_km) +
-  (totalMin / 60 * taux.taux_h) +
+  ((totalKm + ajustKmFeuille) * taux.taux_km) +
+  ((totalMin + ajustMinFeuille) / 60 * taux.taux_h) +
   totalForfait +
   totalDouane;
+
+
+
 
 const montantAjuste =
   ((totalKm + ajustKm) * taux.taux_km) +
@@ -530,9 +585,6 @@ const montantAjuste =
   (totalForfait + ajustForfait) +
   totalDouane +
   ajustBonus;
-
-document.getElementById("totalMontant").textContent = `${montantBrut.toFixed(2)} $`;
-document.getElementById("totalMontantAjuste").textContent = `${montantAjuste.toFixed(2)} $`;
 
 // ➤ Ligne d'ajustement : visible ou non
 const ligneAjustement = document.getElementById("montantAjusteLigne");
@@ -554,10 +606,28 @@ if (recap.length && montantBrut !== montantAjuste) {
 }
 
 // ➤ Totaux affichés
-document.getElementById("totalKm").textContent = totalKm;
-document.getElementById("totalH").textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2, '0')}`;
-document.getElementById("totalForfait").textContent = totalForfait.toFixed(2);
-document.getElementById("totalDouane").textContent = totalDouane.toFixed(2);
+const elKm = document.getElementById("totalKm");
+if (elKm) elKm.textContent = totalKm;
+
+const elH = document.getElementById("totalH");
+if (elH) {
+  const totalMinAvecAjust = totalMin + ajustMinFeuille;
+  elH.textContent = `${Math.floor(totalMinAvecAjust / 60)}h${String(totalMinAvecAjust % 60).padStart(2, '0')}`;
+}
+
+const elForfait = document.getElementById("totalForfait");
+if (elForfait) elForfait.textContent = totalForfait.toFixed(2);
+
+const elDouane = document.getElementById("totalDouane");
+if (elDouane) elDouane.textContent = totalDouane.toFixed(2);
+
+const elBrut = document.querySelector("#totalMontant");
+if (elBrut) elBrut.textContent = `${montantBrut.toFixed(2)} $`;
+
+const elAjuste = document.querySelector("#Ajuste");
+if (elAjuste) elAjuste.textContent = `${montantAjuste.toFixed(2)} $`;
+
+
 
 // ➤ Mise à jour du résumé et pastilles d'impression
 recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane);
@@ -625,10 +695,12 @@ function recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane) {
     totalDouane +
     ajustBonus;
 
-  document.getElementById("totalMontant").textContent = `${montantBrut.toFixed(2)} $`;
-  document.getElementById("totalMontantAjuste").textContent = `${montantAjuste.toFixed(2)} $`;
-}
+  const elMontant = document.getElementById("totalMontant");
+  const elAjuste = document.getElementById("Ajuste");
 
+  if (elMontant) elMontant.textContent = `${montantBrut.toFixed(2)} $`;
+  if (elAjuste) elAjuste.textContent = `${montantAjuste.toFixed(2)} $`;
+}
 
 
 document.addEventListener("DOMContentLoaded", () => {

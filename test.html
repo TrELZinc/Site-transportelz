@@ -586,6 +586,12 @@ if (elBrut) elBrut.textContent = `${montantBrut.toFixed(2)} $`;
 const elAjuste = document.querySelector("#Ajuste");
 if (elAjuste) elAjuste.textContent = `${montantAjuste.toFixed(2)} $`;
 
+const ligneAjustement = document.getElementById("montantAjusteLigne");
+if (ajustKm || ajustH || ajustForfait || ajustBonus) {
+  ligneAjustement.style.display = "block";
+} else {
+  ligneAjustement.style.display = "none";
+}
 
 
 // ➤ Mise à jour du résumé et pastilles d'impression

@@ -23,21 +23,27 @@
     overflow: visible !important;
     page-break-after: always;
   }
- .pastilles-page1 {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr);
+
+  .print-pastilles {
+    display: flex !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
     gap: 16px;
-    overflow: visible;
+    max-width: 960px;
+    margin: auto;
     page-break-after: always;
   }
 
   .pastilles-page2 {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-    overflow: visible;
+    page-break-after: avoid;
   }
-  
+
+.print-summary {
+  page-break-before: avoid;
+  margin-top: 2rem;
+}
+
   /* Pastilles bien compactes pour éviter trop de hauteur */
   .pastille {
     page-break-inside: avoid;
@@ -209,6 +215,12 @@ body {
   font-size: 0.75rem;
   margin-left: 0.4rem;
 }
+
+@media screen {
+  .print-summary {
+    display: none !important;
+  }
+}
   </style>
 </head>
 <body class="p-4">
@@ -232,10 +244,13 @@ body {
       </div>
     </div>
 
-    <div class="grid-week" id="pastillesContainer"></div>
-    <div class="pastilles-page1 d-none d-print-grid"></div>
-    <div class="pastilles-page2 d-none d-print-grid"></div>
-    <div class="summary-box">
+<div class="grid-week" id="pastillesContainer"></div>
+
+<!-- Pour l'impression uniquement -->
+      <div class="pastilles-page1 d-none d-print-grid print-pastilles"></div>
+      <div class="pastilles-page2 d-none d-print-grid print-pastilles"></div>
+      <div class="summary-box print-summary d-none d-print-block"></div>
+      <div class="summary-box no-print">
       <h5>Récapitulatif de la semaine</h5>
       <p><strong>Kilomètres :</strong> <span id="totalKm">0</span> km</p>
       <p><strong>Heures :</strong> <span id="totalH">0h00</span></p>
@@ -368,7 +383,8 @@ async function loadSemaine() {
     const dateKey = jour.toISOString().split("T")[0];
     if (!grouped[dateKey]) grouped[dateKey] = [];
   }
-
+  let index = 0;
+  
   Object.entries(grouped)
   .sort(([dateA], [dateB]) => new Date(dateA) - new Date(dateB))
   .forEach(([date, voyages]) => {
@@ -474,12 +490,14 @@ totalDouane += jourDouane;
   div.appendChild(footer);
   container.appendChild(div);
 
-// Impression : répartir pastilles
-if (container.children.length <= 3) {
-  document.querySelector('.pastilles-page1').appendChild(div.cloneNode(true));
+// Impression : répartir pastilles selon index
+const pastilleClone = div.cloneNode(true);
+if (index < 3) {
+  document.querySelector('.pastilles-page1').appendChild(pastilleClone);
 } else {
-  document.querySelector('.pastilles-page2').appendChild(div.cloneNode(true));
+  document.querySelector('.pastilles-page2').appendChild(pastilleClone);
 }
+index++;
 });
 
 const ajustKm = parseFloat(document.getElementById("ajustKm").value) || 0;
@@ -533,6 +551,26 @@ document.getElementById("totalForfait").textContent = totalForfait.toFixed(2);
 document.getElementById("totalDouane").textContent = totalDouane.toFixed(2);
 recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane);
 
+
+const allPastilles = [...document.querySelectorAll(".pastille")];
+
+const page1 = document.querySelector(".pastilles-page1");
+const page2 = document.querySelector(".pastilles-page2");
+const summary = document.querySelector(".print-summary");
+
+// vider avant
+page1.innerHTML = "";
+page2.innerHTML = "";
+summary.innerHTML = document.querySelector(".summary-box.no-print").innerHTML;
+
+allPastilles.forEach((el, idx) => {
+  const clone = el.cloneNode(true);
+  if (idx < 3) {
+    page1.appendChild(clone);
+  } else {
+    page2.appendChild(clone);
+  }
+});
 }
 
 function sauvegarderSemaine() {

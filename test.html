@@ -586,11 +586,11 @@ if (elBrut) elBrut.textContent = `${montantBrut.toFixed(2)} $`;
 const elAjuste = document.querySelector("#Ajuste");
 if (elAjuste) elAjuste.textContent = `${montantAjuste.toFixed(2)} $`;
 
-tauxActuel = taux;
-totalKmActuel = totalKm;
-totalMinActuel = totalMin;
-totalForfaitActuel = totalForfait;
-totalDouaneActuel = totalDouane;
+totalKmActuel = totalKm + ajustKm;
+totalMinActuel = totalMin + ajustH * 60;
+totalForfaitActuel = totalForfait + ajustForfait;
+totalDouaneActuel = totalDouane; // celui-ci ne bouge pas
+
 
 const allPastilles = [...document.querySelectorAll(".pastille")];
 const summary = document.querySelector(".print-summary");
@@ -672,8 +672,15 @@ const montantAjuste = montantBrut +
 
   if (elMontant) elMontant.textContent = `${montantBrut.toFixed(2)} $`;
   if (elAjuste) elAjuste.textContent = `${montantAjuste.toFixed(2)} $`;
-}
 
+  // ➤ Affichage de la ligne d'ajustement
+  const elLigne = document.getElementById("montantAjusteLigne");
+  if (ajustKm || ajustH || ajustForfait || ajustBonus) {
+    elLigne.style.display = "block";
+  } else {
+    elLigne.style.display = "none";
+  }
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   chargerChauffeursDansSelect();

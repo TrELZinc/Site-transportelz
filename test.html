@@ -463,16 +463,6 @@ voyages.forEach((voyage, idx) => {
       forfait = 0;
     }
 
-    jourForfait += forfait;
-    jourDouane += douane;
-
-    details.innerHTML += `<div><strong>Heures:</strong> ${h}h${String(m).padStart(2, '0')}</div>`;
-    details.innerHTML += `<div><strong>Forfait:</strong> ${forfait.toFixed(2)} $</div>`;
-    if (douane > 0) {
-      details.innerHTML += `<div><strong>Douane:</strong> ${douane.toFixed(2)} $</div>`;
-    }
-  }
-
   // ➤ Ajustements manuels depuis la feuille
   if (voyage.ajust_km) {
     jourAjustKm += parseFloat(voyage.ajust_km);
@@ -510,20 +500,6 @@ if (jourAjustKm > 0 || jourAjustMin > 0) {
 if (jourAjustRaison) {
   details.innerHTML += `<div class="text-muted small fst-italic">📝 ${jourAjustRaison}</div>`;
 }
-
-
-  else if (voyage.type === "heure") {
-    const minutes = parseFloat(voyage.minutes) || 0;
-    const h = Math.floor(minutes / 60);
-    const m = minutes % 60;
-    jourMin += minutes;
-
-    forfait = parseFloat(voyage.prime_forfait) || 0;
-      douane = parseFloat(voyage.prime_douane) || 0;
-
-    if (voyage.origine?.toLowerCase().includes("vimont")) {
-      forfait = 0;
-    }
 
     jourForfait += forfait;
     jourDouane += douane;

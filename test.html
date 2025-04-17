@@ -641,41 +641,37 @@ function recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane) {
   const ajustForfait = parseFloat(document.getElementById("ajustForfait").value) || 0;
   const ajustBonus = parseFloat(document.getElementById("ajustBonus").value) || 0;
 
-  const montantBrut =
-    (totalKm * taux.taux_km) +
-    (totalMin / 60 * taux.taux_h) +
-    totalForfait +
-    totalDouane;
+const montantBrut =
+  (totalKm  * taux.taux_km) +
+  (totalMin  / 60 * taux.taux_h) +
+  totalForfait +
+  totalDouane;
 
-  const montantAjuste = montantBrut +
-    (ajustKm * taux.taux_km) +
-    (ajustH * taux.taux_h) +
-    ajustForfait +
-    ajustBonus;
+
+
+
+const montantAjuste = montantBrut +
+  (ajustKm * taux.taux_km) +
+  (ajustH * taux.taux_h) +
+  ajustForfait +
+  ajustBonus;
+
+
 
   const elMontant = document.getElementById("totalMontant");
   const elAjuste = document.getElementById("Ajuste");
-  const ligneAjustement = document.getElementById("montantAjusteLigne");
-  const recap = document.getElementById("ajustementsRecap");
 
   if (elMontant) elMontant.textContent = `${montantBrut.toFixed(2)} $`;
   if (elAjuste) elAjuste.textContent = `${montantAjuste.toFixed(2)} $`;
-
-  if (ajustKm || ajustH || ajustForfait || ajustBonus) {
-    ligneAjustement.style.display = "block";
-
-    const recapItems = [];
-    if (ajustKm !== 0) recapItems.push(`${ajustKm > 0 ? "+" : ""}${ajustKm} km`);
-    if (ajustH !== 0) recapItems.push(`${ajustH > 0 ? "+" : ""}${ajustH} h`);
-    if (ajustForfait !== 0) recapItems.push(`${ajustForfait > 0 ? "+" : ""}${ajustForfait.toFixed(2)} $ forfait`);
-    if (ajustBonus !== 0) recapItems.push(`${ajustBonus > 0 ? "+" : ""}${ajustBonus.toFixed(2)} $ bonus`);
-
-    recap.innerHTML = `Ajustements appliqués : ${recapItems.join(", ")} <span class="badge bg-success ms-2">Ajustements appliqués</span>`;
-  } else {
-    ligneAjustement.style.display = "none";
-    recap.textContent = "";
-  }
 }
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  chargerChauffeursDansSelect();
+  ["ajustKm", "ajustH", "ajustForfait", "ajustBonus"].forEach(id => {
+  document.getElementById(id).addEventListener("input", () => loadSemaine());
+});
+});
 
 function genererPDF() {
   const printZone = document.createElement('div');

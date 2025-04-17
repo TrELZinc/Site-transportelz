@@ -500,14 +500,6 @@ totalDouane += jourDouane;
 }
 index++;
 
-// Impression : répartir pastilles selon index
-const pastilleClone = div.cloneNode(true);
-if (index < 3) {
-  document.querySelector('.pastilles-page1').appendChild(pastilleClone);
-} else {
-  document.querySelector('.pastilles-page2').appendChild(pastilleClone);
-}
-index++;
 });
 
 const ajustKm = parseFloat(document.getElementById("ajustKm").value) || 0;

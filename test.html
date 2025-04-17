@@ -69,6 +69,23 @@
   }
 }
 
+/* Par défaut : les taux sont à leur position normale */
+.order-mobile-last {
+  order: 0;
+}
+
+/* Sur mobile : on les pousse après le bouton */
+@media (max-width: 767.98px) {
+  .row.g-3 {
+    flex-wrap: wrap;
+  }
+
+  .order-mobile-last {
+    order: 4;
+    margin-top: 10px;
+    justify-content: center !important;
+  }
+}
 
 @media screen {
   .taux-print-only {
@@ -256,9 +273,9 @@ body {
     <label class="form-label">Date de la semaine</label>
     <input type="date" id="dateInput" class="form-control" />
   </div>
-  <div class="col-md-3">
-    <label class="form-label invisible">Taux</label>
-    <div id="chauffeurTauxBox" class="w-100 taux-btns-container justify-content-start"></div>
+  <div class="col-md-3 order-mobile-last">
+  <label class="form-label invisible">Taux</label>
+  <div id="chauffeurTauxBox" class="taux-btns-container w-100"></div>
   </div>
   <div class="col-md-3 d-flex align-items-end">
     <button class="btn btn-primary w-100" style="font-size: 1.05rem;" onclick="loadSemaine()">Afficher la semaine</button>

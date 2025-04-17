@@ -667,7 +667,8 @@ function recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane) {
     }
   });
 
-  // Calcul du montant brut (sans ajustements)
+  const { ajustKm, ajustH, ajustForfait, ajustBonus } = getAjustements();
+
   const montantBrut =
     (totalKm * taux.taux_km) +
     (totalMin / 60 * taux.taux_h) +
@@ -676,7 +677,6 @@ function recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane) {
     
   console.log("Montant brut calculé:", montantBrut);
 
-  // Calcul du montant ajusté (avec ajustements)
   const montantAjuste =
     ((totalKm + ajustKm) * taux.taux_km) +
     ((totalMin / 60 + ajustH) * taux.taux_h) +
@@ -707,6 +707,15 @@ function recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane) {
   } else {
     console.error("Élément montantAjusteLigne non trouvé");
   }
+}
+  
+function getAjustements() {
+  return {
+    ajustKm: parseFloat(document.getElementById("ajustKmInput").value) || 0,
+    ajustH: parseFloat(document.getElementById("ajustHInput").value) || 0,
+    ajustForfait: parseFloat(document.getElementById("ajustForfaitInput").value) || 0,
+    ajustBonus: parseFloat(document.getElementById("ajustBonusInput").value) || 0
+  };
 }
 
   function setupAjustementListeners() {

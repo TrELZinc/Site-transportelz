@@ -372,6 +372,10 @@ voyages.forEach((voyage, idx) => {
   jourPrime += forfait + douane; // ✅ ici ça marche maintenant
 });
 
+// Limite visuelle pour impression (si trop de voyages)
+if (voyages.length > 6) {
+  details.innerHTML += `<div class="text-muted small mt-2">(contenu tronqué pour impression)</div>`;
+}
 
 // Totaux globaux
 totalKm += jourKm;

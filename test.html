@@ -520,12 +520,13 @@ if (index < 3) {
 index++;
 });
 
+const { ajustKm, ajustH, ajustForfait, ajustBonus } = getAjustements();
+
 const montantBrut =
   (totalKm * taux.taux_km) +
   (totalMin / 60 * taux.taux_h) +
   totalForfait +
   totalDouane;
-
 
 const montantAjuste =
   ((totalKm + ajustKm) * taux.taux_km) +
@@ -533,6 +534,7 @@ const montantAjuste =
   (totalForfait + ajustForfait) +
   totalDouane +
   ajustBonus;
+
 
 // ➤ Ligne d'ajustement : visible ou non
 const elLigne = document.getElementById("montantAjusteLigne");
@@ -643,39 +645,15 @@ async function chargerChauffeursDansSelect() {
 }
 
 function recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane) {
-  // Récupérer EXPLICITEMENT les valeurs d'ajustement depuis les éléments HTML
-  const ajustKmEl = document.getElementById("ajustKmInput");
-  const ajustHEl = document.getElementById("ajustHInput");
-  const ajustForfaitEl = document.getElementById("ajustForfaitInput");
-  const ajustBonusEl = document.getElementById("ajustBonusInput");
+  const { ajustKm, ajustH, ajustForfait, ajustBonus } = getAjustements(); // ✅ D'abord !
 
-  console.log("🔥 TEST BONUS:", document.getElementById("ajustBonusInput").value);
-
-  // Convertir en nombres et gérer les cas où la valeur est vide
-  const ajustKm = ajustKmEl ? parseFloat(ajustKmEl.value) || 0 : 0;
-  const ajustH = ajustHEl ? parseFloat(ajustHEl.value) || 0 : 0;
-  const ajustForfait = ajustForfaitEl ? parseFloat(ajustForfaitEl.value) || 0 : 0;
-  const ajustBonus = ajustBonusEl ? parseFloat(ajustBonusEl.value) || 0 : 0;
-  
-  console.log("Valeurs d'ajustement récupérées:", {
-    ajustKm, ajustH, ajustForfait, ajustBonus,
-    rawValues: {
-      km: ajustKmEl ? ajustKmEl.value : 'null',
-      h: ajustHEl ? ajustHEl.value : 'null',
-      forfait: ajustForfaitEl ? ajustForfaitEl.value : 'null',
-      bonus: ajustBonusEl ? ajustBonusEl.value : 'null'
-    }
-  });
-
-  const { ajustKm, ajustH, ajustForfait, ajustBonus } = getAjustements();
+  console.log("🔥 Ajustements récupérés:", { ajustKm, ajustH, ajustForfait, ajustBonus });
 
   const montantBrut =
     (totalKm * taux.taux_km) +
     (totalMin / 60 * taux.taux_h) +
     totalForfait +
     totalDouane;
-    
-  console.log("Montant brut calculé:", montantBrut);
 
   const montantAjuste =
     ((totalKm + ajustKm) * taux.taux_km) +

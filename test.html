@@ -497,7 +497,7 @@ voyages.forEach((voyage, idx) => {
   }
 
   jourPrime += forfait + douane; 
-  totalPrime += jourPrime;
+
 });
 
 // Limite visuelle pour impression (si trop de voyages)
@@ -575,7 +575,9 @@ semaineData.forEach(voyage => {
 const montantBrut =
   ((totalKm + ajustKmFeuille) * taux.taux_km) +
   ((totalMin + ajustMinFeuille) / 60 * taux.taux_h) +
-  totalPrime;
+  totalForfait +
+  totalDouane;
+
 
 
 

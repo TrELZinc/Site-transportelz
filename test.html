@@ -430,6 +430,21 @@ voyages.forEach((voyage, idx) => {
   details.innerHTML += `<div class="fw-bold mb-1">Voyage ${idx + 1} :</div>`;
   details.innerHTML += `<div class="mb-1">(${voyage.origine} → ${voyage.destination})</div>`;
 
+        // ➤ Ajustements manuels importés depuis la feuille
+    const parsedAjustKm = parseFloat((voyage.ajust_km || "0").replace(",", "."));
+    const parsedAjustHr = parseFloat((voyage.ajust_hr || "0").replace(",", "."));
+    
+    if (!isNaN(parsedAjustKm)) {
+      jourAjustKm += parsedAjustKm;
+    }
+    if (!isNaN(parsedAjustHr)) {
+      jourAjustMin += parsedAjustHr * 60;
+    }
+
+    if (voyage.ajust_raison && !jourAjustRaison) {
+      jourAjustRaison = voyage.ajust_raison;
+    }
+  
   if (voyage.type === "kilometrage" || voyage.type === "retour") {
     const km = parseFloat(voyage.km) || 0;
     jourKm += km;
@@ -463,22 +478,7 @@ voyages.forEach((voyage, idx) => {
     if (voyage.origine?.toLowerCase().includes("vimont")) {
       forfait = 0;
     }
-        // ➤ Ajustements manuels importés depuis la feuille
-    const parsedAjustKm = parseFloat((voyage.ajust_km || "0").replace(",", "."));
-    const parsedAjustHr = parseFloat((voyage.ajust_hr || "0").replace(",", "."));
-    
-    if (!isNaN(parsedAjustKm)) {
-      jourAjustKm += parsedAjustKm;
-    }
-    if (!isNaN(parsedAjustHr)) {
-      jourAjustMin += parsedAjustHr * 60;
-    }
-
-    if (voyage.ajust_raison && !jourAjustRaison) {
-      jourAjustRaison = voyage.ajust_raison;
-    }
-
-    
+   
     jourForfait += forfait;
     jourDouane += douane;
 

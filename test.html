@@ -262,7 +262,7 @@ body {
       <p><strong>Heures :</strong> <span id="totalH">0h00</span></p>
       <p><strong>Total forfaits :</strong> <span id="totalForfait">0.00</span> $</p>
       <p><strong>Total primes douane :</strong> <span id="totalDouane">0.00</span> $</p>
-      <p><strong>Montant total :</strong> <span id="" class="fw-bold text-dark">0.00 $</span></p>
+      <p><strong>Montant total :</strong> <span id="totalMontant" class="fw-bold text-dark">0.00 $</span></p>
       <p id="montantAjusteLigne" style="display: none;">
         <strong>Montant avec ajustements :</strong> 
         <span id="Ajuste" class="fw-bold text-success">0.00 $</span>
@@ -617,11 +617,12 @@ if (elForfait) elForfait.textContent = totalForfait.toFixed(2);
 const elDouane = document.getElementById("totalDouane");
 if (elDouane) elDouane.textContent = totalDouane.toFixed(2);
 
-const elMontant = document.getElementById("totalMontant");
-if (elMontant) elMontant.textContent = `${montantBrut.toFixed(2)} $`;
+const elBrut = document.querySelector("#totalMontant");
+if (elBrut) elBrut.textContent = `${montantBrut.toFixed(2)} $`;
 
-const elMontantAjuste = document.getElementById("totalMontantAjuste");
-if (elMontantAjuste) elMontantAjuste.textContent = `${montantAjuste.toFixed(2)} $`;
+const elAjuste = document.querySelector("#Ajuste");
+if (elAjuste) elAjuste.textContent = `${montantAjuste.toFixed(2)} $`;
+
 
 
 // ➤ Mise à jour du résumé et pastilles d'impression

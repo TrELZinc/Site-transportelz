@@ -674,11 +674,29 @@ function genererPDF() {
   printZone.style.display = 'block';
   printZone.style.position = 'absolute';
   printZone.style.left = '-9999px';
+  printZone.style.top = '0';
+  printZone.style.zIndex = '9999';
+  printZone.style.background = 'white';
+  printZone.style.width = '1000px';
 
-  // Cloner le contenu utile à imprimer
-  document.querySelectorAll('.print-pastilles, .print-summary').forEach(el => {
+  // Sélectionner les éléments à cloner
+  const toClone = document.querySelectorAll('.print-pastilles, .print-summary');
+  toClone.forEach(el => {
     const clone = el.cloneNode(true);
-    clone.classList.remove('d-none');
+
+    // ❗️On supprime toutes les classes d-none qui empêchent l'affichage
+    clone.classList.remove('d-none', 'd-print-grid', 'd-print-block');
+
+    // ⚠️ Ajout manuel des bonnes classes d'affichage si besoin
+    if (el.classList.contains('print-pastilles')) {
+      clone.style.display = 'grid';
+      clone.style.gridTemplateColumns = 'repeat(3, 1fr)';
+      clone.style.gap = '16px';
+    }
+    if (el.classList.contains('print-summary')) {
+      clone.style.display = 'block';
+    }
+
     printZone.appendChild(clone);
   });
 
@@ -700,6 +718,7 @@ function genererPDF() {
     window.print();
   });
 }
+
 
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>

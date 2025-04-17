@@ -449,26 +449,40 @@ voyages.forEach((voyage, idx) => {
   let forfait = 0;
   let douane = 0;
 
+  // ⚠️ Exception spéciale : Saint-Basile → Stanstead
+  if (
+    voyage.type === "kilometrage" &&
+    voyage.origine?.toLowerCase().includes("st-basile") &&
+    voyage.destination?.toLowerCase().includes("stanstead")
+  ) {
+    const prochain = voyages[idx + 1];
+    if (prochain?.origine?.toLowerCase().includes("st-basile")) {
+      // KM x2 et ajout du forfait
+      voyage.km = parseFloat(voyage.km) * 2;
+      voyage.prime_forfait = primeForfait;
+    } else if (prochain?.origine?.toLowerCase().includes("stanstead")) {
+      // KM normaux et pas de forfait
+      voyage.prime_forfait = 0;
+    }
+  }
+
   details.innerHTML += `<div class="fw-bold mb-1">Voyage ${idx + 1} :</div>`;
   details.innerHTML += `<div class="mb-1">(${voyage.origine} → ${voyage.destination})</div>`;
 
-        // ➤ Ajustements manuels importés depuis la feuille
-      const parsedAjustHr = parseFloat((voyage.ajust_hr ?? 0).toString().replace(",", "."));
-      const parsedAjustKm = parseFloat((voyage.ajust_km ?? 0).toString().replace(",", "."));
+  const parsedAjustHr = parseFloat((voyage.ajust_hr ?? 0).toString().replace(",", "."));
+  const parsedAjustKm = parseFloat((voyage.ajust_km ?? 0).toString().replace(",", "."));
 
+  if (!isNaN(parsedAjustKm)) {
+    jourAjustKm += parsedAjustKm;
+  }
+  if (!isNaN(parsedAjustHr)) {
+    jourAjustMin += parsedAjustHr * 60;
+  }
 
-    
-    if (!isNaN(parsedAjustKm)) {
-      jourAjustKm += parsedAjustKm;
-    }
-    if (!isNaN(parsedAjustHr)) {
-      jourAjustMin += parsedAjustHr * 60;
-    }
+  if (voyage.ajust_raison && !jourAjustRaison) {
+    jourAjustRaison = voyage.ajust_raison;
+  }
 
-    if (voyage.ajust_raison && !jourAjustRaison) {
-      jourAjustRaison = voyage.ajust_raison;
-    }
-  
   if (voyage.type === "kilometrage" || voyage.type === "retour") {
     const km = parseFloat(voyage.km) || 0;
     jourKm += km;
@@ -497,12 +511,12 @@ voyages.forEach((voyage, idx) => {
     jourMin += minutes;
 
     forfait = parseFloat(voyage.prime_forfait) || 0;
-      douane = parseFloat(voyage.prime_douane) || 0;
+    douane = parseFloat(voyage.prime_douane) || 0;
 
     if (voyage.origine?.toLowerCase().includes("vimont")) {
       forfait = 0;
     }
-   
+
     jourForfait += forfait;
     jourDouane += douane;
 
@@ -517,8 +531,7 @@ voyages.forEach((voyage, idx) => {
     details.innerHTML += `<hr class="my-2">`;
   }
 
-  jourPrime += forfait + douane; 
-
+  jourPrime += forfait + douane;
 });
 
 // Limite visuelle pour impression (si trop de voyages)

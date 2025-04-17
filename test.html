@@ -15,25 +15,63 @@
 
 
 @media print {
-  #btnChargerBox, .mt-4, .summary-box .bg-white, .summary-box h6, .summary-box .row {
-    display: none !important;
-  }
-
+  /* Grille pour 3 pastilles par page */
   .grid-week {
     display: grid !important;
     grid-template-columns: repeat(3, 1fr);
-    overflow: visible !important;
     gap: 16px;
+    overflow: visible !important;
     page-break-after: always;
   }
 
+  /* Pastilles bien compactes pour éviter trop de hauteur */
+  .pastille {
+    page-break-inside: avoid;
+    min-height: auto;
+    max-height: none;
+    height: auto;
+    overflow: hidden;
+  }
+
+  .pastille .details div {
+    margin-bottom: 2px;
+  }
+
+  .date-header {
+    font-size: 0.95rem;
+    padding: 4px 8px;
+  }
+
+  /* Résumé de la semaine avec ajustements masqués */
   .summary-box {
     page-break-before: always;
     margin-top: 0 !important;
+    padding-bottom: 0.5rem !important;
   }
 
-  .chauffeur-zone {
-    flex: 0 0 35% !important;
+  .summary-box .ajustements-manuels,
+  .summary-box .mt-4,
+  .summary-box h6,
+  .summary-box .row {
+    display: none !important;
+  }
+
+  /* Header chauffeur/date/taux */
+  .header-impression {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .header-impression .form-label, 
+  .header-impression select, 
+  .header-impression input, 
+  .header-impression .taux-badge {
+    display: inline-block;
+    width: auto;
+    max-width: 30%;
   }
 
   #chauffeurTauxBox {
@@ -46,7 +84,10 @@
     display: block !important;
   }
 
-  .no-print {
+  /* Cache tous les éléments inutiles */
+  .no-print,
+  #btnChargerBox,
+  .mt-4 {
     display: none !important;
   }
 }
@@ -158,8 +199,8 @@ body {
 </head>
 <body class="p-4">
 <div class="container">
-<div class="d-flex flex-wrap align-items-end mb-4 gap-3" id="enteteZone">
-  <div class="flex-grow-1 chauffeur-zone">
+<div class="header-impression d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+  <div class="flex-grow-1">
     <label class="form-label">Nom du chauffeur</label>
     <select id="chauffeurSelect" class="form-select">
       <option value="">-- Choisir --</option>
@@ -169,11 +210,8 @@ body {
     <label class="form-label">Date de la semaine</label>
     <input type="date" id="dateInput" class="form-control" />
   </div>
-  <div id="chauffeurTauxBox" class="taux-print-only">
-    <!-- Injecté dynamiquement -->
-  </div>
-  <div id="btnChargerBox">
-    <button id="btnCharger" class="btn btn-primary mt-2 mt-md-0" onclick="loadSemaine()">Charger la semaine</button>
+  <div id="chauffeurTauxBox">
+    <!-- Injecté par JS (badge taux) -->
   </div>
 </div>
   <div class="grid-week" id="pastillesContainer"></div>

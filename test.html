@@ -648,12 +648,12 @@ function recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane) {
   totalDouane;
 
 
-const montantAjuste =
-  ((totalKm + ajustKmFeuille + ajustKm) * taux.taux_km) +
-  (((totalMin + ajustMinFeuille) / 60 + ajustH) * taux.taux_h) +
-  (totalForfait + ajustForfait) +
-  totalDouane +
+const montantAjuste = montantBrut +
+  (ajustKm * taux.taux_km) +
+  (ajustH * taux.taux_h) +
+  ajustForfait +
   ajustBonus;
+
 
 
   const elMontant = document.getElementById("totalMontant");

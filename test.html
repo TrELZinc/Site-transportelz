@@ -570,9 +570,9 @@ if (elKm) elKm.textContent = totalKm;
 
 const elH = document.getElementById("totalH");
 if (elH) {
-  const totalMinAvecAjust = totalMin + ajustMinFeuille;
-  elH.textContent = `${Math.floor(totalMinAvecAjust / 60)}h${String(totalMinAvecAjust % 60).padStart(2, '0')}`;
+  elH.textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2, '0')}`;
 }
+
 
 const elForfait = document.getElementById("totalForfait");
 if (elForfait) elForfait.textContent = totalForfait.toFixed(2);

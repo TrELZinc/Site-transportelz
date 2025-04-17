@@ -642,8 +642,8 @@ function recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane) {
   const ajustBonus = parseFloat(document.getElementById("ajustBonus").value) || 0;
 
 const montantBrut =
-  ((totalKm + ajustKmFeuille) * taux.taux_km) +
-  ((totalMin + ajustMinFeuille) / 60 * taux.taux_h) +
+  (totalKm  * taux.taux_km) +
+  (totalMin  / 60 * taux.taux_h) +
   totalForfait +
   totalDouane;
 

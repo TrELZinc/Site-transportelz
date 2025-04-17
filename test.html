@@ -246,21 +246,24 @@ body {
 <body class="p-4">
   <div class="container">
     <div class="row g-3 align-items-end mb-4">
-      <div class="col-md-4">
-        <label class="form-label">Nom du chauffeur</label>
-        <select id="chauffeurSelect" class="form-select">
-          <option value="">-- Choisir --</option>
-        </select>
-      </div>
-      <div class="col-md-4">
-        <label class="form-label">Date de la semaine</label>
-        <input type="date" id="dateInput" class="form-control" />
-      </div>
-     <div class="col-md-4 d-flex flex-column align-items-end">
-      <button class="btn btn-primary w-100 mb-2" style="font-size: 1.1rem;" onclick="loadSemaine()">Afficher la semaine</button>
-      <div id="chauffeurTauxBox" class="w-100"></div>
-      </div>
-      </div>
+  <div class="col-md-3">
+    <label class="form-label">Nom du chauffeur</label>
+    <select id="chauffeurSelect" class="form-select">
+      <option value="">-- Choisir --</option>
+    </select>
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Date de la semaine</label>
+    <input type="date" id="dateInput" class="form-control" />
+  </div>
+  <div class="col-md-3">
+    <label class="form-label invisible">Taux</label>
+    <div id="chauffeurTauxBox" class="w-100 taux-btns-container justify-content-start"></div>
+  </div>
+  <div class="col-md-3 d-flex align-items-end">
+    <button class="btn btn-primary w-100" style="font-size: 1.05rem;" onclick="loadSemaine()">Afficher la semaine</button>
+  </div>
+</div>
     </div>
 
 <div class="grid-week" id="pastillesContainer"></div>

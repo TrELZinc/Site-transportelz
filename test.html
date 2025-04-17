@@ -651,22 +651,20 @@ function recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane) {
   const ajustForfait = parseFloat(document.getElementById("ajustForfait").value) || 0;
   const ajustBonus = parseFloat(document.getElementById("ajustBonus").value) || 0;
 
-const montantBrut =
-  (totalKm  * taux.taux_km) +
-  (totalMin  / 60 * taux.taux_h) +
-  totalForfait +
-  totalDouane;
+  // Calcul du montant brut (sans ajustements)
+  const montantBrut =
+    (totalKm * taux.taux_km) +
+    (totalMin / 60 * taux.taux_h) +
+    totalForfait +
+    totalDouane;
 
-
-
-
-const montantAjuste = montantBrut +
-  (ajustKm * taux.taux_km) +
-  (ajustH * taux.taux_h) +
-  ajustForfait +
-  ajustBonus;
-
-
+  // Calcul du montant ajusté (à partir des valeurs de base)
+  const montantAjuste =
+    ((totalKm + ajustKm) * taux.taux_km) +
+    ((totalMin / 60 + ajustH) * taux.taux_h) +
+    (totalForfait + ajustForfait) +
+    totalDouane +
+    ajustBonus;
 
   const elMontant = document.getElementById("totalMontant");
   const elAjuste = document.getElementById("Ajuste");
@@ -674,7 +672,7 @@ const montantAjuste = montantBrut +
   if (elMontant) elMontant.textContent = `${montantBrut.toFixed(2)} $`;
   if (elAjuste) elAjuste.textContent = `${montantAjuste.toFixed(2)} $`;
 
-  // ➤ Affichage de la ligne d'ajustement
+  // Affichage de la ligne d'ajustement
   const elLigne = document.getElementById("montantAjusteLigne");
   if (ajustKm || ajustH || ajustForfait || ajustBonus) {
     elLigne.style.display = "block";
@@ -686,16 +684,16 @@ const montantAjuste = montantBrut +
 document.addEventListener("DOMContentLoaded", () => {
   chargerChauffeursDansSelect();
   ["ajustKm", "ajustH", "ajustForfait", "ajustBonus"].forEach(id => {
-  document.getElementById(id).addEventListener("input", () => {
-    recalculerMontant(
-      tauxActuel,
-      totalKmActuel,
-      totalMinActuel,
-      totalForfaitActuel,
-      totalDouaneActuel
-    );
+    document.getElementById(id).addEventListener("input", () => {
+      recalculerMontant(
+        tauxActuel,
+        totalKmActuel,
+        totalMinActuel, 
+        totalForfaitActuel,
+        totalDouaneActuel
+      );
+    });
   });
-});
 });
 
 function genererPDF() {

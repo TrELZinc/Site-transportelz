@@ -505,16 +505,14 @@ if (voyages.length > 6) {
   details.innerHTML += `<div class="text-muted small mt-2">(contenu tronqué pour impression)</div>`;
 }
 
-// Totaux globaux
+jourKm += jourAjustKm;
+jourMin += jourAjustMin;
+
 totalKm += jourKm;
 totalMin += jourMin;
 totalForfait += jourForfait;
 totalDouane += jourDouane;
 
-
-// ➤ Appliquer ajustements aux totaux
-jourKm += jourAjustKm;
-jourMin += jourAjustMin;
 
 // ➤ Affichage des ajustements dans la pastille
 if (jourAjustKm > 0 || jourAjustMin > 0) {

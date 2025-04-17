@@ -15,34 +15,19 @@
 
 
 @media print {
-  /* Grille pour 3 pastilles par page */
-  .grid-week {
-    display: none !important;
+  .print-pastilles {
+    display: grid !important;
     grid-template-columns: repeat(3, 1fr);
     gap: 16px;
-    overflow: visible !important;
-    page-break-after: always;
+    page-break-inside: avoid;
   }
 
-  .print-pastilles {
-    display: flex !important;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 16px;
-    max-width: 960px;
-    margin: auto;
-    page-break-after: always;
+  .pastille {
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
-
-  .pastilles-page2 {
-    page-break-after: avoid;
-  }
-
-.print-summary {
-  page-break-before: avoid;
-  margin-top: 2rem;
 }
+
 
   /* Pastilles bien compactes pour éviter trop de hauteur */
   .pastille {
@@ -710,42 +695,38 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 });
 
-  function genererPDF() {
-  const element = document.querySelector(".container");
+function genererPDF() {
+  const printZone = document.createElement('div');
+  printZone.style.display = 'block';
+  printZone.style.position = 'absolute';
+  printZone.style.left = '-9999px';
 
-const dateStr = document.getElementById("dateInput").value;
-const chauffeur = document.getElementById("chauffeurSelect").value || 'chauffeur';
-
-let formattedDate = 'date-inconnue';
-if (dateStr) {
-  const dateObj = new Date(dateStr);
-  formattedDate = dateObj.toLocaleDateString('fr-CA', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric'
+  // Cloner le contenu utile à imprimer
+  document.querySelectorAll('.print-pastilles, .print-summary').forEach(el => {
+    const clone = el.cloneNode(true);
+    clone.classList.remove('d-none');
+    printZone.appendChild(clone);
   });
-}
 
-const nomFichier = `${formattedDate} - ${chauffeur}.pdf`;
+  document.body.appendChild(printZone);
 
   const opt = {
     margin: 0.5,
-    filename: nomFichier,
+    filename: `${document.getElementById("dateInput").value || 'date'} - ${document.getElementById("chauffeurSelect").value || 'chauffeur'}.pdf`,
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: { scale: 2 },
     jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
   };
 
-  try {
-    html2pdf().set(opt).from(element).save().catch(() => {
-      console.warn("html2pdf échoué, fallback vers print()");
-      window.print();
-    });
-  } catch (e) {
-    console.error("Erreur PDF, fallback vers impression:", e);
+  html2pdf().set(opt).from(printZone).save().then(() => {
+    printZone.remove();
+  }).catch(err => {
+    console.error("Erreur génération PDF:", err);
+    printZone.remove();
     window.print();
-  }
+  });
 }
+
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </body>

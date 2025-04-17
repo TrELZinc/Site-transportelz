@@ -175,6 +175,24 @@ body {
   margin-left: 0.4rem;
 }
 
+.taux-box {
+  display: inline-flex;
+  align-items: center;
+  background: linear-gradient(to right, #4facfe, #00f2fe);
+  color: white;
+  border-radius: 999px;
+  padding: 8px 20px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease-in-out;
+}
+
+.taux-box:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
 @media screen {
   .print-summary {
     display: none !important;
@@ -331,8 +349,8 @@ async function loadSemaine() {
   if (!taux) return alert("Taux non trouvés pour ce chauffeur.");
   const tauxBox = document.getElementById("chauffeurTauxBox");
   tauxBox.innerHTML = `
-  <div class="alert alert-info py-2 px-3 mb-0 rounded-pill d-inline-block">
-    <strong>Taux:</strong> ${taux.taux_km.toFixed(2)} $/km &nbsp; | &nbsp; ${taux.taux_h.toFixed(2)} $/h
+  <div class="taux-box">
+    <span><strong>Taux :</strong> ${taux.taux_km.toFixed(2)} $/km &nbsp; | &nbsp; ${taux.taux_h.toFixed(2)} $/h</span>
   </div>
 `;
 

@@ -602,14 +602,27 @@ if (recap.length && montantBrut !== montantAjuste) {
 }
 
 // ➤ Totaux affichés
-document.getElementById("totalKm").textContent = totalKm;
-const totalMinAvecAjust = totalMin + ajustMinFeuille;
-document.getElementById("totalH").textContent =
-  `${Math.floor(totalMinAvecAjust / 60)}h${String(totalMinAvecAjust % 60).padStart(2, '0')}`;
-document.getElementById("totalForfait").textContent = totalForfait.toFixed(2);
-document.getElementById("totalDouane").textContent = totalDouane.toFixed(2);
-document.getElementById("totalMontant").textContent = `${montantBrut.toFixed(2)} $`;
-document.getElementById("totalMontantAjuste").textContent = `${montantAjuste.toFixed(2)} $`;
+const elKm = document.getElementById("totalKm");
+if (elKm) elKm.textContent = totalKm;
+
+const elH = document.getElementById("totalH");
+if (elH) {
+  const totalMinAvecAjust = totalMin + ajustMinFeuille;
+  elH.textContent = `${Math.floor(totalMinAvecAjust / 60)}h${String(totalMinAvecAjust % 60).padStart(2, '0')}`;
+}
+
+const elForfait = document.getElementById("totalForfait");
+if (elForfait) elForfait.textContent = totalForfait.toFixed(2);
+
+const elDouane = document.getElementById("totalDouane");
+if (elDouane) elDouane.textContent = totalDouane.toFixed(2);
+
+const elMontant = document.getElementById("totalMontant");
+if (elMontant) elMontant.textContent = `${montantBrut.toFixed(2)} $`;
+
+const elMontantAjuste = document.getElementById("totalMontantAjuste");
+if (elMontantAjuste) elMontantAjuste.textContent = `${montantAjuste.toFixed(2)} $`;
+
 
 // ➤ Mise à jour du résumé et pastilles d'impression
 recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane);

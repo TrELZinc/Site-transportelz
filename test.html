@@ -151,7 +151,7 @@ body {
   margin-bottom: 4px;
 }
 
-#totalMontantAjuste {
+#Ajuste {
   font-size: 1.1rem;
   border-radius: 8px;
 }
@@ -262,10 +262,10 @@ body {
       <p><strong>Heures :</strong> <span id="totalH">0h00</span></p>
       <p><strong>Total forfaits :</strong> <span id="totalForfait">0.00</span> $</p>
       <p><strong>Total primes douane :</strong> <span id="totalDouane">0.00</span> $</p>
-      <p><strong>Montant total :</strong> <span id="totalMontant" class="fw-bold text-dark">0.00 $</span></p>
+      <p><strong>Montant total :</strong> <span id="" class="fw-bold text-dark">0.00 $</span></p>
       <p id="montantAjusteLigne" style="display: none;">
         <strong>Montant avec ajustements :</strong> 
-        <span id="totalMontantAjuste" class="fw-bold text-success">0.00 $</span>
+        <span id="Ajuste" class="fw-bold text-success">0.00 $</span>
       </p>
 
     <p id="ajustementsRecap" class="text-muted fst-italic small"></p>
@@ -582,9 +582,6 @@ const montantAjuste =
   totalDouane +
   ajustBonus;
 
-document.getElementById("totalMontant").textContent = `${montantBrut.toFixed(2)} $`;
-document.getElementById("totalMontantAjuste").textContent = `${montantAjuste.toFixed(2)} $`;
-
 // ➤ Ligne d'ajustement : visible ou non
 const ligneAjustement = document.getElementById("montantAjusteLigne");
 ligneAjustement.style.display = (ajustKm || ajustH || ajustForfait || ajustBonus) ? "block" : "none";
@@ -611,6 +608,8 @@ document.getElementById("totalH").textContent =
   `${Math.floor(totalMinAvecAjust / 60)}h${String(totalMinAvecAjust % 60).padStart(2, '0')}`;
 document.getElementById("totalForfait").textContent = totalForfait.toFixed(2);
 document.getElementById("totalDouane").textContent = totalDouane.toFixed(2);
+document.getElementById("totalMontant").textContent = `${montantBrut.toFixed(2)} $`;
+document.getElementById("totalMontantAjuste").textContent = `${montantAjuste.toFixed(2)} $`;
 
 // ➤ Mise à jour du résumé et pastilles d'impression
 recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane);
@@ -678,8 +677,8 @@ function recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane) {
     totalDouane +
     ajustBonus;
 
-  document.getElementById("totalMontant").textContent = `${montantBrut.toFixed(2)} $`;
-  document.getElementById("totalMontantAjuste").textContent = `${montantAjuste.toFixed(2)} $`;
+  document.getElementById("").textContent = `${montantBrut.toFixed(2)} $`;
+  document.getElementById("Ajuste").textContent = `${montantAjuste.toFixed(2)} $`;
 }
 
 

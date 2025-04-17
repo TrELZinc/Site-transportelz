@@ -691,10 +691,12 @@ function recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane) {
     totalDouane +
     ajustBonus;
 
-  document.getElementById("").textContent = `${montantBrut.toFixed(2)} $`;
-  document.getElementById("Ajuste").textContent = `${montantAjuste.toFixed(2)} $`;
-}
+  const elMontant = document.getElementById("totalMontant");
+  const elAjuste = document.getElementById("Ajuste");
 
+  if (elMontant) elMontant.textContent = `${montantBrut.toFixed(2)} $`;
+  if (elAjuste) elAjuste.textContent = `${montantAjuste.toFixed(2)} $`;
+}
 
 
 document.addEventListener("DOMContentLoaded", () => {

@@ -556,12 +556,24 @@ const ajustKm = parseFloat(document.getElementById("ajustKm").value) || 0;
 const ajustH = parseFloat(document.getElementById("ajustH").value) || 0;
 const ajustForfait = parseFloat(document.getElementById("ajustForfait").value) || 0;
 const ajustBonus = parseFloat(document.getElementById("ajustBonus").value) || 0;
+  
+let ajustMinFeuille = 0;
+let ajustKmFeuille = 0;
+
+// On boucle sur toutes les données (déjà parsées dans `semaineData`)
+semaineData.forEach(voyage => {
+  const extraHr = parseFloat((voyage.ajust_hr || "0").toString().replace(",", ".")) || 0;
+  const extraKm = parseFloat((voyage.ajust_km || "0").toString().replace(",", ".")) || 0;
+  ajustMinFeuille += extraHr * 60;
+  ajustKmFeuille += extraKm;
+});
 
 const montantBrut =
-  (totalKm * taux.taux_km) +
-  (totalMin / 60 * taux.taux_h) +
+  ((totalKm + ajustKmFeuille) * taux.taux_km) +
+  ((totalMin + ajustMinFeuille) / 60 * taux.taux_h) +
   totalForfait +
   totalDouane;
+
 
 const montantAjuste =
   ((totalKm + ajustKm) * taux.taux_km) +
@@ -594,7 +606,9 @@ if (recap.length && montantBrut !== montantAjuste) {
 
 // ➤ Totaux affichés
 document.getElementById("totalKm").textContent = totalKm;
-document.getElementById("totalH").textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2, '0')}`;
+const totalMinAvecAjust = totalMin + ajustMinFeuille;
+document.getElementById("totalH").textContent =
+  `${Math.floor(totalMinAvecAjust / 60)}h${String(totalMinAvecAjust % 60).padStart(2, '0')}`;
 document.getElementById("totalForfait").textContent = totalForfait.toFixed(2);
 document.getElementById("totalDouane").textContent = totalDouane.toFixed(2);
 

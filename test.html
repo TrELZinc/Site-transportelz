@@ -724,14 +724,19 @@ function getAjustements() {
 
 function recalculHandler() {
   console.log("Recalcul déclenché par un changement d'ajustement");
-  recalculerMontant(
-    tauxActuel,
-    totalKmActuel,
-    totalMinActuel,
-    totalForfaitActuel,
-    totalDouaneActuel
-  );
+
+  // Attendre que le champ ait bien pris la nouvelle valeur
+  setTimeout(() => {
+    recalculerMontant(
+      tauxActuel,
+      totalKmActuel,
+      totalMinActuel,
+      totalForfaitActuel,
+      totalDouaneActuel
+    );
+  }, 0);
 }
+
 
 // Appeler cette fonction dans votre DOMContentLoaded
 document.addEventListener("DOMContentLoaded", () => {

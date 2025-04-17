@@ -642,17 +642,19 @@ function recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane) {
   const ajustBonus = parseFloat(document.getElementById("ajustBonus").value) || 0;
 
   const montantBrut =
-    (totalKm * taux.taux_km) +
-    (totalMin / 60 * taux.taux_h) +
-    totalForfait +
-    totalDouane;
+  ((totalKm + ajustKmFeuille) * taux.taux_km) +
+  ((totalMin + ajustMinFeuille) / 60 * taux.taux_h) +
+  totalForfait +
+  totalDouane;
 
-  const montantAjuste =
-    ((totalKm + ajustKm) * taux.taux_km) +
-    ((totalMin / 60 + ajustH) * taux.taux_h) +
-    (totalForfait + ajustForfait) +
-    totalDouane +
-    ajustBonus;
+
+const montantAjuste =
+  ((totalKm + ajustKmFeuille + ajustKm) * taux.taux_km) +
+  (((totalMin + ajustMinFeuille) / 60 + ajustH) * taux.taux_h) +
+  (totalForfait + ajustForfait) +
+  totalDouane +
+  ajustBonus;
+
 
   const elMontant = document.getElementById("totalMontant");
   const elAjuste = document.getElementById("Ajuste");

@@ -399,7 +399,10 @@ let index = 0;
   Object.entries(grouped)
   .sort(([dateA], [dateB]) => new Date(dateA) - new Date(dateB))
   .forEach(([date, voyages]) => {
-  
+  let jourAjustKm = 0;
+  let jourAjustMin = 0;
+  let jourAjustRaison = "";
+
   console.log("📆 JOUR :", date, voyages);
 
   const div = document.createElement("div");
@@ -418,13 +421,11 @@ let index = 0;
       </div>
     `;
     }
-let jourKm = 0, jourMin = 0, jourForfait = 0, jourDouane = 0, jourPrime = 0;
-
-let jourAjustKm = 0, jourAjustMin = 0;
-let jourAjustRaison = "";
+  let jourKm = 0, jourMin = 0, jourForfait = 0, jourDouane = 0, jourPrime = 0;
 
 voyages.forEach((voyage, idx) => {
-
+  let forfait = 0;
+  let douane = 0;
 
   details.innerHTML += `<div class="fw-bold mb-1">Voyage ${idx + 1} :</div>`;
   details.innerHTML += `<div class="mb-1">(${voyage.origine} → ${voyage.destination})</div>`;
@@ -439,6 +440,15 @@ voyages.forEach((voyage, idx) => {
     if (voyage.origine?.toLowerCase().includes("vimont")) {
       forfait = 0;
     }
+
+    jourForfait += forfait;
+    jourDouane += douane;
+
+    details.innerHTML += `<div><strong>KM:</strong> ${km}</div>`;
+    details.innerHTML += `<div><strong>Forfait:</strong> ${forfait.toFixed(2)} $</div>`;
+    if (douane > 0) {
+      details.innerHTML += `<div><strong>Douane:</strong> ${douane.toFixed(2)} $</div>`;
+    }
   }
 
   else if (voyage.type === "heure") {
@@ -448,49 +458,22 @@ voyages.forEach((voyage, idx) => {
     jourMin += minutes;
 
     forfait = parseFloat(voyage.prime_forfait) || 0;
-    douane = parseFloat(voyage.prime_douane) || 0;
+      douane = parseFloat(voyage.prime_douane) || 0;
 
     if (voyage.origine?.toLowerCase().includes("vimont")) {
       forfait = 0;
     }
+        // ➤ Ajustements manuels importés depuis la feuille
+    if (voyage.ajust_km) {
+      jourAjustKm += parseFloat(voyage.ajust_km);
+    }
+    if (voyage.ajust_hr) {
+      jourAjustMin += parseFloat(voyage.ajust_hr) * 60;
+    }
+    if (voyage.ajust_raison && !jourAjustRaison) {
+      jourAjustRaison = voyage.ajust_raison;
+    }
 
-  // ➤ Ajustements manuels depuis la feuille
-  if (voyage.ajust_km) {
-    jourAjustKm += parseFloat(voyage.ajust_km);
-  }
-  if (voyage.ajust_hr) {
-    jourAjustMin += parseFloat(voyage.ajust_hr) * 60;
-  }
-  if (voyage.ajust_raison && !jourAjustRaison) {
-    jourAjustRaison = voyage.ajust_raison;
-  }
-
-  if (idx < voyages.length - 1) {
-    details.innerHTML += `<hr class="my-2">`;
-  }
-
-  jourPrime += forfait + douane;
-});
-
-// ➤ Appliquer les ajustements au total du jour
-jourKm += jourAjustKm;
-jourMin += jourAjustMin;
-
-// ➤ Affichage des ajustements dans la pastille
-if (jourAjustKm > 0 || jourAjustMin > 0) {
-  let text = `<div class="text-primary"><strong>Ajustement:</strong> `;
-  if (jourAjustKm > 0) text += `+${jourAjustKm} km `;
-  if (jourAjustMin > 0) {
-    const h = Math.floor(jourAjustMin / 60);
-    const m = Math.round(jourAjustMin % 60);
-    text += `+${h}h${String(m).padStart(2, '0')}`;
-  }
-  text += `</div>`;
-  details.innerHTML += text;
-}
-if (jourAjustRaison) {
-  details.innerHTML += `<div class="text-muted small fst-italic">📝 ${jourAjustRaison}</div>`;
-}
 
     jourForfait += forfait;
     jourDouane += douane;
@@ -521,8 +504,27 @@ totalForfait += jourForfait;
 totalDouane += jourDouane;
 
 
+// ➤ Appliquer ajustements aux totaux
+jourKm += jourAjustKm;
+jourMin += jourAjustMin;
 
-  // ➤ Calcul du montant journalier
+// ➤ Affichage des ajustements dans la pastille
+if (jourAjustKm > 0 || jourAjustMin > 0) {
+  let ajustementTexte = `<div class="text-primary"><strong>Ajustement:</strong> `;
+  if (jourAjustKm > 0) ajustementTexte += `+${jourAjustKm} km `;
+  if (jourAjustMin > 0) {
+    const h = Math.floor(jourAjustMin / 60);
+    const m = Math.round(jourAjustMin % 60);
+    ajustementTexte += `+${h}h${String(m).padStart(2, '0')}`;
+  }
+  ajustementTexte += `</div>`;
+  details.innerHTML += ajustementTexte;
+}
+
+if (jourAjustRaison) {
+  details.innerHTML += `<div class="text-muted small fst-italic">📝 ${jourAjustRaison}</div>`;
+}
+
 const montantJour =
   (jourKm * taux.taux_km) +
   (jourMin / 60 * taux.taux_h) +

@@ -175,22 +175,37 @@ body {
   margin-left: 0.4rem;
 }
 
-.taux-box {
-  display: inline-flex;
-  align-items: center;
-  background: linear-gradient(to right, #4facfe, #00f2fe);
-  color: white;
-  border-radius: 999px;
-  padding: 8px 20px;
-  font-weight: 500;
-  font-size: 0.95rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  transition: all 0.2s ease-in-out;
+.taux-btns-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-start;
 }
 
-.taux-box:hover {
-  transform: scale(1.02);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+.taux-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 8px 16px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.taux-btn span {
+  display: inline-block;
+}
+
+@media (max-width: 768px) {
+  .taux-btns-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 @media screen {
@@ -349,8 +364,13 @@ async function loadSemaine() {
   if (!taux) return alert("Taux non trouvés pour ce chauffeur.");
   const tauxBox = document.getElementById("chauffeurTauxBox");
   tauxBox.innerHTML = `
-  <div class="taux-box">
-    <span><strong>Taux :</strong> ${taux.taux_km.toFixed(2)} $/km &nbsp; | &nbsp; ${taux.taux_h.toFixed(2)} $/h</span>
+  <div class="taux-btns-container">
+    <button class="taux-btn">
+      🚚 <span>${taux.taux_km.toFixed(2)} $/km</span>
+    </button>
+    <button class="taux-btn">
+      💰 <span>${taux.taux_h.toFixed(2)} $/h</span>
+    </button>
   </div>
 `;
 

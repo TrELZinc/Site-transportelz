@@ -278,6 +278,12 @@ const API_URL = "https://script.google.com/macros/s/AKfycbyNCeOMXPM8v-eG_X_x56Rg
 
 let primeDouane = 0;
 let primeForfait = 0;
+let tauxActuel = { taux_km: 0, taux_h: 0 };
+let totalKmActuel = 0;
+let totalMinActuel = 0;
+let totalForfaitActuel = 0;
+let totalDouaneActuel = 0;
+
 
 function parseLocalDate(str) {
   const [y, m, d] = str.split("-").map(Number);
@@ -589,6 +595,11 @@ if (elBrut) elBrut.textContent = `${montantBrut.toFixed(2)} $`;
 const elAjuste = document.querySelector("#Ajuste");
 if (elAjuste) elAjuste.textContent = `${montantAjuste.toFixed(2)} $`;
 
+tauxActuel = taux;
+totalKmActuel = totalKm + ajustKmFeuille;
+totalMinActuel = totalMin + ajustMinFeuille;
+totalForfaitActuel = totalForfait;
+totalDouaneActuel = totalDouane;
 
 const allPastilles = [...document.querySelectorAll(".pastille")];
 const summary = document.querySelector(".print-summary");
@@ -668,7 +679,15 @@ const montantAjuste = montantBrut +
 document.addEventListener("DOMContentLoaded", () => {
   chargerChauffeursDansSelect();
   ["ajustKm", "ajustH", "ajustForfait", "ajustBonus"].forEach(id => {
-  document.getElementById(id).addEventListener("input", () => loadSemaine());
+  document.getElementById(id).addEventListener("input", () => {
+    recalculerMontant(
+      tauxActuel,
+      totalKmActuel,
+      totalMinActuel,
+      totalForfaitActuel,
+      totalDouaneActuel
+    );
+  });
 });
 });
 

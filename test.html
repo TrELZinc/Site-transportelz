@@ -496,7 +496,8 @@ voyages.forEach((voyage, idx) => {
     details.innerHTML += `<hr class="my-2">`;
   }
 
-  jourPrime += forfait + douane; // ✅ ici ça marche maintenant
+  jourPrime += forfait + douane; 
+  totalPrime += jourPrime;
 });
 
 // Limite visuelle pour impression (si trop de voyages)
@@ -572,8 +573,8 @@ semaineData.forEach(voyage => {
 const montantBrut =
   ((totalKm + ajustKmFeuille) * taux.taux_km) +
   ((totalMin + ajustMinFeuille) / 60 * taux.taux_h) +
-  totalForfait +
-  totalDouane;
+  totalPrime;
+
 
 
 const montantAjuste =

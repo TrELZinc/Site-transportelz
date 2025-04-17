@@ -497,7 +497,7 @@ footer.className = "mt-2 fw-bold text-success text-center";
 footer.textContent = `Total jour : ${montantJour.toFixed(2)} $`;
 div.appendChild(footer);
 
-// ➤ Clonage dans pastilles d'impression (page1/page2)
+container.appendChild(div);
 const pastilleClone = div.cloneNode(true);
 if (index < 3) {
   page1.appendChild(pastilleClone);
@@ -505,10 +505,8 @@ if (index < 3) {
   page2.appendChild(pastilleClone);
 }
 index++;
+});
 
-// -----------------------------------
-// ➤ Récapitulatif avec ajustements
-// -----------------------------------
 const ajustKm = parseFloat(document.getElementById("ajustKm").value) || 0;
 const ajustH = parseFloat(document.getElementById("ajustH").value) || 0;
 const ajustForfait = parseFloat(document.getElementById("ajustForfait").value) || 0;
@@ -574,7 +572,6 @@ allPastilles.forEach((el, idx) => {
   }
 });
   
-  }
 
 function sauvegarderSemaine() {
   alert("Fonction de sauvegarde activée (Firebase). Implémentation personnalisable.");

@@ -431,8 +431,10 @@ voyages.forEach((voyage, idx) => {
   details.innerHTML += `<div class="mb-1">(${voyage.origine} → ${voyage.destination})</div>`;
 
         // ➤ Ajustements manuels importés depuis la feuille
-    const parsedAjustKm = parseFloat((voyage.ajust_km || "0").replace(",", "."));
-    const parsedAjustHr = parseFloat((voyage.ajust_hr || "0").replace(",", "."));
+      const parsedAjustHr = parseFloat((voyage.ajust_hr ?? 0).toString().replace(",", "."));
+      const parsedAjustKm = parseFloat((voyage.ajust_km ?? 0).toString().replace(",", "."));
+
+
     
     if (!isNaN(parsedAjustKm)) {
       jourAjustKm += parsedAjustKm;

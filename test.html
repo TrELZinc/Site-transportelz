@@ -634,9 +634,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function genererPDF() {
   const element = document.querySelector(".container");
+
+  const dateStr = document.getElementById("dateInput").value;
+  const chauffeur = document.getElementById("chauffeurSelect").value;
+  const formattedDate = dateStr ? new Date(dateStr).toLocaleDateString('fr-CA') : 'date-inconnue';
+  const nomFichier = `${formattedDate} - ${chauffeur || 'chauffeur'}.pdf`;
+
   const opt = {
     margin: 0.5,
-    filename: 'paie_chauffeur.pdf',
+    filename: nomFichier,
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: { scale: 2 },
     jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }

@@ -671,53 +671,46 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function genererPDF() {
   const printZone = document.createElement('div');
-  printZone.style.display = 'block';
-  printZone.style.position = 'absolute';
+  printZone.id = 'print-temp';
+  printZone.style.position = 'fixed';
   printZone.style.left = '-9999px';
   printZone.style.top = '0';
-  printZone.style.zIndex = '9999';
-  printZone.style.background = 'white';
   printZone.style.width = '1000px';
+  printZone.style.background = 'white';
+  printZone.style.zIndex = '9999';
+  document.body.appendChild(printZone);
 
-  // Sélectionner les éléments à cloner
-  const toClone = document.querySelectorAll('.print-pastilles, .print-summary');
-  toClone.forEach(el => {
+  // Cloner les pastilles et le résumé
+  const sections = document.querySelectorAll('.print-pastilles, .print-summary');
+  sections.forEach(el => {
     const clone = el.cloneNode(true);
-
-    // ❗️On supprime toutes les classes d-none qui empêchent l'affichage
     clone.classList.remove('d-none', 'd-print-grid', 'd-print-block');
 
-    // ⚠️ Ajout manuel des bonnes classes d'affichage si besoin
-    if (el.classList.contains('print-pastilles')) {
-      clone.style.display = 'grid';
-      clone.style.gridTemplateColumns = 'repeat(3, 1fr)';
-      clone.style.gap = '16px';
-    }
-    if (el.classList.contains('print-summary')) {
-      clone.style.display = 'block';
-    }
-
+    // Affichage de secours
+    clone.style.display = el.classList.contains('print-pastilles') ? 'grid' : 'block';
     printZone.appendChild(clone);
   });
 
-  document.body.appendChild(printZone);
+  // Laisser le temps au DOM d'insérer le contenu dans le document
+  setTimeout(() => {
+    const opt = {
+      margin: 0.5,
+      filename: `${document.getElementById("dateInput").value || 'date'} - ${document.getElementById("chauffeurSelect").value || 'chauffeur'}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
 
-  const opt = {
-    margin: 0.5,
-    filename: `${document.getElementById("dateInput").value || 'date'} - ${document.getElementById("chauffeurSelect").value || 'chauffeur'}.pdf`,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2 },
-    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-  };
-
-  html2pdf().set(opt).from(printZone).save().then(() => {
-    printZone.remove();
-  }).catch(err => {
-    console.error("Erreur génération PDF:", err);
-    printZone.remove();
-    window.print();
-  });
+    html2pdf().set(opt).from(printZone).save().then(() => {
+      printZone.remove();
+    }).catch(err => {
+      console.error("Erreur PDF → fallback print:", err);
+      printZone.remove();
+      window.print();
+    });
+  }, 500); // ← important: attendre un peu avant capture
 }
+
 
 
 </script>

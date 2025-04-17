@@ -555,9 +555,6 @@ recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane);
 
 
 const allPastilles = [...document.querySelectorAll(".pastille")];
-
-const page1 = document.querySelector(".pastilles-page1");
-const page2 = document.querySelector(".pastilles-page2");
 const summary = document.querySelector(".print-summary");
 
 // vider avant
@@ -672,17 +669,6 @@ const nomFichier = `${formattedDate} - ${chauffeur}.pdf`;
 }
 
 </script>
-
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const btn = document.querySelector('button[onclick="genererPDF()"]');
-    if (btn) {
-      btn.addEventListener("click", genererPDF);
-    }
-  });
-</script>
-
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </body>
 </html>

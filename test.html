@@ -418,16 +418,13 @@ let index = 0;
       </div>
     `;
     }
-  let jourKm = 0, jourMin = 0, jourForfait = 0, jourDouane = 0, jourPrime = 0;
-
-voyages.forEach((voyage, idx) => {
 let jourKm = 0, jourMin = 0, jourForfait = 0, jourDouane = 0, jourPrime = 0;
+
 let jourAjustKm = 0, jourAjustMin = 0;
 let jourAjustRaison = "";
 
 voyages.forEach((voyage, idx) => {
-  let forfait = 0;
-  let douane = 0;
+
 
   details.innerHTML += `<div class="fw-bold mb-1">Voyage ${idx + 1} :</div>`;
   details.innerHTML += `<div class="mb-1">(${voyage.origine} → ${voyage.destination})</div>`;

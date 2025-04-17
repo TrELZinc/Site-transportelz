@@ -198,36 +198,43 @@ body {
   </style>
 </head>
 <body class="p-4">
-<div class="container">
-<div class="header-impression d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
-  <div class="flex-grow-1">
-    <label class="form-label">Nom du chauffeur</label>
-    <select id="chauffeurSelect" class="form-select">
-      <option value="">-- Choisir --</option>
-    </select>
-  </div>
-  <div>
-    <label class="form-label">Date de la semaine</label>
-    <input type="date" id="dateInput" class="form-control" />
-  </div>
-  <div id="chauffeurTauxBox">
-    <!-- Injecté par JS (badge taux) -->
-  </div>
-</div>
-  <div class="grid-week" id="pastillesContainer"></div>
+  <div class="container">
+    <div class="header-impression d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+      <div class="flex-grow-1">
+        <label class="form-label">Nom du chauffeur</label>
+        <select id="chauffeurSelect" class="form-select">
+          <option value="">-- Choisir --</option>
+        </select>
+      </div>
 
-  <div class="summary-box">
-    <h5>Récapitulatif de la semaine</h5>
-    <p><strong>Kilomètres :</strong> <span id="totalKm">0</span> km</p>
-    <p><strong>Heures :</strong> <span id="totalH">0h00</span></p>
-    <p><strong>Total forfaits :</strong> <span id="totalForfait">0.00</span> $</p>
-    <p><strong>Total primes douane :</strong> <span id="totalDouane">0.00</span> $</p>
-    <p><strong>Montant total :</strong> <span id="totalMontant" class="fw-bold text-dark">0.00 $</span></p>
-    <p id="montantAjusteLigne" style="display: none;">
-      <strong>Montant avec ajustements :</strong> 
-      <span id="totalMontantAjuste" class="fw-bold text-success">0.00 $</span>
-    </p>
+      <div>
+        <label class="form-label">Date de la semaine</label>
+        <input type="date" id="dateInput" class="form-control" />
+      </div>
 
+      <div id="chauffeurTauxBox">
+        <!-- Injecté par JS (badge taux) -->
+      </div>
+
+      <!-- Bouton affichage semaine (masqué en impression) -->
+      <div id="btnChargerBox" class="d-flex align-items-end">
+        <button class="btn btn-primary" onclick="loadSemaine()">Afficher la semaine</button>
+      </div>
+    </div>
+
+    <div class="grid-week" id="pastillesContainer"></div>
+
+    <div class="summary-box">
+      <h5>Récapitulatif de la semaine</h5>
+      <p><strong>Kilomètres :</strong> <span id="totalKm">0</span> km</p>
+      <p><strong>Heures :</strong> <span id="totalH">0h00</span></p>
+      <p><strong>Total forfaits :</strong> <span id="totalForfait">0.00</span> $</p>
+      <p><strong>Total primes douane :</strong> <span id="totalDouane">0.00</span> $</p>
+      <p><strong>Montant total :</strong> <span id="totalMontant" class="fw-bold text-dark">0.00 $</span></p>
+      <p id="montantAjusteLigne" style="display: none;">
+        <strong>Montant avec ajustements :</strong> 
+        <span id="totalMontantAjuste" class="fw-bold text-success">0.00 $</span>
+      </p>
 
     <p id="ajustementsRecap" class="text-muted fst-italic small"></p>
    <div class="mt-4 p-3 bg-white border rounded">

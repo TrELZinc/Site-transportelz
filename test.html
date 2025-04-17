@@ -17,13 +17,27 @@
 @media print {
   /* Grille pour 3 pastilles par page */
   .grid-week {
-    display: grid !important;
+    display: none !important;
     grid-template-columns: repeat(3, 1fr);
     gap: 16px;
     overflow: visible !important;
     page-break-after: always;
   }
+ .pastilles-page1 {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    overflow: visible;
+    page-break-after: always;
+  }
 
+  .pastilles-page2 {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    overflow: visible;
+  }
+  
   /* Pastilles bien compactes pour éviter trop de hauteur */
   .pastille {
     page-break-inside: avoid;
@@ -219,6 +233,8 @@ body {
     </div>
 
     <div class="grid-week" id="pastillesContainer"></div>
+    <div class="pastilles-page1 d-none d-print-grid"></div>
+    <div class="pastilles-page2 d-none d-print-grid"></div>
     <div class="summary-box">
       <h5>Récapitulatif de la semaine</h5>
       <p><strong>Kilomètres :</strong> <span id="totalKm">0</span> km</p>
@@ -412,7 +428,7 @@ voyages.forEach((voyage, idx) => {
     jourMin += minutes;
 
     forfait = parseFloat(voyage.prime_forfait) || 0;
-    douane = parseFloat(voyage.prime_douane) || 0;
+      douane = parseFloat(voyage.prime_douane) || 0;
 
     if (voyage.origine?.toLowerCase().includes("vimont")) {
       forfait = 0;
@@ -457,6 +473,13 @@ totalDouane += jourDouane;
 
   div.appendChild(footer);
   container.appendChild(div);
+
+// Impression : répartir pastilles
+if (container.children.length <= 3) {
+  document.querySelector('.pastilles-page1').appendChild(div.cloneNode(true));
+} else {
+  document.querySelector('.pastilles-page2').appendChild(div.cloneNode(true));
+}
 });
 
 const ajustKm = parseFloat(document.getElementById("ajustKm").value) || 0;

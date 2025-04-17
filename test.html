@@ -376,7 +376,7 @@ async function loadSemaine() {
   const container = document.getElementById("pastillesContainer");
   container.innerHTML = "";
 
-  let totalKm = 0, totalMin = 0, totalForfait = 0, totalDouane = 0, totalPrime = 0;
+  let totalKm = 0, totalMin = 0, totalForfait = 0, totalDouane = 0;
   const grouped = {};
   semaineData.forEach(item => {
     if (!grouped[item.date]) grouped[item.date] = [];
@@ -536,7 +536,9 @@ if (jourAjustRaison) {
 const montantJour =
   (jourKm * taux.taux_km) +
   (jourMin / 60 * taux.taux_h) +
-  jourPrime;
+  jourForfait +
+  jourDouane;
+
 
 // ➤ Ajout du footer "Total jour"
 const footer = document.createElement("div");

@@ -10,25 +10,32 @@
 @media print {
   .grid-week {
     display: grid !important;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, 1fr) !important;
     gap: 16px;
     overflow: visible !important;
     flex-wrap: wrap !important;
   }
 
   .pastille {
-    page-break-inside: avoid;
     height: auto !important;
+    min-height: 280px !important;
     max-height: none !important;
-    overflow: visible !important;
-    min-height: 320px;
+    page-break-inside: avoid !important;
   }
 
   .summary-box {
-    page-break-before: always;
+    page-break-before: always !important;
   }
 }
 
+/* Hors impression */
+.grid-week {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 16px;
+  overflow-x: auto;
+  margin-bottom: 2rem;
+}
 body {
   background: #f8f9fa;
 }
@@ -67,14 +74,6 @@ body {
   padding: 6px 10px;
   border-radius: 8px;
   border: 1px solid #ddd;
-}
-
-.grid-week {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 16px;
-  overflow-x: auto;
-  margin-bottom: 2rem;
 }
 
 .separator {

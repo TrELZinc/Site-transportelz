@@ -645,9 +645,11 @@ async function chargerChauffeursDansSelect() {
 }
 
 function recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane) {
-  const { ajustKm, ajustH, ajustForfait, ajustBonus } = getAjustements(); // ✅ D'abord !
+  const { ajustKm, ajustH, ajustForfait, ajustBonus } = getAjustements(); // D'abord !
 
-  console.log("🔥 Ajustements récupérés:", { ajustKm, ajustH, ajustForfait, ajustBonus });
+  console.log("🔥 Ajustements récupérés:", {
+    ajustKm, ajustH, ajustForfait, ajustBonus
+  });
 
   const montantBrut =
     (totalKm * taux.taux_km) +

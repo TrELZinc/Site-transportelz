@@ -15,37 +15,45 @@
 
 
 @media print {
-  .grid-week {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 16px;
-    overflow: visible !important;
-  }
-  #btnCharger {
+  #btnChargerBox, .mt-4, .summary-box .bg-white, .summary-box h6, .summary-box .row {
     display: none !important;
   }
-  .taux-print-only {
-    display: block !important;
-    margin-top: 12px;
-    font-size: 0.9rem;
-    color: #333;
-  }
-  .pastille {
-    max-height: 380px !important; /* hauteur max imprimable sans overflow */
-    overflow: hidden !important;
-    page-break-inside: avoid !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-  }
 
-  .pastille .details {
-    overflow: hidden;
-    text-overflow: ellipsis;
+  .grid-week {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr);
+    overflow: visible !important;
+    gap: 16px;
+    page-break-after: always;
   }
 
   .summary-box {
-    page-break-before: always !important;
+    page-break-before: always;
+    margin-top: 0 !important;
+  }
+
+  .chauffeur-zone {
+    flex: 0 0 35% !important;
+  }
+
+  #chauffeurTauxBox {
+    display: block !important;
+    padding-left: 1rem;
+    margin-top: 0 !important;
+  }
+
+  .taux-print-only {
+    display: block !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}
+
+@media screen {
+  .taux-print-only {
+    display: none !important;
   }
 }
 
@@ -150,8 +158,8 @@ body {
 </head>
 <body class="p-4">
 <div class="container">
-<div class="d-flex flex-wrap justify-content-between align-items-end mb-4 gap-3">
-  <div class="flex-grow-1">
+<div class="d-flex flex-wrap align-items-end mb-4 gap-3" id="enteteZone">
+  <div class="flex-grow-1 chauffeur-zone">
     <label class="form-label">Nom du chauffeur</label>
     <select id="chauffeurSelect" class="form-select">
       <option value="">-- Choisir --</option>
@@ -161,12 +169,12 @@ body {
     <label class="form-label">Date de la semaine</label>
     <input type="date" id="dateInput" class="form-control" />
   </div>
-  <div>
-<button id="btnCharger" class="btn btn-primary mt-2 mt-md-0" onclick="loadSemaine()">Charger la semaine</button>
+  <div id="chauffeurTauxBox" class="taux-print-only">
+    <!-- Injecté dynamiquement -->
   </div>
-</div>
-<div id="chauffeurTauxBox" class="mb-4 taux-print-only">
-  <!-- injecté dynamiquement par JS -->
+  <div id="btnChargerBox">
+    <button id="btnCharger" class="btn btn-primary mt-2 mt-md-0" onclick="loadSemaine()">Charger la semaine</button>
+  </div>
 </div>
   <div class="grid-week" id="pastillesContainer"></div>
 

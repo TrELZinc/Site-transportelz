@@ -645,56 +645,48 @@ async function chargerChauffeursDansSelect() {
 }
 
 function recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane) {
-    const { ajustKm, ajustH, ajustForfait, ajustBonus } = getAjustements();
+  const { ajustKm, ajustH, ajustForfait, ajustBonus } = getAjustements(); // D'abord !
 
-    // Update the main summary (as before)
-    const montantBrut =
-        (totalKm * taux.taux_km) +
-        (totalMin / 60 * taux.taux_h) +
-        totalForfait +
-        totalDouane;
+  console.log("🔥 Ajustements récupérés:", {
+    ajustKm, ajustH, ajustForfait, ajustBonus
+  });
 
-    const montantAjuste =
-        ((totalKm + ajustKm) * taux.taux_km) +
-        ((totalMin / 60 + ajustH) * taux.taux_h) +
-        (totalForfait + ajustForfait) +
-        totalDouane +
-        ajustBonus;
+  const montantBrut =
+    (totalKm * taux.taux_km) +
+    (totalMin / 60 * taux.taux_h) +
+    totalForfait +
+    totalDouane;
 
-    const elMontant = document.getElementById("totalMontant");
-    const elAjuste = document.getElementById("Ajuste");
-    const elLigne = document.getElementById("montantAjusteLigne");
+  const montantAjuste =
+    ((totalKm + ajustKm) * taux.taux_km) +
+    ((totalMin / 60 + ajustH) * taux.taux_h) +
+    (totalForfait + ajustForfait) +
+    totalDouane +
+    ajustBonus;
+    
+  console.log("Montant ajusté calculé:", montantAjuste);
+  console.log("Différence:", montantAjuste - montantBrut);
 
-    if (elMontant) elMontant.textContent = `${montantBrut.toFixed(2)} $`;
-    if (elAjuste) elAjuste.textContent = `${montantAjuste.toFixed(2)} $`;
-    if (elLigne) {
-        elLigne.style.display = (ajustKm !== 0 || ajustH !== 0 || ajustForfait !== 0 || ajustBonus !== 0) ? "block" : "none";
+  // Affichage des montants
+  const elMontant = document.getElementById("totalMontant");
+  const elAjuste = document.getElementById("Ajuste");
+  const elLigne = document.getElementById("montantAjusteLigne");
+
+  if (elMontant) elMontant.textContent = `${montantBrut.toFixed(2)} $`;
+  if (elAjuste) elAjuste.textContent = `${montantAjuste.toFixed(2)} $`;
+
+  // Affichage conditionnel de la ligne d'ajustement
+  if (elLigne) {
+    if (ajustKm !== 0 || ajustH !== 0 || ajustForfait !== 0 || ajustBonus !== 0) {
+      elLigne.style.display = "block";
+      console.log("Ligne d'ajustement affichée");
+    } else {
+      elLigne.style.display = "none";
+      console.log("Ligne d'ajustement masquée");
     }
-
-    // --- Update individual "Total jour" amounts ---
-    const pastilles = document.querySelectorAll(".pastille");
-    pastilles.forEach(pastille => {
-        const originalKm = parseFloat(pastille.dataset.originalKm) || 0;
-        const originalMin = parseFloat(pastille.dataset.originalMin) || 0;
-        const originalForfait = parseFloat(pastille.dataset.originalForfait) || 0;
-        const originalDouane = parseFloat(pastille.dataset.originalDouane) || 0;
-
-        // Apply adjustments - This is a simplified example. You might need more complex logic
-        const adjustedKm = originalKm + (ajustKm / 5); // Distribute evenly (example)
-        const adjustedMin = originalMin + (ajustH * 60 / 5); // Distribute evenly (example)
-        const adjustedForfait = originalForfait + (ajustForfait / 5); // Distribute evenly (example)
-
-        const montantJour =
-            (adjustedKm * taux.taux_km) +
-            (adjustedMin / 60 * taux.taux_h) +
-            adjustedForfait +
-            originalDouane; // Douane might not be adjusted
-
-        const totalJourElement = pastille.querySelector(".mt-2.fw-bold.text-success.text-center");
-        if (totalJourElement) {
-            totalJourElement.textContent = `Total jour : ${montantJour.toFixed(2)} $`;
-        }
-    });
+  } else {
+    console.error("Élément montantAjusteLigne non trouvé");
+  }
 }
   
 function getAjustements() {
@@ -721,8 +713,6 @@ function getAjustements() {
       // Ajouter de nouveaux écouteurs
       el.addEventListener("input", recalculHandler);
       el.addEventListener("change", recalculHandler);
-
-
       
       console.log(`Écouteur installé sur ${id}`);
     } else {
@@ -733,19 +723,14 @@ function getAjustements() {
 
 function recalculHandler() {
   console.log("Recalcul déclenché par un changement d'ajustement");
-
-  // Attendre que le champ ait bien pris la nouvelle valeur
-  setTimeout(() => {
-    recalculerMontant(
-      tauxActuel,
-      totalKmActuel,
-      totalMinActuel,
-      totalForfaitActuel,
-      totalDouaneActuel
-    );
-  }, 0);
+  recalculerMontant(
+    tauxActuel,
+    totalKmActuel,
+    totalMinActuel,
+    totalForfaitActuel,
+    totalDouaneActuel
+  );
 }
-
 
 // Appeler cette fonction dans votre DOMContentLoaded
 document.addEventListener("DOMContentLoaded", () => {

@@ -325,7 +325,7 @@ async function loadSemaine() {
   if (!chauffeur || !inputDate) return alert("Sélectionnez un chauffeur et une date.");
 
   const lundi = getWeekMonday(inputDate);
-  const  = await fetchTauxChauffeurs();
+  const tauxMap = await fetchTauxChauffeurs();
   const taux = tauxMap[chauffeur];
   tauxActuel = taux;
   if (!taux) return alert("Taux non trouvés pour ce chauffeur.");

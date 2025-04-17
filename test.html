@@ -120,7 +120,7 @@
 
 .grid-week {
   display: grid;
-  grid-template-columns: repeat(5, 1fr); /* ✅ 5 colonnes fixes */
+  grid-template-columns: repeat(5, 1fr); /* ✅ 5 colonnes */
   gap: 16px;
   margin-bottom: 2rem;
 }
@@ -139,12 +139,12 @@ body {
   border: 2px solid #dee2e6;
   border-radius: 12px;
   padding: 16px;
-  min-width: 220px;
-  flex: 1 0 220px;
-  min-height: 360px;
-  max-height: 600px;
-  overflow-y: auto;
+  height: 100%;              /* ✅ s'étire sur toute la cellule */
+  min-height: 400px;         /* ✅ hauteur mini */
+  max-height: 400px;         /* ✅ hauteur max identique */
+  overflow: hidden;          /* ✅ coupe l'excès proprement */
 }
+
 
 .pastille .details div {
   margin-bottom: 4px;
@@ -208,6 +208,7 @@ body {
 .container {
   max-width: 1000px;
   margin: auto;
+  overflow-x: hidden;
 }
 
 .badge-prime {

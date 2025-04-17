@@ -197,6 +197,14 @@ body {
   transform: scale(1.03);
 }
 
+.taux-btns-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
 @media (max-width: 768px) {
   .taux-row {
     flex-direction: row;
@@ -245,7 +253,6 @@ body {
       <button class="btn btn-primary w-100 mb-2" style="font-size: 1.1rem;" onclick="loadSemaine()">Afficher la semaine</button>
       <div id="chauffeurTauxBox" class="w-100"></div>
       </div>
-        <button class="btn btn-primary" onclick="loadSemaine()">Afficher la semaine</button>
       </div>
     </div>
 

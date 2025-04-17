@@ -383,7 +383,12 @@ async function loadSemaine() {
     const dateKey = jour.toISOString().split("T")[0];
     if (!grouped[dateKey]) grouped[dateKey] = [];
   }
-  let index = 0;
+  
+const page1 = document.querySelector(".pastilles-page1");
+const page2 = document.querySelector(".pastilles-page2");
+page1.innerHTML = "";
+page2.innerHTML = "";
+let index = 0;
   
   Object.entries(grouped)
   .sort(([dateA], [dateB]) => new Date(dateA) - new Date(dateB))
@@ -488,7 +493,12 @@ totalDouane += jourDouane;
   footer.textContent = `Total jour : ${montantJour.toFixed(2)} $`;
 
   div.appendChild(footer);
-  container.appendChild(div);
+  if (index < 3) {
+  page1.appendChild(div);
+} else {
+  page2.appendChild(div);
+}
+index++;
 
 // Impression : répartir pastilles selon index
 const pastilleClone = div.cloneNode(true);
@@ -635,10 +645,20 @@ document.addEventListener("DOMContentLoaded", () => {
   function genererPDF() {
   const element = document.querySelector(".container");
 
-  const dateStr = document.getElementById("dateInput").value;
-  const chauffeur = document.getElementById("chauffeurSelect").value;
-  const formattedDate = dateStr ? new Date(dateStr).toLocaleDateString('fr-CA') : 'date-inconnue';
-  const nomFichier = `${formattedDate} - ${chauffeur || 'chauffeur'}.pdf`;
+const dateStr = document.getElementById("dateInput").value;
+const chauffeur = document.getElementById("chauffeurSelect").value || 'chauffeur';
+
+let formattedDate = 'date-inconnue';
+if (dateStr) {
+  const dateObj = new Date(dateStr);
+  formattedDate = dateObj.toLocaleDateString('fr-CA', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
+  });
+}
+
+const nomFichier = `${formattedDate} - ${chauffeur}.pdf`;
 
   const opt = {
     margin: 0.5,

@@ -599,6 +599,14 @@ page1.innerHTML = "";
 page2.innerHTML = "";
 summary.innerHTML = document.querySelector(".summary-box.no-print").innerHTML;
 
+  recalculerMontant(
+  tauxActuel,
+  totalKmActuel,
+  totalMinActuel,
+  totalForfaitActuel,
+  totalDouaneActuel
+);
+
 allPastilles.forEach((el, idx) => {
   const clone = el.cloneNode(true);
   if (idx < 3) {

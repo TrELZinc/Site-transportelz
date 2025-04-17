@@ -175,42 +175,44 @@ body {
   margin-left: 0.4rem;
 }
 
-#chauffeurTauxBox {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.taux-btns-container {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+.taux-row {
+  margin-top: 0.25rem;
 }
 
 .taux-btn {
-  flex: 1 1 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
   background-color: #007bff;
   color: white;
   border: none;
-  border-radius: 50px;
+  border-radius: 30px;
   padding: 10px 16px;
+  font-size: 0.95rem;
   font-weight: 500;
-  font-size: 0.9rem;
+  text-align: center;
   white-space: nowrap;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
 }
 
-#chauffeurTauxBox + .btn {
-  width: 100%;
-  font-size: 1.1rem;
-  padding: 12px;
-  border-radius: 12px;
+.taux-btn:hover {
+  transform: scale(1.03);
+}
+
+@media (max-width: 768px) {
+  .taux-row {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .taux-btn {
+    flex: 1 1 48%;
+  }
+
+  .taux-row + .btn {
+    width: 100%;
+    font-size: 1.1rem;
+    padding: 12px;
+    border-radius: 12px;
+  }
 }
 
 @media screen {
@@ -239,10 +241,10 @@ body {
         <label class="form-label">Date de la semaine</label>
         <input type="date" id="dateInput" class="form-control" />
       </div>
-      <div class="col-md-4 d-flex justify-content-end align-items-end gap-2">
-        <div id="chauffeurTauxBox" class="flex-grow-1 text-end">
-          <!-- Injecté dynamiquement par JS -->
-        </div>
+     <div class="col-md-4 d-flex flex-column align-items-end">
+      <button class="btn btn-primary w-100 mb-2" style="font-size: 1.1rem;" onclick="loadSemaine()">Afficher la semaine</button>
+      <div id="chauffeurTauxBox" class="w-100"></div>
+      </div>
         <button class="btn btn-primary" onclick="loadSemaine()">Afficher la semaine</button>
       </div>
     </div>

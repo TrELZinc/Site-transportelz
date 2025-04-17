@@ -524,22 +524,13 @@ const ajustH = parseFloat(document.getElementById("ajustH").value) || 0;
 const ajustForfait = parseFloat(document.getElementById("ajustForfait").value) || 0;
 const ajustBonus = parseFloat(document.getElementById("ajustBonus").value) || 0;
   
-let ajustMinFeuille = 0;
-let ajustKmFeuille = 0;
-
-// On boucle sur toutes les données (déjà parsées dans `semaineData`)
-semaineData.forEach(voyage => {
-  const extraHr = parseFloat((voyage.ajust_hr || "0").toString().replace(",", ".")) || 0;
-  const extraKm = parseFloat((voyage.ajust_km || "0").toString().replace(",", ".")) || 0;
-  ajustMinFeuille += extraHr * 60;
-  ajustKmFeuille += extraKm;
-});
 
 const montantBrut =
-  ((totalKm + ajustKmFeuille) * taux.taux_km) +
-  ((totalMin + ajustMinFeuille) / 60 * taux.taux_h) +
+  (totalKm * taux.taux_km) +
+  (totalMin / 60 * taux.taux_h) +
   totalForfait +
   totalDouane;
+
 
 const montantAjuste =
   ((totalKm + ajustKm) * taux.taux_km) +

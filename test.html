@@ -687,9 +687,10 @@ const summary = document.querySelector(".print-summary");
 page1.innerHTML = "";
 page2.innerHTML = "";
 const noPrintSummary = document.querySelector(".summary-box.no-print");
-summary.innerHTML = noPrintSummary.innerHTML;
-summary.classList.remove("d-none", "no-print");
-summary.classList.add("print-summary");
+const clonedSummary = noPrintSummary.cloneNode(true);
+clonedSummary.classList.remove("no-print");
+clonedSummary.classList.add("print-summary");
+document.querySelector(".print-summary").replaceWith(clonedSummary);
 
 // Remplace le contenu du bloc imprimable par un clone complet
 

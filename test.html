@@ -682,7 +682,13 @@ const summary = document.querySelector(".print-summary");
 
 page1.innerHTML = "";
 page2.innerHTML = "";
-summary.innerHTML = document.querySelector(".summary-box.no-print").innerHTML;
+const noPrintSummary = document.querySelector(".summary-box.no-print");
+const clonedSummary = noPrintSummary.cloneNode(true);
+clonedSummary.classList.remove("no-print");
+clonedSummary.classList.add("print-summary");
+
+// Remplace le contenu du bloc imprimable par un clone complet
+summary.replaceWith(clonedSummary);
 
 allPastilles.forEach((el, idx) => {
   const clone = el.cloneNode(true);

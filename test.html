@@ -773,6 +773,21 @@ function recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane) {
   } else {
     console.error("Élément montantAjusteLigne non trouvé");
   }
+  // ➤ Récap texte des ajustements (ajouté ici aussi)
+const recap = [];
+if (ajustKm !== 0) recap.push(`${ajustKm > 0 ? "+" : ""}${ajustKm} km`);
+if (ajustH !== 0) recap.push(`${ajustH > 0 ? "+" : ""}${ajustH} h`);
+if (ajustForfait !== 0) recap.push(`${ajustForfait > 0 ? "+" : ""}${ajustForfait.toFixed(2)} $ forfait`);
+if (ajustBonus !== 0) recap.push(`${ajustBonus > 0 ? "+" : ""}${ajustBonus.toFixed(2)} $ bonus`);
+
+const recapText = recap.length ? `Ajustements appliqués : ${recap.join(", ")}` : "";
+const recapEl = document.getElementById("ajustementsRecap");
+if (recapEl) {
+  recapEl.innerHTML = recapText;
+  if (recap.length) {
+    recapEl.innerHTML += ' <span class="badge bg-success ms-2">Ajustements appliqués</span>';
+  }
+}
 }
   
 function getAjustements() {

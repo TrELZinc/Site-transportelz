@@ -698,9 +698,23 @@ allPastilles.forEach((el, idx) => {
   }
 });
 
+resetAjustementsManuels();
 setupAjustementListeners();
 
 }  
+
+function resetAjustementsManuels() {
+  ["ajustKmInput", "ajustHInput", "ajustForfaitInput", "ajustBonusInput"].forEach(id => {
+    const input = document.getElementById(id);
+    if (input) input.value = 0;
+  });
+
+  const recap = document.getElementById("ajustementsRecap");
+  if (recap) recap.innerHTML = "";
+
+  const elLigne = document.getElementById("montantAjusteLigne");
+  if (elLigne) elLigne.style.display = "none";
+}
 
 function sauvegarderSemaine() {
   alert("Fonction de sauvegarde activée (Firebase). Implémentation personnalisable.");

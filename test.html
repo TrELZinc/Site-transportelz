@@ -684,14 +684,6 @@ page1.innerHTML = "";
 page2.innerHTML = "";
 summary.innerHTML = document.querySelector(".summary-box.no-print").innerHTML;
 
-  recalculerMontant(
-  tauxActuel,
-  totalKmActuel,
-  totalMinActuel,
-  totalForfaitActuel,
-  totalDouaneActuel
-);
-
 allPastilles.forEach((el, idx) => {
   const clone = el.cloneNode(true);
   if (idx < 3) {
@@ -807,6 +799,14 @@ function getAjustements() {
       console.error(`Élément ${id} non trouvé`);
     }
   });
+  // ➕ Ajout ici pour forcer recalcul initial avec valeurs actuelles
+recalculerMontant(
+  tauxActuel,
+  totalKmActuel,
+  totalMinActuel,
+  totalForfaitActuel,
+  totalDouaneActuel
+);
 }
 
 function recalculHandler() {

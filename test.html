@@ -286,24 +286,29 @@ body {
 <div class="grid-week" id="pastillesContainer"></div>
 
 <!-- Pour l'impression uniquement -->
-      <div class="pastilles-page1 d-none d-print-grid print-pastilles"></div>
-      <div class="pastilles-page2 d-none d-print-grid print-pastilles"></div>
-      <div class="summary-box print-summary d-none d-print-block"></div>
-      <div class="summary-box no-print">
-      <h5>Récapitulatif de la semaine</h5>
-      <p><strong>Kilomètres :</strong> <span id="totalKm">0</span> km</p>
-      <p><strong>Heures :</strong> <span id="totalH">0h00</span></p>
-      <p><strong>Total forfaits :</strong> <span id="totalForfait">0.00</span> $</p>
-      <p><strong>Total primes douane :</strong> <span id="totalDouane">0.00</span> $</p>
-      <p><strong>Montant total :</strong> <span id="totalMontant" class="fw-bold text-dark">0.00 $</span></p>
-      <p id="montantAjusteLigne" style="display: none;">
-        <strong>Montant avec ajustements :</strong> 
-        <span id="Ajuste" class="fw-bold text-success">0.00 $</span>
-      </p>
+     <div class="pastilles-page1 d-none d-print-grid print-pastilles"></div>
+<div class="pastilles-page2 d-none d-print-grid print-pastilles"></div>
 
+<!-- RÉSUMÉ IMPRIMABLE -->
+<div class="summary-box print-summary d-none d-print-block"></div>
 
-    <p id="ajustementsRecap" class="text-muted fst-italic small"></p>
-   <div class="mt-4 p-3 bg-white border rounded">
+<!-- RÉSUMÉ VISIBLE À L'ÉCRAN (SANS LES INPUTS) -->
+<div class="summary-box no-print">
+  <h5>Récapitulatif de la semaine</h5>
+  <p><strong>Kilomètres :</strong> <span id="totalKm">0</span> km</p>
+  <p><strong>Heures :</strong> <span id="totalH">0h00</span></p>
+  <p><strong>Total forfaits :</strong> <span id="totalForfait">0.00</span> $</p>
+  <p><strong>Total primes douane :</strong> <span id="totalDouane">0.00</span> $</p>
+  <p><strong>Montant total :</strong> <span id="totalMontant" class="fw-bold text-dark">0.00 $</span></p>
+  <p id="montantAjusteLigne" style="display: none;">
+    <strong>Montant avec ajustements :</strong> 
+    <span id="Ajuste" class="fw-bold text-success">0.00 $</span>
+  </p>
+  <p id="ajustementsRecap" class="text-muted fst-italic small"></p>
+</div>
+
+<!-- AJUSTEMENTS MANUELS EN DEHORS DU BLOC À IMPRIMER -->
+<div class="mt-4 p-3 bg-white border rounded no-print">
   <h6 class="text-muted mb-3">Ajustements manuels</h6>
   <div class="row g-3">
     <div class="col-md-3">
@@ -324,13 +329,12 @@ body {
     </div>
   </div>
 </div>
-  </div>
 
- <div class="mt-4 d-flex flex-column flex-md-row justify-content-md-end gap-2 text-center">
+<!-- BOUTONS ACTION -->
+<div class="mt-4 d-flex flex-column flex-md-row justify-content-md-end gap-2 text-center">
   <button class="btn btn-success" onclick="sauvegarderSemaine()">Sauvegarder dans Firebase</button>
   <button class="btn btn-outline-secondary" onclick="genererPDF()">Exporter en PDF</button>
 </div>
-
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -683,12 +687,12 @@ const summary = document.querySelector(".print-summary");
 page1.innerHTML = "";
 page2.innerHTML = "";
 const noPrintSummary = document.querySelector(".summary-box.no-print");
-const clonedSummary = noPrintSummary.cloneNode(true);
+summary.innerHTML = noPrintSummary.innerHTML;
 clonedSummary.classList.remove("no-print");
 clonedSummary.classList.add("print-summary");
 
 // Remplace le contenu du bloc imprimable par un clone complet
-//summary.replaceWith(clonedSummary);
+
 
 allPastilles.forEach((el, idx) => {
   const clone = el.cloneNode(true);

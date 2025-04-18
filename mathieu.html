@@ -15,58 +15,50 @@
 
 
 @media print {
-  /* Grille pour 3 pastilles par page */
-  .grid-week {
-    display: none !important;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-    overflow: visible !important;
-    page-break-after: always;
-  }
-
+  /* Grille d'impression propre */
   .print-pastilles {
-    display: flex !important;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: flex-start;
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr); /* 3 pastilles par ligne */
     gap: 16px;
     max-width: 960px;
     margin: auto;
-    page-break-after: always;
-  }
-
-  .pastilles-page2 {
-    page-break-after: avoid;
-  }
-
-.print-summary {
-  page-break-before: avoid;
-  margin-top: 2rem;
-}
-
-  /* Pastilles bien compactes pour éviter trop de hauteur */
-  .pastille {
     page-break-inside: avoid;
-    min-height: auto;
-    max-height: none;
-    height: auto;
-    overflow: hidden;
+  }
+
+  .pastille {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    padding: 10px !important;
+    font-size: 0.85rem;
+    min-height: auto !important;
+    max-height: none !important;
+    height: auto !important;
+  }
+
+  .pastille h5 {
+    font-size: 1rem;
+    margin-bottom: 0.4rem;
   }
 
   .pastille .details div {
-    margin-bottom: 2px;
+    margin-bottom: 2px !important;
+    font-size: 0.85rem;
   }
 
   .date-header {
-    font-size: 0.95rem;
-    padding: 4px 8px;
+    font-size: 0.9rem !important;
+    padding: 4px 6px !important;
   }
 
-  /* Résumé de la semaine avec ajustements masqués */
+  .print-summary {
+    page-break-before: avoid;
+    margin-top: 2rem;
+  }
+
   .summary-box {
     page-break-before: always;
-    margin-top: 0 !important;
-    padding-bottom: 0.5rem !important;
+    padding: 0.75rem !important;
+    font-size: 0.9rem;
   }
 
   .summary-box .ajustements-manuels,
@@ -75,40 +67,23 @@
   .summary-box .row {
     display: none !important;
   }
+}
 
-  /* Header chauffeur/date/taux */
-  .header-impression {
-    display: flex !important;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 1rem;
+/* Par défaut : les taux sont à leur position normale */
+.order-mobile-last {
+  order: 0;
+}
+
+/* Sur mobile : on les pousse après le bouton */
+@media (max-width: 767.98px) {
+  .row.g-3 {
+    flex-wrap: wrap;
   }
 
-  .header-impression .form-label, 
-  .header-impression select, 
-  .header-impression input, 
-  .header-impression .taux-badge {
-    display: inline-block;
-    width: auto;
-    max-width: 30%;
-  }
-
-  #chauffeurTauxBox {
-    display: block !important;
-    padding-left: 1rem;
-    margin-top: 0 !important;
-  }
-
-  .taux-print-only {
-    display: block !important;
-  }
-
-  /* Cache tous les éléments inutiles */
-  .no-print,
-  #btnChargerBox,
-  .mt-4 {
-    display: none !important;
+  .order-mobile-last {
+    order: 4;
+    margin-top: 10px;
+    justify-content: center !important;
   }
 }
 
@@ -217,6 +192,61 @@ body {
   margin-left: 0.4rem;
 }
 
+.taux-row {
+  margin-top: 0.25rem;
+}
+
+.taux-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  padding: 10px 16px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+  min-width: 120px;
+}
+
+.taux-btn:hover {
+  transform: scale(1.03);
+}
+
+.taux-btns-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .taux-row {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .taux-btn {
+    flex: 1 1 48%;
+  }
+
+  .taux-row + .btn {
+    width: 100%;
+    font-size: 1.1rem;
+    padding: 12px;
+    border-radius: 12px;
+  }
+}
+
 @media screen {
   .print-summary {
     display: none !important;
@@ -227,27 +257,30 @@ body {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   }
 }
+
   </style>
 </head>
 <body class="p-4">
   <div class="container">
     <div class="row g-3 align-items-end mb-4">
-      <div class="col-md-4">
-        <label class="form-label">Nom du chauffeur</label>
-        <select id="chauffeurSelect" class="form-select">
-          <option value="">-- Choisir --</option>
-        </select>
-      </div>
-      <div class="col-md-4">
-        <label class="form-label">Date de la semaine</label>
-        <input type="date" id="dateInput" class="form-control" />
-      </div>
-      <div class="col-md-4 d-flex justify-content-end align-items-end gap-2">
-        <div id="chauffeurTauxBox" class="flex-grow-1 text-end">
-          <!-- Injecté dynamiquement par JS -->
-        </div>
-        <button class="btn btn-primary" onclick="loadSemaine()">Afficher la semaine</button>
-      </div>
+  <div class="col-md-3">
+    <label class="form-label">Nom du chauffeur</label>
+    <select id="chauffeurSelect" class="form-select">
+      <option value="">-- Choisir --</option>
+    </select>
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Date de la semaine</label>
+    <input type="date" id="dateInput" class="form-control" />
+  </div>
+  <div class="col-md-3 order-mobile-last">
+  <label class="form-label invisible">Taux</label>
+  <div id="chauffeurTauxBox" class="taux-btns-container w-100"></div>
+  </div>
+  <div class="col-md-3 d-flex align-items-end">
+    <button class="btn btn-primary w-100" style="font-size: 1.05rem;" onclick="loadSemaine()">Afficher la semaine</button>
+  </div>
+</div>
     </div>
 
 <div class="grid-week" id="pastillesContainer"></div>
@@ -275,19 +308,19 @@ body {
   <div class="row g-3">
     <div class="col-md-3">
       <label class="form-label">KM ajustés</label>
-      <input type="number" id="ajustKm" class="form-control" value="0">
+      <input type="number" id="ajustKmInput" class="form-control" value="0">
     </div>
     <div class="col-md-3">
       <label class="form-label">Heures ajustées</label>
-      <input type="number" step="0.25" id="ajustH" class="form-control" value="0">
+      <input type="number" step="0.25" id="ajustHInput" class="form-control" value="0">
     </div>
     <div class="col-md-3">
       <label class="form-label">Forfaits ajustés</label>
-      <input type="number" step="0.01" id="ajustForfait" class="form-control" value="0">
+      <input type="number" step="0.01" id="ajustForfaitInput" class="form-control" value="0">
     </div>
     <div class="col-md-3">
       <label class="form-label">Bonus / Vacances</label>
-      <input type="number" step="0.01" id="ajustBonus" class="form-control" value="0">
+      <input type="number" step="0.01" id="ajustBonusInput" class="form-control" value="0">
     </div>
   </div>
 </div>
@@ -319,6 +352,12 @@ const API_URL = "https://script.google.com/macros/s/AKfycbyNCeOMXPM8v-eG_X_x56Rg
 
 let primeDouane = 0;
 let primeForfait = 0;
+let tauxActuel = { taux_km: 0, taux_h: 0 };
+let totalKmActuel = 0;
+let totalMinActuel = 0;
+let totalForfaitActuel = 0;
+let totalDouaneActuel = 0;
+
 
 function parseLocalDate(str) {
   const [y, m, d] = str.split("-").map(Number);
@@ -362,11 +401,13 @@ async function loadSemaine() {
   const lundi = getWeekMonday(inputDate);
   const tauxMap = await fetchTauxChauffeurs();
   const taux = tauxMap[chauffeur];
+  tauxActuel = taux;
   if (!taux) return alert("Taux non trouvés pour ce chauffeur.");
   const tauxBox = document.getElementById("chauffeurTauxBox");
-  tauxBox.innerHTML = `
-  <div class="alert alert-info py-2 px-3 mb-0 rounded-pill d-inline-block">
-    <strong>Taux:</strong> ${taux.taux_km.toFixed(2)} $/km &nbsp; | &nbsp; ${taux.taux_h.toFixed(2)} $/h
+tauxBox.innerHTML = `
+  <div class="taux-btns-container">
+    <button class="taux-btn">🚚 <span>${taux.taux_km.toFixed(2)} $/km</span></button>
+    <button class="taux-btn">💰 <span>${taux.taux_h.toFixed(2)} $/h</span></button>
   </div>
 `;
 
@@ -428,26 +469,40 @@ voyages.forEach((voyage, idx) => {
   let forfait = 0;
   let douane = 0;
 
+  // ⚠️ Exception spéciale : Saint-Basile → Stanstead
+  if (
+    voyage.type === "kilometrage" &&
+    voyage.origine?.toLowerCase().includes("st-basile") &&
+    voyage.destination?.toLowerCase().includes("stanstead")
+  ) {
+    const prochain = voyages[idx + 1];
+    if (prochain?.origine?.toLowerCase().includes("st-basile")) {
+      // KM x2 et ajout du forfait
+      voyage.km = parseFloat(voyage.km) * 2;
+      voyage.prime_forfait = primeForfait;
+    } else if (prochain?.origine?.toLowerCase().includes("stanstead")) {
+      // KM normaux et pas de forfait
+      voyage.prime_forfait = 0;
+    }
+  }
+
   details.innerHTML += `<div class="fw-bold mb-1">Voyage ${idx + 1} :</div>`;
   details.innerHTML += `<div class="mb-1">(${voyage.origine} → ${voyage.destination})</div>`;
 
-        // ➤ Ajustements manuels importés depuis la feuille
-      const parsedAjustHr = parseFloat((voyage.ajust_hr ?? 0).toString().replace(",", "."));
-      const parsedAjustKm = parseFloat((voyage.ajust_km ?? 0).toString().replace(",", "."));
+  const parsedAjustHr = parseFloat((voyage.ajust_hr ?? 0).toString().replace(",", "."));
+  const parsedAjustKm = parseFloat((voyage.ajust_km ?? 0).toString().replace(",", "."));
 
+  if (!isNaN(parsedAjustKm)) {
+    jourAjustKm += parsedAjustKm;
+  }
+  if (!isNaN(parsedAjustHr)) {
+    jourAjustMin += parsedAjustHr * 60;
+  }
 
-    
-    if (!isNaN(parsedAjustKm)) {
-      jourAjustKm += parsedAjustKm;
-    }
-    if (!isNaN(parsedAjustHr)) {
-      jourAjustMin += parsedAjustHr * 60;
-    }
+  if (voyage.ajust_raison && !jourAjustRaison) {
+    jourAjustRaison = voyage.ajust_raison;
+  }
 
-    if (voyage.ajust_raison && !jourAjustRaison) {
-      jourAjustRaison = voyage.ajust_raison;
-    }
-  
   if (voyage.type === "kilometrage" || voyage.type === "retour") {
     const km = parseFloat(voyage.km) || 0;
     jourKm += km;
@@ -476,12 +531,12 @@ voyages.forEach((voyage, idx) => {
     jourMin += minutes;
 
     forfait = parseFloat(voyage.prime_forfait) || 0;
-      douane = parseFloat(voyage.prime_douane) || 0;
+    douane = parseFloat(voyage.prime_douane) || 0;
 
     if (voyage.origine?.toLowerCase().includes("vimont")) {
       forfait = 0;
     }
-   
+
     jourForfait += forfait;
     jourDouane += douane;
 
@@ -496,8 +551,7 @@ voyages.forEach((voyage, idx) => {
     details.innerHTML += `<hr class="my-2">`;
   }
 
-  jourPrime += forfait + douane; 
-
+  jourPrime += forfait + douane;
 });
 
 // Limite visuelle pour impression (si trop de voyages)
@@ -554,30 +608,13 @@ if (index < 3) {
 index++;
 });
 
-const ajustKm = parseFloat(document.getElementById("ajustKm").value) || 0;
-const ajustH = parseFloat(document.getElementById("ajustH").value) || 0;
-const ajustForfait = parseFloat(document.getElementById("ajustForfait").value) || 0;
-const ajustBonus = parseFloat(document.getElementById("ajustBonus").value) || 0;
-  
-let ajustMinFeuille = 0;
-let ajustKmFeuille = 0;
-
-// On boucle sur toutes les données (déjà parsées dans `semaineData`)
-semaineData.forEach(voyage => {
-  const extraHr = parseFloat((voyage.ajust_hr || "0").toString().replace(",", ".")) || 0;
-  const extraKm = parseFloat((voyage.ajust_km || "0").toString().replace(",", ".")) || 0;
-  ajustMinFeuille += extraHr * 60;
-  ajustKmFeuille += extraKm;
-});
+const { ajustKm, ajustH, ajustForfait, ajustBonus } = getAjustements();
 
 const montantBrut =
-  ((totalKm + ajustKmFeuille) * taux.taux_km) +
-  ((totalMin + ajustMinFeuille) / 60 * taux.taux_h) +
+  (totalKm * taux.taux_km) +
+  (totalMin / 60 * taux.taux_h) +
   totalForfait +
   totalDouane;
-
-
-
 
 const montantAjuste =
   ((totalKm + ajustKm) * taux.taux_km) +
@@ -586,9 +623,15 @@ const montantAjuste =
   totalDouane +
   ajustBonus;
 
+
 // ➤ Ligne d'ajustement : visible ou non
-const ligneAjustement = document.getElementById("montantAjusteLigne");
-ligneAjustement.style.display = (ajustKm || ajustH || ajustForfait || ajustBonus) ? "block" : "none";
+const elLigne = document.getElementById("montantAjusteLigne");
+if (ajustKm || ajustH || ajustForfait || ajustBonus) {
+  elLigne.style.display = "block";
+} else {
+  elLigne.style.display = "none";
+}
+
 
 // ➤ Récap texte des ajustements
 const recap = [];
@@ -600,10 +643,11 @@ if (ajustBonus !== 0) recap.push(`${ajustBonus > 0 ? "+" : ""}${ajustBonus.toFix
 const recapText = recap.length ? `Ajustements appliqués : ${recap.join(", ")}` : "";
 document.getElementById("ajustementsRecap").innerHTML = recapText;
 
-if (recap.length && montantBrut !== montantAjuste) {
+if (recap.length) {
   document.getElementById("ajustementsRecap").innerHTML +=
     ' <span class="badge bg-success ms-2">Ajustements appliqués</span>';
 }
+
 
 // ➤ Totaux affichés
 const elKm = document.getElementById("totalKm");
@@ -611,9 +655,9 @@ if (elKm) elKm.textContent = totalKm;
 
 const elH = document.getElementById("totalH");
 if (elH) {
-  const totalMinAvecAjust = totalMin + ajustMinFeuille;
-  elH.textContent = `${Math.floor(totalMinAvecAjust / 60)}h${String(totalMinAvecAjust % 60).padStart(2, '0')}`;
+  elH.textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2, '0')}`;
 }
+
 
 const elForfait = document.getElementById("totalForfait");
 if (elForfait) elForfait.textContent = totalForfait.toFixed(2);
@@ -627,17 +671,24 @@ if (elBrut) elBrut.textContent = `${montantBrut.toFixed(2)} $`;
 const elAjuste = document.querySelector("#Ajuste");
 if (elAjuste) elAjuste.textContent = `${montantAjuste.toFixed(2)} $`;
 
+totalKmActuel = totalKm + ajustKm;
+totalMinActuel = totalMin + ajustH * 60;
+totalForfaitActuel = totalForfait + ajustForfait;
+totalDouaneActuel = totalDouane; // celui-ci ne bouge pas
 
-
-// ➤ Mise à jour du résumé et pastilles d'impression
-recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane);
 
 const allPastilles = [...document.querySelectorAll(".pastille")];
 const summary = document.querySelector(".print-summary");
 
 page1.innerHTML = "";
 page2.innerHTML = "";
-summary.innerHTML = document.querySelector(".summary-box.no-print").innerHTML;
+const noPrintSummary = document.querySelector(".summary-box.no-print");
+const clonedSummary = noPrintSummary.cloneNode(true);
+clonedSummary.classList.remove("no-print");
+clonedSummary.classList.add("print-summary");
+
+// Remplace le contenu du bloc imprimable par un clone complet
+//summary.replaceWith(clonedSummary);
 
 allPastilles.forEach((el, idx) => {
   const clone = el.cloneNode(true);
@@ -647,7 +698,9 @@ allPastilles.forEach((el, idx) => {
     page2.appendChild(clone);
   }
 });
-  setupAjustementListeners();
+
+setupAjustementListeners();
+
 }  
 
 function sauvegarderSemaine() {
@@ -678,10 +731,11 @@ async function chargerChauffeursDansSelect() {
 }
 
 function recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane) {
-  const ajustKm = parseFloat(document.getElementById("ajustKm").value) || 0;
-  const ajustH = parseFloat(document.getElementById("ajustH").value) || 0;
-  const ajustForfait = parseFloat(document.getElementById("ajustForfait").value) || 0;
-  const ajustBonus = parseFloat(document.getElementById("ajustBonus").value) || 0;
+  const { ajustKm, ajustH, ajustForfait, ajustBonus } = getAjustements(); // D'abord !
+
+  console.log("🔥 Ajustements récupérés:", {
+    ajustKm, ajustH, ajustForfait, ajustBonus
+  });
 
   const montantBrut =
     (totalKm * taux.taux_km) +
@@ -695,58 +749,149 @@ function recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane) {
     (totalForfait + ajustForfait) +
     totalDouane +
     ajustBonus;
+    
+  console.log("Montant ajusté calculé:", montantAjuste);
+  console.log("Différence:", montantAjuste - montantBrut);
 
+  // Affichage des montants
   const elMontant = document.getElementById("totalMontant");
   const elAjuste = document.getElementById("Ajuste");
+  const elLigne = document.getElementById("montantAjusteLigne");
 
   if (elMontant) elMontant.textContent = `${montantBrut.toFixed(2)} $`;
   if (elAjuste) elAjuste.textContent = `${montantAjuste.toFixed(2)} $`;
-}
 
+  // Affichage conditionnel de la ligne d'ajustement
+  if (elLigne) {
+    if (ajustKm !== 0 || ajustH !== 0 || ajustForfait !== 0 || ajustBonus !== 0) {
+      elLigne.style.display = "block";
+      console.log("Ligne d'ajustement affichée");
+    } else {
+      elLigne.style.display = "none";
+      console.log("Ligne d'ajustement masquée");
+    }
+  } else {
+    console.error("Élément montantAjusteLigne non trouvé");
+  }
+  // ➤ Récap texte des ajustements (ajouté ici aussi)
+const recap = [];
+if (ajustKm !== 0) recap.push(`${ajustKm > 0 ? "+" : ""}${ajustKm} km`);
+if (ajustH !== 0) recap.push(`${ajustH > 0 ? "+" : ""}${ajustH} h`);
+if (ajustForfait !== 0) recap.push(`${ajustForfait > 0 ? "+" : ""}${ajustForfait.toFixed(2)} $ forfait`);
+if (ajustBonus !== 0) recap.push(`${ajustBonus > 0 ? "+" : ""}${ajustBonus.toFixed(2)} $ bonus`);
 
-document.addEventListener("DOMContentLoaded", () => {
-  chargerChauffeursDansSelect();
-  ["ajustKm", "ajustH", "ajustForfait", "ajustBonus"].forEach(id => {
-  document.getElementById(id).addEventListener("input", () => loadSemaine());
-});
-});
-
-  function genererPDF() {
-  const element = document.querySelector(".container");
-
-const dateStr = document.getElementById("dateInput").value;
-const chauffeur = document.getElementById("chauffeurSelect").value || 'chauffeur';
-
-let formattedDate = 'date-inconnue';
-if (dateStr) {
-  const dateObj = new Date(dateStr);
-  formattedDate = dateObj.toLocaleDateString('fr-CA', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric'
-  });
-}
-
-const nomFichier = `${formattedDate} - ${chauffeur}.pdf`;
-
-  const opt = {
-    margin: 0.5,
-    filename: nomFichier,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2 },
-    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-  };
-
-  try {
-    html2pdf().set(opt).from(element).save().catch(() => {
-      console.warn("html2pdf échoué, fallback vers print()");
-      window.print();
-    });
-  } catch (e) {
-    console.error("Erreur PDF, fallback vers impression:", e);
-    window.print();
+const recapText = recap.length ? `Ajustements appliqués : ${recap.join(", ")}` : "";
+const recapEl = document.getElementById("ajustementsRecap");
+if (recapEl) {
+  recapEl.innerHTML = recapText;
+  if (recap.length) {
+    recapEl.innerHTML += ' <span class="badge bg-success ms-2">Ajustements appliqués</span>';
   }
 }
+}
+  
+function getAjustements() {
+  return {
+    ajustKm: parseFloat(document.getElementById("ajustKmInput").value) || 0,
+    ajustH: parseFloat(document.getElementById("ajustHInput").value) || 0,
+    ajustForfait: parseFloat(document.getElementById("ajustForfaitInput").value) || 0,
+    ajustBonus: parseFloat(document.getElementById("ajustBonusInput").value) || 0
+  };
+}
+
+  function setupAjustementListeners() {
+  console.log("Configuration des écouteurs d'ajustement");
+  
+  const ajustIds = ["ajustKmInput", "ajustHInput", "ajustForfaitInput", "ajustBonusInput"];
+  
+  ajustIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      // Supprimer les anciens écouteurs pour éviter les doublons
+      el.removeEventListener("input", recalculHandler);
+      el.removeEventListener("change", recalculHandler);
+      
+      // Ajouter de nouveaux écouteurs
+      el.addEventListener("input", recalculHandler);
+      el.addEventListener("change", recalculHandler);
+      
+      console.log(`Écouteur installé sur ${id}`);
+    } else {
+      console.error(`Élément ${id} non trouvé`);
+    }
+  });
+  // ➕ Ajout ici pour forcer recalcul initial avec valeurs actuelles
+recalculerMontant(
+  tauxActuel,
+  totalKmActuel,
+  totalMinActuel,
+  totalForfaitActuel,
+  totalDouaneActuel
+);
+}
+
+function recalculHandler() {
+  console.log("Recalcul déclenché par un changement d'ajustement");
+  recalculerMontant(
+    tauxActuel,
+    totalKmActuel,
+    totalMinActuel,
+    totalForfaitActuel,
+    totalDouaneActuel
+  );
+}
+
+// Appeler cette fonction dans votre DOMContentLoaded
+document.addEventListener("DOMContentLoaded", () => {
+  chargerChauffeursDansSelect();
+  setupAjustementListeners();
+});
+
+
+function genererPDF() {
+  const printZone = document.createElement('div');
+  printZone.id = 'print-temp';
+  printZone.style.position = 'fixed';
+  printZone.style.left = '-9999px';
+  printZone.style.top = '0';
+  printZone.style.width = '1000px';
+  printZone.style.background = 'white';
+  printZone.style.zIndex = '9999';
+  document.body.appendChild(printZone);
+
+  // Cloner les pastilles et le résumé
+  const sections = document.querySelectorAll('.print-pastilles, .print-summary');
+  sections.forEach(el => {
+    const clone = el.cloneNode(true);
+    clone.classList.remove('d-none', 'd-print-grid', 'd-print-block');
+
+    // Affichage de secours
+    clone.style.display = el.classList.contains('print-pastilles') ? 'grid' : 'block';
+    printZone.appendChild(clone);
+  });
+
+  // Laisser le temps au DOM d'insérer le contenu dans le document
+  setTimeout(() => {
+    const opt = {
+      margin: 0.5,
+      filename: `${document.getElementById("dateInput").value || 'date'} - ${document.getElementById("chauffeurSelect").value || 'chauffeur'}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(printZone).save().then(() => {
+      printZone.remove();
+    }).catch(err => {
+      console.error("Erreur PDF → fallback print:", err);
+      printZone.remove();
+      window.print();
+    });
+  }, 500); // ← important: attendre un peu avant capture
+}
+
+
+
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </body>

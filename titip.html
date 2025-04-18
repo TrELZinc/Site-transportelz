@@ -198,11 +198,19 @@
         <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
       </div>
 
-      <div class="mb-3">
-        <label for="photos" class="form-label">Ajouter des photos</label>
-        <input class="form-control" type="file" id="photos" name="photos" accept="image/*,video/mp4,video/quicktime" multiple />
-        <div class="d-flex flex-wrap gap-2 mt-2" id="preview"></div>
-      </div>
+<div class="mb-3">
+  <label class="form-label">Ajouter des photos ou vidéos</label>
+  
+  <!-- Bouton customisé -->
+  <div class="d-flex flex-column gap-2">
+    <button type="button" class="btn btn-outline-primary" id="fileTrigger">Choisir des fichiers</button>
+    <input type="file" id="photos" name="photos" accept="image/*,video/mp4,video/quicktime" multiple hidden />
+    <div id="fileNames" class="text-muted small"></div>
+  </div>
+
+  <!-- Preview ici -->
+  <div class="d-flex flex-wrap gap-2 mt-2" id="preview"></div>
+</div>
 
       <button type="submit" class="btn btn-dark w-100">Envoyer</button>
     </form>
@@ -225,6 +233,17 @@
     const confirmation = document.getElementById("confirmation");
     const loading = document.getElementById("loading-screen");
     let imageList = [];
+    const fileTrigger = document.getElementById("fileTrigger");
+    const fileNames = document.getElementById("fileNames");
+
+fileTrigger.addEventListener("click", () => {
+  photosInput.click();
+});
+
+photosInput.addEventListener("change", () => {
+  const names = Array.from(photosInput.files).map(f => f.name).join(", ");
+  fileNames.textContent = names || "Aucun fichier sélectionné";
+});
 
 photosInput.addEventListener("change", (e) => {
   const files = Array.from(e.target.files);

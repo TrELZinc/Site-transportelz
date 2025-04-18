@@ -233,36 +233,30 @@
   </div>
 
   <script>
-    const form = document.getElementById("repair-form");
-    const photosInput = document.getElementById("photos");
-    const preview = document.getElementById("preview");
-    const confirmation = document.getElementById("confirmation");
-    const loading = document.getElementById("loading-screen");
-    let imageList = [];
-    const fileTrigger = document.getElementById("fileTrigger");
-    const fileNames = document.getElementById("fileNames");
+const form = document.getElementById("repair-form");
+const photosInput = document.getElementById("photos");
+const preview = document.getElementById("preview");
+const confirmation = document.getElementById("confirmation");
+const loading = document.getElementById("loading-screen");
+let imageList = [];
 
+const fileTrigger = document.getElementById("fileTrigger");
+const fileNames = document.getElementById("fileNames");
+
+// Bouton customisé déclenche l'input
 fileTrigger.addEventListener("click", () => {
   photosInput.click();
 });
 
-photosInput.addEventListener("change", () => {
-  const names = Array.from(photosInput.files).map(f => f.name).join(", ");
-  fileNames.textContent = names || "Aucun fichier sélectionné";
-});
-
+// Affiche les noms des fichiers
 photosInput.addEventListener("change", (e) => {
   const files = Array.from(e.target.files);
+  const names = files.map(f => f.name).join(", ");
+  fileNames.textContent = names || "Aucun fichier sélectionné";
+
   files.forEach((file) => {
     const reader = new FileReader();
     reader.onload = () => {
-      const removeBtn = document.createElement("div");
-removeBtn.className = "remove-btn";
-removeBtn.innerHTML = `<i class="bi bi-x-lg"></i>`;
-removeBtn.onclick = () => {
-  container.remove();
-  imageList = imageList.filter((i) => i.data !== mediaUrl.split(",")[1]);
-};
       const mediaUrl = reader.result;
       imageList.push({ name: file.name, type: file.type, data: mediaUrl.split(",")[1] });
 
@@ -283,10 +277,10 @@ removeBtn.onclick = () => {
         container.appendChild(video);
       }
 
-      // Bouton "X"
+      // Bouton X
       const removeBtn = document.createElement("div");
       removeBtn.className = "remove-btn";
-      removeBtn.textContent = "X";
+      removeBtn.innerHTML = `<i class="bi bi-x-lg"></i>`;
       removeBtn.onclick = () => {
         container.remove();
         imageList = imageList.filter((i) => i.data !== mediaUrl.split(",")[1]);
@@ -295,8 +289,10 @@ removeBtn.onclick = () => {
       container.appendChild(removeBtn);
       preview.appendChild(container);
     };
+
     reader.readAsDataURL(file);
   });
+
   photosInput.value = "";
 });
 
@@ -331,6 +327,7 @@ form.addEventListener("submit", async (e) => {
 
     form.reset();
     preview.innerHTML = "";
+    fileNames.textContent = "";
     imageList = [];
   } catch (error) {
     loading.classList.remove("show");

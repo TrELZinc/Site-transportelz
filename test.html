@@ -894,6 +894,9 @@ function chargerAnciennePaie() {
 }
 
 function afficherPaieSauvegardée(data) {
+  // Mettre à jour le champ de date de la semaine
+  document.getElementById("dateInput").value = data.lundi;
+
   // Remplir les champs d'ajustement
   document.getElementById("ajustKmInput").value = data.ajustKm || 0;
   document.getElementById("ajustHInput").value = data.ajustH || 0;

@@ -869,6 +869,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function chargerAnciennePaie() {
   const chauffeur = document.getElementById("chauffeurSelect").value;
+  console.log("🧪 Chauffeur sélectionné :", chauffeur); // ← Debug ici
   if (!chauffeur) return alert("Sélectionnez un chauffeur d'abord.");
 
   db.collection("Paies")
@@ -881,6 +882,7 @@ function chargerAnciennePaie() {
       container.innerHTML = "<h6>Paies disponibles :</h6>";
 
       if (snapshot.empty) {
+        console.warn("⚠️ Aucun document trouvé pour ce chauffeur.");
         container.innerHTML += "<p class='text-danger'>Aucune paie trouvée.</p>";
         return;
       }
@@ -897,7 +899,7 @@ function chargerAnciennePaie() {
       });
     })
     .catch(err => {
-      console.error("Erreur chargement paies:", err);
+      console.error("❌ Erreur chargement paies:", err);
     });
 }
 

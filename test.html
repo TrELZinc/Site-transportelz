@@ -929,10 +929,10 @@ function chargerChauffeursDansSelect() {
     .then(res => res.json())
     .then(data => {
       const noms = data.chauffeurs.map(c => c.nom).sort();
-      noms.forEach(nom => {
+      noms.forEach(nomComplet => {
         const option = document.createElement("option");
-        option.value = nom;
-        option.textContent = nom;
+        option.value = nomComplet; // valeur exacte pour Firestore
+        option.textContent = nomComplet.replace(/ #\d+$/, ""); // affichage plus propre
         select.appendChild(option);
       });
     })

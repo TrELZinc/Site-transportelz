@@ -894,15 +894,33 @@ function chargerAnciennePaie() {
 }
 
 function afficherPaieSauvegardée(data) {
-  alert(`
-Semaine: ${data.lundi}
-KM: ${data.km}
-Heures: ${Math.floor(data.minutes / 60)}h${String(data.minutes % 60).padStart(2, '0')}
-Forfaits: ${data.forfaits}$
-Douanes: ${data.douanes}$
-Taux KM: ${data.taux_km}$
-Taux H: ${data.taux_h}$
-  `);
+  // Remplir les champs d'ajustement
+  document.getElementById("ajustKmInput").value = data.ajustKm || 0;
+  document.getElementById("ajustHInput").value = data.ajustH || 0;
+  document.getElementById("ajustForfaitInput").value = data.ajustForfait || 0;
+  document.getElementById("ajustBonusInput").value = data.ajustBonus || 0;
+
+  // Mettre à jour les valeurs globales
+  totalKmActuel = data.km;
+  totalMinActuel = data.minutes;
+  totalForfaitActuel = data.forfaits;
+  totalDouaneActuel = data.douanes;
+  tauxActuel = {
+    taux_km: data.taux_km,
+    taux_h: data.taux_h
+  };
+
+  // Recalcul automatique des montants avec ajustements
+  recalculerMontant(
+    tauxActuel,
+    totalKmActuel,
+    totalMinActuel,
+    totalForfaitActuel,
+    totalDouaneActuel
+  );
+
+  // Afficher un message de confirmation
+  alert(`Paie de la semaine du ${data.lundi} chargée dans l'interface.`);
 }
 
 

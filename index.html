@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <link rel="icon" type="image/png" href="assets/favicon.png">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Connexion – Transport E.L.Z inc.</title>
+  <link rel="icon" type="image/png" href="assets/favicon.png">
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet">
   <style>
     * {
@@ -125,29 +125,29 @@
   </form>
 
   <script>
-const utilisateurs = [
-  { identifiant: "sr01", hash: "ec6658121dc67a30d23fc5a0c0bcbcd0e734df0b23d51bcda13d2aab8ee37b6f", role: "admin" },
-  { identifiant: "md160", hash: "45f3a7f3e63a74950f03ecfb12ec5c0f0d45f7ec5193dbca425e44be4c926aa5", role: "admin" },
-  { identifiant: "jj04", hash: "7d7b0264df0c8bcad3df76f0531c0e02db0ee5b6460879ee5cf07993b394ba1c", role: "user" },
-  { identifiant: "bp10", hash: "c03a6fa01a6a0e14c2a8d1b81bead3b3f97e5aa93bffde33920fd502e307af3c", role: "user" },
-  { identifiant: "rp16", hash: "53a4ae3ffbd7efcb92c14e2cf416d06fc1c9ef2e0093a83297bde881a5a93679", role: "user" },
-  { identifiant: "dm17", hash: "a1ac4bece62e993e307df68c1bb0b2a1fc9332ae364a70c51fc6d80a9e3781e0", role: "user" },
-  { identifiant: "mo26", hash: "3dd3eb68e69aab4ff94877686d019e66e6cb73e6b1dd05502c406ae9a0883501", role: "user" },
-  { identifiant: "al34", hash: "f92a3acb04d159b86ab7b4c45c157b2e0a45b03a39066cc7de3f105cdaebf02b", role: "user" },
-  { identifiant: "pf36", hash: "5a556e5a6e9c36f297870a8bc83b6b1d1c2cc7b4051f2ebfc3f6b18c6cdbf438", role: "user" },
-  { identifiant: "rb55", hash: "524f8c84106331dbe882307ee17a92b5ae0177f58db8f1948b5d47fe5ff69f3c", role: "user" },
-  { identifiant: "rd128", hash: "26f6a5efc2c9e6ee5871f3f5a31a5f79b3ec4b2d112f28792a771ce8d6fe4526", role: "user" },
-  { identifiant: "ym139", hash: "e7de17d15459f8d17742c9b5d3e1963e3de7b0c93172e96cfc42b6cc1b22e8e9", role: "user" },
-  { identifiant: "ds140", hash: "11cbd80033f0bb246b250f8bc92be53c0dc61c1aa0f2e09389e0096d40f58bb9", role: "user" },
-  { identifiant: "bp145", hash: "37bb6b7c745c23986de9ad11e4ae45b4a2bde3bc2e0e07a98f01efb1459c8a8e", role: "user" },
-  { identifiant: "sr146", hash: "c15854dc51014fcf2a865ceea688e7557479c119b8911b5dc55e3e40d1b429ed", role: "user" },
-  { identifiant: "ap150", hash: "a52c5790f09a165c1d1e7f8b010528f4c91a9ac70c9fc9eaa538a0aa688c23c1", role: "user" },
-  { identifiant: "yp151", hash: "7b050e8b46b5d1ff6cb92f6d635b9fa57e52d73374fc2e79e235198b034a3c86", role: "user" },
-  { identifiant: "ac155", hash: "b6eb3d1a0be3cd4723d3958cf5954f328c3b8056e4b31b9b18c92f172701fd98", role: "user" },
-  { identifiant: "gd161", hash: "400a30b56e65e1e884c40183d6802de9a0b7cd4827f7c0d6be19401009e2b44b", role: "user" },
-  { identifiant: "cyr162", hash: "610823db195542d253dd789ce2d2cfa50a02080413ef2c2732d12203e181bffc", role: "user" },
-  { identifiant: "mg01", hash: "7d31e1168617cb44ee062ea5d74f9c7240c1d818b181a635ac6f9f103b18a2fd", role: "user" },
-];
+    const utilisateurs = [
+      { identifiant: "sr01", hash: "ec6658121dc67a30d23fc5a0c0bcbcd0e734df0b23d51bcda13d2aab8ee37b6f", role: "admin" },
+      { identifiant: "md160", hash: "45f3a7f3e63a74950f03ecfb12ec5c0f0d45f7ec5193dbca425e44be4c926aa5", role: "admin" },
+      { identifiant: "jj04", hash: "7d7b0264df0c8bcad3df76f0531c0e02db0ee5b6460879ee5cf07993b394ba1c", role: "user" },
+      { identifiant: "bp10", hash: "c03a6fa01a6a0e14c2a8d1b81bead3b3f97e5aa93bffde33920fd502e307af3c", role: "user" },
+      { identifiant: "rp16", hash: "53a4ae3ffbd7efcb92c14e2cf416d06fc1c9ef2e0093a83297bde881a5a93679", role: "user" },
+      { identifiant: "dm17", hash: "a1ac4bece62e993e307df68c1bb0b2a1fc9332ae364a70c51fc6d80a9e3781e0", role: "user" },
+      { identifiant: "mo26", hash: "3dd3eb68e69aab4ff94877686d019e66e6cb73e6b1dd05502c406ae9a0883501", role: "user" },
+      { identifiant: "al34", hash: "f92a3acb04d159b86ab7b4c45c157b2e0a45b03a39066cc7de3f105cdaebf02b", role: "user" },
+      { identifiant: "pf36", hash: "5a556e5a6e9c36f297870a8bc83b6b1d1c2cc7b4051f2ebfc3f6b18c6cdbf438", role: "user" },
+      { identifiant: "rb55", hash: "524f8c84106331dbe882307ee17a92b5ae0177f58db8f1948b5d47fe5ff69f3c", role: "user" },
+      { identifiant: "rd128", hash: "26f6a5efc2c9e6ee5871f3f5a31a5f79b3ec4b2d112f28792a771ce8d6fe4526", role: "user" },
+      { identifiant: "ym139", hash: "e7de17d15459f8d17742c9b5d3e1963e3de7b0c93172e96cfc42b6cc1b22e8e9", role: "user" },
+      { identifiant: "ds140", hash: "11cbd80033f0bb246b250f8bc92be53c0dc61c1aa0f2e09389e0096d40f58bb9", role: "user" },
+      { identifiant: "bp145", hash: "37bb6b7c745c23986de9ad11e4ae45b4a2bde3bc2e0e07a98f01efb1459c8a8e", role: "user" },
+      { identifiant: "sr146", hash: "c15854dc51014fcf2a865ceea688e7557479c119b8911b5dc55e3e40d1b429ed", role: "user" },
+      { identifiant: "ap150", hash: "a52c5790f09a165c1d1e7f8b010528f4c91a9ac70c9fc9eaa538a0aa688c23c1", role: "user" },
+      { identifiant: "yp151", hash: "7b050e8b46b5d1ff6cb92f6d635b9fa57e52d73374fc2e79e235198b034a3c86", role: "user" },
+      { identifiant: "ac155", hash: "b6eb3d1a0be3cd4723d3958cf5954f328c3b8056e4b31b9b18c92f172701fd98", role: "user" },
+      { identifiant: "gd161", hash: "400a30b56e65e1e884c40183d6802de9a0b7cd4827f7c0d6be19401009e2b44b", role: "user" },
+      { identifiant: "cyr162", hash: "610823db195542d253dd789ce2d2cfa50a02080413ef2c2732d12203e181bffc", role: "user" },
+      { identifiant: "mg01", hash: "7d31e1168617cb44ee062ea5d74f9c7240c1d818b181a635ac6f9f103b18a2fd", role: "user" }
+    ];
 
     const remember = localStorage.getItem("rememberTransportelz");
     const storedRole = localStorage.getItem("roleTransportelz");
@@ -159,40 +159,39 @@ const utilisateurs = [
       event.preventDefault();
       verifierConnexion();
     });
-    
-async function hacherTexte(texte) {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(texte);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
-}
 
-async function verifierConnexion() {
-  const identifiant = document.getElementById("identifiant").value.toLowerCase();
-  const motdepasse = document.getElementById("motdepasse").value;
-  const rememberMe = document.getElementById("rememberMe").checked;
-  const erreur = document.getElementById("erreur");
-
-  const utilisateur = utilisateurs.find(u => u.identifiant.toLowerCase() === identifiant);
-
-  if (!utilisateur) {
-    erreur.textContent = "Informations incorrectes.";
-    return;
-  }
-
-  const hashEntre = await hacherTexte(motdepasse.toLowerCase());
-  if (hashEntre === utilisateur.hash) {
-    if (rememberMe) {
-      localStorage.setItem("rememberTransportelz", "true");
-      localStorage.setItem("roleTransportelz", utilisateur.role);
-      localStorage.setItem("identifiantTransportelz", utilisateur.identifiant);
+    async function hacherTexte(texte) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(texte);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
     }
-    window.location.href = "/linktree.html";
-  } else {
-    erreur.textContent = "Informations incorrectes.";
-  }
-}
+
+    async function verifierConnexion() {
+      const identifiant = document.getElementById("identifiant").value.toLowerCase();
+      const motdepasse = document.getElementById("motdepasse").value.toLowerCase(); // ignore la casse ici
+      const rememberMe = document.getElementById("rememberMe").checked;
+      const erreur = document.getElementById("erreur");
+
+      const utilisateur = utilisateurs.find(u => u.identifiant.toLowerCase() === identifiant);
+      if (!utilisateur) {
+        erreur.textContent = "Informations incorrectes.";
+        return;
+      }
+
+      const hashEntre = await hacherTexte(motdepasse);
+      if (hashEntre === utilisateur.hash) {
+        if (rememberMe) {
+          localStorage.setItem("rememberTransportelz", "true");
+          localStorage.setItem("roleTransportelz", utilisateur.role);
+          localStorage.setItem("identifiantTransportelz", utilisateur.identifiant);
+        }
+        window.location.href = "/linktree.html";
+      } else {
+        erreur.textContent = "Informations incorrectes.";
+      }
+    }
   </script>
 </body>
 </html>

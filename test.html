@@ -3,990 +3,200 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Vue Hebdomadaire - Administration</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <title>Transport ELZ – Portail Employés</title>
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
   <style>
-  
+    body {
+      margin: 0;
+      font-family: 'Comfortaa', sans-serif;
+      background-color: #f8f8f8;
+      color: #111;
+    }
 
-@media print {
-  /* Grille d'impression propre */
-  .print-pastilles {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr); /* 3 pastilles par ligne */
-    gap: 16px;
-    max-width: 960px;
-    margin: auto;
-    page-break-inside: avoid;
-  }
+    .header {
+      background-color: #111;
+      padding: 20px;
+      text-align: center;
+    }
 
-  .pastille {
-    break-inside: avoid;
-    page-break-inside: avoid;
-    padding: 10px !important;
-    font-size: 0.85rem;
-    min-height: auto !important;
-    max-height: none !important;
-    height: auto !important;
-  }
+    .logo {
+      height: 60px;
+    }
 
-  .pastille h5 {
-    font-size: 1rem;
-    margin-bottom: 0.4rem;
-  }
+    h1 {
+      font-size: 22px;
+      margin: 30px 0;
+      text-align: center;
+    }
 
-  .pastille .details div {
-    margin-bottom: 2px !important;
-    font-size: 0.85rem;
-  }
+    .button {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 20px 14px 60px;
+      background-color: #ff281e;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      transition: background 0.3s ease;
+      height: 55px;
+      line-height: 1.2;
+    }
 
-  .date-header {
-    font-size: 0.9rem !important;
-    padding: 4px 6px !important;
-  }
+    .button:hover {
+      background-color: #d31e15;
+    }
 
-  .print-summary {
-    page-break-before: avoid;
-    margin-top: 2rem;
-  }
+    .button img {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 30px;
+      width: 30px;
+    }
 
-  .summary-box {
-    page-break-before: always;
-    padding: 0.75rem !important;
-    font-size: 0.9rem;
-  }
+    .admin-popup {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1050;
+    }
 
-  .summary-box .ajustements-manuels,
-  .summary-box .mt-4,
-  .summary-box h6,
-  .summary-box .row {
-    display: none !important;
-  }
-}
+    .admin-popup.show {
+      display: flex;
+    }
 
-/* Par défaut : les taux sont à leur position normale */
-.order-mobile-last {
-  order: 0;
-}
+    .admin-box {
+      background: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      text-align: center;
+      width: 90%;
+      max-width: 320px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
 
-/* Sur mobile : on les pousse après le bouton */
-@media (max-width: 767.98px) {
-  .row.g-3 {
-    flex-wrap: wrap;
-  }
+    .admin-box input {
+      padding: 12px;
+      font-size: 18px;
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
 
-  .order-mobile-last {
-    order: 4;
-    margin-top: 10px;
-    justify-content: center !important;
-  }
-}
+    .admin-box button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background-color: #000;
+      color: #fff;
+      cursor: pointer;
+      width: 100%;
+    }
 
-@media screen {
-  .taux-print-only {
-    display: none !important;
-  }
-  .pastille {
-    max-height: none !important;
-    height: auto !important;
-    overflow: visible;
-  }
-}
-
-.grid-week {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr); /* ✅ 5 pastilles égales */
-  gap: 20px;
-  margin-bottom: 2rem;
-}
-
-
-
-body {
-  background: #f8f9fa;
-  overflow-x: hidden;
-}
-
-.pastille {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  background: white;
-  border: 2px solid #dee2e6;
-  border-radius: 12px;
-  padding: 16px;
-  height: 100%;
-  min-height: 420px;
-  max-height: 420px;
-  overflow: hidden;
-}
-
-
-.pastille .details div {
-  margin-bottom: 4px;
-}
-
-#Ajuste {
-  font-size: 1.1rem;
-  border-radius: 8px;
-}
-
-.date-header {
-  font-weight: 600;
-  font-size: 1rem;
-  color: #333;
-  background-color: #f1f1f1;
-  padding: 6px 10px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-}
-
-.separator {
-  border-top: 1px solid #dee2e6;
-  margin: 8px 0;
-}
-
-.badge {
-  display: inline-block;
-  padding: 0.35em 0.65em;
-  font-size: 0.75rem;
-  font-weight: 600;
-  line-height: 1;
-  text-align: center;
-  white-space: nowrap;
-  vertical-align: baseline;
-  border-radius: 0.375rem;
-}
-
-.pastille h5 {
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
-  text-transform: capitalize;
-}
-
-.pastille .details {
-  font-size: 0.9rem;
-  line-height: 1.3;
-}
-
-.summary-box {
-  border: 2px solid #ccc;
-  border-radius: 8px;
-  padding: 1rem;
-  background: #e6f4ea;
-}
-
-#chauffeurTauxBox {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.container {
-  max-width: 100%;          
-  padding: 0 1rem; 
-  overflow-x: hidden;
-}
-
-.badge-prime {
-  font-size: 0.75rem;
-  margin-left: 0.4rem;
-}
-
-.taux-row {
-  margin-top: 0.25rem;
-}
-
-.taux-btn {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 30px;
-  padding: 10px 16px;
-  font-size: 0.95rem;
-  font-weight: 500;
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  transition: transform 0.2s ease;
-  min-width: 120px;
-}
-
-.taux-btn:hover {
-  transform: scale(1.03);
-}
-
-.taux-btns-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 4px;
-  width: 100%;
-}
-
-@media (max-width: 768px) {
-  .taux-row {
-    flex-direction: row;
-    justify-content: space-between;
-  }
-
-  .taux-btn {
-    flex: 1 1 48%;
-  }
-
-  .taux-row + .btn {
-    width: 100%;
-    font-size: 1.1rem;
-    padding: 12px;
-    border-radius: 12px;
-  }
-}
-
-@media screen {
-  .print-summary {
-    display: none !important;
-  }
-}
-    @media (max-width: 1024px) {
-  .grid-week {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  }
-}
-
+    footer {
+      margin-top: 50px;
+      padding: 20px 0 10px;
+      font-size: 12px;
+      color: #888;
+      text-align: center;
+    }
   </style>
 </head>
-<body class="p-4">
-  <div class="container">
-    <div class="row g-3 align-items-end mb-4">
-  <div class="col-md-3">
-    <label class="form-label">Nom du chauffeur</label>
-    <select id="chauffeurSelect" class="form-select">
-      <option value="">-- Choisir --</option>
-    </select>
-  </div>
-  <div class="col-md-3">
-    <label class="form-label">Date de la semaine</label>
-    <input type="date" id="dateInput" class="form-control" />
-  </div>
-  <div class="col-md-3 order-mobile-last">
-  <label class="form-label invisible">Taux</label>
-  <div id="chauffeurTauxBox" class="taux-btns-container w-100"></div>
-  </div>
-  <div class="col-md-3 d-flex align-items-end">
-    <button class="btn btn-primary w-100" style="font-size: 1.05rem;" onclick="loadSemaine()">Afficher la semaine</button>
-  </div>
-</div>
-    </div>
+<body>
 
-<div class="grid-week" id="pastillesContainer"></div>
+  <header class="header">
+    <img src="assets/logo.jpeg" alt="Logo Transport ELZ" class="logo" />
+  </header>
 
-<!-- Pour l'impression uniquement -->
-      <div class="pastilles-page1 d-none d-print-grid print-pastilles"></div>
-      <div class="pastilles-page2 d-none d-print-grid print-pastilles"></div>
-      <div class="summary-box print-summary d-none d-print-block"></div>
-      <div class="summary-box no-print">
-      <h5>Récapitulatif de la semaine</h5>
-      <p><strong>Kilomètres :</strong> <span id="totalKm">0</span> km</p>
-      <p><strong>Heures :</strong> <span id="totalH">0h00</span></p>
-      <p><strong>Total forfaits :</strong> <span id="totalForfait">0.00</span> $</p>
-      <p><strong>Total primes douane :</strong> <span id="totalDouane">0.00</span> $</p>
-      <p><strong>Montant total :</strong> <span id="totalMontant" class="fw-bold text-dark">0.00 $</span></p>
-      <p id="montantAjusteLigne" style="display: none;">
-        <strong>Montant avec ajustements :</strong> 
-        <span id="Ajuste" class="fw-bold text-success">0.00 $</span>
-      </p>
+  <main class="container py-4 d-flex flex-column align-items-center">
+    <h1>Portail des employés</h1>
 
-
-    <p id="ajustementsRecap" class="text-muted fst-italic small"></p>
-   <div class="mt-4 p-3 bg-white border rounded">
-  <h6 class="text-muted mb-3">Ajustements manuels</h6>
-  <div class="row g-3">
-    <div class="col-md-3">
-      <label class="form-label">KM ajustés</label>
-      <input type="number" id="ajustKmInput" class="form-control" value="0">
-    </div>
-    <div class="col-md-3">
-      <label class="form-label">Heures ajustées</label>
-      <input type="number" step="0.25" id="ajustHInput" class="form-control" value="0">
-    </div>
-    <div class="col-md-3">
-      <label class="form-label">Forfaits ajustés</label>
-      <input type="number" step="0.01" id="ajustForfaitInput" class="form-control" value="0">
-    </div>
-    <div class="col-md-3">
-      <label class="form-label">Bonus / Vacances</label>
-      <input type="number" step="0.01" id="ajustBonusInput" class="form-control" value="0">
-    </div>
-  </div>
-</div>
-  </div>
-
-<div class="mt-4 d-flex flex-column flex-md-row justify-content-md-end gap-2 text-center">
-  <button class="btn btn-success" onclick="sauvegarderSemaine()">Sauvegarder dans Firebase</button>
-    <button class="btn btn-secondary" onclick="chargerAnciennePaie()">Charger une paie antérieure</button>
-  <button class="btn btn-outline-secondary" onclick="genererPDF()">Exporter en PDF</button>
-
-</div>
-
-<!-- Liste des paies affichées après clic -->
-<div id="listePaies" class="mt-3"></div>
-
-</div>
-
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyD4U85mokKXsAP1AdwClWtcbt8udZrwlAw",
-    authDomain: "sommaireelz.firebaseapp.com",
-    projectId: "sommaireelz",
-    storageBucket: "sommaireelz.appspot.com",
-    messagingSenderId: "171788284751",
-    appId: "1:171788284751:web:694f070d1cafe8b7c04b3a"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-</script>
-<script>
-const API_URL = "https://script.google.com/macros/s/AKfycbyNCeOMXPM8v-eG_X_x56RgninO1LWAMNAOZyQ7mHPUY22KyDvCd8_2HeDUh-E07v7C/exec";
-
-let primeDouane = 0;
-let primeForfait = 0;
-let tauxActuel = { taux_km: 0, taux_h: 0 };
-let totalKmActuel = 0;
-let totalMinActuel = 0;
-let totalForfaitActuel = 0;
-let totalDouaneActuel = 0;
-
-
-function parseLocalDate(str) {
-  const [y, m, d] = str.split("-").map(Number);
-  return new Date(y, m - 1, d); // SANS UTC – utiliser fuseau local
-}
-
-function getWeekMonday(dateStr) {
-  const [year, month, day] = dateStr.split("-").map(Number);
-  const date = new Date(year, month - 1, day); // ← Ceci respecte le fuseau local
-  const dayOfWeek = date.getDay(); // 0=dimanche, 1=lundi, ..., 6=samedi
-  const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-  date.setDate(date.getDate() + mondayOffset);
-  return date.toISOString().split("T")[0];
-}
-
-
-async function fetchSemaineData(chauffeur, lundi) {
-  const url = `${API_URL}?chauffeur=${encodeURIComponent(chauffeur)}&lundi=${lundi}`;
-  const res = await fetch(url);
-  return await res.json();
-}
-
-async function fetchTauxChauffeurs() {
-  const res = await fetch(API_URL);
-  const json = await res.json();
-  primeDouane = parseFloat(json.parametres.prime_douane);
-  primeForfait = parseFloat(json.parametres.prime_forfait);
-
-  const map = {};
-  json.chauffeurs.forEach(c => {
-    map[c.nom] = { taux_km: parseFloat(c.taux_km), taux_h: parseFloat(c.taux_h) };
-  });
-  return map;
-}
-
-async function loadSemaine() {
-  const chauffeur = document.getElementById("chauffeurSelect").value;
-  const inputDate = document.getElementById("dateInput").value;
-  if (!chauffeur || !inputDate) return alert("Sélectionnez un chauffeur et une date.");
-
-  const lundi = getWeekMonday(inputDate);
-  const tauxMap = await fetchTauxChauffeurs();
-  const taux = tauxMap[chauffeur];
-  tauxActuel = taux;
-  if (!taux) return alert("Taux non trouvés pour ce chauffeur.");
-  const tauxBox = document.getElementById("chauffeurTauxBox");
-tauxBox.innerHTML = `
-  <div class="taux-btns-container">
-    <button class="taux-btn">🚚 <span>${taux.taux_km.toFixed(2)} $/km</span></button>
-    <button class="taux-btn">💰 <span>${taux.taux_h.toFixed(2)} $/h</span></button>
-  </div>
-`;
-
-  const semaineData = await fetchSemaineData(chauffeur, lundi);
-  console.log("📤 Requête envoyée à l'API avec :", chauffeur, lundi);
-  console.log("📦 Données reçues du serveur :", semaineData);
-  const container = document.getElementById("pastillesContainer");
-  container.innerHTML = "";
-
-  let totalKm = 0, totalMin = 0, totalForfait = 0, totalDouane = 0;
-  const grouped = {};
-  semaineData.forEach(item => {
-    if (!grouped[item.date]) grouped[item.date] = [];
-    grouped[item.date].push(item);
-  });
-  
-  // Forcer l'ajout de tous les jours de lundi à vendredi même sans données
-  for (let i = 0; i < 5; i++) {
-    const jour = new Date(lundi);
-    jour.setDate(jour.getDate() + i);
-    const dateKey = jour.toISOString().split("T")[0];
-    if (!grouped[dateKey]) grouped[dateKey] = [];
-  }
-  
-const page1 = document.querySelector(".pastilles-page1");
-const page2 = document.querySelector(".pastilles-page2");
-page1.innerHTML = "";
-page2.innerHTML = "";
-let index = 0;
-  
-  Object.entries(grouped)
-  .sort(([dateA], [dateB]) => new Date(dateA) - new Date(dateB))
-  .forEach(([date, voyages]) => {
-  let jourAjustKm = 0;
-  let jourAjustMin = 0;
-  let jourAjustRaison = "";
-
-  console.log("📆 JOUR :", date, voyages);
-
-  const div = document.createElement("div");
-  div.className = "pastille";
-
-  const parts = date.split("-");
-  const jsDate = new Date(parts[0], parts[1] - 1, parts[2]);
-  const dateAffich = jsDate.toLocaleDateString("fr-CA", { weekday: 'long', day: 'numeric', month: 'short' });
-  div.innerHTML = `<div class="date-header text-center mb-3">${dateAffich}</div><div class="details"></div>`;
-
-  const details = div.querySelector(".details");
-     if (voyages.length === 0) {
-      details.innerHTML = `
-      <div class="no-data text-center">
-        <span class="badge bg-warning text-dark">Aucune donnée ce jour-là</span>
+    <div class="w-100 px-2" id="liens">
+      <div class="d-grid gap-3">
+        <a href="paie.html" class="button" aria-label="Envoyer une feuille de route">
+          <img src="assets/icones/feuille.png" alt=""> Envoyer une feuille de route
+        </a>
+        <a href="reparation.html" class="button" aria-label="Envoyer une demande de réparation">
+          <img src="assets/icones/outil.png" alt=""> Envoyer une demande de réparation
+        </a>
+        <a href="equipements.html" class="button" aria-label="Voir la disponibilité des équipements">
+          <img src="assets/icones/camion.png" alt=""> Disponibilité des équipements
+        </a>
+        <a href="fuel.html" class="button" aria-label="Afficher le prix du diesel">
+          <img src="assets/icones/fuel.png" alt=""> Afficher le prix du diesel
+        </a>
+        <a href="poids.html" class="button" aria-label="Consulter la liste des charges">
+          <img src="assets/icones/liste.png" alt=""> Consulter la liste des charges
+        </a>
+        <button onclick="ouvrirPopup()" class="btn btn-dark fw-bold shadow-sm mt-2" aria-label="Accès administrateur">
+          🔐 Accès administrateur
+        </button>
       </div>
-    `;
-    }
-  let jourKm = 0, jourMin = 0, jourForfait = 0, jourDouane = 0, jourPrime = 0;
+    </div>
 
-voyages.forEach((voyage, idx) => {
-  let forfait = 0;
-  let douane = 0;
+    <div class="mt-4 w-100 px-2">
+      <button onclick="deconnexion()" class="btn btn-secondary w-100 shadow-sm">
+        Se déconnecter
+      </button>
+    </div>
 
-  // ⚠️ Exception spéciale : Saint-Basile → Stanstead
-  if (
-    voyage.type === "kilometrage" &&
-    voyage.origine?.toLowerCase().includes("st-basile") &&
-    voyage.destination?.toLowerCase().includes("stanstead")
-  ) {
-    const prochain = voyages[idx + 1];
-    if (prochain?.origine?.toLowerCase().includes("st-basile")) {
-      // KM x2 et ajout du forfait
-      voyage.km = parseFloat(voyage.km) * 2;
-      voyage.prime_forfait = primeForfait;
-    } else if (prochain?.origine?.toLowerCase().includes("stanstead")) {
-      // KM normaux et pas de forfait
-      voyage.prime_forfait = 0;
-    }
-  }
+    <footer class="mt-5">
+      Transport ELZ inc. – Tous droits réservés
+    </footer>
+  </main>
 
-  details.innerHTML += `<div class="fw-bold mb-1">Voyage ${idx + 1} :</div>`;
-  details.innerHTML += `<div class="mb-1">(${voyage.origine} → ${voyage.destination})</div>`;
+  <!-- Popup NIP -->
+  <div id="popupNIP" class="admin-popup" aria-modal="true" role="dialog">
+    <div class="admin-box">
+      <p>Entrez le NIP pour accéder à cette section :</p>
+      <input id="nipInput" type="password" inputmode="numeric" maxlength="6" pattern="\d{6}" aria-label="Champ NIP sécurisé" />
+      <button onclick="validerNIP()">Valider</button>
+    </div>
+  </div>
 
-  const parsedAjustHr = parseFloat((voyage.ajust_hr ?? 0).toString().replace(",", "."));
-  const parsedAjustKm = parseFloat((voyage.ajust_km ?? 0).toString().replace(",", "."));
-
-  if (!isNaN(parsedAjustKm)) {
-    jourAjustKm += parsedAjustKm;
-  }
-  if (!isNaN(parsedAjustHr)) {
-    jourAjustMin += parsedAjustHr * 60;
-  }
-
-  if (voyage.ajust_raison && !jourAjustRaison) {
-    jourAjustRaison = voyage.ajust_raison;
-  }
-
-  if (voyage.type === "kilometrage" || voyage.type === "retour") {
-    const km = parseFloat(voyage.km) || 0;
-    jourKm += km;
-
-    forfait = parseFloat(voyage.prime_forfait) || 0;
-    douane = parseFloat(voyage.prime_douane) || 0;
-
-    if (voyage.origine?.toLowerCase().includes("vimont")) {
-      forfait = 0;
+  <script>
+    function ouvrirPopup() {
+      document.getElementById("popupNIP").classList.add("show");
+      document.getElementById("nipInput").focus();
     }
 
-    jourForfait += forfait;
-    jourDouane += douane;
-
-    details.innerHTML += `<div><strong>KM:</strong> ${km}</div>`;
-    details.innerHTML += `<div><strong>Forfait:</strong> ${forfait.toFixed(2)} $</div>`;
-    if (douane > 0) {
-      details.innerHTML += `<div><strong>Douane:</strong> ${douane.toFixed(2)} $</div>`;
-    }
-  }
-
-  else if (voyage.type === "heure") {
-    const minutes = parseFloat(voyage.minutes) || 0;
-    const h = Math.floor(minutes / 60);
-    const m = minutes % 60;
-    jourMin += minutes;
-
-    forfait = parseFloat(voyage.prime_forfait) || 0;
-    douane = parseFloat(voyage.prime_douane) || 0;
-
-    if (voyage.origine?.toLowerCase().includes("vimont")) {
-      forfait = 0;
-    }
-
-    jourForfait += forfait;
-    jourDouane += douane;
-
-    details.innerHTML += `<div><strong>Heures:</strong> ${h}h${String(m).padStart(2, '0')}</div>`;
-    details.innerHTML += `<div><strong>Forfait:</strong> ${forfait.toFixed(2)} $</div>`;
-    if (douane > 0) {
-      details.innerHTML += `<div><strong>Douane:</strong> ${douane.toFixed(2)} $</div>`;
-    }
-  }
-
-  if (idx < voyages.length - 1) {
-    details.innerHTML += `<hr class="my-2">`;
-  }
-
-  jourPrime += forfait + douane;
-});
-
-// Limite visuelle pour impression (si trop de voyages)
-if (voyages.length > 6) {
-  details.innerHTML += `<div class="text-muted small mt-2">(contenu tronqué pour impression)</div>`;
-}
-
-jourKm += jourAjustKm;
-jourMin += jourAjustMin;
-
-totalKm += jourKm;
-totalMin += jourMin;
-totalForfait += jourForfait;
-totalDouane += jourDouane;
-
-
-// ➤ Affichage des ajustements dans la pastille
-if (jourAjustKm > 0 || jourAjustMin > 0) {
-  let ajustementTexte = `<div class="text-primary"><strong>Ajustement:</strong> `;
-  if (jourAjustKm > 0) ajustementTexte += `+${jourAjustKm} km `;
-  if (jourAjustMin > 0) {
-    const h = Math.floor(jourAjustMin / 60);
-    const m = Math.round(jourAjustMin % 60);
-    ajustementTexte += `+${h}h${String(m).padStart(2, '0')}`;
-  }
-  ajustementTexte += `</div>`;
-  details.innerHTML += ajustementTexte;
-}
-
-if (jourAjustRaison) {
-  details.innerHTML += `<div class="text-muted small fst-italic">📝 ${jourAjustRaison}</div>`;
-}
-
-const montantJour =
-  (jourKm * taux.taux_km) +
-  (jourMin / 60 * taux.taux_h) +
-  jourForfait +
-  jourDouane;
-
-
-// ➤ Ajout du footer "Total jour"
-const footer = document.createElement("div");
-footer.className = "mt-2 fw-bold text-success text-center";
-footer.textContent = `Total jour : ${montantJour.toFixed(2)} $`;
-div.appendChild(footer);
-
-container.appendChild(div);
-const pastilleClone = div.cloneNode(true);
-if (index < 3) {
-  page1.appendChild(pastilleClone);
-} else {
-  page2.appendChild(pastilleClone);
-}
-index++;
-});
-
-const { ajustKm, ajustH, ajustForfait, ajustBonus } = getAjustements();
-
-const montantBrut =
-  (totalKm * taux.taux_km) +
-  (totalMin / 60 * taux.taux_h) +
-  totalForfait +
-  totalDouane;
-
-const montantAjuste =
-  ((totalKm + ajustKm) * taux.taux_km) +
-  ((totalMin / 60 + ajustH) * taux.taux_h) +
-  (totalForfait + ajustForfait) +
-  totalDouane +
-  ajustBonus;
-
-
-// ➤ Ligne d'ajustement : visible ou non
-const elLigne = document.getElementById("montantAjusteLigne");
-if (ajustKm || ajustH || ajustForfait || ajustBonus) {
-  elLigne.style.display = "block";
-} else {
-  elLigne.style.display = "none";
-}
-
-
-// ➤ Récap texte des ajustements
-const recap = [];
-if (ajustKm !== 0) recap.push(`${ajustKm > 0 ? "+" : ""}${ajustKm} km`);
-if (ajustH !== 0) recap.push(`${ajustH > 0 ? "+" : ""}${ajustH} h`);
-if (ajustForfait !== 0) recap.push(`${ajustForfait > 0 ? "+" : ""}${ajustForfait.toFixed(2)} $ forfait`);
-if (ajustBonus !== 0) recap.push(`${ajustBonus > 0 ? "+" : ""}${ajustBonus.toFixed(2)} $ bonus`);
-
-const recapText = recap.length ? `Ajustements appliqués : ${recap.join(", ")}` : "";
-document.getElementById("ajustementsRecap").innerHTML = recapText;
-
-if (recap.length) {
-  document.getElementById("ajustementsRecap").innerHTML +=
-    ' <span class="badge bg-success ms-2">Ajustements appliqués</span>';
-}
-
-
-// ➤ Totaux affichés
-const elKm = document.getElementById("totalKm");
-if (elKm) elKm.textContent = totalKm;
-
-const elH = document.getElementById("totalH");
-if (elH) {
-  elH.textContent = `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2, '0')}`;
-}
-
-
-const elForfait = document.getElementById("totalForfait");
-if (elForfait) elForfait.textContent = totalForfait.toFixed(2);
-
-const elDouane = document.getElementById("totalDouane");
-if (elDouane) elDouane.textContent = totalDouane.toFixed(2);
-
-const elBrut = document.querySelector("#totalMontant");
-if (elBrut) elBrut.textContent = `${montantBrut.toFixed(2)} $`;
-
-const elAjuste = document.querySelector("#Ajuste");
-if (elAjuste) elAjuste.textContent = `${montantAjuste.toFixed(2)} $`;
-
-totalKmActuel = totalKm + ajustKm;
-totalMinActuel = totalMin + ajustH * 60;
-totalForfaitActuel = totalForfait + ajustForfait;
-totalDouaneActuel = totalDouane; // celui-ci ne bouge pas
-
-
-const allPastilles = [...document.querySelectorAll(".pastille")];
-const summary = document.querySelector(".print-summary");
-
-page1.innerHTML = "";
-page2.innerHTML = "";
-const noPrintSummary = document.querySelector(".summary-box.no-print");
-const clonedSummary = noPrintSummary.cloneNode(true);
-clonedSummary.classList.remove("no-print");
-clonedSummary.classList.add("print-summary");
-
-// Remplace le contenu du bloc imprimable par un clone complet
-//summary.replaceWith(clonedSummary);
-
-allPastilles.forEach((el, idx) => {
-  const clone = el.cloneNode(true);
-  if (idx < 3) {
-    page1.appendChild(clone);
-  } else {
-    page2.appendChild(clone);
-  }
-});
-
-resetAjustementsManuels();
-setupAjustementListeners();
-
-}  
-
-function resetAjustementsManuels() {
-  ["ajustKmInput", "ajustHInput", "ajustForfaitInput", "ajustBonusInput"].forEach(id => {
-    const input = document.getElementById(id);
-    if (input) input.value = 0;
-  });
-
-  const recap = document.getElementById("ajustementsRecap");
-  if (recap) recap.innerHTML = "";
-
-  const elLigne = document.getElementById("montantAjusteLigne");
-  if (elLigne) elLigne.style.display = "none";
-}
-
-function sauvegarderSemaine() {
-  const chauffeur = document.getElementById("chauffeurSelect").value;
-  const inputDate = document.getElementById("dateInput").value;
-  const lundi = getWeekMonday(inputDate);
-
-  const { ajustKm, ajustH, ajustForfait, ajustBonus } = getAjustements();
-
-  const data = {
-    chauffeur,
-    lundi,
-    km: totalKmActuel,
-    minutes: totalMinActuel,
-    forfaits: totalForfaitActuel,
-    douanes: totalDouaneActuel,
-    taux_km: tauxActuel.taux_km,
-    taux_h: tauxActuel.taux_h,
-    ajustKm,
-    ajustH,
-    ajustForfait,
-    ajustBonus,
-    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-  };
-
-  db.collection("Paies")
-    .add(data)
-    .then(() => alert("✅ Semaine sauvegardée dans la collection Paies."))
-    .catch(err => console.error("❌ Erreur sauvegarde:", err));
-}
-
-function recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane) {
-  const { ajustKm, ajustH, ajustForfait, ajustBonus } = getAjustements(); // D'abord !
-
-  console.log("🔥 Ajustements récupérés:", {
-    ajustKm, ajustH, ajustForfait, ajustBonus
-  });
-
-  const montantBrut =
-    (totalKm * taux.taux_km) +
-    (totalMin / 60 * taux.taux_h) +
-    totalForfait +
-    totalDouane;
-
-  const montantAjuste =
-    ((totalKm + ajustKm) * taux.taux_km) +
-    ((totalMin / 60 + ajustH) * taux.taux_h) +
-    (totalForfait + ajustForfait) +
-    totalDouane +
-    ajustBonus;
-    
-  console.log("Montant ajusté calculé:", montantAjuste);
-  console.log("Différence:", montantAjuste - montantBrut);
-
-  // Affichage des montants
-  const elMontant = document.getElementById("totalMontant");
-  const elAjuste = document.getElementById("Ajuste");
-  const elLigne = document.getElementById("montantAjusteLigne");
-
-  if (elMontant) elMontant.textContent = `${montantBrut.toFixed(2)} $`;
-  if (elAjuste) elAjuste.textContent = `${montantAjuste.toFixed(2)} $`;
-
-  // Affichage conditionnel de la ligne d'ajustement
-  if (elLigne) {
-    if (ajustKm !== 0 || ajustH !== 0 || ajustForfait !== 0 || ajustBonus !== 0) {
-      elLigne.style.display = "block";
-      console.log("Ligne d'ajustement affichée");
-    } else {
-      elLigne.style.display = "none";
-      console.log("Ligne d'ajustement masquée");
-    }
-  } else {
-    console.error("Élément montantAjusteLigne non trouvé");
-  }
-  // ➤ Récap texte des ajustements (ajouté ici aussi)
-const recap = [];
-if (ajustKm !== 0) recap.push(`${ajustKm > 0 ? "+" : ""}${ajustKm} km`);
-if (ajustH !== 0) recap.push(`${ajustH > 0 ? "+" : ""}${ajustH} h`);
-if (ajustForfait !== 0) recap.push(`${ajustForfait > 0 ? "+" : ""}${ajustForfait.toFixed(2)} $ forfait`);
-if (ajustBonus !== 0) recap.push(`${ajustBonus > 0 ? "+" : ""}${ajustBonus.toFixed(2)} $ bonus`);
-
-const recapText = recap.length ? `Ajustements appliqués : ${recap.join(", ")}` : "";
-const recapEl = document.getElementById("ajustementsRecap");
-if (recapEl) {
-  recapEl.innerHTML = recapText;
-  if (recap.length) {
-    recapEl.innerHTML += ' <span class="badge bg-success ms-2">Ajustements appliqués</span>';
-  }
-}
-}
-  
-function getAjustements() {
-  return {
-    ajustKm: parseFloat(document.getElementById("ajustKmInput").value) || 0,
-    ajustH: parseFloat(document.getElementById("ajustHInput").value) || 0,
-    ajustForfait: parseFloat(document.getElementById("ajustForfaitInput").value) || 0,
-    ajustBonus: parseFloat(document.getElementById("ajustBonusInput").value) || 0
-  };
-}
-
-  function setupAjustementListeners() {
-  console.log("Configuration des écouteurs d'ajustement");
-  
-  const ajustIds = ["ajustKmInput", "ajustHInput", "ajustForfaitInput", "ajustBonusInput"];
-  
-  ajustIds.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-      // Supprimer les anciens écouteurs pour éviter les doublons
-      el.removeEventListener("input", recalculHandler);
-      el.removeEventListener("change", recalculHandler);
-      
-      // Ajouter de nouveaux écouteurs
-      el.addEventListener("input", recalculHandler);
-      el.addEventListener("change", recalculHandler);
-      
-      console.log(`Écouteur installé sur ${id}`);
-    } else {
-      console.error(`Élément ${id} non trouvé`);
-    }
-  });
-  // ➕ Ajout ici pour forcer recalcul initial avec valeurs actuelles
-recalculerMontant(
-  tauxActuel,
-  totalKmActuel,
-  totalMinActuel,
-  totalForfaitActuel,
-  totalDouaneActuel
-);
-}
-
-function recalculHandler() {
-  console.log("Recalcul déclenché par un changement d'ajustement");
-  recalculerMontant(
-    tauxActuel,
-    totalKmActuel,
-    totalMinActuel,
-    totalForfaitActuel,
-    totalDouaneActuel
-  );
-}
-
-// Appeler cette fonction dans votre DOMContentLoaded
-document.addEventListener("DOMContentLoaded", () => {
-  chargerChauffeursDansSelect();
-  setupAjustementListeners();
-});
-
-function chargerAnciennePaie() {
-  const chauffeur = document.getElementById("chauffeurSelect").value;
-  if (!chauffeur) return alert("Sélectionnez un chauffeur d'abord.");
-
-  db.collection("Paies")
-    .where("chauffeur", "==", chauffeur)
-    .orderBy("lundi", "desc")
-    .limit(10)
-    .get()
-    .then(snapshot => {
-      const container = document.getElementById("listePaies");
-      container.innerHTML = "<h6>Paies disponibles :</h6>";
-
-      if (snapshot.empty) {
-        container.innerHTML += "<p class='text-danger'>Aucune paie trouvée pour ce chauffeur.</p>";
-        return;
+    function validerNIP() {
+      const nip = document.getElementById("nipInput").value;
+      if (nip === "1359") {
+        const btnContainer = document.getElementById("liens");
+        const lienDispatch = document.createElement("a");
+        lienDispatch.href = "dispos.html";
+        lienDispatch.className = "button mt-3";
+        lienDispatch.setAttribute("aria-label", "Dispatch interne");
+        lienDispatch.innerHTML = `<img src="assets/icones/dispatch.png" alt=""> Dispatch interne`;
+        btnContainer.querySelector(".d-grid").appendChild(lienDispatch);
+        document.getElementById("popupNIP").classList.remove("show");
+      } else {
+        alert("NIP incorrect.");
       }
+    }
 
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        const btn = document.createElement("button");
-        btn.className = "btn btn-outline-primary btn-sm me-2 mb-2";
-        btn.textContent = `Semaine du ${data.lundi}`;
-        btn.onclick = () => afficherPaieSauvegardée(data);
-        container.appendChild(btn);
-      });
-    })
-    .catch(err => {
-      console.error("Erreur chargement paies:", err);
-    });
-}
+    function deconnexion() {
+      localStorage.removeItem("rememberTransportelz");
+      localStorage.removeItem("roleTransportelz");
+      window.location.href = "index.html";
+    }
+  </script>
 
-async function afficherPaieSauvegardée(data) {
-  // Mettre à jour la date et le chauffeur
-  document.getElementById("chauffeurSelect").value = data.chauffeur;
-  document.getElementById("dateInput").value = data.lundi;
-
-  // Remplir les champs d'ajustement
-  document.getElementById("ajustKmInput").value = data.ajustKm || 0;
-  document.getElementById("ajustHInput").value = data.ajustH || 0;
-  document.getElementById("ajustForfaitInput").value = data.ajustForfait || 0;
-  document.getElementById("ajustBonusInput").value = data.ajustBonus || 0;
-
-  // ➕ Forcer le chargement des pastilles
-  await loadSemaine();
-
-  // Afficher un message
-  alert(`Paie de la semaine du ${data.lundi} chargée avec ses données et pastilles.`);
-}
-
-function chargerChauffeursDansSelect() {
-  const select = document.getElementById("chauffeurSelect");
-  if (!select) return;
-
-  fetch(API_URL)
-    .then(res => res.json())
-    .then(data => {
-      const noms = data.chauffeurs.map(c => c.nom).sort();
-      noms.forEach(nomComplet => {
-        const option = document.createElement("option");
-        option.value = nomComplet; // ← valeur exacte
-        option.textContent = nomComplet.replace(/ #\d+$/, ""); // ← affichage plus propre
-        select.appendChild(option);
-      });
-
-      // ✅ Si aucun chauffeur sélectionné, et 1er existe → le sélectionner
-      if (!select.value && noms.length > 0) {
-        select.value = noms[0]; // ← ceci garde le #146 dans la valeur
-      }
-    })
-    .catch(err => {
-      console.error("Erreur chargement des chauffeurs :", err);
-    });
-}
-
-function genererPDF() {
-  const printZone = document.createElement('div');
-  printZone.id = 'print-temp';
-  printZone.style.position = 'fixed';
-  printZone.style.left = '-9999px';
-  printZone.style.top = '0';
-  printZone.style.width = '1000px';
-  printZone.style.background = 'white';
-  printZone.style.zIndex = '9999';
-  document.body.appendChild(printZone);
-
-  // Cloner les pastilles et le résumé
-  const sections = document.querySelectorAll('.print-pastilles, .print-summary');
-  sections.forEach(el => {
-    const clone = el.cloneNode(true);
-    clone.classList.remove('d-none', 'd-print-grid', 'd-print-block');
-
-    // Affichage de secours
-    clone.style.display = el.classList.contains('print-pastilles') ? 'grid' : 'block';
-    printZone.appendChild(clone);
-  });
-
-  // Laisser le temps au DOM d'insérer le contenu dans le document
-  setTimeout(() => {
-    const opt = {
-      margin: 0.5,
-      filename: `${document.getElementById("dateInput").value || 'date'} - ${document.getElementById("chauffeurSelect").value || 'chauffeur'}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-    };
-
-    html2pdf().set(opt).from(printZone).save().then(() => {
-      printZone.remove();
-    }).catch(err => {
-      console.error("Erreur PDF → fallback print:", err);
-      printZone.remove();
-      window.print();
-    });
-  }, 500); // ← important: attendre un peu avant capture
-}
-
-
-
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </body>
 </html>

@@ -181,7 +181,7 @@ async function verifierConnexion() {
     return;
   }
 
-  const hashEntre = await hacherTexte(motdepasse);
+  const hashEntre = await hacherTexte(motdepasse.toLowerCase());
   if (hashEntre === utilisateur.hash) {
     if (rememberMe) {
       localStorage.setItem("rememberTransportelz", "true");

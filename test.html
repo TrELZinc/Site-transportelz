@@ -1,202 +1,130 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Transport ELZ – Portail Employés</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Connexion – Transport E.L.Z inc.</title>
   <link rel="icon" type="image/png" href="assets/favicon.png">
-  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <style>
     body {
-      margin: 0;
-      font-family: 'Comfortaa', sans-serif;
-      background-color: #f8f8f8;
-      color: #111;
+      font-family: 'Comfortaa', cursive;
+      background-color: #f6f6f6;
     }
-
-    .header {
+    header {
       background-color: #111;
-      padding: 20px;
+      padding: 20px 0;
       text-align: center;
     }
-
-    .logo {
-      height: 60px;
+    header img {
+      height: 50px;
     }
-
-    h1 {
-      font-size: 22px;
-      margin: 30px 0;
-      text-align: center;
-    }
-
-    .button {
+    .checkbox-custom input[type="checkbox"] {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #000;
+      border-radius: 4px;
+      display: inline-block;
       position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 14px 20px 14px 60px;
-      background-color: #ff281e;
-      color: #fff;
-      text-decoration: none;
-      border-radius: 10px;
-      font-size: 15px;
-      font-weight: bold;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      transition: background 0.3s ease;
-      height: 55px;
-      line-height: 1.2;
-    }
-
-    .button:hover {
-      background-color: #d31e15;
-    }
-
-    .button img {
-      position: absolute;
-      left: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      height: 30px;
-      width: 30px;
-    }
-
-    .admin-popup {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.6);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1050;
-    }
-
-    .admin-popup.show {
-      display: flex;
-    }
-
-    .admin-box {
-      background: #fff;
-      padding: 25px;
-      border-radius: 12px;
-      text-align: center;
-      width: 90%;
-      max-width: 320px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-    }
-
-    .admin-box input {
-      padding: 12px;
-      font-size: 18px;
-      width: 100%;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      margin-top: 10px;
-    }
-
-    .admin-box button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      background-color: #000;
-      color: #fff;
       cursor: pointer;
-      width: 100%;
     }
-
-    footer {
-      margin-top: 50px;
-      padding: 20px 0 10px;
-      font-size: 12px;
-      color: #888;
-      text-align: center;
+    .checkbox-custom input[type="checkbox"]:checked::after {
+      content: "✓";
+      position: absolute;
+      font-size: 14px;
+      top: -2px;
+      left: 2px;
+      color: #000;
     }
   </style>
 </head>
 <body>
 
-  <header class="header">
-    <img src="assets/logo.jpeg" alt="Logo Transport ELZ" class="logo" />
+  <header>
+    <img src="assets/logo.jpeg" alt="Logo Transportelz">
   </header>
 
-  <main class="container py-4 d-flex flex-column align-items-center">
-    <h1>Portail des employés</h1>
-
-    <div class="w-100 px-2" id="liens">
-      <div class="d-grid gap-3">
-        <a href="paie.html" class="button" aria-label="Envoyer une feuille de route">
-          <img src="assets/icones/feuille.png" alt=""> Envoyer une feuille de route
-        </a>
-        <a href="reparation.html" class="button" aria-label="Envoyer une demande de réparation">
-          <img src="assets/icones/outil.png" alt=""> Envoyer une demande de réparation
-        </a>
-        <a href="equipements.html" class="button" aria-label="Voir la disponibilité des équipements">
-          <img src="assets/icones/camion.png" alt=""> Disponibilité des équipements
-        </a>
-        <a href="fuel.html" class="button" aria-label="Afficher le prix du diesel">
-          <img src="assets/icones/fuel.png" alt=""> Afficher le prix du diesel
-        </a>
-        <a href="poids.html" class="button" aria-label="Consulter la liste des charges">
-          <img src="assets/icones/liste.png" alt=""> Consulter la liste des charges
-        </a>
-        <button onclick="ouvrirPopup()" class="btn btn-dark fw-bold shadow-sm mt-2" aria-label="Accès administrateur">
-          🔐 Accès administrateur
-        </button>
-      </div>
-    </div>
-
-    <div class="mt-4 w-100 px-2">
-      <button onclick="deconnexion()" class="btn btn-secondary w-100 shadow-sm">
-        Se déconnecter
-      </button>
-    </div>
-
-    <footer class="mt-5">
-      Transport ELZ inc. – Tous droits réservés
-    </footer>
-  </main>
-
-  <!-- Popup NIP -->
-  <div id="popupNIP" class="admin-popup" aria-modal="true" role="dialog">
-    <div class="admin-box">
-      <p>Entrez le NIP pour accéder à cette section :</p>
-      <input id="nipInput" type="password" inputmode="numeric" maxlength="6" pattern="\d{6}" aria-label="Champ NIP sécurisé" />
-      <button onclick="validerNIP()">Valider</button>
+  <div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card shadow p-4 w-100" style="max-width: 400px;">
+      <h2 class="text-center mb-4">Connexion</h2>
+      <form id="loginForm">
+        <div class="mb-3">
+          <input type="text" class="form-control" id="identifiant" placeholder="Identifiant" required>
+        </div>
+        <div class="mb-3">
+          <input type="password" class="form-control" id="motdepasse" placeholder="Mot de passe" required>
+        </div>
+        <div class="form-check mb-3 checkbox-custom">
+          <input type="checkbox" class="form-check-input" id="rememberMe">
+          <label class="form-check-label" for="rememberMe">Rester connecté</label>
+        </div>
+        <button type="submit" class="btn btn-dark w-100">Se connecter</button>
+        <p id="erreur" class="text-danger text-center mt-3 mb-0"></p>
+      </form>
     </div>
   </div>
 
   <script>
-    function ouvrirPopup() {
-      document.getElementById("popupNIP").classList.add("show");
-      document.getElementById("nipInput").focus();
+    const utilisateurs = [
+      { identifiant: "sr01", motdepasse: "sr01", role: "admin" },
+      { identifiant: "md160", motdepasse: "md160", role: "admin" },
+      { identifiant: "jj04", motdepasse: "jj04", role: "user" },
+      { identifiant: "bp10", motdepasse: "bp10", role: "user" },
+      { identifiant: "rp16", motdepasse: "rp16", role: "user" },
+      { identifiant: "dm17", motdepasse: "dm17", role: "user" },
+      { identifiant: "mo26", motdepasse: "mo26", role: "user" },
+      { identifiant: "al34", motdepasse: "al34", role: "user" },
+      { identifiant: "pf36", motdepasse: "pf36", role: "user" },
+      { identifiant: "rb55", motdepasse: "rb55", role: "user" },
+      { identifiant: "rd128", motdepasse: "rd128", role: "user" },
+      { identifiant: "ym139", motdepasse: "ym139", role: "user" },
+      { identifiant: "ds140", motdepasse: "ds140", role: "user" },
+      { identifiant: "bp145", motdepasse: "bp145", role: "user" },
+      { identifiant: "sr146", motdepasse: "sr146", role: "user" },
+      { identifiant: "ap150", motdepasse: "ap150", role: "user" },
+      { identifiant: "yp151", motdepasse: "yp151", role: "user" },
+      { identifiant: "ac155", motdepasse: "ac155", role: "user" },
+      { identifiant: "gd161", motdepasse: "gd161", role: "user" },
+      { identifiant: "cyr162", motdepasse: "cyr162", role: "user" },
+      { identifiant: "mg01", motdepasse: "mg01", role: "user" },
+    ];
+
+    const remember = localStorage.getItem("rememberTransportelz");
+    const storedRole = localStorage.getItem("roleTransportelz");
+    if (remember === "true" && storedRole) {
+      window.location.href = "/linktree.html";
     }
 
-    function validerNIP() {
-      const nip = document.getElementById("nipInput").value;
-      if (nip === "1359") {
-        const btnContainer = document.getElementById("liens");
-        const lienDispatch = document.createElement("a");
-        lienDispatch.href = "dispos.html";
-        lienDispatch.className = "button mt-3";
-        lienDispatch.setAttribute("aria-label", "Dispatch interne");
-        lienDispatch.innerHTML = `<img src="assets/icones/dispatch.png" alt=""> Dispatch interne`;
-        btnContainer.querySelector(".d-grid").appendChild(lienDispatch);
-        document.getElementById("popupNIP").classList.remove("show");
+    document.getElementById("loginForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+      verifierConnexion();
+    });
+
+    function verifierConnexion() {
+      const identifiant = document.getElementById("identifiant").value.toLowerCase();
+      const motdepasse = document.getElementById("motdepasse").value.toLowerCase();
+      const rememberMe = document.getElementById("rememberMe").checked;
+      const erreur = document.getElementById("erreur");
+
+      const utilisateur = utilisateurs.find(u =>
+        u.identifiant.toLowerCase() === identifiant &&
+        u.motdepasse.toLowerCase() === motdepasse
+      );
+
+      if (utilisateur) {
+        if (rememberMe) {
+          localStorage.setItem("rememberTransportelz", "true");
+          localStorage.setItem("roleTransportelz", utilisateur.role);
+          localStorage.setItem("identifiantTransportelz", utilisateur.identifiant);
+        }
+        window.location.href = "/linktree.html";
       } else {
-        alert("NIP incorrect.");
+        erreur.textContent = "Identifiant ou mot de passe invalide.";
       }
     }
-
-    function deconnexion() {
-      localStorage.removeItem("rememberTransportelz");
-      localStorage.removeItem("roleTransportelz");
-      window.location.href = "index.html";
-    }
   </script>
-
 </body>
 </html>

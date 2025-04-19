@@ -927,10 +927,15 @@ function chargerChauffeursDansSelect() {
       const noms = data.chauffeurs.map(c => c.nom).sort();
       noms.forEach(nomComplet => {
         const option = document.createElement("option");
-        option.value = nomComplet; // valeur exacte pour Firestore
-        option.textContent = nomComplet.replace(/ #\d+$/, ""); // affichage plus propre
+        option.value = nomComplet; // ← valeur exacte
+        option.textContent = nomComplet.replace(/ #\d+$/, ""); // ← affichage plus propre
         select.appendChild(option);
       });
+
+      // ✅ Si aucun chauffeur sélectionné, et 1er existe → le sélectionner
+      if (!select.value && noms.length > 0) {
+        select.value = noms[0]; // ← ceci garde le #146 dans la valeur
+      }
     })
     .catch(err => {
       console.error("Erreur chargement des chauffeurs :", err);

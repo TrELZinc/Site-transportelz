@@ -717,30 +717,42 @@ function resetAjustementsManuels() {
 }
 
 function sauvegarderSemaine() {
-  alert("Fonction de sauvegarde activée (Firebase). Implémentation personnalisable.");
-}
+  const chauffeur = document.getElementById("chauffeurSelect").value;
+  const inputDate = document.getElementById("dateInput").value;
 
-async function chargerChauffeursDansSelect() {
-  try {
-    const response = await fetch(API_URL);
-    const json = await response.json();
-
-    if (!json.chauffeurs || !Array.isArray(json.chauffeurs)) {
-      throw new Error("Le champ 'chauffeurs' est manquant ou invalide.");
-    }
-
-    const select = document.getElementById("chauffeurSelect");
-    json.chauffeurs.forEach(c => {
-      const opt = document.createElement("option");
-      opt.value = c.nom;
-      opt.textContent = c.nom;
-      select.appendChild(opt);
-    });
-
-  } catch (error) {
-    console.error("❌ Erreur de chargement des chauffeurs:", error.message);
-    alert("Impossible de charger les chauffeurs depuis Google Sheets.");
+  if (!chauffeur || !inputDate) {
+    alert("Chauffeur ou date manquant.");
+    return;
   }
+
+  const lundi = getWeekMonday(inputDate); // La clé de la semaine
+  const docId = `${chauffeur}_${lundi}`;
+
+  const data = {
+    chauffeur: chauffeur,
+    semaine_du: lundi,
+    total_km: totalKmActuel,
+    total_heures: (totalMinActuel / 60).toFixed(2),
+    total_forfaits: totalForfaitActuel,
+    total_douane: totalDouaneActuel,
+    taux_km: tauxActuel.taux_km,
+    taux_h: tauxActuel.taux_h,
+    montant_brut: parseFloat(document.getElementById("totalMontant").textContent),
+    montant_ajuste: parseFloat(document.getElementById("Ajuste").textContent),
+    ajustements: getAjustements(),
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  };
+
+  db.collection("Paies")
+    .doc(docId)
+    .set(data)
+    .then(() => {
+      alert("✅ Données sauvegardées dans la collection Paies !");
+    })
+    .catch((err) => {
+      console.error("❌ Erreur de sauvegarde Firebase :", err);
+      alert("Erreur lors de la sauvegarde.");
+    });
 }
 
 function recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane) {

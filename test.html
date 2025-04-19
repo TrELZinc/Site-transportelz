@@ -325,10 +325,14 @@ body {
 </div>
   </div>
 
- <div class="mt-4 d-flex flex-column flex-md-row justify-content-md-end gap-2 text-center">
+<div class="mt-4 d-flex flex-column flex-md-row justify-content-md-end gap-2 text-center">
   <button class="btn btn-success" onclick="sauvegarderSemaine()">Sauvegarder dans Firebase</button>
   <button class="btn btn-outline-secondary" onclick="genererPDF()">Exporter en PDF</button>
+  <button class="btn btn-secondary" onclick="chargerAnciennePaie()">Charger une paie antérieure</button>
 </div>
+
+<!-- Liste des paies affichées après clic -->
+<div id="listePaies" class="mt-3"></div>
 
 </div>
 
@@ -719,40 +723,30 @@ function resetAjustementsManuels() {
 function sauvegarderSemaine() {
   const chauffeur = document.getElementById("chauffeurSelect").value;
   const inputDate = document.getElementById("dateInput").value;
+  const lundi = getWeekMonday(inputDate);
 
-  if (!chauffeur || !inputDate) {
-    alert("Chauffeur ou date manquant.");
-    return;
-  }
-
-  const lundi = getWeekMonday(inputDate); // La clé de la semaine
-  const docId = `${chauffeur}_${lundi}`;
+  const { ajustKm, ajustH, ajustForfait, ajustBonus } = getAjustements();
 
   const data = {
-    chauffeur: chauffeur,
-    semaine_du: lundi,
-    total_km: totalKmActuel,
-    total_heures: (totalMinActuel / 60).toFixed(2),
-    total_forfaits: totalForfaitActuel,
-    total_douane: totalDouaneActuel,
+    chauffeur,
+    lundi,
+    km: totalKmActuel,
+    minutes: totalMinActuel,
+    forfaits: totalForfaitActuel,
+    douanes: totalDouaneActuel,
     taux_km: tauxActuel.taux_km,
     taux_h: tauxActuel.taux_h,
-    montant_brut: parseFloat(document.getElementById("totalMontant").textContent),
-    montant_ajuste: parseFloat(document.getElementById("Ajuste").textContent),
-    ajustements: getAjustements(),
+    ajustKm,
+    ajustH,
+    ajustForfait,
+    ajustBonus,
     timestamp: firebase.firestore.FieldValue.serverTimestamp()
   };
 
   db.collection("Paies")
-    .doc(docId)
-    .set(data)
-    .then(() => {
-      alert("✅ Données sauvegardées dans la collection Paies !");
-    })
-    .catch((err) => {
-      console.error("❌ Erreur de sauvegarde Firebase :", err);
-      alert("Erreur lors de la sauvegarde.");
-    });
+    .add(data)
+    .then(() => alert("✅ Semaine sauvegardée dans la collection Paies."))
+    .catch(err => console.error("❌ Erreur sauvegarde:", err));
 }
 
 function recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane) {
@@ -871,6 +865,44 @@ document.addEventListener("DOMContentLoaded", () => {
   chargerChauffeursDansSelect();
   setupAjustementListeners();
 });
+
+function chargerAnciennePaie() {
+  const chauffeur = document.getElementById("chauffeurSelect").value;
+  if (!chauffeur) return alert("Sélectionnez un chauffeur d'abord.");
+
+  db.collection("Paies")
+    .where("chauffeur", "==", chauffeur)
+    .orderBy("lundi", "desc")
+    .limit(10)
+    .get()
+    .then(snapshot => {
+      const container = document.getElementById("listePaies");
+      container.innerHTML = "<h6>Paies disponibles :</h6>";
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const btn = document.createElement("button");
+        btn.className = "btn btn-outline-primary btn-sm me-2 mb-2";
+        btn.textContent = `Semaine du ${data.lundi}`;
+        btn.onclick = () => afficherPaieSauvegardée(data);
+        container.appendChild(btn);
+      });
+    })
+    .catch(err => {
+      console.error("Erreur chargement paies:", err);
+    });
+}
+
+function afficherPaieSauvegardée(data) {
+  alert(`
+Semaine: ${data.lundi}
+KM: ${data.km}
+Heures: ${Math.floor(data.minutes / 60)}h${String(data.minutes % 60).padStart(2, '0')}
+Forfaits: ${data.forfaits}$
+Douanes: ${data.douanes}$
+Taux KM: ${data.taux_km}$
+Taux H: ${data.taux_h}$
+  `);
+}
 
 
 function genererPDF() {

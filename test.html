@@ -879,8 +879,16 @@ function chargerAnciennePaie() {
     .then(snapshot => {
       const container = document.getElementById("listePaies");
       container.innerHTML = "<h6>Paies disponibles :</h6>";
+
+      if (snapshot.empty) {
+        container.innerHTML += "<p class='text-danger'>Aucune paie trouvée.</p>";
+        return;
+      }
+
       snapshot.forEach(doc => {
         const data = doc.data();
+        console.log("🧾 Paie trouvée:", data);
+
         const btn = document.createElement("button");
         btn.className = "btn btn-outline-primary btn-sm me-2 mb-2";
         btn.textContent = `Semaine du ${data.lundi}`;
@@ -891,25 +899,6 @@ function chargerAnciennePaie() {
     .catch(err => {
       console.error("Erreur chargement paies:", err);
     });
-    .then(snapshot => {
-  const container = document.getElementById("listePaies");
-  container.innerHTML = "<h6>Paies disponibles :</h6>";
-
-  if (snapshot.empty) {
-    container.innerHTML += "<p class='text-danger'>Aucune paie trouvée.</p>";
-    return;
-  }
-
-  snapshot.forEach(doc => {
-    const data = doc.data();
-    console.log("🧾 Paie trouvée:", data);
-    const btn = document.createElement("button");
-    btn.className = "btn btn-outline-primary btn-sm me-2 mb-2";
-    btn.textContent = `Semaine du ${data.lundi}`;
-    btn.onclick = () => afficherPaieSauvegardée(data);
-    container.appendChild(btn);
-  });
-})
 }
 
 async function afficherPaieSauvegardée(data) {

@@ -1,148 +1,134 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Permis Mobile</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gestion des Permis</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    .pdf-viewer {
-      width: 100%;
-      height: 400px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
+    body { padding: 20px; }
+    iframe { width: 100%; height: 500px; border: none; margin-top: 15px; }
+    .equipment-item { margin-bottom: 10px; }
   </style>
 </head>
 <body>
-  <div class="container py-4">
-    <h4 class="mb-3 text-center">Gestion des Permis</h4>
 
-    <!-- Sélection unité -->
-    <div class="mb-3">
-      <label class="form-label">Sélectionnez l’unité</label>
-      <select id="unitSelect" class="form-select"></select>
-    </div>
+<div class="container">
+  <h3 class="text-center mb-4">Gestion des Permis</h3>
 
-    <!-- Sélection permis -->
-    <div class="mb-3">
-      <label class="form-label">Sélectionnez le permis</label>
-      <select id="permitSelect" class="form-select">
-        <option value="Permis A">Permis A</option>
-        <option value="Permis B">Permis B</option>
-        <option value="Permis C">Permis C</option>
-        <option value="Permis D">Permis D</option>
-        <option value="Permis E">Permis E</option>
-        <option value="Permis F">Permis F</option>
-        <option value="Permis G">Permis G</option>
-      </select>
-    </div>
+  <!-- Sélection unité -->
+  <div class="mb-3">
+    <label for="uniteSelect" class="form-label">Choisir l’unité :</label>
+    <select class="form-select" id="uniteSelect">
+      <option selected disabled>-- Sélectionnez une unité --</option>
+    </select>
+  </div>
 
-    <!-- PDF -->
-    <div class="mb-3">
-      <label class="form-label">Permis (Visionneuse PDF)</label>
-      <iframe id="pdfViewer" class="pdf-viewer" src=""></iframe>
-    </div>
+  <!-- Sélection permis -->
+  <div class="mb-3">
+    <label for="permisSelect" class="form-label">Choisir le permis :</label>
+    <select class="form-select" id="permisSelect" disabled>
+      <option selected disabled>-- Sélectionnez un permis --</option>
+    </select>
+  </div>
 
-    <!-- Date -->
-    <div class="mb-3">
-      <label class="form-label">Date de renouvellement</label>
-      <input id="renewalDate" class="form-control" type="text" readonly value="N/A" />
-    </div>
+  <!-- Visionneuse PDF -->
+  <div id="pdfViewer" class="d-none">
+    <h5>Permis sélectionné :</h5>
+    <iframe id="pdfFrame" src=""></iframe>
+    <p class="mt-2">Date de renouvellement : <strong id="renewalDate">--</strong></p>
 
-    <!-- Upload -->
-    <div class="mb-3">
-      <label class="form-label">Uploader un nouveau fichier</label>
-      <input type="file" id="fileInput" accept="application/pdf" class="form-control" />
-    </div>
-
-    <!-- Boutons gestion équipements -->
-    <div class="mb-3 text-center">
-      <button class="btn btn-outline-success me-2" id="addUnit">Ajouter une unité</button>
-      <button class="btn btn-outline-danger" id="removeUnit">Supprimer une unité</button>
+    <!-- Upload de nouveau PDF -->
+    <div class="mt-3">
+      <label class="form-label">Remplacer ce permis :</label>
+      <input type="file" class="form-control" id="fileUpload" accept="application/pdf">
     </div>
   </div>
 
-  <script>
-    const unitSelect = document.getElementById('unitSelect');
-    const permitSelect = document.getElementById('permitSelect');
-    const pdfViewer = document.getElementById('pdfViewer');
-    const renewalDate = document.getElementById('renewalDate');
-    const fileInput = document.getElementById('fileInput');
+  <!-- Équipements -->
+  <div class="mt-4">
+    <h5>Équipements liés</h5>
+    <div id="equipmentList" class="mb-2"></div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-primary btn-sm" onclick="addEquipment()">Ajouter un équipement</button>
+      <button class="btn btn-outline-danger btn-sm" onclick="removeEquipment()">Supprimer le dernier</button>
+    </div>
+  </div>
+</div>
 
-    let unitCount = 20;
-    const permits = ['Permis A', 'Permis B', 'Permis C', 'Permis D', 'Permis E', 'Permis F', 'Permis G'];
+<script>
+  const units = Array.from({ length: 20 }, (_, i) => `Unité ${i + 1}`);
+  const permitsPerUnit = 7;
 
-    const data = {};
+  const uniteSelect = document.getElementById("uniteSelect");
+  const permisSelect = document.getElementById("permisSelect");
+  const pdfFrame = document.getElementById("pdfFrame");
+  const renewalDate = document.getElementById("renewalDate");
+  const pdfViewer = document.getElementById("pdfViewer");
+  const equipmentList = document.getElementById("equipmentList");
 
-    // Initialisation des unités
-    function initUnits() {
-      unitSelect.innerHTML = '';
-      for (let i = 1; i <= unitCount; i++) {
-        const name = `Unité ${i}`;
-        const opt = document.createElement('option');
-        opt.value = name;
-        opt.textContent = name;
-        unitSelect.appendChild(opt);
+  // Simuler des liens Google Drive
+  function getDriveURL(uniteIndex, permisIndex) {
+    return `https://drive.google.com/file/d/FAKE_ID_U${uniteIndex}_P${permisIndex}/preview`;
+  }
 
-        if (!data[name]) {
-          data[name] = {};
-          permits.forEach(p => {
-            data[name][p] = {
-              pdf: '',
-              date: 'N/A'
-            };
-          });
-        }
-      }
+  // Simuler des dates de renouvellement
+  function getFakeRenewalDate(uniteIndex, permisIndex) {
+    const base = new Date();
+    base.setMonth(base.getMonth() + uniteIndex + permisIndex);
+    return base.toLocaleDateString("fr-FR");
+  }
+
+  // Populate unités
+  units.forEach((unit, i) => {
+    const opt = document.createElement("option");
+    opt.value = i;
+    opt.textContent = unit;
+    uniteSelect.appendChild(opt);
+  });
+
+  uniteSelect.addEventListener("change", () => {
+    const uniteIndex = parseInt(uniteSelect.value);
+    permisSelect.innerHTML = '<option selected disabled>-- Sélectionnez un permis --</option>';
+    permisSelect.disabled = false;
+
+    for (let i = 1; i <= permitsPerUnit; i++) {
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = `Permis ${i}`;
+      permisSelect.appendChild(opt);
     }
+    pdfViewer.classList.add("d-none");
+  });
 
-    // Mise à jour de l'affichage
-    function updateDisplay() {
-      const unit = unitSelect.value;
-      const permit = permitSelect.value;
-      const entry = data[unit][permit];
-      pdfViewer.src = entry.pdf || '';
-      renewalDate.value = entry.date;
-    }
+  permisSelect.addEventListener("change", () => {
+    const uniteIndex = parseInt(uniteSelect.value);
+    const permisIndex = parseInt(permisSelect.value);
 
-    // Gérer l'upload
-    fileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        // Remplacer PDF localement (simulation)
-        const fakeDriveUrl = `https://drive.google.com/viewerng/viewer?embedded=true&url=fake_url/${file.name}`;
-        const unit = unitSelect.value;
-        const permit = permitSelect.value;
-        data[unit][permit].pdf = fakeDriveUrl;
-        data[unit][permit].date = new Date().toISOString().split('T')[0];
-        updateDisplay();
-        alert('Fichier remplacé localement (à connecter à Google Drive)');
-      }
-    });
+    const pdfUrl = getDriveURL(uniteIndex, permisIndex);
+    pdfFrame.src = pdfUrl;
+    renewalDate.textContent = getFakeRenewalDate(uniteIndex, permisIndex);
+    pdfViewer.classList.remove("d-none");
+  });
 
-    // Ajout / suppression d’unités
-    document.getElementById('addUnit').addEventListener('click', () => {
-      unitCount++;
-      initUnits();
-    });
+  function addEquipment() {
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "form-control equipment-item";
+    input.placeholder = "Nom de l’équipement";
+    equipmentList.appendChild(input);
+  }
 
-    document.getElementById('removeUnit').addEventListener('click', () => {
-      if (unitCount > 1) {
-        const last = `Unité ${unitCount}`;
-        delete data[last];
-        unitCount--;
-        initUnits();
-      }
-    });
+  function removeEquipment() {
+    const last = equipmentList.lastElementChild;
+    if (last) equipmentList.removeChild(last);
+  }
 
-    unitSelect.addEventListener('change', updateDisplay);
-    permitSelect.addEventListener('change', updateDisplay);
+  // Upload local uniquement (pas backend)
+  document.getElementById("fileUpload").addEventListener("change", (e) => {
+    alert("Fichier sélectionné : " + e.target.files[0].name + "\n(Remplacement simulé côté client)");
+  });
+</script>
 
-    initUnits();
-    updateDisplay();
-  </script>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

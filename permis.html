@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Permis E.L.Z inc.</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <script src="https://apis.google.com/js/api.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <style>
     #pdfViewer { width: 100%; border: 1px solid #ccc; border-radius: 5px; }
@@ -14,7 +13,7 @@
 </head>
 <body>
 <div class="container py-4">
-  <h4 class="text-center mb-4">Gestion des Permis Google Drive</h4>
+  <h4 class="text-center mb-4">Visionneuse de Permis</h4>
 
   <div class="mb-3">
     <label class="form-label">Unité</label>
@@ -27,114 +26,85 @@
   </div>
 
   <div class="mb-3">
-    <label class="form-label">Date de renouvellement</label>
-    <input id="renewalDate" class="form-control" type="text" readonly value="N/A" />
-  </div>
-
-  <div id="pdfViewer" class="mb-3">
+    <label class="form-label">PDF affiché</label>
     <canvas id="pdfCanvas"></canvas>
   </div>
+
+  <div class="alert alert-warning" id="msg" style="display: none;"></div>
 </div>
 
 <script>
-const CLIENT_ID = '634208374611-k813794di8olcaoci33pe1r56eknfljjp.apps.googleusercontent.com';
-const SCOPES = 'https://www.googleapis.com/auth/drive.readonly';
-const rootFolderId = '1jw4BN7tlvwttYv1vfp6sCi3GGvJrs8I1'; // Ton dossier "Permis"
-
 const permits = [
   "Permis N.H", "Permis MASS", "Permis Vermont",
   "Permis Overweight QC", "Immatriculation", "Permis F", "Permis G"
 ];
-const customUnits = [
-  "Camion 11103", "Camion 1202", "Camion 1303",
+
+const units = [
+  "Camion 1103", "Camion 1202", "Camion 1303",
   "Remorque 1505", "Remorque 1805"
 ];
 
 const unitSelect = document.getElementById('unitSelect');
 const permitSelect = document.getElementById('permitSelect');
-const renewalDate = document.getElementById('renewalDate');
 const canvas = document.getElementById('pdfCanvas');
 const ctx = canvas.getContext('2d');
+const msg = document.getElementById('msg');
 
-function initSelectors() {
-  customUnits.forEach(unit => unitSelect.add(new Option(unit, unit)));
+let pdfMap = {};
+
+function populateSelectors() {
+  units.forEach(u => unitSelect.add(new Option(u, u)));
   permits.forEach(p => permitSelect.add(new Option(p, p)));
 }
 
-function waitGapiReady() {
-  return new Promise(resolve => gapi.load("client:auth2", resolve));
-}
-
-async function initGoogleClient() {
-  await gapi.client.init({
-    clientId: CLIENT_ID,
-    scope: SCOPES,
-    discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"]
-  });
-
-  const authInstance = gapi.auth2.getAuthInstance();
-  if (!authInstance.isSignedIn.get()) {
-    await authInstance.signIn();
-  }
-
-  console.log("✅ Auth Google OK");
-}
-
-async function getFolderIdByName(name, parentId) {
-  const res = await gapi.client.drive.files.list({
-    q: `'${parentId}' in parents and name = '${name}' and mimeType = 'application/vnd.google-apps.folder' and trashed = false`,
-    fields: 'files(id, name)',
-  });
-  return res.result.files.length ? res.result.files[0].id : null;
-}
-
-async function getFileIdByName(name, folderId) {
-  const res = await gapi.client.drive.files.list({
-    q: `'${folderId}' in parents and name = '${name}.pdf' and mimeType='application/pdf' and trashed=false`,
-    fields: 'files(id, name)'
-  });
-  return res.result.files.length ? res.result.files[0].id : null;
-}
-
-async function displaySelectedPDF() {
-  const unit = unitSelect.value;
-  const permit = permitSelect.value;
-
+async function loadPDFMap() {
   try {
-    const folderId = await getFolderIdByName(unit, rootFolderId);
-    if (!folderId) return alert(`Dossier "${unit}" introuvable.`);
-
-    const fileId = await getFileIdByName(permit, folderId);
-    if (!fileId) return alert(`PDF "${permit}.pdf" introuvable dans "${unit}".`);
-
-    const fileUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
-    renewalDate.value = "À synchroniser (manuel ou metadata)";
-    renderPDF(fileUrl);
+    const res = await fetch("https://transportelz.ca/data/pdfMap.json");
+    pdfMap = await res.json();
   } catch (err) {
+    msg.style.display = 'block';
+    msg.textContent = "❌ Erreur lors du chargement du fichier JSON.";
     console.error(err);
-    alert("❌ Erreur Google Drive");
   }
 }
 
 async function renderPDF(url) {
-  const loadingTask = pdfjsLib.getDocument(url);
-  const pdf = await loadingTask.promise;
-  const page = await pdf.getPage(1);
-  const viewport = page.getViewport({ scale: 1.5 });
-  canvas.height = viewport.height;
-  canvas.width = viewport.width;
-  await page.render({ canvasContext: ctx, viewport }).promise;
+  try {
+    const loadingTask = pdfjsLib.getDocument(url);
+    const pdf = await loadingTask.promise;
+    const page = await pdf.getPage(1);
+    const viewport = page.getViewport({ scale: 1.5 });
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+    await page.render({ canvasContext: ctx, viewport }).promise;
+  } catch (err) {
+    msg.style.display = 'block';
+    msg.textContent = "❌ Impossible d'afficher le PDF.";
+    console.error(err);
+  }
 }
 
-// 📦 Init complet
-unitSelect.addEventListener('change', displaySelectedPDF);
-permitSelect.addEventListener('change', displaySelectedPDF);
+function updateDisplay() {
+  const key = `${unitSelect.value} - ${permitSelect.value}`;
+  const pdfUrl = pdfMap[key];
 
-initSelectors();
+  if (!pdfUrl) {
+    msg.style.display = 'block';
+    msg.textContent = `⚠️ Aucun PDF trouvé pour : ${key}`;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    return;
+  }
 
-waitGapiReady().then(initGoogleClient).then(displaySelectedPDF);
+  msg.style.display = 'none';
+  renderPDF(pdfUrl);
+}
+
+// Init
+populateSelectors();
+loadPDFMap().then(() => updateDisplay());
+
+unitSelect.addEventListener('change', updateDisplay);
+permitSelect.addEventListener('change', updateDisplay);
 </script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -984,6 +984,7 @@ const ajRaison = document.getElementById("ajust_raison")?.value.trim();
   const data = {};
   formData.forEach((val, key) => data[key] = val);
 // Ajouter manuellement les ajustements à l'objet data
+data["unite_diesel"] = document.querySelector('select[name="unite_diesel"]')?.value || "L";
 data["ajust_hr"] = document.getElementById("ajust_hr")?.value || "";
 data["ajust_km"] = document.getElementById("ajust_km")?.value || "";
 data["ajust_raison"] = document.getElementById("ajust_raison")?.value || "";

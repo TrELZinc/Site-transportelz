@@ -29,16 +29,7 @@
 
     <div class="mb-3">
       <label class="form-label">Permis</label>
-   <select id="permitSelect" class="form-select">
-      <option value="Permis N.H">Permis N.H</option>
-      <option value="Permis MASS">Permis MASS</option>
-      <option value="Permis Vermont">Permis Vermont</option>
-      <option value="Permis Overweight QC">Permis Overweight QC</option>
-      <option value="Immatriculation">Immatriculation</option>
-      <option value="Permis F">Permis F</option>
-      <option value="Permis G">Permis G</option>
-    </select>
-
+      <select id="permitSelect" class="form-select"></select>
     </div>
 
     <!-- Date -->
@@ -69,44 +60,47 @@
     const canvas = document.getElementById('pdfCanvas');
     const ctx = canvas.getContext('2d');
 
-    let unitCount = 20;
-    const permits = ['Permis N.H', 'Permis MASS', 'Permis Vermont', 'Permis Overweight QC', 'Immatriculation', 'Permis F', 'Permis G'];
+    // ✅ Permis — à modifier ici SEULEMENT
+    const permits = [
+      "Permis N.H",
+      "Permis MASS",
+      "Permis Vermont",
+      "Permis Overweight QC",
+      "Immatriculation",
+      "Permis F",
+      "Permis G"
+    ];
+
+    // ✅ Unités personnalisées
+    const customUnits = [
+      "Camion 11103", "Camion 1202", "Camion 1203", "Camion 1303",
+      "Camion 1404", "Camion 1502", "Camion 1503", "Camion 1603",
+      "Camion 1703", "Camion 1803", "Remorque 1505", "Remorque 1605",
+      "Remorque 1805", "Remorque 1806", "Remorque 1905", "Remorque 1906",
+      "Remorque 2006", "Remorque 2205", "Remorque 2405", "Remorque 2506",
+      "Remorque 2706"
+    ];
+
     const data = {};
+
+    function initPermits() {
+      permitSelect.innerHTML = '';
+      permits.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p;
+        opt.textContent = p;
+        permitSelect.appendChild(opt);
+      });
+    }
 
     function initUnits() {
       unitSelect.innerHTML = '';
-    // Liste personnalisée de tes unités
-    const customUnits = [
-      "Camion 11103",
-      "Camion 1202",
-      "Camion 1203",
-      "Camion 1303",
-      "Camion 1404",
-      "Camion 1502",
-      "Camion 1503",
-      "Camion 1603",
-      "Camion 1703",
-      "Camion 1803",
-      "Remorque 1505",
-      "Remorque 1605",
-      "Remorque 1805",
-      "Remorque 1806",
-      "Remorque 1905",
-      "Remorque 1906",
-      "Remorque 2006",
-      "Remorque 2205",
-      "Remorque 2405",
-      "Remorque 2506",
-      "Remorque 2706"
-    ];
-    
       customUnits.forEach(unit => {
         const opt = document.createElement('option');
         opt.value = unit;
         opt.textContent = unit;
         unitSelect.appendChild(opt);
-    
-        // Initialisation du stockage si absent
+
         if (!data[unit]) {
           data[unit] = {};
           permits.forEach(p => {
@@ -119,7 +113,6 @@
       });
     }
 
-
     async function renderPDF(url) {
       if (!url) return;
       const loadingTask = pdfjsLib.getDocument(url);
@@ -128,11 +121,7 @@
       const viewport = page.getViewport({ scale: 1.5 });
       canvas.height = viewport.height;
       canvas.width = viewport.width;
-
-      await page.render({
-        canvasContext: ctx,
-        viewport: viewport
-      }).promise;
+      await page.render({ canvasContext: ctx, viewport }).promise;
     }
 
     function updateDisplay() {
@@ -162,6 +151,8 @@
     unitSelect.addEventListener('change', updateDisplay);
     permitSelect.addEventListener('change', updateDisplay);
 
+    // 🚀 Initialisation complète
+    initPermits();
     initUnits();
     updateDisplay();
   </script>

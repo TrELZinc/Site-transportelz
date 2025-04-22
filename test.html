@@ -1,199 +1,1127 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Connexion – Transport E.L.Z inc.</title>
-  <link rel="icon" type="image/png" href="assets/favicon.png">
-  <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Feuille de temps</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
-body {
-  font-family: 'Comfortaa', cursive;
-  background: linear-gradient(180deg, #f6f6f6, #ebebeb);
-  margin: 0;
-  padding: 0 15px;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+    .form-label {
+  font-weight: 600;
+  font-size: 1rem;
 }
-
-header {
-  background-color: #000;
-  padding: 20px;
-  text-align: center;
+.mb-3 {
+  margin-bottom: 1.25rem;
 }
-
-header img {
-  max-width: 250px;
-  height: auto;
+.autocomplete-list div:hover {
+  background-color: #f0f0f0;
 }
-
-.container {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.card {
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-  padding: 35px;
-  width: 100%;
-  max-width: 400px;
-  animation: fadeInUp 0.8s ease;
-}
-
-@keyframes fadeInUp {
-  from {
-    transform: translateY(40px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-input.form-control {
-  border-radius: 12px;
-  border: 1px solid #ccc;
-  padding: 12px;
+    body {
+      background-color: #f8f9fa;
+      color: #212529;
+    }
+    .form-label,
+    .form-check-label {
+      color: #212529;
+    }
+    .form-control,
+    .form-select {
+      background-color: #ffffff;
+      color: #212529;
+      border: 1px solid #ced4da;
+    }
+    .btn-primary {
+      background-color: #cc0000;
+      border: none;
+    }
+    .btn-primary:hover {
+      background-color: #ff0000;
+    }
+    .container {
+      max-width: 540px;
+    }
+    .section-box {
+      background-color: #ffffff;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+      margin-bottom: 1.5rem;
+    }
+.voyage-toggle {
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 0.75rem;
   transition: all 0.2s ease-in-out;
-  font-size: 16px;
+  border: 2px solid #ccc;
+  border-radius: 0.75rem;
+  cursor: pointer;
 }
 
-input.form-control:focus {
-  border-color: #000;
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
-  outline: none;
+.voyage-toggle:hover {
+  background-color: #f8f9fa;
+  border-color: #cc0000;
 }
 
-button.btn {
-  border-radius: 12px;
-  font-weight: bold;
-  font-size: 16px;
-  padding: 12px;
-  background-color: #000;
-  border: none;
-  transition: all 0.3s ease-in-out;
-}
-
-button.btn:hover {
-  background-color: #333;
+.voyage-toggle.active {
+  background-color: #cc0000;
+  color: white;
+  border-color: #cc0000;
 }
 
 .form-check-input {
-  width: 20px;
-  height: 20px;
-  border-radius: 4px;
-  border: 2px solid #000;
+  width: 1.25rem;
+  height: 1.25rem;
 }
 
-.form-check-input:checked {
-  background-color: #000;
-  border-color: #000;
+.form-check-label {
+  font-size: 1.05rem;
+  padding-left: 0.4rem;
+  cursor: pointer;
+}
+
+.form-check {
+  margin-bottom: 0.75rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease;
+}
+
+.form-check:hover {
+  background-color: #f8f9fa;
+}
+
+.fuel-check {
+  padding: 0.5rem 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+.fuel-toggle {
+  font-size: 0.875rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ced4da;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  text-align: left;
+  width: 100%;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.fuel-toggle:hover {
+  background-color: #f8f9fa;
+  border-color: #cc0000;
+}
+
+.fuel-toggle.active {
+  background-color: #cc0000;
+  color: white;
+  border-color: #cc0000;
+}
+
+.visually-enhanced-block {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 12px;
+  margin-top: 12px;
+}
+
+.visually-enhanced-block label {
+  font-weight: 600;
+  font-size: 1rem;
+}
+.fuel-toggle.autre-input {
+  padding: 0;
+  border: none;
+  margin-bottom: 10px;
+}
+
+.form-control-custom {
+  display: block;
+  width: 100%;
+  padding: 0.65rem 1rem;
+  font-size: 1rem;
+  font-family: inherit;
+  border: 1px solid #ced4da;
+  border-radius: 0.5rem;
+  background-color: white;
+  transition: all 0.2s ease-in-out;
+}
+
+.form-control-custom:focus {
+  outline: none;
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.15rem rgba(220, 53, 69, 0.25);
+}
+
+/* Style uniforme */
+.fuel-toggle.autre-input input[type="text"] {
+  height: 46px;
+  padding: 0.65rem 1rem;
+  font-size: 0.95rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ced4da;
+  width: 100%;
+}
+
+/* Focus actif en rouge */
+.fuel-toggle.autre-input input[type="text"]:focus {
+  border: 2px solid #d9534f;
+  outline: none;
+  box-shadow: 0 0 0 0.1rem rgba(217, 83, 79, 0.25);
+}
+.autocomplete-list {
+  max-height: 160px; /* ~4 lignes selon padding */
+  overflow-y: auto;
+  border-radius: 8px;
+  padding: 0.25rem 0;
+  scroll-behavior: smooth;
+}
+
+.autocomplete-list div {
+  padding: 10px 16px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.autocomplete-list div:active,
+.autocomplete-list div:hover {
+  background-color: #f8d7da;
 }
   </style>
 </head>
 <body>
-
-  <header>
-  <img src="assets/logo.jpeg" alt="Logo Transport E.L.Z">
-</header>
-
-  <div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
-    <div class="card shadow p-4 w-100" style="max-width: 400px;">
-      <h2 class="text-center mb-4">Connexion</h2>
-      <form id="loginForm">
+  <div class="container py-4">
+    <h2 class="mb-4 text-center">Feuille de temps</h2>
+    <form id="formulaire" class="d-none">
+      <div class="section-box">
         <div class="mb-3">
-          <input type="text" class="form-control" id="identifiant" placeholder="Identifiant" required>
+          <label for="date" class="form-label fw-bold text-uppercase">Date</label>
+          <input type="date" class="form-control" id="date" name="date" required />
         </div>
         <div class="mb-3">
-          <input type="password" class="form-control" id="motdepasse" placeholder="Mot de passe" required>
+          <label for="nom" class="form-label fw-bold text-uppercase">Nom complet</label>
+          <select class="form-select" id="nom" name="nom" required>
+          <option value="">-- Sélectionner votre nom --</option>
+          </select>
         </div>
-        <div class="form-check mb-3 checkbox-custom">
-          <input type="checkbox" class="form-check-input" id="rememberMe">
-          <label class="form-check-label" for="rememberMe">Rester connecté</label>
-        </div>
-        <button type="submit" class="btn btn-dark w-100">Se connecter</button>
-        <p id="erreur" class="text-danger text-center mt-3 mb-0"></p>
-      </form>
-    </div>
+        <div class="mb-3">
+          <label for="camion" class="form-label fw-bold text-uppercase">Numéro de camion</label>
+          <select class="form-select" id="camion" name="camion" required>
+            <option value="">-- Sélectionner --</option>
+            <option value="1103">Camion 1103</option>
+            <option value="1202">Camion 1202</option>
+            <option value="1303">Camion 1303</option>
+            <option value="1404">Camion 1404</option>
+            <option value="1502">Camion 1502</option>
+            <option value="1603">Camion 1603</option>
+            <option value="1703">Camion 1703</option>
+            <option value="1803">Camion 1803</option>
+          </select>
+      </div>
+
+      <div id="voyageContainer"></div>
+<div id="formError" class="alert alert-danger d-none" role="alert">
+  Merci de remplir tous les champs obligatoires avant de prévisualiser.
+</div>
+      <button type="button" class="btn btn-primary w-100 mt-3" id="btn-preview">Prévisualiser</button>
+    </form>
   </div>
-
+<div id="loader" class="text-center py-5">
+  <div class="spinner-border text-danger" role="status">
+    <span class="visually-hidden">Chargement...</span>
+  </div>
+  <p class="mt-3">Chargement du formulaire...</p>
+</div>
   <script>
-    const utilisateurs = [
-  { identifiant: "sr01", hash: "ec6658121dc67a30d23fc5a0c0bcbcd0e734df0b23d51bcda13d2aab8ee37b6f", role: "admin" },
-  { identifiant: "md160", hash: "45f3a7f3e63a74950f03ecfb12ec5c0f0d45f7ec5193dbca425e44be4c926aa5", role: "admin" },
-  { identifiant: "jj04", hash: "7d7b0264df0c8bcad3df76f0531c0e02db0ee5b6460879ee5cf07993b394ba1c", role: "user" },
-  { identifiant: "bp10", hash: "c03a6fa01a6a0e14c2a8d1b81bead3b3f97e5aa93bffde33920fd502e307af3c", role: "user" },
-  { identifiant: "rp16", hash: "53a4ae3ffbd7efcb92c14e2cf416d06fc1c9ef2e0093a83297bde881a5a93679", role: "user" },
-  { identifiant: "dm17", hash: "a1ac4bece62e993e307df68c1bb0b2a1fc9332ae364a70c51fc6d80a9e3781e0", role: "user" },
-  { identifiant: "mo26", hash: "3dd3eb68e69aab4ff94877686d019e66e6cb73e6b1dd05502c406ae9a0883501", role: "user" },
-  { identifiant: "al34", hash: "f92a3acb04d159b86ab7b4c45c157b2e0a45b03a39066cc7de3f105cdaebf02b", role: "user" },
-  { identifiant: "pf36", hash: "5a556e5a6e9c36f297870a8bc83b6b1d1c2cc7b4051f2ebfc3f6b18c6cdbf438", role: "user" },
-  { identifiant: "rb55", hash: "524f8c84106331dbe882307ee17a92b5ae0177f58db8f1948b5d47fe5ff69f3c", role: "user" },
-  { identifiant: "rd128", hash: "26f6a5efc2c9e6ee5871f3f5a31a5f79b3ec4b2d112f28792a771ce8d6fe4526", role: "user" },
-  { identifiant: "ym139", hash: "e7de17d15459f8d17742c9b5d3e1963e3de7b0c93172e96cfc42b6cc1b22e8e9", role: "user" },
-  { identifiant: "ds140", hash: "11cbd80033f0bb246b250f8bc92be53c0dc61c1aa0f2e09389e0096d40f58bb9", role: "user" },
-  { identifiant: "bp145", hash: "37bb6b7c745c23986de9ad11e4ae45b4a2bde3bc2e0e07a98f01efb1459c8a8e", role: "user" },
-  { identifiant: "sr146", hash: "c15854dc51014fcf2a865ceea688e7557479c119b8911b5dc55e3e40d1b429ed", role: "user" },
-  { identifiant: "ap150", hash: "a52c5790f09a165c1d1e7f8b010528f4c91a9ac70c9fc9eaa538a0aa688c23c1", role: "user" },
-  { identifiant: "yp151", hash: "7b050e8b46b5d1ff6cb92f6d635b9fa57e52d73374fc2e79e235198b034a3c86", role: "user" },
-  { identifiant: "ac155", hash: "b6eb3d1a0be3cd4723d3958cf5954f328c3b8056e4b31b9b18c92f172701fd98", role: "user" },
-  { identifiant: "gd161", hash: "400a30b56e65e1e884c40183d6802de9a0b7cd4827f7c0d6be19401009e2b44b", role: "user" },
-  { identifiant: "cyr162", hash: "610823db195542d253dd789ce2d2cfa50a02080413ef2c2732d12203e181bffc", role: "user" },
-  { identifiant: "mg01", hash: "7d31e1168617cb44ee062ea5d74f9c7240c1d818b181a635ac6f9f103b18a2fd", role: "user" },
-];
-
-
-    const remember = localStorage.getItem("rememberTransportelz");
-    const storedRole = localStorage.getItem("roleTransportelz");
-    if (remember === "true" && storedRole) {
-      window.location.href = "/linktree.html";
-    }
-
-    document.getElementById("loginForm").addEventListener("submit", function(event) {
-      event.preventDefault();
-      verifierConnexion();
-    });
-async function hacherTexte(texte) {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(texte);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+    let voyages = []; // GLOBAL
+    function normalizeStr(str) {
+    return (str || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // ❗ corrige ici : sans l'échappement mal placé
+    .toLowerCase()
+    .trim();
 }
 
-async function verifierConnexion() {
-  const identifiant = document.getElementById("identifiant").value.toLowerCase();
-  const motdepasse = document.getElementById("motdepasse").value;
-  const rememberMe = document.getElementById("rememberMe").checked;
-  const erreur = document.getElementById("erreur");
+    
+    const form = document.getElementById("formulaire");
+    const voyageContainer = document.getElementById("voyageContainer");
+    let voyageCount = 0;
+    const MAX_VOYAGES = 3;
 
-  const utilisateur = utilisateurs.find(u => u.identifiant.toLowerCase() === identifiant);
 
-  if (!utilisateur) {
-    erreur.textContent = "Informations incorrectes.";
+function addVoyageSection() {
+  if (voyageCount >= MAX_VOYAGES) return;
+  voyageCount++;
+  const id = voyageCount;
+
+  const section = document.createElement("div");
+  section.className = "section-box";
+  section.innerHTML = `
+    <h5 class="mb-3">Voyage ${id}</h5>
+    <div class="mb-3">
+      <label class="form-label fw-bold text-uppercase">Type de voyage</label>
+      <div class="btn-group-toggle w-100" data-toggle="buttons">
+        <label class="btn btn-outline-dark btn-lg w-100 mb-2 voyage-toggle" for="km_${id}">
+          <input type="radio" class="d-none" name="type_voyage_${id}" id="km_${id}" value="kilometrage" required>
+          Voyage au kilométrage
+        </label>
+        <label class="btn btn-outline-dark btn-lg w-100 voyage-toggle" for="heure_${id}">
+          <input type="radio" class="d-none" name="type_voyage_${id}" id="heure_${id}" value="heure" required>
+          Voyage à l’heure
+        </label>
+      </div>
+    </div>
+    <div id="details_${id}"></div>
+  `;
+  voyageContainer.appendChild(section);
+
+  const radios = section.querySelectorAll(`input[name="type_voyage_${id}"]`);
+  radios.forEach((radio) => {
+    radio.addEventListener("change", () => {
+      radios.forEach(r => r.closest("label").classList.remove("active"));
+      if (radio.checked) {
+        radio.closest("label").classList.add("active");
+      }
+
+      const container = section.querySelector(`#details_${id}`);
+
+      // Champs communs
+      let innerHTML = `
+        <div class="mb-3">
+          <label class="form-label fw-bold text-uppercase">Origine</label>
+          <select class="form-select origine-select" name="origine_${id}" id="origine_${id}" required>
+            <option value="St-Basile" selected>St-Basile</option>
+            <option value="Vimont">Vimont</option>
+            <option value="Stanstead">Stanstead</option>
+          </select>
+        </div>
+        <div class="mb-3 position-relative">
+          <label class="form-label fw-bold text-uppercase">Ville de destination</label>
+          <input type="text" class="form-control destination-input" name="destination_${id}" id="destination_${id}" autocomplete="off" required />
+          <div class="autocomplete-list position-absolute bg-white border border-1 rounded shadow-sm z-3 w-100" id="autocomplete_${id}" style="display: none;"></div>
+        </div>
+      `;
+
+      if (radio.value === "heure") {
+        innerHTML += generateHeureHtml(id);
+      }
+
+      if (id < MAX_VOYAGES) {
+        innerHTML += getSuiviHTML(id);
+      }
+
+      container.innerHTML = innerHTML;
+      setupSuiviListener(id);
+
+      const destinationInput = section.querySelector(`#destination_${id}`);
+      const listContainer = section.querySelector(`#autocomplete_${id}`);
+      const origineSelect = section.querySelector(`#origine_${id}`);
+
+      if (radio.value === "kilometrage") {
+        const applyAutocomplete = () => {
+          const origineVal = origineSelect.value.trim().toLowerCase();
+          const sourceKey = origineVal === "vimont" ? "st-basile" : origineVal;
+          setupAutocomplete(destinationInput, listContainer, sourceKey);
+        };
+
+        applyAutocomplete();
+        origineSelect.addEventListener("change", applyAutocomplete);
+      } else {
+  const applyAutocomplete = () => {
+    const origineVal = origineSelect.value.trim().toLowerCase();
+    const isVimont = origineVal === "vimont";
+
+    if (isVimont) {
+      setupAutocomplete(destinationInput, listContainer, "st-basile");
+    } else {
+      listContainer.innerHTML = "";
+      listContainer.style.display = "none";
+      destinationInput.value = "";
+      destinationInput.removeEventListener("input", () => {});
+      destinationInput.removeEventListener("blur", () => {});
+      const preview = destinationInput.parentNode.querySelector(".text-muted.mt-1");
+      if (preview) preview.remove();
+    }
+  };
+
+  applyAutocomplete();
+  origineSelect.addEventListener("change", applyAutocomplete);
+}
+    });
+  });
+}
+
+function setupAutocomplete(input, listContainer, origine) {
+  let origineNorm = normalizeStr(origine);
+  if (origineNorm === "vimont") origineNorm = "st-basile";
+
+  const dataOrigine = kmMap[origineNorm];
+  if (!dataOrigine) return;
+
+  input.addEventListener('focus', () => {
+    setTimeout(() => {
+      const rect = input.getBoundingClientRect();
+      window.scrollTo({
+        top: window.scrollY + rect.top - 100,
+        behavior: 'smooth'
+      });
+    }, 250);
+  });
+
+  let preview = input.parentNode.querySelector(".text-muted.mt-1");
+  if (!preview) {
+    preview = document.createElement("div");
+    preview.className = "text-muted mt-1 small";
+    input.parentNode.appendChild(preview);
+  }
+
+  input.addEventListener("input", () => {
+    const valeur = normalizeStr(input.value);
+    listContainer.innerHTML = "";
+    listContainer.style.display = "none";
+    preview.textContent = "";
+
+    const correspondants = getDestinationsPropres(dataOrigine, input).slice(0, 4); // max 4 suggestions
+    if (correspondants.length === 0) return;
+
+    correspondants.forEach(dest => {
+      const distanceKm = dataOrigine[dest];
+      const opt = document.createElement("div");
+      opt.className = "p-2 border-bottom";
+      opt.style.cursor = "pointer";
+      opt.textContent = dest;
+
+      opt.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        input.value = dest;
+        listContainer.innerHTML = "";
+        listContainer.style.display = "none";
+
+        const voyageDiv = input.closest(".section-box");
+        const origineSelect = voyageDiv?.querySelector("select[name^='origine_']");
+        const typeHeure = voyageDiv?.querySelector("input[type=radio][value=heure]")?.checked;
+        const isHeureVimont = typeHeure && origineSelect?.value === "Vimont";
+
+        preview.textContent = (!isHeureVimont && distanceKm !== undefined)
+          ? `Distance estimée : ${Math.round(distanceKm)} km`
+          : "";
+      });
+
+      listContainer.appendChild(opt);
+    });
+
+    listContainer.style.display = "block";
+  });
+
+  input.addEventListener("blur", () => {
+    setTimeout(() => {
+      const valeur = normalizeStr(input.value);
+      const distanceKm = dataOrigine?.[Object.keys(dataOrigine).find(d => normalizeStr(d) === valeur)];
+
+      const voyageDiv = input.closest(".section-box");
+      const origineSelect = voyageDiv?.querySelector("select[name^='origine_']");
+      const typeHeure = voyageDiv?.querySelector("input[type=radio][value=heure]")?.checked;
+      const isHeureVimont = typeHeure && origineSelect?.value === "Vimont";
+
+      preview.textContent = (!isHeureVimont && distanceKm !== undefined)
+        ? `Distance estimée : ${Math.round(distanceKm)} km`
+        : "";
+    }, 200);
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!listContainer.contains(e.target) && e.target !== input) {
+      listContainer.style.display = "none";
+    }
+  });
+}
+
+
+function generateHeureHtml(id) {
+  return `
+    <div class="mb-3">
+      <label class="form-label fw-bold text-uppercase">Heure de début</label>
+      <div class="d-flex gap-2">
+        <select class="form-select" name="heure_debut_h_${id}" required>
+          ${Array.from({length: 24}, (_, i) => `<option value="${String(i).padStart(2, '0')}">${String(i).padStart(2, '0')}</option>`).join('')}
+        </select>
+        <select class="form-select" name="heure_debut_m_${id}" required>
+          <option value="00">00</option>
+          <option value="15">15</option>
+          <option value="30">30</option>
+          <option value="45">45</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label fw-bold text-uppercase">Heure de fin</label>
+      <div class="d-flex gap-2">
+        <select class="form-select" name="heure_fin_h_${id}" required>
+          ${Array.from({length: 24}, (_, i) => `<option value="${String(i).padStart(2, '0')}">${String(i).padStart(2, '0')}</option>`).join('')}
+        </select>
+        <select class="form-select" name="heure_fin_m_${id}" required>
+          <option value="00">00</option>
+          <option value="15">15</option>
+          <option value="30">30</option>
+          <option value="45">45</option>
+        </select>
+      </div>
+    </div>
+  `;
+}
+
+    function getSuiviHTML(id) {
+  return `
+    <div class="mb-3 mt-3">
+      <label class="form-label fw-bold text-uppercase">Avez-vous fait un autre voyage ensuite ?</label>
+      <div class="d-flex gap-2">
+  <label class="btn btn-outline-dark voyage-toggle flex-fill text-center" for="oui_${id}">
+    <input class="d-none" type="radio" name="autre_${id}" id="oui_${id}" value="oui" required />
+    Oui
+  </label>
+  <label class="btn btn-outline-dark voyage-toggle flex-fill text-center" for="non_${id}">
+    <input class="d-none" type="radio" name="autre_${id}" id="non_${id}" value="non" required />
+    Non
+  </label>
+</div>
+    </div>
+  `;
+}
+
+    function setupSuiviListener(id) {
+  const oui = document.getElementById(`oui_${id}`);
+  const non = document.getElementById(`non_${id}`);
+
+  if (oui) {
+  oui.addEventListener("change", () => {
+    const sectionSuivanteExiste = document.querySelector(`#details_${id + 1}`);
+    if (voyageCount < MAX_VOYAGES && !sectionSuivanteExiste) {
+      addVoyageSection();
+    }
+  });
+}
+
+  if (non) {
+    non.addEventListener("change", () => {
+      // Supprimer les voyages suivants s’ils existent
+      while (voyageCount > id) {
+        const sectionToRemove = document.querySelector(`#voyageContainer .section-box:last-child`);
+        if (sectionToRemove) {
+          voyageContainer.removeChild(sectionToRemove);
+          voyageCount--;
+        }
+      }
+      afficherSectionFinale();
+    });
+  }
+const radios = document.querySelectorAll(`input[name="autre_${id}"]`);
+radios.forEach((radio) => {
+  radio.addEventListener("change", () => {
+    radios.forEach(r => r.closest("label").classList.remove("active"));
+    if (radio.checked) {
+      radio.closest("label").classList.add("active");
+    }
+  });
+});
+  if (voyageCount === MAX_VOYAGES) {
+    afficherSectionFinale();
+  }
+}
+
+    function afficherSectionFinale() {
+  const section = document.createElement("div");
+  section.className = "section-box";
+  section.innerHTML = `
+    <h5 class="mb-3">Fin du journal de bord</h5>
+
+<!-- Diesel -->
+<div class="mb-3">
+  <label class="form-label fw-bold text-uppercase">Avez-vous fait le plein de diesel ?</label>
+  <div class="btn-group-toggle d-grid gap-2">
+    <label class="btn btn-outline-secondary fuel-toggle" for="diesel_non">
+      <input class="d-none" type="radio" name="diesel" id="diesel_non" value="non" required />
+      Non
+    </label>
+    <label class="btn btn-outline-secondary fuel-toggle" for="diesel_stbasile">
+      <input class="d-none" type="radio" name="diesel" id="diesel_stbasile" value="stbasile" required />
+      Oui, St Basile Transport
+    </label>
+    <label class="btn btn-outline-secondary fuel-toggle" for="diesel_esso">
+      <input class="d-none" type="radio" name="diesel" id="diesel_esso" value="esso" required />
+      Oui, ESSO Deschambault
+    </label>
+    <label class="btn btn-outline-secondary fuel-toggle" for="diesel_irving">
+      <input class="d-none" type="radio" name="diesel" id="diesel_irving" value="irving" required />
+      Oui, Irving USA
+    </label>
+    <div class="fuel-toggle autre-input">
+      <input
+        type="text"
+        class="form-control form-control-custom"
+        name="diesel_spec"
+        placeholder="Autre (inscrivez ici)"
+        id="diesel_spec_direct"
+      />
+    </div>
+  </div>
+</div>
+<!-- Litres diesel -->
+<div class="mb-3 d-none visually-enhanced-block" id="litres_diesel_block">
+  <label class="form-label fw-bold">Inscrivez la quantité de litres (diesel)</label>
+<div class="d-flex gap-2 align-items-center mt-2">
+  <input type="number" inputmode="numeric" class="form-control" name="litres_diesel" />
+  <select name="unite_diesel" class="form-select w-auto" style="min-width: 80px;">
+    <option value="L" selected>L</option>
+    <option value="G">G</option>
+  </select>
+</div>
+</div>
+
+<!-- Urée -->
+<div class="mb-3">
+  <label class="form-label fw-bold text-uppercase">Avez-vous fait le plein d’urée ?</label>
+  <div class="btn-group-toggle d-grid gap-2">
+    <label class="btn btn-outline-secondary fuel-toggle" for="uree_non">
+      <input class="d-none" type="radio" name="uree" id="uree_non" value="non" required />
+      Non
+    </label>
+    <label class="btn btn-outline-secondary fuel-toggle" for="uree_elz">
+      <input class="d-none" type="radio" name="uree" id="uree_elz" value="garage_elz" required />
+      Oui, au garage ELZ
+    </label>
+    <div class="fuel-toggle autre-input">
+      <input
+        type="text"
+        class="form-control form-control-custom"
+        name="uree_spec"
+        placeholder="Autre (inscrivez ici)"
+        id="uree_spec_direct"
+      />
+    </div>
+  </div>
+</div>
+<!-- Litres urée -->
+<div class="mb-3 d-none visually-enhanced-block" id="litres_uree_block">
+  <label class="form-label fw-bold">Inscrivez la quantité de litres (urée)</label>
+  <input type="number" inputmode="numeric" class="form-control mt-2" name="litres_uree" />
+</div>
+  `;
+
+voyageContainer.appendChild(section);
+
+// Activation visuelle des boutons Diesel / Urée
+section.querySelectorAll('.fuel-toggle input[type="radio"]').forEach(input => {
+  input.addEventListener('change', () => {
+    const name = input.name;
+    section.querySelectorAll(`input[name="${name}"]`).forEach(el => {
+      el.closest('.fuel-toggle').classList.remove('active');
+    });
+    if (input.checked) {
+      input.closest('.fuel-toggle').classList.add('active');
+    }
+  });
+});
+
+// DIESEL
+const dieselRadios = section.querySelectorAll('input[name="diesel"]');
+const dieselLitres = section.querySelector("#litres_diesel_block");
+const dieselAutreInput = section.querySelector("#diesel_spec_direct");
+
+// Si on clique sur un bouton radio
+dieselRadios.forEach((radio) => {
+  radio.addEventListener("change", () => {
+    if (radio.checked && radio.value !== "non") {
+      dieselLitres.classList.remove("d-none");
+    } else if (radio.checked && radio.value === "non") {
+      dieselLitres.classList.add("d-none");
+    }
+  });
+});
+
+// Si on clique dans le champ Autre
+dieselAutreInput.addEventListener("focus", () => {
+  dieselRadios.forEach(r => {
+    r.checked = false;
+    r.closest('.fuel-toggle').classList.remove("active");
+  });
+  dieselLitres.classList.remove("d-none");
+});
+
+
+// URÉE
+const ureeRadios = section.querySelectorAll('input[name="uree"]');
+const ureeLitres = section.querySelector("#litres_uree_block");
+const ureeAutreInput = section.querySelector("#uree_spec_direct");
+
+ureeRadios.forEach((radio) => {
+  radio.addEventListener("change", () => {
+    if (radio.checked && radio.value !== "non") {
+      ureeLitres.classList.remove("d-none");
+    } else if (radio.checked && radio.value === "non") {
+      ureeLitres.classList.add("d-none");
+    }
+  });
+});
+
+ureeAutreInput.addEventListener("focus", () => {
+  ureeRadios.forEach(r => {
+    r.checked = false;
+    r.closest('.fuel-toggle').classList.remove("active");
+  });
+  ureeLitres.classList.remove("d-none");
+});
+}
+  </script>
+  <!-- Résumé -->
+<div class="container py-4 d-none" id="resumeContainer">
+  <div class="section-box">
+    <h4 class="mb-3">Résumé de votre journée</h4>
+    <div id="resumeContent"></div>
+    <!-- Ajustements manuels -->
+<div class="section-box mt-3">
+  <button class="btn btn-outline-secondary w-100 mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#ajustementsCollapse">
+    + Ajouter des ajustements manuels
+  </button>
+
+  <div class="collapse" id="ajustementsCollapse">
+    <div class="mb-3">
+      <label for="ajust_hr" class="form-label">Heures supplémentaires</label>
+      <input type="number" step="0.25" min="0" class="form-control" id="ajust_hr" placeholder="Ex: 1.5" />
+    </div>
+    <div class="mb-3">
+      <label for="ajust_km" class="form-label">Kilomètres supplémentaires</label>
+      <input type="number" step="1" min="0" class="form-control" id="ajust_km" placeholder="Ex: 12" />
+    </div>
+    <div class="mb-3">
+      <label for="ajust_raison" class="form-label">Justification</label>
+      <textarea class="form-control" id="ajust_raison" rows="2" placeholder="Obligatoire si ajustement ajouté"></textarea>
+    </div>
+  </div>
+</div>
+    <div class="d-flex justify-content-between mt-4">
+      <button type="button" class="btn btn-secondary" id="btn-modifier">Modifier</button>
+      <button type="button" class="btn btn-success" id="btn-confirm">Confirmer et envoyer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirmation après envoi -->
+<div class="container py-4 d-none" id="confirmationContainer">
+  <div class="section-box text-center">
+    <h4 class="mb-3 text-success">Formulaire envoyé 🎉</h4>
+    <p>Merci pour votre envoi. Vos données ont été enregistrées avec succès.</p>
+    <button class="btn btn-primary mt-3" onclick="window.location.reload()">Remplir un nouveau formulaire</button>
+  </div>
+</div>
+
+<script>
+
+  function getDestinationsPropres(dataOrigine, input) {
+  const val = normalizeStr(input.value);
+  return Object.keys(dataOrigine).filter(
+    key => !key.endsWith("_DOUANE") && normalizeStr(key).includes(val)
+  );
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const btnPreview = document.getElementById("btn-preview");
+  const resumeContainer = document.getElementById("resumeContainer");
+  const resumeContent = document.getElementById("resumeContent");
+  const btnModifier = document.getElementById("btn-modifier");
+
+  if (!btnPreview) {
+    console.error("⛔ Le bouton #btn-preview est introuvable dans le DOM !");
     return;
   }
 
-  const hashEntre = await hacherTexte(motdepasse);
-  if (hashEntre === utilisateur.hash) {
-    if (rememberMe) {
-      localStorage.setItem("rememberTransportelz", "true");
-      localStorage.setItem("roleTransportelz", utilisateur.role);
-      localStorage.setItem("identifiantTransportelz", utilisateur.identifiant);
+btnPreview.addEventListener("click", () => {
+  const formEl = document.getElementById("formulaire");
+
+  const formError = document.getElementById("formError");
+
+if (!formEl.checkValidity()) {
+  formEl.reportValidity();
+  formError.classList.remove("d-none");
+
+  // Optionnel : cache après 4 secondes
+  setTimeout(() => {
+    formError.classList.add("d-none");
+  }, 4000);
+
+  return;
+}
+
+// Si le formulaire est valide, on cache l'erreur si affichée
+formError.classList.add("d-none");
+
+  const data = new FormData(formEl);
+  const chauffeur = data.get("nom");
+  const taux = tauxMap[chauffeur] || { taux_h: 0, taux_km: 0 };
+
+  let html = "";
+  let totalMinutes = 0;
+  let totalKm = 0;
+  let totalPrime = 0;
+  voyages = [];
+
+  for (let i = 1; i <= 3; i++) {
+    const type = data.get(`type_voyage_${i}`);
+    if (!type) continue;
+
+    const origine = data.get(`origine_${i}`);
+    const destination = data.get(`destination_${i}`);
+    const normOrigine = normalizeStr(origine);
+    const normDestination = normalizeStr(destination);
+    const kmVal = kmMap[normOrigine]?.[normDestination] || 0;
+    const isDouane = (kmMap[normOrigine]?.[normDestination + "_DOUANE"] === true);
+
+    if (type === "kilometrage") {
+      voyages.push({
+        id: i,
+        type,
+        origine,
+        destination,
+        km: kmVal,
+        douane: isDouane
+      });
+    } else {
+      const dH = parseInt(data.get(`heure_debut_h_${i}`) || "0", 10);
+      const dM = parseInt(data.get(`heure_debut_m_${i}`) || "0", 10);
+      const fH = parseInt(data.get(`heure_fin_h_${i}`) || "0", 10);
+      const fM = parseInt(data.get(`heure_fin_m_${i}`) || "0", 10);
+      const duration = (fH * 60 + fM) - (dH * 60 + dM);
+      if (duration > 0) totalMinutes += duration;
+      voyages.push({
+        id: i,
+        type,
+        origine,
+        destination,
+        h1: dH,
+        m1: dM,
+        h2: fH,
+        m2: fM
+      });
     }
-    window.location.href = "/linktree.html";
+  }
+
+  const lastHeureVimont = [...voyages]
+    .reverse()
+    .find(v => v.type === "heure" && normalizeStr(v.origine) === "vimont");
+
+for (let i = 0; i < voyages.length; i++) {
+  const v = voyages[i];
+  if (v.type === "kilometrage") {
+    let kmPayes = v.km;
+    let label = `${v.destination || `Voyage ${v.id}`} - KM`;
+
+    const next = voyages[i + 1];
+    const isStansteadTransfer = normalizeStr(v.origine) === "st-basile" &&
+                                normalizeStr(v.destination) === "stanstead" &&
+                                next?.type === "kilometrage" &&
+                                normalizeStr(next.origine) === "stanstead";
+
+    const isRetourStanstead = normalizeStr(v.origine) === "stanstead" &&
+                              normalizeStr(v.destination) === "st-basile";
+
+    let afficherPrime = true;
+
+    if (isRetourStanstead) {
+      label += " (aller simple retour de Stanstead)";
+      afficherPrime = false; // pas de prime
+      // pas de double km non plus
+    } else if (isStansteadTransfer) {
+      label += " (aller simple)";
+      afficherPrime = false;
+    } else if (next?.type === "heure" && normalizeStr(next.origine) === "vimont") {
+      label += " (aller simple)";
+    } else {
+      label += " (aller-retour)";
+      kmPayes *= 2;
+    }
+
+    html += `<p><strong>${label}:</strong> ${kmPayes}km</p>`;
+    totalKm += kmPayes;
+
+    if (afficherPrime) {
+  totalPrime += parametresMap.prime_forfait;
+}
+
   } else {
-    erreur.textContent = "Informations incorrectes.";
+    html += `<p><strong>${v.destination} - Heure:</strong> ${v.h1}h${v.m1.toString().padStart(2, "0")} → ${v.h2}h${v.m2.toString().padStart(2, "0")}</p>`;
+
+    if (v === lastHeureVimont) {
+      const retourKm = kmMap["st-basile"]?.[normalizeStr(v.destination)] || 0;
+      html += `<p><strong>Retour de ${v.destination} :</strong> ${retourKm}km</p>`;
+      totalKm += retourKm;
+    }
   }
 }
-  </script>
+   // ✅ Nouveau comptage correct des primes douanes
+const nbPrimesDouane = voyages.filter(v => v.douane).length;
+if (nbPrimesDouane > 0) {
+  totalPrime += nbPrimesDouane * parametresMap.prime_douane;
+}
+
+
+
+// Recalcule après boucle complétée
+const totalH = Math.floor(totalMinutes / 60);
+const totalM = totalMinutes % 60;
+const montantKm = totalKm * taux.taux_km;
+const montantH = (totalMinutes / 60) * taux.taux_h;
+
+// Ajout des ajustements (avant montantFinal)
+const ajustHr = parseFloat(document.getElementById("ajust_hr")?.value || "0");
+const ajustKm = parseFloat(document.getElementById("ajust_km")?.value || "0");
+const ajustRaison = document.getElementById("ajust_raison")?.value.trim();
+
+if ((ajustHr > 0 || ajustKm > 0) && ajustRaison.length === 0) {
+  alert("Merci d’ajouter une justification pour les ajustements manuels.");
+  return;
+}
+
+// Ajoute les valeurs aux totaux
+if (ajustKm > 0) totalKm += ajustKm;
+if (ajustHr > 0) totalMinutes += ajustHr * 60;
+
+
+// Recalcule montant total avec ajouts
+const montantKmFinal = totalKm * taux.taux_km;
+const montantHFinal = (totalMinutes / 60) * taux.taux_h;
+const montantFinal = montantKmFinal + montantHFinal + totalPrime;
+
+// Génération HTML
+html += `<hr/><p><strong>KM Payés:</strong> ${totalKm}km</p>`;
+html += `<p><strong>Heures Payées:</strong> ${Math.floor(totalMinutes / 60)}h${String(totalMinutes % 60).padStart(2, "0")}</p>`;
+if (totalPrime >= parametresMap.prime_forfait) {
+  html += `<p><strong>Forfait:</strong> ${parametresMap.prime_forfait.toFixed(2)}$</p>`;
+}
+
+if (nbPrimesDouane > 0) {
+  html += `<p><strong>Prime Douane (${nbPrimesDouane}x):</strong> ${(nbPrimesDouane * parametresMap.prime_douane).toFixed(2)}$</p>`;
+}
+
+
+// Affiche les ajustements
+if (ajustKm > 0) {
+  html += `<p><strong>Ajustement KM:</strong> +${ajustKm} km</p>`;
+}
+if (ajustHr > 0) {
+  html += `<p><strong>Ajustement heure:</strong> +${ajustHr} h</p>`;
+}
+if (ajustHr > 0 || ajustKm > 0) {
+  html += `<p class="text-muted"><strong>Justification:</strong> ${ajustRaison}</p>`;
+}
+
+// Total final
+html += `<hr/><p><strong>Total payé estimé:</strong> ${montantFinal.toFixed(2)}$</p>`;
+
+resumeContent.innerHTML = html;
+
+  
+  // -- LIVE UPDATE AJUSTEMENTS --
+function calculerResumeAvecAjustements() {
+  const ajustKm = parseFloat(document.getElementById("ajust_km")?.value || "0");
+  const ajustHeures = parseFloat(document.getElementById("ajust_hr")?.value || "0");
+  const justification = document.getElementById("ajust_raison")?.value.trim();
+  const tauxKm = taux.taux_km || 0;
+  const tauxH = taux.taux_h || 0;
+
+  let htmlAjust = "";
+
+  const bonusKm = ajustKm > 0 ? ajustKm * tauxKm : 0;
+  const bonusH = ajustHeures > 0 ? ajustHeures * tauxH : 0;
+
+  if (bonusKm > 0 || bonusH > 0) {
+    htmlAjust += `<hr/><p><strong>Ajustements manuels :</strong></p>`;
+    if (bonusKm > 0) htmlAjust += `<p>+ ${ajustKm}km supplémentaires = ${(bonusKm).toFixed(2)}$</p>`;
+    if (bonusH > 0) htmlAjust += `<p>+ ${ajustHeures}h supplémentaires = ${(bonusH).toFixed(2)}$</p>`;
+    htmlAjust += `<p class="text-muted small">Justification : ${justification || '(non précisée)'}</p>`;
+  }
+
+  const totalFinal = montantKm + montantH + totalPrime + bonusKm + bonusH;
+  resumeContent.innerHTML = html + htmlAjust +
+    `<hr/><p><strong>Total payé estimé:</strong> ${totalFinal.toFixed(2)}$</p>`;
+}
+
+// Réagir aux changements en live
+["ajust_hr", "ajust_km", "ajust_raison"].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) {
+    el.addEventListener("input", calculerResumeAvecAjustements);
+  }
+});
+  
+  formEl.classList.add("d-none");
+  resumeContainer.classList.remove("d-none");
+  btnModifier.addEventListener("click", () => {
+  resumeContainer.classList.add("d-none");
+  form.classList.remove("d-none");
+});
+});
+
+const ajHr = parseFloat(document.getElementById("ajust_hr")?.value || "0");
+const ajKm = parseFloat(document.getElementById("ajust_km")?.value || "0");
+const ajRaison = document.getElementById("ajust_raison")?.value.trim();
+
+  document.getElementById("btn-confirm").addEventListener("click", () => {
+  const ajustHr = parseFloat(document.getElementById("ajust_hr")?.value || "0");
+  const ajustKm = parseFloat(document.getElementById("ajust_km")?.value || "0");
+  const ajustRaison = document.getElementById("ajust_raison")?.value.trim();
+
+  // Bloquer l’envoi s’il manque la justification
+  if ((ajustHr > 0 || ajustKm > 0) && ajustRaison.length === 0) {
+    alert("Merci d’ajouter une justification pour les ajustements manuels.");
+    return; // <-- ❗ Stoppe ici
+  }
+
+  const formData = new FormData(document.getElementById("formulaire"));
+  const data = {};
+  formData.forEach((val, key) => data[key] = val);
+// Ajouter manuellement les ajustements à l'objet data
+data["ajust_hr"] = document.getElementById("ajust_hr")?.value || "";
+data["ajust_km"] = document.getElementById("ajust_km")?.value || "";
+data["ajust_raison"] = document.getElementById("ajust_raison")?.value || "";
+
+data["prime_forfait"] = voyages.some(v =>
+  v.type === "kilometrage" &&
+  !(normalizeStr(v.origine) === "st-basile" && normalizeStr(v.destination) === "stanstead")
+) ? parametresMap.prime_forfait : 0;
+
+data["prime_douane"] = voyages.some(v => v.douane) ? parametresMap.prime_douane : 0;
+
+
+
+  fetch("https://script.google.com/macros/s/AKfycbxkIdLvTHQ0JREJ9AAXNLFo1E5T7Ou63TAFZh9izuo198Ii2wxGvmYzTQswbacP_4tK/exec", {
+    method: "POST",
+    mode: "no-cors",
+    body: JSON.stringify(data),
+    headers: { "Content-Type": "application/json" }
+  });
+
+  resumeContainer.classList.add("d-none");
+  document.getElementById("confirmationContainer").classList.remove("d-none");
+});
+});
+  
+  let parametresMap = { prime_forfait: 60.85, prime_douane: 15 }; // Valeurs par défaut
+
+</script>
+<script>
+let tauxMap = {};
+let kmMap = {};
+let  = {};
+
+fetch("https://script.google.com/macros/s/AKfycbxkIdLvTHQ0JREJ9AAXNLFo1E5T7Ou63TAFZh9izuo198Ii2wxGvmYzTQswbacP_4tK/exec")
+  .then(res => res.json())
+  .then(data => {
+    console.log("✅ Données reçues :", data);
+    console.table(data.chauffeurs); // 👀 Visualisation claire
+    parametresMap = data.parametres || parametresMap;
+    console.log("💰 Paramètres reçus :", parametresMap);
+
+    const selectNom = document.getElementById("nom");
+    const selectCamion = document.getElementById("camion");
+
+    // 🔁 Création des maps
+    tauxMap = data.chauffeurs.reduce((acc, el) => {
+      acc[el.nom] = {
+        taux_h: parseFloat(el.taux_h),
+        taux_km: parseFloat(el.taux_km),
+      };
+      return acc;
+    }, {});
+
+    chauffeurCamionMap = data.chauffeurs.reduce((acc, el) => {
+  const nom = el.nom || "";
+  const camion = el.camion?.trim() || "";
+  if (nom) acc[nom] = camion;
+  return acc;
+}, {});
+
+
+    // ✅ 🗺️ Construction de kmMap pour l'autocomplétion
+    kmMap = data.km.reduce((acc, el) => {
+  const origine = normalizeStr(el.origine);
+  const destination = normalizeStr(el.destination);
+  const distance = parseFloat(el.km);
+  const douane = (el.douane || "").toString().trim().toUpperCase();
+
+  if (!acc[origine]) acc[origine] = {};
+
+  // Stocker la distance
+  acc[origine][destination] = isNaN(distance) ? 0 : distance;
+
+  // Stocker l'info douane en parallèle
+  if (douane === "OUI") {
+    acc[origine][`${destination}_DOUANE`] = true;
+  }
+
+  return acc;
+}, {});
+    console.log("🗺️ kmMap bien construit :", kmMap);
+
+    // 🔽 Remplissage liste des chauffeurs
+    data.chauffeurs.forEach(chauffeur => {
+      const opt = document.createElement("option");
+      opt.value = chauffeur.nom;
+      opt.textContent = chauffeur.nom;
+      selectNom.appendChild(opt);
+    });
+
+    // 🔁 Préselection du camion
+  function preselectCamionPourNom(nom) {
+  const camionNomComplet = chauffeurCamionMap[nom]; // ex. "Camion 1103"
+  if (!camionNomComplet) return;
+
+  const camionCode = camionNomComplet.replace(/\D/g, ""); // Extrait "1103"
+  const option = Array.from(selectCamion.options).find(
+    (opt) => opt.value === camionCode
+  );
+
+  if (option) {
+    selectCamion.value = option.value;
+    console.log(`🚚 Camion ${camionCode} présélectionné pour ${nom}`);
+  } else {
+    console.warn(`❗ Camion "${camionNomComplet}" (code ${camionCode}) introuvable pour ${nom}`);
+  }
+}
+
+selectNom.addEventListener("change", () => {
+  const nom = selectNom.value;
+  preselectCamionPourNom(nom);
+});
+
+// Au chargement si déjà pré-sélectionné
+if (selectNom.value) {
+  preselectCamionPourNom(selectNom.value);
+}
+
+
+    // 🆙 Formulaire prêt
+    addVoyageSection();
+    document.getElementById("formulaire").classList.remove("d-none");
+    document.getElementById("loader").style.display = "none";
+  })
+  .catch(err => console.error("❌ Erreur chargement:", err));
+
+
+document.querySelectorAll('input[list]').forEach(input => {
+  input.addEventListener('focus', () => {
+    setTimeout(() => {
+      input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300); // délai pour laisser le clavier apparaître
+  });
+});
+ 
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+ 
 </body>
 </html>

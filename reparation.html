@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Réparation mécanique</title>
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
     body {
       font-family: 'Comfortaa', cursive;
-      margin: 0;
       background-color: #fefefe;
     }
 
@@ -22,100 +24,38 @@
 
     header img {
       height: 60px;
-      display: block;
-      margin: 0 auto 10px;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 24px;
-    }
-
-    .form-container {
-      max-width: 600px;
-      margin: 30px auto;
-      padding: 0 16px;
-      box-sizing: border-box;
-    }
-
-    form {
-      width: 100%;
-      padding: 32px 24px;
-      background-color: white;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      box-sizing: border-box;
-    }
-
-    label {
-      display: block;
-      margin-top: 15px;
-      font-weight: bold;
-    }
-
-    input, select, textarea {
-      display: block;
-      width: 100%;
-      box-sizing: border-box;
-    }
-
-    input, select, textarea, button {
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-family: 'Comfortaa', cursive;
-    }
-
-    button {
-      background-color: black;
-      color: white;
-      border: none;
-      margin-top: 20px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    button:hover {
-      background-color: #333;
-    }
-
-    .preview {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 15px;
-    }
-
-    .preview-image {
-      position: relative;
-      display: inline-block;
+      margin-bottom: 10px;
     }
 
     .preview-image img {
       height: 80px;
-      width: auto;
       border-radius: 8px;
       border: 1px solid #ccc;
     }
 
-    .remove-btn {
-      position: absolute;
-      top: -10px;
-      right: -10px;
-      background-color: red;
-      border: 2px solid black;
-      color: white;
-      border-radius: 50%;
-      width: 22px;
-      height: 22px;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-weight: bold;
-    }
+.remove-btn {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  z-index: 2;
+  border: 2px solid white;
+  transition: transform 0.2s ease;
+}
+
+.remove-btn:hover {
+  transform: scale(1.1);
+}
 
     .confirmation-popup {
       position: fixed;
@@ -146,11 +86,10 @@
       width: 100%;
       height: 100%;
       background-color: rgba(255, 255, 255, 0.85);
-      display: flex;
+      display: none;
       justify-content: center;
       align-items: center;
       z-index: 9998;
-      display: none;
     }
 
     #loading-screen.show {
@@ -170,65 +109,120 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+    
+    @media (max-width: 576px) {
+  .form-control, .form-select, textarea, button {
+    font-size: 1rem;
+    padding: 12px;
+  }
 
-    @media screen and (max-width: 600px) {
-      input, select, textarea {
-        font-size: 16px;
-      }
-    }
+  .btn {
+    font-size: 1.1rem;
+  }
+
+  header h1 {
+    font-size: 1.25rem;
+  }
+
+  .preview-image img {
+    height: 70px;
+  }
+
+  .confirmation-popup {
+    width: 90%;
+    font-size: 1rem;
+    padding: 16px;
+  }
+}
+
+.preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.preview-image {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  overflow: visible; /* Autorise le X à dépasser */
+  margin-right: 4px;
+}
+
+.preview-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
   </style>
 </head>
 <body>
+
   <header>
     <img src="assets/logo.jpeg" alt="Logo ELZ"/>
-    <h1>Demande de réparation mécanique</h1>
   </header>
 
-  <div class="form-container">
-    <form id="repair-form">
-      <label for="nom">Nom du chauffeur</label>
-      <input type="text" id="nom" name="nom" required />
+  <div class="container my-5">
+    <form id="repair-form" class="bg-white p-4 rounded shadow-sm">
+      <h2 class="h5 text-center mb-4">📋 Demande de réparation mécanique</h2>
+      <div class="mb-3">
+        <label for="nom" class="form-label">Nom du chauffeur</label>
+        <input type="text" class="form-control" id="nom" name="nom" required />
+      </div>
 
-      <label for="unite">Numéro de l'unité</label>
-      <select id="unite" name="unite" required>
-        <option value="">-- Sélectionner une unité --</option>
-        <option>Camion 1103</option>
-        <option>Camion 1202</option>
-        <option>Camion 1203</option>
-        <option>Camion 1303</option>
-        <option>Camion 1404</option>
-        <option>Camion 1502</option>
-        <option>Camion 1503</option>
-        <option>Camion 1602</option>
-        <option>Camion 1603</option>
-        <option>Camion 1703</option>
-        <option>Camion 1803</option>
-        <option>Remorque 1505</option>
-        <option>Remorque 1605</option>
-        <option>Remorque 1805</option>
-        <option>Remorque 1806</option>
-        <option>Remorque 1905</option>
-        <option>Remorque 1906</option>
-        <option>Remorque 2006</option>
-        <option>Remorque 2205</option>
-        <option>Remorque 2405</option>
-        <option>Remorque 2506</option>
-        <option>Remorque 2706</option>
-      </select>
+      <div class="mb-3">
+        <label for="unite" class="form-label">Numéro de l'unité</label>
+        <select class="form-select" id="unite" name="unite" required>
+          <option value="">-- Sélectionner une unité --</option>
+          <option>Camion 1103</option>
+          <option>Camion 1202</option>
+          <option>Camion 1203</option>
+          <option>Camion 1303</option>
+          <option>Camion 1404</option>
+          <option>Camion 1502</option>
+          <option>Camion 1503</option>
+          <option>Camion 1602</option>
+          <option>Camion 1603</option>
+          <option>Camion 1703</option>
+          <option>Camion 1803</option>
+          <option>Remorque 1505</option>
+          <option>Remorque 1605</option>
+          <option>Remorque 1805</option>
+          <option>Remorque 1806</option>
+          <option>Remorque 1905</option>
+          <option>Remorque 1906</option>
+          <option>Remorque 2006</option>
+          <option>Remorque 2205</option>
+          <option>Remorque 2405</option>
+          <option>Remorque 2506</option>
+          <option>Remorque 2706</option>
+        </select>
+      </div>
 
-      <label for="description">Description du problème</label>
-      <textarea id="description" name="description" rows="4" required></textarea>
+      <div class="mb-3">
+        <label for="description" class="form-label">Description du problème</label>
+        <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+      </div>
 
-      <label for="photos">Ajouter des photos</label>
-      <input type="file" id="photos" name="photos" accept="image/*" multiple />
-      <div class="preview" id="preview"></div>
+<div class="mb-3">
+  <label class="form-label">Ajouter des  ou vidéos</label>
+  
+  <!-- Bouton customisé -->
+  <div class="d-flex flex-column gap-2">
+    <button type="button" class="btn btn-outline-primary" id="fileTrigger">Choisir des fichiers</button>
+    <input type="file" id="photos" name="photos" accept="image/*,video/mp4,video/quicktime" multiple hidden />
+    <div id="fileNames" class="text-muted small"></div>
+  </div>
 
-      <button type="submit">Envoyer</button>
+  <!-- Preview ici -->
+  <div class="d-flex flex-wrap gap-2 mt-2" id="preview"></div>
+</div>
+
+      <button type="submit" class="btn btn-dark w-100">Envoyer</button>
     </form>
 
-    <a href="linktree.html" style="text-decoration: none;">
-      <button style="margin-top: 10px;">Retour au menu principal</button>
-    </a>
+    <a href="linktree.html" class="btn btn-outline-dark w-100 mt-3">Retour au menu principal</a>
   </div>
 
   <div id="confirmation" class="confirmation-popup">
@@ -240,81 +234,121 @@
   </div>
 
   <script>
-    const form = document.getElementById("repair-form");
-    const photosInput = document.getElementById("photos");
-    const preview = document.getElementById("preview");
-    const confirmation = document.getElementById("confirmation");
-    const loading = document.getElementById("loading-screen");
-    let imageList = [];
+const form = document.getElementById("repair-form");
+const photosInput = document.getElementById("photos");
+const preview = document.getElementById("preview");
+const confirmation = document.getElementById("confirmation");
+const loading = document.getElementById("loading-screen");
+let imageList = [];
 
-    photosInput.addEventListener("change", (e) => {
-      const files = Array.from(e.target.files);
-      files.forEach((file) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const imageUrl = reader.result;
-          imageList.push({ name: file.name, type: file.type, data: imageUrl.split(",")[1] });
+const fileTrigger = document.getElementById("fileTrigger");
+const fileNames = document.getElementById("fileNames");
 
-          const container = document.createElement("div");
-          container.classList.add("preview-image");
+// Bouton customisé déclenche l'input
+fileTrigger.addEventListener("click", () => {
+  photosInput.click();
+});
 
-          const img = document.createElement("img");
-          img.src = imageUrl;
-          container.appendChild(img);
+// Affiche les noms des fichiers
+photosInput.addEventListener("change", (e) => {
+  const files = Array.from(e.target.files);
+  const names = files.map(f => f.name).join(", ");
+  fileNames.textContent = ""; // On n'affiche rien
 
-          const removeBtn = document.createElement("div");
-          removeBtn.className = "remove-btn";
-          removeBtn.textContent = "X";
-          removeBtn.onclick = () => {
-            container.remove();
-            imageList = imageList.filter((i) => i.data !== imageUrl.split(",")[1]);
-          };
+  const MAX_FILE_SIZE = 12 * 1024 * 1024; // 12 Mo
 
-          container.appendChild(removeBtn);
-          preview.appendChild(container);
-        };
-        reader.readAsDataURL(file);
-      });
-      photosInput.value = "";
-    });
+  files.forEach((file) => {
+    if (file.size > MAX_FILE_SIZE) {
+      alert(`⛔ Le fichier "${file.name}" dépasse la limite de 12 Mo et a été ignoré.`);
+      return;
+    }
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
+    const reader = new FileReader();
+    reader.onload = () => {
+      const mediaUrl = reader.result;
+      imageList.push({ name: file.name, type: file.type, data: mediaUrl.split(",")[1] });
 
-      const data = {
-        nom: form.nom.value,
-        unite: form.unite.value,
-        description: form.description.value,
-        images: imageList
+      const container = document.createElement("div");
+      container.className = "preview-image";
+
+      if (file.type.startsWith("image/")) {
+        const img = document.createElement("img");
+        img.src = mediaUrl;
+        container.appendChild(img);
+    } else if (file.type.startsWith("video/")) {
+        const videoIcon = document.createElement("div");
+        videoIcon.style.width = "100%";
+        videoIcon.style.height = "100%";
+        videoIcon.style.display = "flex";
+        videoIcon.style.alignItems = "center";
+        videoIcon.style.justifyContent = "center";
+        videoIcon.style.fontSize = "26px";
+        videoIcon.style.background = "#e9ecef";
+        videoIcon.style.borderRadius = "6px";
+        videoIcon.textContent = "🎥";
+        container.appendChild(videoIcon);
+      }
+
+
+      const removeBtn = document.createElement("div");
+      removeBtn.className = "remove-btn";
+      removeBtn.innerHTML = `<i class="bi bi-x-lg"></i>`;
+      removeBtn.onclick = () => {
+        container.remove();
+        imageList = imageList.filter((i) => i.data !== mediaUrl.split(",")[1]);
       };
 
-      try {
-        loading.classList.add("show");
+      container.appendChild(removeBtn);
+      preview.appendChild(container);
+    };
 
-        await fetch("https://script.google.com/macros/s/AKfycbySqfT4czHCHx4utgjgsX6FtQN2aZFHwoov_46aVIoX_VptZvzz9NwIRPJ03udsSRR8/exec", {
-          method: "POST",
-          mode: "no-cors",
-          body: JSON.stringify(data),
-          headers: {
-            "Content-Type": "application/json"
-          }
-        });
+    reader.readAsDataURL(file);
+  });
 
-        loading.classList.remove("show");
-        confirmation.classList.add("show");
+  photosInput.value = "";
+});
 
-        setTimeout(() => {
-          confirmation.classList.remove("show");
-        }, 4000);
 
-        form.reset();
-        preview.innerHTML = "";
-        imageList = [];
-      } catch (error) {
-        loading.classList.remove("show");
-        alert("Erreur lors de l'envoi du formulaire : " + error.message);
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const data = {
+    nom: form.nom.value,
+    unite: form.unite.value,
+    description: form.description.value,
+    images: imageList
+  };
+
+  try {
+    loading.classList.add("show");
+
+    await fetch("https://script.google.com/macros/s/AKfycbwZ0skgtZzmmVsQa04zLTJeGFq_7ue-1rIXhf05-tmiQ4p_SQ8aNpszKmjr2j_LbpzK/exec", {
+      method: "POST",
+      mode: "no-cors",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json"
       }
     });
-  </script>
+
+    loading.classList.remove("show");
+    confirmation.classList.add("show");
+
+    setTimeout(() => {
+      confirmation.classList.remove("show");
+    }, 4000);
+
+    form.reset();
+    preview.innerHTML = "";
+    fileNames.textContent = "";
+    imageList = [];
+  } catch (error) {
+    loading.classList.remove("show");
+    alert("Erreur lors de l'envoi du formulaire : " + error.message);
+  }
+});
+ </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

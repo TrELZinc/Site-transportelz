@@ -20,10 +20,10 @@
   </style>
 </head>
 <body class="bg-light py-4">
-  <div id="renewalBanner" class="d-none position-relative" style="background: rgba(255, 0, 0, 0.1); overflow: hidden;">
-  <div class="py-2 px-3 text-danger fw-bold d-flex align-items-center" style="white-space: nowrap; animation: scroll-left 20s linear infinite;">
-    <span class="me-3">⏰ Permis à renouveler :</span>
-    <div id="renewalMarquee" class="d-inline-block text-danger"></div>
+<div id="renewalBanner" class="d-none w-100 shadow-sm text-center" style="position: relative; z-index: 1030;">
+  <div class="bg-danger bg-opacity-10 text-danger py-2 fw-semibold" style="animation: scroll-left 20s linear infinite;">
+    <span class="me-2">⚠️ Permis à renouveler :</span>
+    <span id="renewalMarquee"></span>
   </div>
 </div>
   <div id="renewalBanner" class="bg-warning-subtle text-dark text-center py-1 d-none overflow-hidden" style="white-space: nowrap;">
@@ -108,7 +108,7 @@
     }
   }
 
-  function showUpcomingRenewals() {
+function showUpcomingRenewals() {
   const now = new Date();
   const threeMonthsLater = new Date();
   threeMonthsLater.setMonth(now.getMonth() + 3);

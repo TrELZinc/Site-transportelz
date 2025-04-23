@@ -107,7 +107,19 @@
     }
   }
 
-  document.getElementById("unitSelect").addEventListener("change", updateDisplay);
+  document.getElementById("unitSelect").addEventListener("change", () => {
+  const unit = document.getElementById("unitSelect").value;
+  const permitsForUnit = [...new Set(docs.filter(d => d.unit === unit).map(d => d.permit))];
+
+  const permitSelect = document.getElementById("permitSelect");
+  permitSelect.innerHTML = `<option disabled selected>Choisir un permis</option>`;
+  permitsForUnit.forEach(p => {
+    permitSelect.innerHTML += `<option value="${p}">${p}</option>`;
+  });
+
+  // Reset info and selection
+  document.getElementById("infoBlock").classList.add("d-none");
+});
   document.getElementById("permitSelect").addEventListener("change", updateDisplay);
 
   document.getElementById("sendViaScriptBtn").addEventListener("click", async () => {

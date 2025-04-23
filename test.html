@@ -60,7 +60,7 @@
 </div>
 
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbzIWLsKHnKueCFoDYYcZr24nqZVLcNk7CDpRd1sEKe-hnZC_RXHbFWkn36ddlNDUAPM/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbzhuXirXSlQRn7zch6AiLWHYVQdkzrtE-gCiUECQKahf9Akx_eBjyI66VScLqw4XSzq/exec";
   let docs = [];
   let selectedDoc = null;
 
@@ -111,11 +111,18 @@
   document.getElementById("permitSelect").addEventListener("change", updateDisplay);
 
   document.getElementById("sendViaScriptBtn").addEventListener("click", async () => {
-    const email = document.getElementById("emailInput").value;
+    const emailInput = document.getElementById("emailInput");
+    const statusMsg = document.getElementById("pjStatus");
+    const btn = document.getElementById("sendViaScriptBtn");
+
+    const email = emailInput.value;
     if (!email || !selectedDoc) {
       alert("Veuillez choisir un document et entrer une adresse email.");
       return;
     }
+
+    btn.disabled = true;
+    statusMsg.textContent = "⏳ Envoi en cours...";
 
     const params = new URLSearchParams({
       email: email,
@@ -130,13 +137,22 @@
         body: params
       });
       const text = await res.text();
-      document.getElementById("pjStatus").textContent = text === "OK" ? "📧 Envoyé avec pièce jointe !" : "Erreur : " + text;
+
+      if (text === "OK") {
+        statusMsg.textContent = "📧 Envoyé avec pièce jointe !";
+        emailInput.value = "";
+      } else {
+        statusMsg.textContent = "Erreur : " + text;
+      }
     } catch (e) {
-      document.getElementById("pjStatus").textContent = "❌ Erreur réseau : " + e.message;
+      statusMsg.textContent = "❌ Erreur réseau : " + e.message;
     }
+
+    btn.disabled = false;
   });
 
   fetchDocs();
+
 </script>
 
 </body>

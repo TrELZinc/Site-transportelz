@@ -96,6 +96,13 @@
   
   fetchDocs().then(showUpcomingRenewals);
   
+  docs.push({
+  unit: "DémoCamion",
+  permit: "DémoPermis",
+  expiration: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString().split('T')[0],
+  fileId: "DEMO123456"
+});
+  
   function showUpcomingRenewals() {
   const now = new Date();
   const threeMonthsLater = new Date();

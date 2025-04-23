@@ -39,28 +39,27 @@
 </div>
 
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbyjFi9GLqG5ysTdVnOU1XT9enAzkj21wqXLssXP769uSeWJojKq2sQ2RFMjtPNlBbd7/exec"; // remplace plus tard
+  const API_URL = "https://script.google.com/macros/s/AKfycbzv9XqIAm6XBCsaulrGfmA4i56R9p0QyaKcH_H5M79BzTYsB0uVhPCiuuYRyCr73f-Q/exec"; // remplace plus tard
 
   let docs = [];
 
   async function fetchDocs() {
     try {
       const res = await fetch(API_URL);
-      docs = await res.json();
-
-      const units = [...new Set(docs.map(d => d.unit))];
-      const permits = [...new Set(docs.map(d => d.permit))];
-
-      units.forEach(unit => {
+      const data = await res.json();
+      docs = data.docs;
+  
+      data.units.forEach(unit => {
         document.getElementById('unitSelect').innerHTML += `<option value="${unit}">${unit}</option>`;
       });
-      permits.forEach(permit => {
+      data.permits.forEach(permit => {
         document.getElementById('permitSelect').innerHTML += `<option value="${permit}">${permit}</option>`;
       });
     } catch (e) {
       alert("Erreur de chargement des données : " + e.message);
     }
   }
+  
 
   function updateDisplay() {
     const unit = document.getElementById("unitSelect").value;

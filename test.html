@@ -40,7 +40,7 @@
 </div>
 
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbybKaBOGgQh6rTR4C1frpDNO5FzaX6beDJ_ED__EJ-TfqFvgSBPuz1FSdair2dAPFmK/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbzh2n4zo5cxiWFMyt_JKRiiz15w050UjqGZai1irxaGkqXANtuXVonLcRheSE2kRNdA/exec";
   let docs = [];
 
   async function fetchDocs() {
@@ -63,8 +63,11 @@
   }
 
   async function displayPDF(fileId) {
-    const url = `${API_URL}?id=${fileId}`; // Proxy par Apps Script
-    const loadingTask = pdfjsLib.getDocument(url);
+    const response = await fetch(`${API_URL}?id=${fileId}`);
+    const base64 = await response.text();
+    const dataUrl = `data:application/pdf;base64,${base64}`;
+
+    const loadingTask = pdfjsLib.getDocument({ url: dataUrl });
     const pdf = await loadingTask.promise;
     const page = await pdf.getPage(1);
 

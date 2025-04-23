@@ -253,7 +253,7 @@ fileTrigger.addEventListener("click", () => {
 photosInput.addEventListener("change", (e) => {
   const files = Array.from(e.target.files);
   const names = files.map(f => f.name).join(", ");
-  fileNames.textContent = names || "Aucun fichier sélectionné";
+  fileNames.textContent = ""; // On n'affiche rien
 
   const MAX_FILE_SIZE = 12 * 1024 * 1024; // 12 Mo
 
@@ -275,14 +275,20 @@ photosInput.addEventListener("change", (e) => {
         const img = document.createElement("img");
         img.src = mediaUrl;
         container.appendChild(img);
-      } else if (file.type.startsWith("video/")) {
-        const video = document.createElement("video");
-        video.src = mediaUrl;
-        video.controls = true;
-        video.style.width = "100%";
-        video.style.height = "100%";
-        container.appendChild(video);
+    } else if (file.type.startsWith("video/")) {
+        const videoIcon = document.createElement("div");
+        videoIcon.style.width = "100%";
+        videoIcon.style.height = "100%";
+        videoIcon.style.display = "flex";
+        videoIcon.style.alignItems = "center";
+        videoIcon.style.justifyContent = "center";
+        videoIcon.style.fontSize = "26px";
+        videoIcon.style.background = "#e9ecef";
+        videoIcon.style.borderRadius = "6px";
+        videoIcon.textContent = "🎥";
+        container.appendChild(videoIcon);
       }
+
 
       const removeBtn = document.createElement("div");
       removeBtn.className = "remove-btn";

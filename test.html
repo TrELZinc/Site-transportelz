@@ -75,52 +75,47 @@
   let selectedDoc = null;
 
   async function fetchDocs() {
-  try {
-    const res = await fetch(API_URL);
-    const data = await res.json();
-    docs = data.docs || data;
+    try {
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      docs = data.docs || data;
 
-    // ➕ AJOUT D'UN DOCUMENT FACTICE POUR TEST
-    docs.push({
-      unit: "DémoCamion",
-      permit: "DémoPermis",
-      expiration: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString().split('T')[0],
-      fileId: "DEMO123456"
-    });
+      // ➕ AJOUT D'UN DOCUMENT FACTICE POUR TEST
+      docs.push({
+        unit: "DémoCamion",
+        permit: "DémoPermis",
+        expiration: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString().split('T')[0],
+        fileId: "DEMO123456"
+      });
 
-    const units = data.units || [...new Set(docs.map(d => d.unit))];
-    const permits = data.permits || [...new Set(docs.map(d => d.permit))];
-
-    units.forEach(unit => {
-      document.getElementById('unitSelect').innerHTML += `<option value="${unit}">${unit}</option>`;
-    });
-    permits.forEach(permit => {
-      document.getElementById('permitSelect').innerHTML += `<option value="${permit}">${permit}</option>`;
-    });
-  } catch (e) {
-    alert("Erreur de chargement des données : " + e.message);
+      // ➕ UNITS UNIQUES à partir de docs
+      const units = [...new Set(docs.map(d => d.unit))];
+      units.forEach(unit => {
+        document.getElementById('unitSelect').innerHTML += `<option value="${unit}">${unit}</option>`;
+      });
+    } catch (e) {
+      alert("Erreur de chargement des données : " + e.message);
+    }
   }
-}
 
   function showUpcomingRenewals() {
-  const now = new Date();
-  const threeMonthsLater = new Date();
-  threeMonthsLater.setMonth(now.getMonth() + 3);
+    const now = new Date();
+    const threeMonthsLater = new Date();
+    threeMonthsLater.setMonth(now.getMonth() + 3);
 
-  const upcoming = docs.filter(doc => {
-    const exp = new Date(doc.expiration);
-    return exp >= now && exp <= threeMonthsLater;
-  }).sort((a, b) => new Date(a.expiration) - new Date(b.expiration)).slice(0, 5);
+    const upcoming = docs.filter(doc => {
+      const exp = new Date(doc.expiration);
+      return exp >= now && exp <= threeMonthsLater;
+    }).sort((a, b) => new Date(a.expiration) - new Date(b.expiration)).slice(0, 5);
 
-  if (upcoming.length > 0) {
-    const messages = upcoming.map(doc =>
-      `${doc.unit} - ${doc.permit} (expire le ${doc.expiration})`
-    );
-    document.getElementById("renewalMarquee").textContent = messages.join("   |   ");
-    document.getElementById("renewalBanner").classList.remove("d-none");
+    if (upcoming.length > 0) {
+      const messages = upcoming.map(doc =>
+        `${doc.unit} - ${doc.permit} (expire le ${doc.expiration})`
+      );
+      document.getElementById("renewalMarquee").textContent = messages.join("   |   ");
+      document.getElementById("renewalBanner").classList.remove("d-none");
+    }
   }
-}
-
 
   function updateDisplay() {
     const unit = document.getElementById("unitSelect").value;
@@ -146,18 +141,18 @@
   }
 
   document.getElementById("unitSelect").addEventListener("change", () => {
-  const unit = document.getElementById("unitSelect").value;
-  const permitsForUnit = [...new Set(docs.filter(d => d.unit === unit).map(d => d.permit))];
+    const unit = document.getElementById("unitSelect").value;
+    const permitsForUnit = [...new Set(docs.filter(d => d.unit === unit).map(d => d.permit))];
 
-  const permitSelect = document.getElementById("permitSelect");
-  permitSelect.innerHTML = `<option disabled selected>Choisir un permis</option>`;
-  permitsForUnit.forEach(p => {
-    permitSelect.innerHTML += `<option value="${p}">${p}</option>`;
+    const permitSelect = document.getElementById("permitSelect");
+    permitSelect.innerHTML = `<option disabled selected>Choisir un permis</option>`;
+    permitsForUnit.forEach(p => {
+      permitSelect.innerHTML += `<option value="${p}">${p}</option>`;
+    });
+
+    document.getElementById("infoBlock").classList.add("d-none");
   });
 
-  // Reset info and selection
-  document.getElementById("infoBlock").classList.add("d-none");
-});
   document.getElementById("permitSelect").addEventListener("change", updateDisplay);
 
   document.getElementById("sendViaScriptBtn").addEventListener("click", async () => {
@@ -201,8 +196,11 @@
     btn.disabled = false;
   });
 
-  
-
+  // Exécution correcte séquentielle
+  (async () => {
+    await fetchDocs();
+    showUpcomingRenewals();
+  })();
 </script>
 
 </body>

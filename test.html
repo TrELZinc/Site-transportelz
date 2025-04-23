@@ -94,9 +94,7 @@
     }
   }
   
-  fetchDocs().then(() => {
-  showUpcomingRenewals();
-});
+  fetchDocs().then(showUpcomingRenewals);
   
   function showUpcomingRenewals() {
   const now = new Date();
@@ -197,7 +195,7 @@
     btn.disabled = false;
   });
 
-  fetchDocs();
+  
 
 </script>
 

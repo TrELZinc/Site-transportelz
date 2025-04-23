@@ -13,11 +13,7 @@
         white-space: nowrap;
       }
     }
-    @keyframes scroll-left {
-  0% { transform: translateX(100%); }
-  100% { transform: translateX(-100%); }
-  }
-  .renewal-box {
+.renewal-box {
   max-width: 95%;
   font-size: 0.95rem;
   font-family: system-ui, sans-serif;
@@ -25,13 +21,33 @@
   backdrop-filter: blur(3px);
   background-color: rgba(255, 0, 0, 0.075) !important;
 }
+
+.marquee-container {
+  overflow: hidden;
+  position: relative;
+  height: 1.5em;
+}
+
+.marquee-content {
+  white-space: nowrap;
+  animation: scroll-left 12s linear infinite;
+  display: inline-block;
+  padding-left: 100%;
+}
+
+@keyframes scroll-left {
+  0%   { transform: translateX(0%); }
+  100% { transform: translateX(-100%); }
+}
   </style>
 </head>
 <body class="bg-light py-4">
 <div id="renewalBanner" class="d-none w-100">
   <div class="renewal-box mx-auto my-2 px-3 py-2 rounded shadow-sm text-danger bg-danger-subtle bg-opacity-25 text-center">
-    <span class="fw-bold">⚠️ Permis à renouveler :</span>
-    <span id="renewalMarquee" class="ms-2 text-danger-emphasis"></span>
+    <div class="fw-bold">⚠️ Permis à renouveler</div>
+    <div id="renewalMarquee" class="mt-1 text-danger-emphasis marquee-container">
+      <span class="marquee-content d-inline-block"></span>
+    </div>
   </div>
 </div>
   <div id="renewalBanner" class="bg-warning-subtle text-dark text-center py-1 d-none overflow-hidden" style="white-space: nowrap;">
@@ -124,13 +140,13 @@ function showUpcomingRenewals() {
   const upcoming = docs.filter(doc => {
     const exp = new Date(doc.expiration);
     return exp >= now && exp <= threeMonthsLater;
-  }).sort((a, b) => new Date(a.expiration) - new Date(b.expiration)).slice(0, 5);
+  }).sort((a, b) => new Date(a.expiration) - new Date(b.expiration)).slice(0, 2);
 
   if (upcoming.length > 0) {
     const messages = upcoming.map(doc =>
       `${doc.unit} – ${doc.permit} (expire le ${doc.expiration})`
     );
-    document.getElementById("renewalMarquee").textContent = messages.join("   •   ");
+    document.querySelector(".marquee-content").textContent = messages.join("   •   ");
     document.getElementById("renewalBanner").classList.remove("d-none");
   }
 }

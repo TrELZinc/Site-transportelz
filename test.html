@@ -3,81 +3,86 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Test Permis PDF</title>
+  <title>Documents Permis - Autochargés</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body class="bg-light p-4">
-  <div class="container">
-    <h2 class="text-center mb-4">Prévisualisation d’un document PDF</h2>
+<body class="bg-light py-4">
 
-    <div class="row g-3 mb-3">
-      <div class="col-md-6">
-        <label class="form-label">Unité</label>
-        <select id="unitSelect" class="form-select">
-          <option disabled selected>Choisir une unité</option>
-        </select>
-      </div>
-      <div class="col-md-6">
-        <label class="form-label">Type de permis</label>
-        <select id="permitSelect" class="form-select">
-          <option disabled selected>Choisir un permis</option>
-        </select>
-      </div>
+<div class="container">
+  <h1 class="mb-4 text-center">📄 Visualisation des Permis</h1>
+
+  <div class="row g-3 mb-3">
+    <div class="col-md-6">
+      <label class="form-label">Unité</label>
+      <select id="unitSelect" class="form-select">
+        <option disabled selected>Choisir une unité</option>
+      </select>
     </div>
-
-    <div class="mt-4">
-      <div id="info" class="d-none">
-        <p><strong>Unité:</strong> <span id="unit"></span></p>
-        <p><strong>Permis:</strong> <span id="permit"></span></p>
-        <p><strong>Expiration:</strong> <span id="expiration"></span></p>
-        <a id="openPDF" class="btn btn-primary" target="_blank">Afficher le PDF</a>
-      </div>
+    <div class="col-md-6">
+      <label class="form-label">Type de permis</label>
+      <select id="permitSelect" class="form-select">
+        <option disabled selected>Choisir un permis</option>
+      </select>
     </div>
   </div>
 
-  <script>
-    const docs = [
-      {
-        unit: "Unité Alpha",
-        permit: "Permis Travail",
-        fileId: "1Yt1UeMQAXQK5Z9jKrUVweVZzO3ty0mBr", // lien test Google Drive public
-        expiration: "2025-10-01"
-      }
-    ];
+  <div class="mt-4">
+    <div id="infoBlock" class="d-none">
+      <ul class="list-group">
+        <li class="list-group-item"><strong>Unité :</strong> <span id="unitLabel"></span></li>
+        <li class="list-group-item"><strong>Permis :</strong> <span id="permitLabel"></span></li>
+        <li class="list-group-item"><strong>Expiration :</strong> <span id="expirationLabel"></span></li>
+      </ul>
+      <a id="openPdf" href="#" target="_blank" class="btn btn-primary mt-3">🧾 Voir le PDF</a>
+    </div>
+  </div>
+</div>
 
-    const unitSelect = document.getElementById("unitSelect");
-    const permitSelect = document.getElementById("permitSelect");
-    const infoBlock = document.getElementById("info");
-    const unitText = document.getElementById("unit");
-    const permitText = document.getElementById("permit");
-    const expirationText = document.getElementById("expiration");
-    const openPDF = document.getElementById("openPDF");
+<script>
+  const API_URL = "https://script.google.com/macros/s/TON_WEBAPP_ID/exec"; // remplace plus tard
 
-    // Initialisation
-    const units = [...new Set(docs.map(d => d.unit))];
-    const permits = [...new Set(docs.map(d => d.permit))];
+  let docs = [];
 
-    units.forEach(u => unitSelect.innerHTML += `<option>${u}</option>`);
-    permits.forEach(p => permitSelect.innerHTML += `<option>${p}</option>`);
+  async function fetchDocs() {
+    try {
+      const res = await fetch(API_URL);
+      docs = await res.json();
 
-    function displayDoc() {
-      const unit = unitSelect.value;
-      const permit = permitSelect.value;
-      const doc = docs.find(d => d.unit === unit && d.permit === permit);
+      const units = [...new Set(docs.map(d => d.unit))];
+      const permits = [...new Set(docs.map(d => d.permit))];
 
-      if (doc) {
-        unitText.textContent = unit;
-        permitText.textContent = permit;
-        expirationText.textContent = doc.expiration;
-        openPDF.href = `https://drive.google.com/file/d/${doc.fileId}/view`;
-        infoBlock.classList.remove("d-none");
-      } else {
-        infoBlock.classList.add("d-none");
-      }
+      units.forEach(unit => {
+        document.getElementById('unitSelect').innerHTML += `<option value="${unit}">${unit}</option>`;
+      });
+      permits.forEach(permit => {
+        document.getElementById('permitSelect').innerHTML += `<option value="${permit}">${permit}</option>`;
+      });
+    } catch (e) {
+      alert("Erreur de chargement des données : " + e.message);
     }
+  }
 
-    unitSelect.addEventListener("change", displayDoc);
-    permitSelect.addEventListener("change", displayDoc);
-  </script>
+  function updateDisplay() {
+    const unit = document.getElementById("unitSelect").value;
+    const permit = document.getElementById("permitSelect").value;
+    const doc = docs.find(d => d.unit === unit && d.permit === permit);
+
+    if (doc) {
+      document.getElementById("unitLabel").textContent = doc.unit;
+      document.getElementById("permitLabel").textContent = doc.permit;
+      document.getElementById("expirationLabel").textContent = doc.expiration;
+      document.getElementById("openPdf").href = `https://drive.google.com/file/d/${doc.fileId}/view`;
+      document.getElementById("infoBlock").classList.remove("d-none");
+    } else {
+      document.getElementById("infoBlock").classList.add("d-none");
+    }
+  }
+
+  document.getElementById("unitSelect").addEventListener("change", updateDisplay);
+  document.getElementById("permitSelect").addEventListener("change", updateDisplay);
+
+  fetchDocs();
+</script>
+
 </body>
 </html>

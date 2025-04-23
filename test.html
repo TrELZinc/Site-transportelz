@@ -117,14 +117,6 @@
       const data = await res.json();
       docs = data.docs || data;
 
-      // ➕ AJOUT D'UN DOCUMENT FACTICE POUR TEST
-      docs.push({
-        unit: "DémoCamion",
-        permit: "DémoPermis",
-        expiration: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString().split('T')[0],
-        fileId: "DEMO123456"
-      });
-
       // ➕ UNITS UNIQUES à partir de docs
       const units = [...new Set(docs.map(d => d.unit))];
       units.forEach(unit => {

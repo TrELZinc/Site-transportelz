@@ -71,7 +71,7 @@
       document.getElementById("unitLabel").textContent = doc.unit;
       document.getElementById("permitLabel").textContent = doc.permit;
       document.getElementById("expirationLabel").textContent = doc.expiration;
-      document.getElementById("openPdf").href = `https://drive.google.com/uc?export=download&id=${doc.fileId}`;
+      document.getElementById("openPdf").href = `https://drive.google.com/file/d/${doc.fileId}/preview`;
       document.getElementById("infoBlock").classList.remove("d-none");
     } else {
       document.getElementById("infoBlock").classList.add("d-none");

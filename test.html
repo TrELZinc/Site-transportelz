@@ -33,33 +33,38 @@
         <li class="list-group-item"><strong>Permis :</strong> <span id="permitLabel"></span></li>
         <li class="list-group-item"><strong>Expiration :</strong> <span id="expirationLabel"></span></li>
       </ul>
-      <a id="openPdf" href="#" target="_blank" class="btn btn-primary mt-3">🧾 Voir le PDF</a>
+      <div class="mt-3 d-flex flex-wrap gap-2">
+        <a id="openPdf" href="#" target="_blank" class="btn btn-primary">🧾 Voir le PDF</a>
+        <a id="downloadPdf" href="#" class="btn btn-success" download>⬇️ Télécharger</a>
+        <a id="emailPdf" href="#" class="btn btn-outline-secondary">✉️ Envoyer par email</a>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbzv9XqIAm6XBCsaulrGfmA4i56R9p0QyaKcH_H5M79BzTYsB0uVhPCiuuYRyCr73f-Q/exec"; // remplace plus tard
-
+  const API_URL = "https://script.google.com/macros/s/AKfycbxnjGHBrmu89Tc41I7Ag_wktcGHEtxwDxtsA8dYLSlVw7hKZ831VnUM4l3WBBAjVSvd/exec";
   let docs = [];
 
   async function fetchDocs() {
     try {
       const res = await fetch(API_URL);
       const data = await res.json();
-      docs = data.docs;
-  
-      data.units.forEach(unit => {
+      docs = data.docs || data; // support legacy or optimized format
+
+      const units = data.units || [...new Set(docs.map(d => d.unit))];
+      const permits = data.permits || [...new Set(docs.map(d => d.permit))];
+
+      units.forEach(unit => {
         document.getElementById('unitSelect').innerHTML += `<option value="${unit}">${unit}</option>`;
       });
-      data.permits.forEach(permit => {
+      permits.forEach(permit => {
         document.getElementById('permitSelect').innerHTML += `<option value="${permit}">${permit}</option>`;
       });
     } catch (e) {
       alert("Erreur de chargement des données : " + e.message);
     }
   }
-  
 
   function updateDisplay() {
     const unit = document.getElementById("unitSelect").value;
@@ -67,10 +72,17 @@
     const doc = docs.find(d => d.unit === unit && d.permit === permit);
 
     if (doc) {
+      const driveLink = `https://drive.google.com/file/d/${doc.fileId}/preview`;
+      const downloadLink = `https://drive.google.com/uc?export=download&id=${doc.fileId}`;
+
       document.getElementById("unitLabel").textContent = doc.unit;
       document.getElementById("permitLabel").textContent = doc.permit;
       document.getElementById("expirationLabel").textContent = doc.expiration;
-      document.getElementById("openPdf").href = `https://drive.google.com/file/d/${doc.fileId}/preview`;
+
+      document.getElementById("openPdf").href = driveLink;
+      document.getElementById("downloadPdf").href = downloadLink;
+      document.getElementById("emailPdf").href = `mailto:?subject=Permis ${doc.permit} - ${doc.unit}&body=Voici le lien pour consulter le permis :%0A${driveLink}`;
+
       document.getElementById("infoBlock").classList.remove("d-none");
     } else {
       document.getElementById("infoBlock").classList.add("d-none");

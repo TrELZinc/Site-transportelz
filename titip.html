@@ -206,7 +206,7 @@
       </div>
 
 <div class="mb-3">
-  <label class="form-label">Ajouter des photos ou vidéos</label>
+  <label class="form-label">Ajouter des  ou vidéos</label>
   
   <!-- Bouton customisé -->
   <div class="d-flex flex-column gap-2">
@@ -255,7 +255,14 @@ photosInput.addEventListener("change", (e) => {
   const names = files.map(f => f.name).join(", ");
   fileNames.textContent = names || "Aucun fichier sélectionné";
 
+  const MAX_FILE_SIZE = 12 * 1024 * 1024; // 12 Mo
+
   files.forEach((file) => {
+    if (file.size > MAX_FILE_SIZE) {
+      alert(`⛔ Le fichier "${file.name}" dépasse la limite de 12 Mo et a été ignoré.`);
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = () => {
       const mediaUrl = reader.result;
@@ -264,7 +271,6 @@ photosInput.addEventListener("change", (e) => {
       const container = document.createElement("div");
       container.className = "preview-image";
 
-      // Image ou vidéo
       if (file.type.startsWith("image/")) {
         const img = document.createElement("img");
         img.src = mediaUrl;
@@ -278,7 +284,6 @@ photosInput.addEventListener("change", (e) => {
         container.appendChild(video);
       }
 
-      // Bouton X
       const removeBtn = document.createElement("div");
       removeBtn.className = "remove-btn";
       removeBtn.innerHTML = `<i class="bi bi-x-lg"></i>`;
@@ -297,6 +302,7 @@ photosInput.addEventListener("change", (e) => {
   photosInput.value = "";
 });
 
+
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -310,7 +316,7 @@ form.addEventListener("submit", async (e) => {
   try {
     loading.classList.add("show");
 
-    await fetch("https://script.google.com/macros/s/AKfycby5nIu1zUNAbVOOCr0-cn45gVyvavbMpvZXZO3ehhHZZ3LNST-a57ZD683DLwvtyedY/exec", {
+    await fetch("https://script.google.com/macros/s/AKfycbwZ0skgtZzmmVsQa04zLTJeGFq_7ue-1rIXhf05-tmiQ4p_SQ8aNpszKmjr2j_LbpzK/exec", {
       method: "POST",
       mode: "no-cors",
       body: JSON.stringify(data),

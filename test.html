@@ -13,10 +13,19 @@
         white-space: nowrap;
       }
     }
-    
+    @keyframes scroll-left {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+  }
   </style>
 </head>
 <body class="bg-light py-4">
+  <div id="renewalBanner" class="d-none position-relative" style="background: rgba(255, 0, 0, 0.1); overflow: hidden;">
+  <div class="py-2 px-3 text-danger fw-bold d-flex align-items-center" style="white-space: nowrap; animation: scroll-left 20s linear infinite;">
+    <span class="me-3">⏰ Permis à renouveler :</span>
+    <div id="renewalMarquee" class="d-inline-block text-danger"></div>
+  </div>
+</div>
   <div id="renewalBanner" class="bg-warning-subtle text-dark text-center py-1 d-none overflow-hidden" style="white-space: nowrap;">
   <div id="renewalMarquee" class="d-inline-block" style="animation: scroll-left 20s linear infinite;"></div>
 </div>
@@ -100,23 +109,23 @@
   }
 
   function showUpcomingRenewals() {
-    const now = new Date();
-    const threeMonthsLater = new Date();
-    threeMonthsLater.setMonth(now.getMonth() + 3);
+  const now = new Date();
+  const threeMonthsLater = new Date();
+  threeMonthsLater.setMonth(now.getMonth() + 3);
 
-    const upcoming = docs.filter(doc => {
-      const exp = new Date(doc.expiration);
-      return exp >= now && exp <= threeMonthsLater;
-    }).sort((a, b) => new Date(a.expiration) - new Date(b.expiration)).slice(0, 5);
+  const upcoming = docs.filter(doc => {
+    const exp = new Date(doc.expiration);
+    return exp >= now && exp <= threeMonthsLater;
+  }).sort((a, b) => new Date(a.expiration) - new Date(b.expiration)).slice(0, 5);
 
-    if (upcoming.length > 0) {
-      const messages = upcoming.map(doc =>
-        `${doc.unit} - ${doc.permit} (expire le ${doc.expiration})`
-      );
-      document.getElementById("renewalMarquee").textContent = messages.join("   |   ");
-      document.getElementById("renewalBanner").classList.remove("d-none");
-    }
+  if (upcoming.length > 0) {
+    const messages = upcoming.map(doc =>
+      `${doc.unit} - ${doc.permit} (expire le ${doc.expiration})`
+    );
+    document.getElementById("renewalMarquee").textContent = messages.join("   •   ");
+    document.getElementById("renewalBanner").classList.remove("d-none");
   }
+}
 
   function updateDisplay() {
     const unit = document.getElementById("unitSelect").value;

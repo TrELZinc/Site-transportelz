@@ -16,6 +16,16 @@
   </style>
 </head>
 <body class="bg-light py-4">
+  <div id="renewalBanner" class="bg-warning-subtle text-dark text-center py-1 d-none overflow-hidden" style="white-space: nowrap;">
+  <div id="renewalMarquee" class="d-inline-block" style="animation: scroll-left 20s linear infinite;"></div>
+</div>
+
+<style>
+  @keyframes scroll-left {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
+</style>
 
 <div class="container">
   <h1 class="mb-4 text-center">📄 Visualisation des Permis</h1>
@@ -83,6 +93,30 @@
       alert("Erreur de chargement des données : " + e.message);
     }
   }
+  
+  fetchDocs().then(() => {
+  showUpcomingRenewals();
+});
+  
+  function showUpcomingRenewals() {
+  const now = new Date();
+  const threeMonthsLater = new Date();
+  threeMonthsLater.setMonth(now.getMonth() + 3);
+
+  const upcoming = docs.filter(doc => {
+    const exp = new Date(doc.expiration);
+    return exp >= now && exp <= threeMonthsLater;
+  }).sort((a, b) => new Date(a.expiration) - new Date(b.expiration)).slice(0, 5);
+
+  if (upcoming.length > 0) {
+    const messages = upcoming.map(doc =>
+      `${doc.unit} - ${doc.permit} (expire le ${doc.expiration})`
+    );
+    document.getElementById("renewalMarquee").textContent = messages.join("   |   ");
+    document.getElementById("renewalBanner").classList.remove("d-none");
+  }
+}
+
 
   function updateDisplay() {
     const unit = document.getElementById("unitSelect").value;

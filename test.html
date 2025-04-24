@@ -54,13 +54,6 @@
   </div>
 </div>
 
-<style>
-  @keyframes scroll-left {
-    0% { transform: translateX(100%); }
-    100% { transform: translateX(-100%); }
-  }
-</style>
-
 <div class="container">
   <h1 class="mb-4 text-center">📄 Visualisation des Permis</h1>
 
@@ -115,7 +108,7 @@
       docs = data.docs || data;
 
       // ➕ UNITS UNIQUES à partir de docs
-  const units = data.units || [...new Set(docs.map(d => d.unit))].sort((a, b) => {
+  const units = [...new Set(docs.map(d => d.unit))].sort((a, b) => {
   const getChunks = str => str.match(/\D+|\d+/g).map(s => isNaN(s) ? s : parseInt(s));
   const aChunks = getChunks(a);
   const bChunks = getChunks(b);

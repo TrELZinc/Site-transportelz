@@ -199,40 +199,55 @@
 function validerNIP() {
   const nip = document.getElementById("nipInput").value;
   if (nip === "1359") {
-    const btnContainer = document.getElementById("liens");
-
-    // Dispatch interne
-    const lienDispatch = document.createElement("a");
-    lienDispatch.href = "dispos.html";
-    lienDispatch.className = "button";
-    lienDispatch.innerHTML = `<img src="assets/icones/dispatch.png" alt=""> Dispatch interne`;
-    btnContainer.appendChild(lienDispatch);
-
-    // Pastille 1 : Rapport d'activité
-    const lienRapport = document.createElement("a");
-    lienRapport.href = "permis.html";
-    lienRapport.className = "button";
-    lienRapport.innerHTML = `<img src="assets/icones/feuille.png" alt=""> Gestion des permis`;
-    btnContainer.appendChild(lienRapport);
-
-    // Pastille 2 : Journal des connexions
-    const lienJournal = document.createElement("a");
-    lienJournal.href = "mathieu.html";
-    lienJournal.className = "button";
-    lienJournal.innerHTML = `<img src="assets/icones/feuille.png" alt="">Paie`;
-    btnContainer.appendChild(lienJournal);
-
+    localStorage.setItem("adminValid", "true");
+    afficherBoutonsAdmin();
     document.getElementById("popupNIP").style.display = "none";
   } else {
     alert("NIP incorrect.");
   }
 }
 
-    function deconnexion() {
-      localStorage.removeItem("rememberTransportelz");
-      localStorage.removeItem("roleTransportelz");
-      window.location.href = "index.html";
-    }
+
+function afficherBoutonsAdmin() {
+  const btnContainer = document.getElementById("liens");
+
+  if (document.getElementById("admin-btn-dispatch")) return;
+
+  // Dispatch interne
+  const lienDispatch = document.createElement("a");
+  lienDispatch.id = "admin-btn-dispatch";
+  lienDispatch.href = "dispos.html";
+  lienDispatch.className = "button";
+  lienDispatch.innerHTML = `<img src="assets/icones/dispatch.png" alt=""> Dispatch interne`;
+  btnContainer.appendChild(lienDispatch);
+
+  // Pastille 1 : Gestion des permis
+  const lienRapport = document.createElement("a");
+  lienRapport.href = "permis.html";
+  lienRapport.className = "button";
+  lienRapport.innerHTML = `<img src="assets/icones/feuille.png" alt=""> Gestion des permis`;
+  btnContainer.appendChild(lienRapport);
+
+  // Pastille 2 : Paie
+  const lienJournal = document.createElement("a");
+  lienJournal.href = "mathieu.html";
+  lienJournal.className = "button";
+  lienJournal.innerHTML = `<img src="assets/icones/feuille.png" alt=""> Paie`;
+  btnContainer.appendChild(lienJournal);
+}
+
+function deconnexion() {
+  localStorage.removeItem("rememberTransportelz");
+  localStorage.removeItem("roleTransportelz");
+  localStorage.removeItem("adminValid"); // réinitialise l'accès admin
+  window.location.href = "index.html";
+}
+
+window.onload = function() {
+  if (localStorage.getItem("adminValid") === "true") {
+    afficherBoutonsAdmin();
+  }
+};
   </script>
 
 </body>

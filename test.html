@@ -118,7 +118,7 @@
       docs = data.docs || data;
 
       // ➕ UNITS UNIQUES à partir de docs
-      const units = [...new Set(docs.map(d => d.unit))];
+      const units = data.units || [...new Set(docs.map(d => d.unit))].sort((a, b) => a.localeCompare(b));
       units.forEach(unit => {
         document.getElementById('unitSelect').innerHTML += `<option value="${unit}">${unit}</option>`;
       });

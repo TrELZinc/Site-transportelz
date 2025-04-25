@@ -101,33 +101,44 @@
   let docs = [];
   let selectedDoc = null;
 
-  async function fetchDocs() {
-    try {
-      const res = await fetch(API_URL);
-      const data = await res.json();
-      docs = data.docs || data;
+async function fetchDocs() {
+  try {
+    const res = await fetch(API_URL);
+    const data = await res.json();
+    docs = data.docs || data;
 
-      // ➕ UNITS UNIQUES à partir de docs
-  const units = [...new Set(docs.map(d => d.unit))].sort((a, b) => {
-  const getChunks = str => str.match(/\D+|\d+/g).map(s => isNaN(s) ? s : parseInt(s));
-  const aChunks = getChunks(a);
-  const bChunks = getChunks(b);
+    const unitSelect = document.getElementById('unitSelect');
+    unitSelect.innerHTML = '<option disabled selected>Choisir une unité</option>';
 
-  for (let i = 0; i < Math.max(aChunks.length, bChunks.length); i++) {
-    if (aChunks[i] === undefined) return -1;
-    if (bChunks[i] === undefined) return 1;
-    if (aChunks[i] < bChunks[i]) return -1;
-    if (aChunks[i] > bChunks[i]) return 1;
+    const unitMap = new Map(); // éviter les doublons réels
+
+    docs.forEach(doc => {
+      if (doc.unit && !unitMap.has(doc.unit)) {
+        unitMap.set(doc.unit, true);
+      }
+    });
+
+    const sortedUnits = Array.from(unitMap.keys()).sort((a, b) => {
+      const getChunks = str => str.match(/\D+|\d+/g).map(s => isNaN(s) ? s : parseInt(s));
+      const ac = getChunks(a);
+      const bc = getChunks(b);
+      for (let i = 0; i < Math.max(ac.length, bc.length); i++) {
+        if (ac[i] === undefined) return -1;
+        if (bc[i] === undefined) return 1;
+        if (ac[i] < bc[i]) return -1;
+        if (ac[i] > bc[i]) return 1;
+      }
+      return 0;
+    });
+
+    sortedUnits.forEach(unit => {
+      unitSelect.innerHTML += `<option value="${unit}">${unit}</option>`;
+    });
+  } catch (e) {
+    alert("Erreur de chargement des données : " + e.message);
   }
-  return 0;
-});
-      units.forEach(unit => {
-        document.getElementById('unitSelect').innerHTML += `<option value="${unit}">${unit}</option>`;
-      });
-    } catch (e) {
-      alert("Erreur de chargement des données : " + e.message);
-    }
-  }
+}
+
 
 function showUpcomingRenewals() {
   const now = new Date();

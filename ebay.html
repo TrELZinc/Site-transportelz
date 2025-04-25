@@ -107,9 +107,7 @@
 </div>
 
 <script>
-  const appId = 'VOTRE_APP_ID_EBAY'; // <-- Remplace ici avec ton vrai App ID
-
-  async function searchEbay() {
+  function searchEbay() {
     const query = document.getElementById('searchInput').value.trim();
     const resultsDiv = document.getElementById('results');
     resultsDiv.innerHTML = '';
@@ -119,43 +117,52 @@
       return;
     }
 
-    const endpoint = 'https://svcs.ebay.com/services/search/FindingService/v1';
-    const url = `${endpoint}?OPERATION-NAME=findCompletedItems&SERVICE-VERSION=1.0.0&SECURITY-APPNAME=${appId}&RESPONSE-DATA-FORMAT=JSON&REST-PAYLOAD&keywords=${encodeURIComponent(query)}&itemFilter(0).name=SoldItemsOnly&itemFilter(0).value=true`;
-
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
-      const items = data.findCompletedItemsResponse[0].searchResult[0].item || [];
-
-      if (items.length === 0) {
-        resultsDiv.innerHTML = '<p class="no-results">Aucun résultat trouvé pour cette recherche.</p>';
-        return;
+    // Simulation de données de ventes finalisées
+    const fakeItems = [
+      {
+        title: "Apple iPhone 13 Pro Max 256GB - Graphite",
+        price: "899.99",
+        currency: "EUR",
+        img: "https://cdn.pixabay.com/photo/2021/11/23/18/07/iphone-6818136_960_720.jpg",
+        link: "https://www.ebay.com/itm/iphone13"
+      },
+      {
+        title: "Sony PlayStation 5 Console - Disc Edition",
+        price: "549.99",
+        currency: "EUR",
+        img: "https://cdn.pixabay.com/photo/2021/01/02/11/36/ps5-5882467_960_720.jpg",
+        link: "https://www.ebay.com/itm/ps5"
+      },
+      {
+        title: "Apple AirPods Pro 2e Génération - Neufs",
+        price: "229.00",
+        currency: "EUR",
+        img: "https://cdn.pixabay.com/photo/2022/09/30/08/59/airpods-7488868_960_720.jpg",
+        link: "https://www.ebay.com/itm/airpodspro"
+      },
+      {
+        title: "Samsung Galaxy S22 Ultra 512GB Phantom Black",
+        price: "749.00",
+        currency: "EUR",
+        img: "https://cdn.pixabay.com/photo/2022/03/24/20/42/smartphone-7091435_960_720.jpg",
+        link: "https://www.ebay.com/itm/s22ultra"
       }
+    ];
 
-      items.forEach(item => {
-        const title = item.title[0];
-        const price = item.sellingStatus[0].currentPrice[0].__value__;
-        const currency = item.sellingStatus[0].currentPrice[0]['@currencyId'];
-        const img = item.galleryURL[0] || 'https://via.placeholder.com/300x200?text=No+Image';
-        const link = item.viewItemURL[0];
-
-        resultsDiv.innerHTML += `
-          <div class="item">
-            <a href="${link}" target="_blank">
-              <img src="${img}" alt="${title}">
-            </a>
-            <div class="item-content">
-              <p class="item-title">${title}</p>
-              <p class="price">${price} ${currency}</p>
-            </div>
+    fakeItems.forEach(item => {
+      const html = `
+        <div class="item">
+          <a href="${item.link}" target="_blank">
+            <img src="${item.img}" alt="${item.title}">
+          </a>
+          <div class="item-content">
+            <p class="item-title">${item.title}</p>
+            <p class="price">${item.price} ${item.currency}</p>
           </div>
-        `;
-      });
-
-    } catch (err) {
-      console.error('Erreur API eBay:', err);
-      resultsDiv.innerHTML = '<p class="no-results">Erreur lors de la récupération des données eBay.</p>';
-    }
+        </div>
+      `;
+      resultsDiv.innerHTML += html;
+    });
   }
 </script>
 

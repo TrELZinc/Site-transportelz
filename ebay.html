@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Recherche eBay – Ventes Finalisées</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    input, button { padding: 10px; margin-right: 10px; }
+    .results { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 20px; }
+    .item { border: 1px solid #ccc; padding: 10px; border-radius: 5px; }
+    .item img { max-width: 100%; height: auto; }
+    .price { font-weight: bold; color: green; margin-top: 5px; }
+  </style>
+</head>
+<body>
+
+<h1>Recherche des objets vendus sur eBay</h1>
+<input type="text" id="searchInput" placeholder="Entrez un mot-clé ex: iPhone 13" />
+<button onclick="searchEbay()">Rechercher</button>
+
+<div class="results" id="results"></div>
+
+<script>
+  const appId = 'VOTRE_APP_ID_EBAY'; // <-- Remplace par ton App ID eBay
+
+  async function searchEbay() {
+    const query = document.getElementById('searchInput').value.trim();
+    if (!query) return;
+
+    const endpoint = 'https://svcs.ebay.com/services/search/FindingService/v1';
+    const url = `${endpoint}?OPERATION-NAME=findCompletedItems&SERVICE-VERSION=1.0.0&SECURITY-APPNAME=${appId}&RESPONSE-DATA-FORMAT=JSON&REST-PAYLOAD&keywords=${encodeURIComponent(query)}&itemFilter(0).name=SoldItemsOnly&itemFilter(0).value=true`;
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    const items = data.findCompletedItemsResponse[0].searchResult[0].item || [];
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = '';
+
+    if (items.length === 0) {
+      resultsDiv.innerHTML = '<p>Aucun objet trouvé.</p>';
+      return;
+    }
+
+    items.forEach(item => {
+      const title = item.title[0];
+      const price = item.sellingStatus[0].currentPrice[0].__value__;
+      const currency = item.sellingStatus[0].currentPrice[0]['@currencyId'];
+      const img = item.galleryURL[0] || '';
+      const link = item.viewItemURL[0];
+
+      const html = `
+        <div class="item">
+          <a href="${link}" target="_blank"><img src="${img}" alt="Image"></a>
+          <p>${title}</p>
+          <p class="price">${price} ${currency}</p>
+        </div>
+      `;
+      resultsDiv.innerHTML += html;
+    });
+  }
+</script>
+
+</body>
+</html>

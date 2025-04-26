@@ -1,171 +1,68 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Lumière Useless Intergalactique</title>
+  <title>Carte Avions Live</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
   <style>
-    body {
+    body, html {
+      height: 100%;
       margin: 0;
-      height: 100vh;
-      background: linear-gradient(270deg, #0f0c29, #302b63, #24243e);
-      background-size: 600% 600%;
-      animation: gradientBG 20s ease infinite;
-      transition: background-color 1s ease;
-      overflow: hidden;
-      position: relative;
     }
-
-    @keyframes gradientBG {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+    #map {
+      height: 100%;
     }
-
-    .globe {
-      width: 100px;
-      height: 100px;
-      background: radial-gradient(circle at center, #f5f5dc, #aaa);
-      border-radius: 50%;
-      position: absolute;
-      top: 50px;
-      left: 50%;
-      transform: translateX(-50%);
-      box-shadow: 0 0 40px 10px rgba(255, 255, 200, 0.8);
-      z-index: 5;
-      transition: box-shadow 0.5s;
+    .leaflet-popup-content {
+      font-size: 14px;
     }
-
-    .rope {
-      width: 4px;
-      height: 100px;
-      background: #333;
-      position: absolute;
-      top: 150px;
-      left: 50%;
-      transform: translateX(-50%);
-      cursor: pointer;
-      z-index: 4;
-    }
-
-    .rope::after {
-      content: '';
-      width: 20px;
-      height: 20px;
-      background: #555;
-      border-radius: 50%;
-      position: absolute;
-      bottom: -10px;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-
-    .dimmed {
-      background-color: #000 !important;
-      background-image: none !important;
-    }
-
-    .door {
-      width: 200px;
-      height: 300px;
-      background: brown;
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      border: 5px solid #522;
-      z-index: 2;
-      transition: transform 1s ease;
-    }
-
-    .door.open {
-      transform: translateX(-50%) translateY(100%);
-    }
-
-    .bear {
-      width: 100px;
-      height: 100px;
-      background: url('https://upload.wikimedia.org/wikipedia/commons/6/6b/Polar_Bear_2004-11-15.jpg');
-      background-size: cover;
-      background-position: center;
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%) translateY(100%);
-      border-radius: 50%;
-      z-index: 3;
-      transition: transform 1s ease 1s;
-    }
-
-    .bear.show {
-      transform: translateX(-50%) translateY(0);
-    }
-
-    .quote {
-      position: absolute;
-      bottom: 30px;
-      width: 100%;
-      text-align: center;
-      color: #fff;
-      font-style: italic;
-      font-size: 1.2rem;
-      opacity: 0.8;
-      z-index: 1;
-    }
-
   </style>
 </head>
 <body>
+  <div id="map"></div>
 
-  <div class="globe" id="globe"></div>
-  <div class="rope" id="rope"></div>
-  <div class="door" id="door"></div>
-  <div class="bear" id="bear"></div>
-  <div class="quote">"Ce site ne sert à rien, et c’est ça qui le rend indispensable."</div>
-
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    const rope = document.getElementById('rope');
-    const body = document.body;
-    const globe = document.getElementById('globe');
-    const door = document.getElementById('door');
-    const bear = document.getElementById('bear');
-    let lightOn = true;
-    let bearCooldown = false;
+    const map = L.map('map').setView([48.8566, 2.3522], 5); // Centré sur Paris
 
-    rope.addEventListener('click', () => {
-      if (!lightOn || bearCooldown) return;
-      // Allumer : passage à obscur après délai
-      body.classList.add('dimmed');
-      globe.style.boxShadow = '0 0 0 0 rgba(0,0,0,0)';
-      lightOn = false;
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 10,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
 
-      // Porte s’ouvre
-      setTimeout(() => {
-        door.classList.add('open');
-      }, 500);
+    let planeMarkers = [];
 
-      // L’ourse sort
-      setTimeout(() => {
-        bear.classList.add('show');
-      }, 1500);
+    function fetchPlanes() {
+      fetch('https://opensky-network.org/api/states/all')
+        .then(res => res.json())
+        .then(data => {
+          planeMarkers.forEach(m => map.removeLayer(m)); // Remove old markers
+          planeMarkers = [];
 
-      // Elle tire la corde (ré-éteint)
-      setTimeout(() => {
-        body.classList.remove('dimmed');
-        globe.style.boxShadow = '0 0 40px 10px rgba(255, 255, 200, 0.8)';
-        lightOn = true;
-      }, 3000);
+          data.states.forEach(plane => {
+            const callsign = plane[1];
+            const lat = plane[6];
+            const lon = plane[5];
+            const alt = plane[7];
+            const country = plane[2];
 
-      // Elle repart et porte se ferme
-      setTimeout(() => {
-        bear.classList.remove('show');
-        door.classList.remove('open');
-        bearCooldown = true;
-        setTimeout(() => bearCooldown = false, 2000);
-      }, 4000);
-    });
+            if (lat && lon) {
+              const marker = L.marker([lat, lon]).addTo(map);
+              marker.bindPopup(`<strong>${callsign || 'Unknown'}</strong><br>
+                Altitude: ${alt} m<br>
+                Pays: ${country}`);
+              planeMarkers.push(marker);
+            }
+          });
+        })
+        .catch(console.error);
+    }
+
+    fetchPlanes();
+    setInterval(fetchPlanes, 15000); // Mise à jour toutes les 15s
   </script>
-
 </body>
 </html>

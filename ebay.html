@@ -2,79 +2,170 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <title>Lumière Useless Intergalactique</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Site Inutile</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
-      background: linear-gradient(135deg, #ff9a9e, #fad0c4, #fad0c4, #ffd1ff);
-      height: 100vh;
       margin: 0;
-      font-family: 'Comic Sans MS', cursive;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      height: 100vh;
+      background: linear-gradient(270deg, #0f0c29, #302b63, #24243e);
+      background-size: 600% 600%;
+      animation: gradientBG 20s ease infinite;
+      transition: background-color 1s ease;
+      overflow: hidden;
+      position: relative;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .globe {
+      width: 100px;
+      height: 100px;
+      background: radial-gradient(circle at center, #f5f5dc, #aaa);
+      border-radius: 50%;
+      position: absolute;
+      top: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 0 40px 10px rgba(255, 255, 200, 0.8);
+      z-index: 5;
+      transition: box-shadow 0.5s;
+    }
+
+    .rope {
+      width: 4px;
+      height: 100px;
+      background: #333;
+      position: absolute;
+      top: 150px;
+      left: 50%;
+      transform: translateX(-50%);
+      cursor: pointer;
+      z-index: 4;
+    }
+
+    .rope::after {
+      content: '';
+      width: 20px;
+      height: 20px;
+      background: #555;
+      border-radius: 50%;
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .dimmed {
+      background-color: #000 !important;
+      background-image: none !important;
+    }
+
+    .door {
+      width: 200px;
+      height: 300px;
+      background: brown;
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid #522;
+      z-index: 2;
+      transition: transform 1s ease;
+    }
+
+    .door.open {
+      transform: translateX(-50%) translateY(100%);
+    }
+
+    .bear {
+      width: 100px;
+      height: 100px;
+      background: url('https://upload.wikimedia.org/wikipedia/commons/6/6b/Polar_Bear_2004-11-15.jpg');
+      background-size: cover;
+      background-position: center;
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%) translateY(100%);
+      border-radius: 50%;
+      z-index: 3;
+      transition: transform 1s ease 1s;
+    }
+
+    .bear.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .quote {
+      position: absolute;
+      bottom: 30px;
+      width: 100%;
       text-align: center;
-    }
-
-    .useless-box {
-      background: white;
-      border-radius: 20px;
-      padding: 40px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-      transition: transform 0.3s ease;
-    }
-
-    .useless-box:hover {
-      transform: scale(1.03);
-    }
-
-    .useless-button {
-      background: linear-gradient(45deg, #f857a6, #ff5858);
-      color: white;
-      border: none;
-      padding: 15px 30px;
-      font-size: 1.5rem;
-      border-radius: 30px;
-      box-shadow: 0 10px 20px rgba(248, 87, 166, 0.4);
-      transition: all 0.2s ease-in-out;
-    }
-
-    .useless-button:hover {
-      background: linear-gradient(45deg, #ff5858, #f857a6);
-      transform: scale(1.1);
-    }
-
-    .reaction {
-      margin-top: 30px;
+      color: #fff;
+      font-style: italic;
       font-size: 1.2rem;
-      color: #555;
-      opacity: 0;
-      transition: opacity 0.5s ease;
+      opacity: 0.8;
+      z-index: 1;
     }
 
-    .reaction.show {
-      opacity: 1;
-    }
   </style>
 </head>
 <body>
-  <div class="useless-box">
-    <h1>Ceci est le site le plus inutile.</h1>
-    <p>Mais avoue… c’est joli non ?</p>
-    <button class="useless-button" onclick="react()">Clique-moi pour rien</button>
-    <div id="reaction" class="reaction">Bravo. Tu as cliqué. C’est toujours inutile.</div>
-  </div>
+
+  <div class="globe" id="globe"></div>
+  <div class="rope" id="rope"></div>
+  <div class="door" id="door"></div>
+  <div class="bear" id="bear"></div>
+  <div class="quote">"Ce site ne sert à rien, et c’est ça qui le rend indispensable."</div>
 
   <script>
-    function react() {
-      const reaction = document.getElementById('reaction');
-      reaction.classList.add('show');
-      reaction.innerText = "Encore un clic… toujours aussi inutile.";
+    const rope = document.getElementById('rope');
+    const body = document.body;
+    const globe = document.getElementById('globe');
+    const door = document.getElementById('door');
+    const bear = document.getElementById('bear');
+    let lightOn = true;
+    let bearCooldown = false;
+
+    rope.addEventListener('click', () => {
+      if (!lightOn || bearCooldown) return;
+      // Allumer : passage à obscur après délai
+      body.classList.add('dimmed');
+      globe.style.boxShadow = '0 0 0 0 rgba(0,0,0,0)';
+      lightOn = false;
+
+      // Porte s’ouvre
       setTimeout(() => {
-        reaction.innerText = "Tu veux recommencer ?";
+        door.classList.add('open');
+      }, 500);
+
+      // L’ourse sort
+      setTimeout(() => {
+        bear.classList.add('show');
+      }, 1500);
+
+      // Elle tire la corde (ré-éteint)
+      setTimeout(() => {
+        body.classList.remove('dimmed');
+        globe.style.boxShadow = '0 0 40px 10px rgba(255, 255, 200, 0.8)';
+        lightOn = true;
       }, 3000);
-    }
+
+      // Elle repart et porte se ferme
+      setTimeout(() => {
+        bear.classList.remove('show');
+        door.classList.remove('open');
+        bearCooldown = true;
+        setTimeout(() => bearCooldown = false, 2000);
+      }, 4000);
+    });
   </script>
+
 </body>
 </html>

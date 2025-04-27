@@ -494,7 +494,7 @@ function completer(button) {
     showToast("Réparation complétée avec succès ✅");
     setTimeout(() => {
       chargerReparations(true); // Recharge rapide (true pour NO RESET)
-    }, 500);
+    }, 2000);
   })
   .catch(error => {
     console.error("Erreur mise à jour:", error);

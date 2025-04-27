@@ -50,7 +50,7 @@
 
 </div>
 
-<!-- ... (le head et le body restent identiques, juste le script change un peu) -->
+<!-- (head et body restent identiques, voici le nouveau script amélioré) -->
 
 <script>
 // Données simulées
@@ -60,7 +60,7 @@ let aFaire = [
   { id: 3, date: "2025-04-18", nom: "Luc Gagnon", unite: "Excavatrice 501", description: "Réparer fuite hydraulique." }
 ];
 
-let fait = []; // Réparations complétées
+let fait = [];
 
 function showTab(tab) {
   document.getElementById('a-faire-tab').classList.remove('active');
@@ -86,13 +86,18 @@ function renderAFaire() {
   const search = document.getElementById('searchInput').value.toLowerCase();
   content.innerHTML = '';
 
-  const filtered = aFaire.filter(item => item.unite.toLowerCase().includes(search));
+  // 1. Appliquer le filtre recherche
+  let filtered = aFaire.filter(item => item.unite.toLowerCase().includes(search));
+
+  // 2. Trier par urgence
+  filtered.sort((a, b) => getUrgenceLevel(b.date) - getUrgenceLevel(a.date));
 
   if (filtered.length === 0) {
     content.innerHTML = '<div class="text-center text-muted">Aucune réparation trouvée.</div>';
     return;
   }
 
+  // 3. Afficher
   filtered.forEach(item => {
     const urgenceBadge = getUrgenceBadge(item.date);
 
@@ -135,6 +140,15 @@ function getUrgenceBadge(dateStr) {
   } else {
     return `<span class="badge bg-danger ms-2">URGENT</span>`;
   }
+}
+
+// Cette fonction donne un score numérique pour trier plus urgemment
+function getUrgenceLevel(dateStr) {
+  const today = new Date();
+  const repairDate = new Date(dateStr);
+  const diffTime = today - repairDate;
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays; // Plus de jours = plus urgent
 }
 
 function renderFait() {
@@ -201,7 +215,7 @@ function completer(button) {
   showTab('faire');
 }
 
-// Charger initialement
+// Initialiser la vue
 showTab('faire');
 </script>
 

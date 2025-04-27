@@ -98,7 +98,7 @@ let fait = [];
 
   async function chargerReparations() {
   try {
-    const response = await fetch("https://script.google.com/macros/s/AKfycbzKlB27HHe-8uA8i0LtJz4Zqc84kE2GSVorHdhjUYj8BVgLpskIBl8aRiGWC12VFOdh/exec?read=1");
+    const response = await fetch("https://script.google.com/macros/s/AKfycbwl1asucD_mFG273rs6C1pdIdI5Xfoc0M6esPFWaVPnDH-6mDx_jQXRbb3N0pnEeSao/exec?read=1");
     aFaire = await response.json();
     showTab('faire');
   } catch (error) {
@@ -155,29 +155,40 @@ function renderAFaire() {
   filtered.forEach(item => {
     const diffDays = getDaysSince(item.date);
     const badge = getDaysBadge(diffDays);
+    const hasFiles = item.fichiers && item.fichiers.length > 0;
+
     const div = document.createElement('div');
     div.className = 'list-group-item';
     div.innerHTML = `
       <div class="d-flex justify-content-between align-items-center">
         <div>
           <h6 class="mb-1">${item.unite} - ${item.nom}</h6>
+          ${hasFiles ? '<div class="text-warning small mt-1">📸 Fichiers attachés</div>' : ''}
           ${badge}<br>
           <small class="text-muted">${formatDate(item.date)}</small>
           <p class="mb-1">${item.description}</p>
         </div>
         <div><small class="text-primary">🔽 Voir</small></div>
       </div>
-      <div class="details">
+      <div class="details mt-2">
+        ${hasFiles ? `
+          <div class="mb-3 d-flex flex-wrap gap-2">
+            ${item.fichiers.map(f => isImage(f) 
+              ? `<img src="${f}" style="height: 80px; border-radius: 8px; cursor: pointer;" onclick="openImage('${f}')">`
+              : `<a href="${f}" target="_blank" class="btn btn-sm btn-outline-primary">🎥 Voir vidéo</a>`).join('')}
+          </div>
+        ` : ''}
+        
         <textarea class="form-control mb-2" placeholder="🛠️ Réparations effectuées" oninput="checkFields(this)"></textarea>
 
-       <label class="form-label mt-2">⏱️ Temps de réparation</label>
+        <label class="form-label mt-2">⏱️ Temps de réparation</label>
         <div class="mb-2"><strong id="timeDisplay">Sélectionnez le temps</strong></div>
         <input type="range" class="form-range" min="0" max="240" step="15" value="0" oninput="updateTimeDisplay(this)">
         <button class="btn btn-success btn-completer mt-3" onclick="completer(this)" disabled>✅ Compléter</button>
       </div>
     `;
     div.addEventListener('click', function(e) {
-      if (!e.target.closest('textarea') && !e.target.closest('input[type=range]') && !e.target.closest('button')) {
+      if (!e.target.closest('textarea') && !e.target.closest('input[type=range]') && !e.target.closest('button') && !e.target.closest('a') && !e.target.closest('img')) {
         this.classList.toggle('opened');
       }
     });
@@ -186,6 +197,19 @@ function renderAFaire() {
 
   updateCounters();
 }
+
+// Petite fonction utilitaire pour détecter si c'est une image
+function isImage(url) {
+  return url.match(/\.(jpeg|jpg|gif|png)$/i);
+}
+
+// Fonction pour ouvrir une image en grand (popup native)
+function openImage(url) {
+  const w = window.open();
+  w.document.write('<img src="' + url + '" style="width:100%">');
+}
+
+
 
 function renderFait() {
   const content = document.getElementById('faitList');
@@ -323,7 +347,7 @@ function completer(button) {
 
   aFaire = aFaire.filter(r => r.id !== id);
 
-fetch("https://script.google.com/macros/s/AKfycbzKlB27HHe-8uA8i0LtJz4Zqc84kE2GSVorHdhjUYj8BVgLpskIBl8aRiGWC12VFOdh/exec", {
+fetch("https://script.google.com/macros/s/AKfycbwl1asucD_mFG273rs6C1pdIdI5Xfoc0M6esPFWaVPnDH-6mDx_jQXRbb3N0pnEeSao/exec", {
   method: "POST",
   mode: "no-cors",
   headers: {

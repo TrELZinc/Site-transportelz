@@ -565,10 +565,10 @@ function showToast(message = "Succès") {
 
   <!-- Petit Popup Media -->
 <div id="popupOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); z-index:1050; justify-content:center; align-items:center;">
-  <div id="popupContent" style="position:relative; max-width:90%; max-height:90%;">
-    <button onclick="closePopup()" style="position:absolute; top:-10px; right:-10px; background:red; color:white; border:none; border-radius:50%; width:30px; height:30px; font-weight:bold;">&times;</button>
-    <div id="popupInner" style="width:100%; height:100%;"></div>
-  </div>
+<div id="popupContent" style="position:relative; padding:20px; background:transparent;">
+  <button onclick="closePopup()" style="position:absolute; top:-10px; right:-10px; background:red; color:white; border:none; border-radius:50%; width:30px; height:30px; font-weight:bold;">&times;</button>
+  <div id="popupInner" style="display:flex; align-items:center; justify-content:center;"></div>
+</div>
 </div>
   
 <!-- Toast Notification -->

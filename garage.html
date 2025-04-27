@@ -313,21 +313,26 @@ function initGalleries() {
 }
 
 function transformDriveUrl(url, type = "image", full = false) {
-  let match = url.match(/\/d\/([^\/]+)/) || url.match(/id=([^&]+)/);
-  if (!match) return url;
-
-  const id = match[1];
-
-  if (type.startsWith("video")) {
-    return `https://drive.google.com/file/d/${id}/preview`;
+  let match = url.match(/\/d\/([^\/]+)/);
+  if (!match) {
+    match = url.match(/id=([^&]+)/);
+  }
+  
+  if (match && match[1]) {
+    const id = match[1];
+    if (type.startsWith("video")) {
+      return `https://drive.google.com/file/d/${id}/preview`;
+    }
+    if (full) {
+      // lien IMAGE haute résolution
+      return `https://drive.google.com/thumbnail?id=${id}&sz=w1600-h1200`;
+    } else {
+      // lien MINIATURE légère
+      return `https://drive.google.com/thumbnail?id=${id}&sz=w400-h400`;
+    }
   }
 
-  if (full) {
-    // on ne charge PAS uc= car Google Drive bloque parfois
-    return `https://drive.google.com/file/d/${id}/preview`;
-  } else {
-    return `https://drive.google.com/thumbnail?id=${id}`;
-  }
+  return url; // fallback
 }
 
 function renderFait() {

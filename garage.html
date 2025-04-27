@@ -114,7 +114,7 @@ input[type=range]::-webkit-slider-thumb {
 
   <!-- Zone de filtre -->
   <div id="filterZone" class="mb-3">
-    <input type="text" class="form-control" id="searchInput" placeholder="🔎 Filtrer par unité..." oninput="entTab()">
+    <input type="text" class="form-control" id="searchInput" placeholder="🔎 Filtrer par unité..." oninput="renderCurrentTab()">
   </div>
 
   <!-- Contenus -->
@@ -143,9 +143,10 @@ async function chargerReparations(noReset = false) {
     if (!noReset) {
       showTab('faire');
     } else {
-      entTab(); 
+      renderCurrentTab();
       updateCounters();
     }
+
   } catch (error) {
     console.error("Erreur de chargement :", error);
     alert("Erreur lors du chargement des réparations. Veuillez réessayer.");

@@ -207,7 +207,7 @@ function renderAFaire() {
               const type = isVideo ? "video" : "image";
               
               return `
-                <img src="${transformDriveUrl(f)}" class="img-thumbnail-mini" onclick="openMediaInModal('${transformDriveUrl(f, type)}', '${type}')">
+                <img src="${transformDriveUrl(f)}" class="img-thumbnail-mini" onclick="openPopupMedia('${transformDriveUrl(f, type)}', '${type}')">
               `;
             }).join('')}
 
@@ -411,21 +411,25 @@ function checkFields(input) {
   }
 }
 
-  function openMediaInModal(url, type) {
-  const container = document.getElementById('modalMediaContainer');
-  container.innerHTML = '';
+function openPopupMedia(url, type) {
+  const overlay = document.getElementById('popupOverlay');
+  const content = document.getElementById('popupInner');
+  content.innerHTML = '';
 
   if (type.startsWith('image')) {
-    container.innerHTML = `<img src="${url}" class="img-fluid w-100" alt="Image">`;
+    content.innerHTML = `<img src="${url}" style="max-width:100%; max-height:100%; border-radius:10px;">`;
   } else if (type.startsWith('video')) {
-    container.innerHTML = `
-      <iframe src="${url}" frameborder="0" allow="autoplay; fullscreen" allowfullscreen style="width:100%; height:80vh;"></iframe>
-    `;
+    content.innerHTML = `<iframe src="${url}" frameborder="0" allow="autoplay; fullscreen" allowfullscreen style="width:100%; height:80%; border-radius:10px;"></iframe>`;
   }
 
-  const modal = new bootstrap.Modal(document.getElementById('mediaModal'));
-  modal.show();
+  overlay.style.display = 'flex';
 }
+
+function closePopup() {
+  const overlay = document.getElementById('popupOverlay');
+  overlay.style.display = 'none';
+}
+
 
 function completer(button) {
   const item = button.closest('.list-group-item');
@@ -495,6 +499,15 @@ function updateCounters() {
     </div>
   </div>
 </div>
+
+  <!-- Petit Popup Media -->
+<div id="popupOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); z-index:1050; justify-content:center; align-items:center;">
+  <div id="popupContent" style="position:relative; max-width:90%; max-height:90%;">
+    <button onclick="closePopup()" style="position:absolute; top:-10px; right:-10px; background:red; color:white; border:none; border-radius:50%; width:30px; height:30px; font-weight:bold;">&times;</button>
+    <div id="popupInner" style="width:100%; height:100%;"></div>
+  </div>
+</div>
+
   
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 

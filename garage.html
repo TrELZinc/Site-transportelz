@@ -173,9 +173,11 @@ function renderAFaire() {
       <div class="details mt-2">
         ${hasFiles ? `
           <div class="mb-3 d-flex flex-wrap gap-2">
-            ${item.fichiers.map(f => isImage(f) 
-              ? `<img src="${f}" style="height: 80px; border-radius: 8px; cursor: pointer;" onclick="openImage('${f}')">`
-              : `<a href="${f}" target="_blank" class="btn btn-sm btn-outline-primary">🎥 Voir vidéo</a>`).join('')}
+            ${item.fichiers.map(f => 
+                f.includes('drive.google.com') 
+                ? `<img src="${transformDriveUrl(f)}" style="height: 80px; border-radius: 8px; cursor: pointer;" onclick="openImage('${transformDriveUrl(f)}')">`
+                : `<a href="${f}" target="_blank" class="btn btn-sm btn-outline-primary">Voir fichier</a>`
+            ).join('')}
           </div>
         ` : ''}
         
@@ -198,18 +200,21 @@ function renderAFaire() {
   updateCounters();
 }
 
-// Petite fonction utilitaire pour détecter si c'est une image
-function isImage(url) {
-  return url.match(/\.(jpeg|jpg|gif|png)$/i);
+
+// Utilitaire pour transformer lien Drive en lien image
+function transformDriveUrl(url) {
+  const idMatch = url.match(/\/d\/(.*?)\//);
+  if (idMatch && idMatch[1]) {
+    return `https://drive.google.com/uc?id=${idMatch[1]}`;
+  }
+  return url; // fallback
 }
 
-// Fonction pour ouvrir une image en grand (popup native)
+// Utilitaire pour ouvrir en grand au clic
 function openImage(url) {
   const w = window.open();
   w.document.write('<img src="' + url + '" style="width:100%">');
 }
-
-
 
 function renderFait() {
   const content = document.getElementById('faitList');

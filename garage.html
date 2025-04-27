@@ -241,6 +241,29 @@ function renderAFaire() {
           <span class="text-muted">${escapeHtml(item.description)}</span>
         </p>
 
+        ${hasFiles ? `
+          <div class="mb-3 d-flex flex-wrap gap-2 gallery" id="gallery-${item.id}">
+            ${item.fichiers.map(f => {
+              const ext = f.toLowerCase();
+              const isVideo = ext.includes(".mp4") || ext.includes(".mov") || ext.includes(".webm");
+              const type = isVideo ? "video" : "image";
+              const src = transformDriveUrl(f, type);
+
+              if (type === "image") {
+                return `
+                  <a href="${src}" data-pswp-width="1600" data-pswp-height="1200" class="gallery-link">
+                    <img src="${src}" class="img-thumbnail-mini">
+                  </a>
+                `;
+              } else {
+                return `
+                  <img src="${src}" class="img-thumbnail-mini" onclick="openPopupMedia('${src}', '${type}')">
+                `;
+              }
+            }).join('')}
+          </div>
+        ` : ''}
+
         <label class="form-label mt-2">🛠️ Réparations effectuées</label>
         <textarea class="form-control mb-3" rows="2" placeholder="Décrire la réparation..." oninput="checkFields(this)"></textarea>
 
@@ -253,7 +276,7 @@ function renderAFaire() {
     `;
 
     div.addEventListener('click', function(e) {
-      if (!e.target.closest('a') && !e.target.closest('textarea') && !e.target.closest('input') && !e.target.closest('button')) {
+      if (!e.target.closest('a') && !e.target.closest('textarea') && !e.target.closest('input') && !e.target.closest('button') && !e.target.closest('img')) {
         this.classList.toggle('opened');
         const details = this.querySelector('.details');
         if (this.classList.contains('opened')) {
@@ -268,6 +291,7 @@ function renderAFaire() {
 
     content.appendChild(div);
   });
+
   initGalleries();
   updateCounters();
 }

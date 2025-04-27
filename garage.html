@@ -470,40 +470,30 @@ function completer(button) {
 
   const id = aFaire.find(r => title.includes(r.nom)).id;
 
-  fait.push({
-    id: id,
-    unite: title.split(" - ")[0].trim(),
-    nom: title.split(" - ")[1].trim(),
-    date: subtitle,
-    description: description,
-    notes: textarea,
-    temps: temps
-  });
-
-  aFaire = aFaire.filter(r => r.id !== id);
-
-fetch("https://script.google.com/macros/s/AKfycby8eRNmj1-ApWoVYv2JUKhr_FL_q1_AvnNZlRax7nacutt7meMkEc6TE5023aBQTes0/exec", {
-  method: "POST",
-  mode: "no-cors",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    update: true,
-    id: id,
-    notes: textarea,
-    temps: temps
+  fetch("https://script.google.com/macros/s/AKfycby8eRNmj1-ApWoVYv2JUKhr_FL_q1_AvnNZlRax7nacutt7meMkEc6TE5023aBQTes0/exec", {
+    method: "POST",
+    mode: "no-cors",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      update: true,
+      id: id,
+      notes: textarea,
+      temps: temps
+    })
   })
-})
-.then(() => console.log("Mise à jour envoyée (mode no-cors)"))
-.catch(error => console.error("Erreur mise à jour:", error));
-
-
-
-  alert("Réparation complétée avec succès!");
-
-  showTab('faire');
+  .then(() => {
+    alert("Réparation complétée avec succès!");
+    // 🔥 Recharger les données depuis Google Sheet
+    chargerReparations();
+  })
+  .catch(error => {
+    console.error("Erreur mise à jour:", error);
+    alert("Erreur lors de l'envoi au serveur.");
+  });
 }
+
 
 function updateCounters() {
   const aFaireCount = aFaire.filter(item => !item.notes || item.notes.trim() === "").length;

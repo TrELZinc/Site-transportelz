@@ -170,7 +170,7 @@ function showTab(tab) {
   if (tab === 'faire') {
     document.getElementById('a-faire-tab').classList.add('active');
     document.getElementById('faireList').classList.remove('d-none');
-    renderAFaire();
+    Faire();
   } else {
     document.getElementById('fait-tab').classList.add('active');
     document.getElementById('faitList').classList.remove('d-none');
@@ -182,7 +182,7 @@ function showTab(tab) {
 }
 
 function renderCurrentTab() {
-  if (currentTab === 'faire') renderAFaire();
+  if (currentTab === 'faire') Faire();
   else renderFait();
 }
 
@@ -191,10 +191,11 @@ function renderAFaire() {
   const search = document.getElementById('searchInput').value.toLowerCase();
   content.innerHTML = '';
 
-  let filtered = aFaire.filter(item => 
-  item.unite.toLowerCase().includes(search) && 
-  (!item.notes || item.notes.trim() === "")
-  );  
+  let filtered = aFaire.filter(item => {
+    const notes = (item.notes || "").trim(); // sécurisation importante ici
+    return item.unite.toLowerCase().includes(search) && notes === "";
+  });
+
 
   filtered.sort((a, b) => getUrgenceLevel(b.date) - getUrgenceLevel(a.date));
 

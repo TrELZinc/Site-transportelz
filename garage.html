@@ -66,7 +66,6 @@
 
 <!-- Juste la partie dynamique JS modifiée car le reste du HTML est correct -->
 
-<!-- script JS amélioré -->
 <script>
 // Données simulées
 let aFaire = [
@@ -96,6 +95,7 @@ function showTab(tab) {
     document.getElementById('faitList').classList.remove('d-none');
     renderFait();
   }
+  updateCounters();
 }
 
 function renderCurrentTab() {
@@ -113,6 +113,7 @@ function renderAFaire() {
 
   if (filtered.length === 0) {
     content.innerHTML = '<div class="text-center text-muted">Aucune réparation trouvée.</div>';
+    updateCounters();
     return;
   }
 
@@ -135,7 +136,7 @@ function renderAFaire() {
         <textarea class="form-control mb-2" placeholder="🛠️ Réparations effectuées" oninput="checkFields(this)"></textarea>
 
         <label class="form-label mt-2">⏱️ Temps de réparation</label>
-        <input type="range" class="form-range" min="0" max="480" step="15" value="0" oninput="updateTimeDisplay(this)">
+        <input type="range" class="form-range" min="0" max="240" step="15" value="0" oninput="updateTimeDisplay(this)">
         <div class="mb-2"><strong id="timeDisplay">Sélectionnez le temps</strong></div>
 
         <button class="btn btn-success btn-sm" onclick="completer(this)" disabled>✅ Compléter</button>
@@ -148,6 +149,8 @@ function renderAFaire() {
     });
     content.appendChild(div);
   });
+
+  updateCounters();
 }
 
 function renderFait() {
@@ -263,6 +266,10 @@ function completer(button) {
   alert("Réparation complétée avec succès!");
 
   showTab('faire');
+}
+
+function updateCounters() {
+  document.getElementById('a-faire-tab').innerHTML = `À faire (${aFaire.length})`;
 }
 
 // Démarrer

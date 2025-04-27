@@ -253,7 +253,7 @@ const fullSrc = transformDriveUrl(f, type, true);
 
 if (type === "image") {
   return `
-<a href="${fullSrc}" class="gallery-link">
+<img src="${thumbSrc}" class="img-thumbnail-mini" onclick="openPopupMedia('${fullSrc}', 'image')">
       <img src="${thumbSrc}" class="img-thumbnail-mini">
     </a>
   `;

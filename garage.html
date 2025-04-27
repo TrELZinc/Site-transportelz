@@ -344,7 +344,7 @@ function renderFait() {
       <div class="d-flex justify-content-between align-items-center">
         <div class="w-100">
           <h6 class="mb-1">${item.unite} - ${item.nom}</h6>
-          <small class="text-muted">${item.date}</small>
+          <small class="text-muted">${formatDate(item.date)}</small>
           <div class="mb-2">${escapeHtml(truncateText(item.description, 60))}</div>
         </div>
         <div class="ms-2">

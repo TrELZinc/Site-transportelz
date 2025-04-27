@@ -197,7 +197,7 @@ function renderFait() {
         <div>
           <h6 class="mb-1">${item.unite} - ${item.nom}</h6>
           <small class="text-muted">${item.date}</small>
-          <p class="mb-1">${item.description}</p>
+          p class="mb-1">${truncateText(item.description, 60)}</p>
         </div>
         <div><small class="text-primary">🔽 Voir</small></div>
       </div>
@@ -212,6 +212,11 @@ function renderFait() {
     });
     content.appendChild(div);
   });
+}
+
+function truncateText(text, maxLength) {
+  if (text.length <= maxLength) return text;
+  return text.substring(0, maxLength) + "...";
 }
 
 function getDaysSince(dateStr) {

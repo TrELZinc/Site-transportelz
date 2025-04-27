@@ -201,13 +201,13 @@ function renderAFaire() {
 }
 
 
-// Utilitaire pour transformer lien Drive en lien image
 function transformDriveUrl(url) {
-  const idMatch = url.match(/\/d\/(.*?)\//);
+  // Essayer de récupérer l'ID du fichier Drive
+  const idMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
   if (idMatch && idMatch[1]) {
-    return `https://drive.google.com/uc?id=${idMatch[1]}`;
+    return `https://drive.google.com/uc?id=${idMatch[1]}&export=download`;
   }
-  return url; // fallback
+  return url; // fallback: si c'est pas un lien Drive, on retourne normal
 }
 
 // Utilitaire pour ouvrir en grand au clic

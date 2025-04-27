@@ -247,9 +247,9 @@ ${hasFiles ? `
       const ext = f.toLowerCase();
       const isVideo = ext.includes(".mp4") || ext.includes(".mov") || ext.includes(".webm");
       const type = isVideo ? "video" : "image";
-      
-      const thumbSrc = transformDriveUrl(f, type); // miniature
-      const fullSrc = transformDriveUrl(f, type, true); // HD pour clic
+
+      const thumbSrc = transformDriveUrl(f, type, false); // miniature
+      const fullSrc = transformDriveUrl(f, type, true);   // HD pour PhotoSwipe
 
       if (type === "image") {
         return `

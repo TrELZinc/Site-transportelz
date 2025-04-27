@@ -250,17 +250,16 @@ function renderAFaire() {
               const src = transformDriveUrl(f, type);
 
               if (type === "image") {
-                return `
-                  <a href="${src}" data-pswp-width="1600" data-pswp-height="1200" class="gallery-link">
-                    <img src="${src}" class="img-thumbnail-mini">
-                  </a>
-                `;
-              } else {
-                return `
-                  <img src="${src}" class="img-thumbnail-mini" onclick="openPopupMedia('${src}', '${type}')">
-                `;
-              }
-            }).join('')}
+  return `
+    <a href="${transformDriveUrl(f, type, true)}" data-pswp-width="1600" data-pswp-height="1200" class="gallery-link">
+      <img src="${transformDriveUrl(f, type)}" class="img-thumbnail-mini">
+    </a>
+  `;
+} else {
+  return `
+    <img src="${transformDriveUrl(f, type)}" class="img-thumbnail-mini" onclick="openPopupMedia('${transformDriveUrl(f, type)}', '${type}')">
+  `;
+}
           </div>
         ` : ''}
 
@@ -310,21 +309,25 @@ function initGalleries() {
   });
 }
 
-function transformDriveUrl(url, type = "image") {
+function transformDriveUrl(url, type = "image", full = false) {
   let match = url.match(/\/d\/([^\/]+)/);
   if (match && match[1]) {
     const id = match[1];
-    return type.startsWith("video") 
-      ? `https://drive.google.com/file/d/${id}/preview` 
-      : `https://drive.google.com/thumbnail?id=${id}`;
+    return full
+      ? `https://drive.google.com/uc?id=${id}`
+      : (type.startsWith("video")
+        ? `https://drive.google.com/file/d/${id}/preview`
+        : `https://drive.google.com/thumbnail?id=${id}`);
   }
 
   match = url.match(/id=([^&]+)/);
   if (match && match[1]) {
     const id = match[1];
-    return type.startsWith("video") 
-      ? `https://drive.google.com/file/d/${id}/preview`
-      : `https://drive.google.com/thumbnail?id=${id}`;
+    return full
+      ? `https://drive.google.com/uc?id=${id}`
+      : (type.startsWith("video")
+        ? `https://drive.google.com/file/d/${id}/preview`
+        : `https://drive.google.com/thumbnail?id=${id}`);
   }
 
   return url; // fallback

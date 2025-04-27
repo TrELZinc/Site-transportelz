@@ -248,20 +248,20 @@ ${hasFiles ? `
       const isVideo = ext.includes(".mp4") || ext.includes(".mov") || ext.includes(".webm");
       const type = isVideo ? "video" : "image";
 
-      const thumbSrc = transformDriveUrl(f, type, false); // miniature
-      const fullSrc = transformDriveUrl(f, type, true);   // HD pour PhotoSwipe
+      const thumbSrc = transformDriveUrl(f, type, false);
+const fullSrc = transformDriveUrl(f, type, true);
 
-      if (type === "image") {
-        return `
-          <a href="${fullSrc}" data-pswp-width="1600" data-pswp-height="1200" class="gallery-link">
-            <img src="${thumbSrc}" class="img-thumbnail-mini">
-          </a>
-        `;
-      } else {
-        return `
-          <img src="${thumbSrc}" class="img-thumbnail-mini" onclick="openPopupMedia('${fullSrc}', '${type}')">
-        `;
-      }
+if (type === "image") {
+  return `
+    <a href="${fullSrc}" data-pswp-width="1600" data-pswp-height="1200" class="gallery-link">
+      <img src="${thumbSrc}" class="img-thumbnail-mini">
+    </a>
+  `;
+} else {
+  return `
+    <img src="${thumbSrc}" class="img-thumbnail-mini" onclick="openPopupMedia('${fullSrc}', '${type}')">
+  `;
+}
     }).join('')}
   </div>
 ` : ''}
@@ -313,26 +313,21 @@ function initGalleries() {
 }
 
 function transformDriveUrl(url, type = "image", full = false) {
-  let match = url.match(/\/d\/([^\/]+)/);
-  if (!match) {
-    match = url.match(/id=([^&]+)/);
+  let match = url.match(/\/d\/([^\/]+)/) || url.match(/id=([^&]+)/);
+  if (!match) return url;
+
+  const id = match[1];
+
+  if (type.startsWith("video")) {
+    return `https://drive.google.com/file/d/${id}/preview`;
   }
 
-  if (match && match[1]) {
-    const id = match[1];
-    if (type.startsWith("video")) {
-      return `https://drive.google.com/file/d/${id}/preview`;
-    }
-    if (full) {
-      // lien FULL SIZE non compressé
-      return `https://drive.google.com/uc?id=${id}`;
-    } else {
-      // miniature auto-optimisée
-      return `https://drive.google.com/thumbnail?id=${id}`;
-    }
+  if (full) {
+    // on ne charge PAS uc= car Google Drive bloque parfois
+    return `https://drive.google.com/file/d/${id}/preview`;
+  } else {
+    return `https://drive.google.com/thumbnail?id=${id}`;
   }
-
-  return url; // fallback
 }
 
 function renderFait() {

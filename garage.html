@@ -490,12 +490,15 @@ function completer(button) {
       temps: temps
     })
   })
-  .then(() => {
-    showToast("Réparation complétée avec succès ✅");
-    setTimeout(() => {
-      chargerReparations(true); // Recharge rapide (true pour NO RESET)
-    }, 2000);
-  })
+.then(() => {
+  showToast("Réparation complétée avec succès ✅");
+  
+  // Nouvelle logique plus propre
+  setTimeout(() => {
+    console.log("Recharge après 2 secondes pour laisser Google Sheet se mettre à jour...");
+    chargerReparations(true);
+  }, 2000); // 2 secondes, pas moins !
+})
   .catch(error => {
     console.error("Erreur mise à jour:", error);
     alert("Erreur lors de l'envoi au serveur.");

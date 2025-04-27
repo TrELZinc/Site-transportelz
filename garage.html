@@ -249,19 +249,11 @@ ${hasFiles ? `
       const type = isVideo ? "video" : "image";
 
       const thumbSrc = transformDriveUrl(f, type, false);
-const fullSrc = transformDriveUrl(f, type, true);
+      const fullSrc = transformDriveUrl(f, type, true);
 
-if (type === "image") {
-  return `
-<img src="${thumbSrc}" class="img-thumbnail-mini" onclick="openPopupMedia('${fullSrc}', 'image')">
-      <img src="${thumbSrc}" class="img-thumbnail-mini">
-    </a>
-  `;
-} else {
-  return `
-    <img src="${thumbSrc}" class="img-thumbnail-mini" onclick="openPopupMedia('${fullSrc}', '${type}')">
-  `;
-}
+      return `
+        <img src="${thumbSrc}" class="img-thumbnail-mini" onclick="openPopupMedia('${fullSrc}', '${type}')">
+      `;
     }).join('')}
   </div>
 ` : ''}

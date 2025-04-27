@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Réparations Mobile Démo</title>
+  <title>Réparations Mobile Démo 2.0</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
@@ -61,13 +61,14 @@ function renderList() {
         <div><small class="text-primary">Voir</small></div>
       </div>
       <div class="details">
-        <textarea class="form-control mb-2" placeholder="Ajouter des détails..."></textarea>
-        <button class="btn btn-success btn-sm" onclick="completer(this)">Compléter</button>
+        <textarea class="form-control mb-2" placeholder="Réparations effectuées" oninput="checkFields(this)"></textarea>
+        <input type="number" class="form-control mb-2" placeholder="Temps (minutes)" min="0" oninput="checkFields(this)">
+        <button class="btn btn-success btn-sm" onclick="completer(this)" disabled>Compléter</button>
       </div>
     `;
 
     div.addEventListener('click', function(e) {
-      if (!e.target.closest('button')) { // ne pas fermer quand on clique sur le bouton
+      if (!e.target.closest('textarea') && !e.target.closest('input') && !e.target.closest('button')) {
         this.classList.toggle('opened');
       }
     });
@@ -76,22 +77,32 @@ function renderList() {
   });
 }
 
+function checkFields(input) {
+  const container = input.closest('.details');
+  const textarea = container.querySelector('textarea');
+  const timeInput = container.querySelector('input[type="number"]');
+  const button = container.querySelector('button');
+
+  if (textarea.value.trim() !== "" && timeInput.value.trim() !== "" && parseInt(timeInput.value) > 0) {
+    button.disabled = false;
+  } else {
+    button.disabled = true;
+  }
+}
+
 function completer(button) {
   const item = button.closest('.list-group-item');
   const note = item.querySelector('textarea').value.trim();
-
-  if (note === "") {
-    alert("Merci d'ajouter un commentaire avant de compléter !");
-    return;
-  }
+  const temps = item.querySelector('input[type="number"]').value.trim();
 
   item.classList.add('text-muted');
   item.querySelector('textarea').disabled = true;
+  item.querySelector('input[type="number"]').disabled = true;
   button.disabled = true;
   button.innerText = "Complété";
   item.style.backgroundColor = "#d4edda"; // vert pâle pour visuel
 
-  alert("Réparation complétée avec la note : " + note);
+  alert(`Réparation complétée!\nNotes: ${note}\nTemps: ${temps} minutes`);
 }
 
 // Charger initialement

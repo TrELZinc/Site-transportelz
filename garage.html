@@ -64,7 +64,35 @@ let aFaire = [
   { id: 3, date: "2025-04-18", nom: "Luc Gagnon", unite: "Excavatrice 501", description: "Réparer fuite hydraulique." }
 ];
 
-let fait = [];
+let fait = [
+  {
+    id: 4,
+    unite: "Camion 202",
+    nom: "Maxime Roy",
+    date: "2025-04-23",
+    description: "Remplacement des freins avant.",
+    notes: "Remplacé plaquettes et disques. Nettoyage complet du système de freinage.",
+    temps: 120
+  },
+  {
+    id: 5,
+    unite: "Tracteur 450",
+    nom: "Sophie Martin",
+    date: "2025-04-24",
+    description: "Réglage du moteur et changement de filtres.",
+    notes: "Réglé l'injection, changé le filtre à air et filtre à huile.",
+    temps: 90
+  },
+  {
+    id: 6,
+    unite: "Chargeuse 880",
+    nom: "Éric Tremblay",
+    date: "2025-04-22",
+    description: "Réparation de la fuite hydraulique.",
+    notes: "Réparé tuyau principal et remplacé un raccord endommagé.",
+    temps: 150
+  }
+];
 
 function showTab(tab) {
   document.getElementById('a-faire-tab').classList.remove('active');

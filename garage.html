@@ -238,12 +238,21 @@ function renderAFaire() {
 
 
 function transformDriveUrl(url) {
-  const idMatch = url.match(/\/d\/([^/]+)/);
-  if (idMatch && idMatch[1]) {
-    return `https://drive.google.com/uc?export=view&id=${idMatch[1]}`;
+  // Cas classique "/d/FILE_ID"
+  let match = url.match(/\/d\/([^\/]+)/);
+  if (match && match[1]) {
+    return `https://drive.google.com/uc?export=view&id=${match[1]}`;
   }
+  
+  // Cas alternatif "/download?id=FILE_ID"
+  match = url.match(/id=([^&]+)/);
+  if (match && match[1]) {
+    return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+  }
+  
   return url; // fallback
 }
+
 
 
 function renderFait() {

@@ -120,6 +120,9 @@ input[type=range]::-webkit-slider-thumb {
   <!-- Contenus -->
   <div id="faireList" class="list-group"></div>
   <div id="faitList" class="list-group d-none"></div>
+  <div class="text-center my-3">
+  <button id="toggleFaitView" class="btn btn-secondary btn-sm" onclick="toggleFaitView()">Afficher tout</button>
+  </div>
 </div>
 
 <!-- Juste la partie dynamique JS modifiée car le reste du HTML est correct -->
@@ -128,6 +131,8 @@ input[type=range]::-webkit-slider-thumb {
 // Données simulées
 let aFaire = [];
 let fait = [];
+let showAllFait = false;
+
 
   async function chargerReparations() {
   try {
@@ -164,6 +169,8 @@ function showTab(tab) {
     renderFait();
   }
   updateCounters();
+
+  document.getElementById('toggleFaitView').style.display = (tab === 'fait') ? 'inline-block' : 'none';
 }
 
 function renderCurrentTab() {
@@ -302,10 +309,16 @@ function renderFait() {
   content.innerHTML = '';
 
   let filtered = aFaire.filter(item => 
-  item.notes && item.notes.trim() !== "" &&
-  item.unite.toLowerCase().includes(search)
+    item.notes && item.notes.trim() !== "" &&
+    item.unite.toLowerCase().includes(search)
   );
 
+  if (!showAllFait) {
+    filtered = filtered.filter(item => {
+      const days = getDaysSince(item.date);
+      return days <= 30; // Seulement si 30 jours ou moins
+    });
+  }
 
   if (filtered.length === 0) {
     content.innerHTML = '<div class="text-center text-muted">Aucune réparation complétée trouvée.</div>';
@@ -343,6 +356,14 @@ function renderFait() {
     });
     content.appendChild(div);
   });
+
+  updateCounters();
+}
+
+function toggleFaitView() {
+  showAllFait = !showAllFait;
+  document.getElementById('toggleFaitView').innerText = showAllFait ? "Afficher seulement 30 jours" : "Afficher tout";
+  renderFait();
 }
 
 function truncateText(text, maxLength) {

@@ -60,6 +60,9 @@ input[type=range]::-webkit-slider-thumb {
   font-size: 1.2rem;
   font-weight: bold;
 }
+.description-tronquee {
+  min-height: 40px;
+}
 .img-thumbnail-mini {
   height: 80px;
   width: 80px;
@@ -208,74 +211,55 @@ function renderAFaire() {
     return;
   }
 
-  filtered.forEach(item => {
-    const diffDays = getDaysSince(item.date);
-    const badge = getDaysBadge(diffDays);
-    const hasFiles = item.fichiers && item.fichiers.length > 0;
+filtered.forEach(item => {
+  const diffDays = getDaysSince(item.date);
+  const badge = getDaysBadge(diffDays);
+  const hasFiles = item.fichiers && item.fichiers.length > 0;
 
-    const div = document.createElement('div');
-    div.className = 'list-group-item';
-    div.innerHTML = `
-      <div class="d-flex justify-content-between align-items-center">
-        <div>
-          <h6 class="mb-1">${item.unite} - ${item.nom}</h6>
-          ${hasFiles ? '<div class="text-warning small mt-1">📸 Fichiers attachés</div>' : ''}
-          ${badge}<br>
-          <small class="text-muted">${formatDate(item.date)}</small>
-          <p class="mb-1">${item.description}</p>
-        </div>
-        <div><small class="text-primary">🔽 Voir</small></div>
+  const div = document.createElement('div');
+  div.className = 'list-group-item p-3 position-relative';
+  div.style.minHeight = "120px";
+
+  div.innerHTML = `
+    <div class="d-flex justify-content-between align-items-start">
+      <div class="w-100 pe-4">
+        <h6 class="mb-1">${item.unite} - ${item.nom}</h6>
+        ${hasFiles ? '<div class="text-warning small mt-1">📸 Fichiers attachés</div>' : ''}
+        ${badge}
+        <br>
+        <small class="text-muted">${formatDate(item.date)}</small>
+        <div class="mb-2 description-tronquee">${escapeHtml(truncateText(item.description, 60))}</div>
       </div>
-
-      <div class="details mt-2" style="display: none;">
-        ${hasFiles ? `
-          <div class="mb-3 d-flex flex-wrap gap-2 gallery" id="gallery-${item.id}">
-            ${item.fichiers.map(f => {
-              const ext = f.toLowerCase();
-              const isVideo = ext.includes(".mp4") || ext.includes(".mov") || ext.includes(".webm");
-              const type = isVideo ? "video" : "image";
-              const src = transformDriveUrl(f, type);
-            
-              if (type === "image") {
-                return `
-                  <a href="${src}" data-pswp-width="1600" data-pswp-height="1200" class="gallery-link">
-                    <img src="${src}" class="img-thumbnail-mini">
-                  </a>
-                `;
-              } else {
-                // Vidéo = simple clic normal pour popup interne
-                return `
-                  <img src="${src}" class="img-thumbnail-mini" onclick="openPopupMedia('${src}', '${type}')">
-                `;
-              }
-            }).join('')}
-
-
-          </div>
-        ` : ''}
-        <textarea class="form-control mb-2" placeholder="🛠️ Réparations effectuées" oninput="checkFields(this)"></textarea>
-        <label class="form-label mt-2">⏱️ Temps de réparation</label>
-        <div class="mb-2"><strong id="timeDisplay">Sélectionnez le temps</strong></div>
-        <input type="range" class="form-range" min="0" max="240" step="15" value="0" oninput="updateTimeDisplay(this)">
-        <button class="btn btn-success btn-completer mt-3" onclick="completer(this)" disabled>✅ Compléter</button>
+      <div class="position-absolute top-0 end-0 p-2">
+        <small class="text-primary">🔽 Voir</small>
       </div>
-    `;
+    </div>
 
-    div.addEventListener('click', function(e) {
-      if (!e.target.closest('a') && !e.target.closest('img') && !e.target.closest('textarea') && !e.target.closest('input') && !e.target.closest('button')) {
-        this.classList.toggle('opened');
-        const details = this.querySelector('.details');
-        if (this.classList.contains('opened')) {
-          details.style.display = 'block';
-        } else {
-          details.style.display = 'none';
-        }
+    <div class="details mt-2 p-2 bg-light rounded" style="display: none;">
+      <hr>
+      <p class="mb-2">
+        <strong>📄 Description complète :</strong><br>
+        <span class="text-muted">${escapeHtml(item.description)}</span>
+      </p>
+    </div>
+  `;
+
+  div.addEventListener('click', function(e) {
+    if (!e.target.closest('a') && !e.target.closest('textarea') && !e.target.closest('input') && !e.target.closest('button')) {
+      this.classList.toggle('opened');
+      const details = this.querySelector('.details');
+      if (this.classList.contains('opened')) {
+        details.style.display = 'block';
+        this.querySelector('.description-tronquee').style.display = 'none';
+      } else {
+        details.style.display = 'none';
+        this.querySelector('.description-tronquee').style.display = 'block';
       }
-    });
-
-
-    content.appendChild(div);
+    }
   });
+
+  content.appendChild(div);
+});
   
   initGalleries();
   updateCounters();
@@ -486,8 +470,8 @@ function completer(button) {
   const textarea = item.querySelector('textarea').value.trim();
   const slider = item.querySelector('input[type=range]');
   const title = item.querySelector('h6').innerText;
-  const subtitle = item.querySelectorAll('small')[1].innerText;
-  const description = item.querySelector('p').innerText;
+  const subtitle = item.querySelector('small').innerText;
+  const description = item.querySelector('.description-tronquee')?.innerText || "";
 
   const minutes = parseInt(slider.value);
   const h = Math.floor(minutes / 60);
@@ -511,12 +495,10 @@ function completer(button) {
   })
 .then(() => {
   showToast("Réparation complétée avec succès ✅");
-  
-  // Nouvelle logique plus propre
   setTimeout(() => {
-    console.log("Recharge après 2 secondes pour laisser Google Sheet se mettre à jour...");
+    console.log("Recharge après 2 secondes...");
     chargerReparations(true);
-  }, 500); // 2 secondes, pas moins !
+  }, 500);
 })
   .catch(error => {
     console.error("Erreur mise à jour:", error);

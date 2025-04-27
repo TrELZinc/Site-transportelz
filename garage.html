@@ -66,6 +66,7 @@
 
 <!-- Juste la partie dynamique JS modifiée car le reste du HTML est correct -->
 
+<!-- script JS amélioré -->
 <script>
 // Données simulées
 let aFaire = [
@@ -74,26 +75,7 @@ let aFaire = [
   { id: 3, date: "2025-04-18", nom: "Luc Gagnon", unite: "Excavatrice 501", description: "Réparer fuite hydraulique." }
 ];
 
-let fait = [
-  {
-    id: 4,
-    unite: "Camion 202",
-    nom: "Maxime Roy",
-    date: "2025-04-23",
-    description: "Remplacement des freins avant.",
-    notes: "Remplacé plaquettes et disques. Nettoyage complet du système de freinage.",
-    temps: "2 heures"
-  },
-  {
-    id: 5,
-    unite: "Tracteur 450",
-    nom: "Sophie Martin",
-    date: "2025-04-24",
-    description: "Réglage du moteur et changement de filtres.",
-    notes: "Réglé l'injection, changé le filtre à air et filtre à huile.",
-    temps: "1 heure"
-  }
-];
+let fait = [];
 
 let currentTab = 'faire';
 
@@ -136,13 +118,14 @@ function renderAFaire() {
 
   filtered.forEach(item => {
     const diffDays = getDaysSince(item.date);
+    const badge = getDaysBadge(diffDays);
     const div = document.createElement('div');
     div.className = 'list-group-item';
     div.innerHTML = `
       <div class="d-flex justify-content-between align-items-center">
         <div>
           <h6 class="mb-1">${item.unite} - ${item.nom}</h6>
-          <small class="text-muted">Demandée il y a ${diffDays} jours</small><br>
+          ${badge}<br>
           <small class="text-muted">${item.date}</small>
           <p class="mb-1">${item.description}</p>
         </div>
@@ -150,20 +133,16 @@ function renderAFaire() {
       </div>
       <div class="details">
         <textarea class="form-control mb-2" placeholder="🛠️ Réparations effectuées" oninput="checkFields(this)"></textarea>
-        <select class="form-select mb-2" onchange="checkFields(this)">
-          <option value="">⏱️ Temps de réparation</option>
-          <option>15 minutes</option>
-          <option>30 minutes</option>
-          <option>45 minutes</option>
-          <option>1 heure</option>
-          <option>2 heures</option>
-          <option>3 heures</option>
-        </select>
+
+        <label class="form-label mt-2">⏱️ Temps de réparation</label>
+        <input type="range" class="form-range" min="0" max="480" step="15" value="0" oninput="updateTimeDisplay(this)">
+        <div class="mb-2"><strong id="timeDisplay">Sélectionnez le temps</strong></div>
+
         <button class="btn btn-success btn-sm" onclick="completer(this)" disabled>✅ Compléter</button>
       </div>
     `;
     div.addEventListener('click', function(e) {
-      if (!e.target.closest('textarea') && !e.target.closest('select') && !e.target.closest('button')) {
+      if (!e.target.closest('textarea') && !e.target.closest('input[type=range]') && !e.target.closest('button')) {
         this.classList.toggle('opened');
       }
     });
@@ -219,13 +198,35 @@ function getUrgenceLevel(dateStr) {
   return getDaysSince(dateStr);
 }
 
+function getDaysBadge(diffDays) {
+  let color = "bg-success";
+  if (diffDays >= 3 && diffDays <= 5) color = "bg-warning text-dark";
+  if (diffDays > 5) color = "bg-danger";
+
+  return `<span class="badge ${color} rounded-pill">Demandée il y a ${diffDays} jours</span>`;
+}
+
+function updateTimeDisplay(slider) {
+  const display = slider.parentElement.querySelector("#timeDisplay");
+  const minutes = parseInt(slider.value);
+
+  if (minutes === 0) {
+    display.innerText = "Sélectionnez le temps";
+  } else {
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    display.innerText = `${h > 0 ? h + "h" : ""}${m > 0 ? " " + m + "min" : ""}`;
+  }
+  checkFields(slider);
+}
+
 function checkFields(input) {
   const container = input.closest('.details');
   const textarea = container.querySelector('textarea');
-  const select = container.querySelector('select');
+  const slider = container.querySelector('input[type=range]');
   const button = container.querySelector('button');
 
-  if (textarea.value.trim() !== "" && select.value !== "") {
+  if (textarea.value.trim() !== "" && parseInt(slider.value) > 0) {
     button.disabled = false;
   } else {
     button.disabled = true;
@@ -235,10 +236,15 @@ function checkFields(input) {
 function completer(button) {
   const item = button.closest('.list-group-item');
   const textarea = item.querySelector('textarea').value.trim();
-  const temps = item.querySelector('select').value;
+  const slider = item.querySelector('input[type=range]');
   const title = item.querySelector('h6').innerText;
   const subtitle = item.querySelectorAll('small')[1].innerText;
   const description = item.querySelector('p').innerText;
+
+  const minutes = parseInt(slider.value);
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  const temps = `${h > 0 ? h + "h" : ""}${m > 0 ? " " + m + "min" : ""}`;
 
   const id = aFaire.find(r => title.includes(r.nom)).id;
 
@@ -262,5 +268,7 @@ function completer(button) {
 // Démarrer
 showTab('faire');
 </script>
+
+
 </body>
 </html>

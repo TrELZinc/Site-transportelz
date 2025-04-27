@@ -241,27 +241,30 @@ function renderAFaire() {
           <span class="text-muted">${escapeHtml(item.description)}</span>
         </p>
 
-        ${hasFiles ? `
-          <div class="mb-3 d-flex flex-wrap gap-2 gallery" id="gallery-${item.id}">
-            ${item.fichiers.map(f => {
-              const ext = f.toLowerCase();
-              const isVideo = ext.includes(".mp4") || ext.includes(".mov") || ext.includes(".webm");
-              const type = isVideo ? "video" : "image";
-              const src = transformDriveUrl(f, type);
+${hasFiles ? `
+  <div class="mb-3 d-flex flex-wrap gap-2 gallery" id="gallery-${item.id}">
+    ${item.fichiers.map(f => {
+      const ext = f.toLowerCase();
+      const isVideo = ext.includes(".mp4") || ext.includes(".mov") || ext.includes(".webm");
+      const type = isVideo ? "video" : "image";
+      
+      const thumbSrc = transformDriveUrl(f, type); // miniature
+      const fullSrc = transformDriveUrl(f, type, true); // HD pour clic
 
-              if (type === "image") {
-  return `
-    <a href="${transformDriveUrl(f, type, true)}" data-pswp-width="1600" data-pswp-height="1200" class="gallery-link">
-      <img src="${transformDriveUrl(f, type)}" class="img-thumbnail-mini">
-    </a>
-  `;
-} else {
-  return `
-    <img src="${transformDriveUrl(f, type)}" class="img-thumbnail-mini" onclick="openPopupMedia('${transformDriveUrl(f, type)}', '${type}')">
-  `;
-}
-          </div>
-        ` : ''}
+      if (type === "image") {
+        return `
+          <a href="${fullSrc}" data-pswp-width="1600" data-pswp-height="1200" class="gallery-link">
+            <img src="${thumbSrc}" class="img-thumbnail-mini">
+          </a>
+        `;
+      } else {
+        return `
+          <img src="${thumbSrc}" class="img-thumbnail-mini" onclick="openPopupMedia('${fullSrc}', '${type}')">
+        `;
+      }
+    }).join('')}
+  </div>
+` : ''}
 
         <label class="form-label mt-2">🛠️ Réparations effectuées</label>
         <textarea class="form-control mb-3" rows="2" placeholder="Décrire la réparation..." oninput="checkFields(this)"></textarea>

@@ -60,6 +60,22 @@ input[type=range]::-webkit-slider-thumb {
   font-size: 1.2rem;
   font-weight: bold;
 }
+.img-thumbnail-mini {
+  height: 80px;
+  width: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  transition: transform 0.2s ease;
+}
+.img-thumbnail-mini:hover {
+  transform: scale(1.05);
+}
+@media (max-width: 768px) {
+  .img-thumbnail-mini {
+    height: 60px;
+    width: 60px;
+  }
+}
   </style>
 </head>
 <body>
@@ -179,7 +195,7 @@ function renderAFaire() {
           <div class="mb-3 d-flex flex-wrap gap-2">
             ${item.fichiers.map(f => `
               <a href="${transformDriveUrl(f)}" data-toggle="lightbox" data-gallery="gallery-${item.id}" class="d-inline-block">
-                <img src="${transformDriveUrl(f)}" style="height: 80px; width: 80px; object-fit: cover; border-radius: 8px;">
+              <img src="${transformDriveUrl(f)}" class="img-thumbnail-mini">
               </a>
             `).join('')}
           </div>

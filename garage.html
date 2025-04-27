@@ -173,31 +173,37 @@ function renderAFaire() {
         </div>
         <div><small class="text-primary">🔽 Voir</small></div>
       </div>
-      <div class="details mt-2">
-  ${hasFiles ? `
-    <div class="mb-3 d-flex flex-wrap gap-2">
-      ${item.fichiers.map((f, index) => `
-        <a href="${transformDriveUrl(f)}" data-toggle="lightbox" data-gallery="gallery-${item.id}" class="d-inline-block">
-          <img src="${transformDriveUrl(f)}" style="height: 80px; width: 80px; object-fit: cover; border-radius: 8px;">
-        </a>
-      `).join('')}
-    </div>
-  ` : ''}
-</div>
-  
-        <textarea class="form-control mb-2" placeholder="🛠️ Réparations effectuées" oninput="checkFields(this)"></textarea>
 
+      <div class="details mt-2" style="display: none;">
+        ${hasFiles ? `
+          <div class="mb-3 d-flex flex-wrap gap-2">
+            ${item.fichiers.map(f => `
+              <a href="${transformDriveUrl(f)}" data-toggle="lightbox" data-gallery="gallery-${item.id}" class="d-inline-block">
+                <img src="${transformDriveUrl(f)}" style="height: 80px; width: 80px; object-fit: cover; border-radius: 8px;">
+              </a>
+            `).join('')}
+          </div>
+        ` : ''}
+        <textarea class="form-control mb-2" placeholder="🛠️ Réparations effectuées" oninput="checkFields(this)"></textarea>
         <label class="form-label mt-2">⏱️ Temps de réparation</label>
         <div class="mb-2"><strong id="timeDisplay">Sélectionnez le temps</strong></div>
         <input type="range" class="form-range" min="0" max="240" step="15" value="0" oninput="updateTimeDisplay(this)">
         <button class="btn btn-success btn-completer mt-3" onclick="completer(this)" disabled>✅ Compléter</button>
       </div>
     `;
+
     div.addEventListener('click', function(e) {
-      if (!e.target.closest('textarea') && !e.target.closest('input[type=range]') && !e.target.closest('button') && !e.target.closest('a') && !e.target.closest('img')) {
+      if (!e.target.closest('a') && !e.target.closest('img') && !e.target.closest('textarea') && !e.target.closest('input') && !e.target.closest('button')) {
         this.classList.toggle('opened');
+        const details = this.querySelector('.details');
+        if (this.classList.contains('opened')) {
+          details.style.display = 'block';
+        } else {
+          details.style.display = 'none';
+        }
       }
     });
+
     content.appendChild(div);
   });
 
@@ -206,12 +212,11 @@ function renderAFaire() {
 
 
 function transformDriveUrl(url) {
-  // Essayer de récupérer l'ID du fichier Drive
   const idMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
   if (idMatch && idMatch[1]) {
-    return `https://drive.google.com/uc?id=${idMatch[1]}&export=download`;
+    return `https://drive.google.com/uc?id=${idMatch[1]}`;
   }
-  return url; // fallback: si c'est pas un lien Drive, on retourne normal
+  return url;
 }
 
 

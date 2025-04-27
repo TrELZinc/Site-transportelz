@@ -98,7 +98,7 @@ let fait = [];
 
   async function chargerReparations() {
   try {
-    const response = await fetch("https://script.google.com/macros/s/AKfycbwDywoP6AiqOUfNKiE9MGSppT6WTWP7W-yzfuRyKiAT-2gPp54devDxuI7swrQaYRu3/exec?read=1");
+    const response = await fetch("https://script.google.com/macros/s/AKfycbxxJuAqc8-5ZUa0fM0h81CL52_6fl_d5qB_waw0UpnlGztCWVmGusbBoiA-lv0vo02m/exec?read=1");
     aFaire = await response.json();
     showTab('faire');
   } catch (error) {
@@ -301,6 +301,23 @@ function completer(button) {
   });
 
   aFaire = aFaire.filter(r => r.id !== id);
+
+  // 🔥 Envoi vers Google Sheet pour compléter la réparation
+fetch("https://script.google.com/macros/s/AKfycbxxJuAqc8-5ZUa0fM0h81CL52_6fl_d5qB_waw0UpnlGztCWVmGusbBoiA-lv0vo02m/exec", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    update: true,
+    id: id,
+    notes: textarea,
+    temps: temps
+  })
+})
+.then(response => console.log("Mise à jour réussie"))
+.catch(error => console.error("Erreur mise à jour:", error));
+
 
   alert("Réparation complétée avec succès!");
 

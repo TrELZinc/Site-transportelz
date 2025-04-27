@@ -314,23 +314,22 @@ function initGalleries() {
 
 function transformDriveUrl(url, type = "image", full = false) {
   let match = url.match(/\/d\/([^\/]+)/);
-  if (match && match[1]) {
-    const id = match[1];
-    return full
-      ? `https://drive.google.com/uc?id=${id}`
-      : (type.startsWith("video")
-        ? `https://drive.google.com/file/d/${id}/preview`
-        : `https://drive.google.com/thumbnail?id=${id}`);
+  if (!match) {
+    match = url.match(/id=([^&]+)/);
   }
-
-  match = url.match(/id=([^&]+)/);
+  
   if (match && match[1]) {
     const id = match[1];
-    return full
-      ? `https://drive.google.com/uc?id=${id}`
-      : (type.startsWith("video")
-        ? `https://drive.google.com/file/d/${id}/preview`
-        : `https://drive.google.com/thumbnail?id=${id}`);
+    if (type.startsWith("video")) {
+      return `https://drive.google.com/file/d/${id}/preview`;
+    }
+    if (full) {
+      // lien IMAGE haute résolution
+      return `https://drive.google.com/thumbnail?id=${id}&sz=w1600-h1200`;
+    } else {
+      // lien MINIATURE légère
+      return `https://drive.google.com/thumbnail?id=${id}&sz=w400-h400`;
+    }
   }
 
   return url; // fallback

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Réparations Mobile Démo 2.0</title>
+  <title>Réparations Mobile Avancée</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
@@ -14,7 +14,6 @@
       border-radius: 10px;
       margin-bottom: 10px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      cursor: pointer;
     }
     .details {
       display: none;
@@ -28,27 +27,71 @@
 <body>
 
 <div class="container py-4">
-  <h2 class="text-center mb-4">Réparations à traiter</h2>
+  <h2 class="text-center mb-4">Réparations</h2>
 
-  <div id="content" class="list-group">
-    <!-- Réparations simulées ici -->
+  <!-- Onglets -->
+  <ul class="nav nav-pills nav-justified mb-3">
+    <li class="nav-item">
+      <button class="nav-link active" id="a-faire-tab" onclick="showTab('faire')">À faire</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" id="fait-tab" onclick="showTab('fait')">Réparé</button>
+    </li>
+  </ul>
+
+  <!-- Zone de filtre -->
+  <div id="filterZone" class="mb-3">
+    <input type="text" class="form-control" id="searchInput" placeholder="Filtrer par unité..." oninput="renderAFaire()">
   </div>
+
+  <!-- Contenus -->
+  <div id="faireList" class="list-group"></div>
+  <div id="faitList" class="list-group d-none"></div>
+
 </div>
 
 <script>
 // Données simulées
-const reparations = [
+let aFaire = [
   { id: 1, date: "2025-04-25", nom: "Jean Dupont", unite: "Camion 101", description: "Changer l'huile moteur." },
   { id: 2, date: "2025-04-24", nom: "Marie Tremblay", unite: "Tracteur 302", description: "Remplacer la batterie." },
   { id: 3, date: "2025-04-23", nom: "Luc Gagnon", unite: "Excavatrice 501", description: "Réparer fuite hydraulique." }
 ];
 
-// Générer l'affichage
-function renderList() {
-  const content = document.getElementById('content');
+let fait = []; // Réparations complétées
+
+function showTab(tab) {
+  document.getElementById('a-faire-tab').classList.remove('active');
+  document.getElementById('fait-tab').classList.remove('active');
+  document.getElementById('faireList').classList.add('d-none');
+  document.getElementById('faitList').classList.add('d-none');
+  document.getElementById('filterZone').classList.add('d-none');
+
+  if (tab === 'faire') {
+    document.getElementById('a-faire-tab').classList.add('active');
+    document.getElementById('faireList').classList.remove('d-none');
+    document.getElementById('filterZone').classList.remove('d-none');
+    renderAFaire();
+  } else {
+    document.getElementById('fait-tab').classList.add('active');
+    document.getElementById('faitList').classList.remove('d-none');
+    renderFait();
+  }
+}
+
+function renderAFaire() {
+  const content = document.getElementById('faireList');
+  const search = document.getElementById('searchInput').value.toLowerCase();
   content.innerHTML = '';
 
-  reparations.forEach(item => {
+  const filtered = aFaire.filter(item => item.unite.toLowerCase().includes(search));
+
+  if (filtered.length === 0) {
+    content.innerHTML = '<div class="text-center text-muted">Aucune réparation trouvée.</div>';
+    return;
+  }
+
+  filtered.forEach(item => {
     const div = document.createElement('div');
     div.className = 'list-group-item';
     div.innerHTML = `
@@ -62,17 +105,39 @@ function renderList() {
       </div>
       <div class="details">
         <textarea class="form-control mb-2" placeholder="Réparations effectuées" oninput="checkFields(this)"></textarea>
-        <input type="number" class="form-control mb-2" placeholder="Temps (minutes)" min="0" oninput="checkFields(this)">
+        <input type="number" class="form-control mb-2" placeholder="Temps (minutes)" min="1" oninput="checkFields(this)">
         <button class="btn btn-success btn-sm" onclick="completer(this)" disabled>Compléter</button>
       </div>
     `;
-
     div.addEventListener('click', function(e) {
       if (!e.target.closest('textarea') && !e.target.closest('input') && !e.target.closest('button')) {
         this.classList.toggle('opened');
       }
     });
+    content.appendChild(div);
+  });
+}
 
+function renderFait() {
+  const content = document.getElementById('faitList');
+  content.innerHTML = '';
+
+  if (fait.length === 0) {
+    content.innerHTML = '<div class="text-center text-muted">Aucune réparation complétée.</div>';
+    return;
+  }
+
+  fait.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'list-group-item bg-light';
+    div.innerHTML = `
+      <h6>${item.unite} - ${item.nom}</h6>
+      <small class="text-muted">${item.date}</small>
+      <p class="mb-1">${item.description}</p>
+      <hr>
+      <p><strong>Réparations effectuées :</strong> ${item.notes}</p>
+      <p><strong>Temps :</strong> ${item.temps} minutes</p>
+    `;
     content.appendChild(div);
   });
 }
@@ -92,21 +157,36 @@ function checkFields(input) {
 
 function completer(button) {
   const item = button.closest('.list-group-item');
-  const note = item.querySelector('textarea').value.trim();
+  const textarea = item.querySelector('textarea').value.trim();
   const temps = item.querySelector('input[type="number"]').value.trim();
+  const title = item.querySelector('h6').innerText;
+  const subtitle = item.querySelector('small').innerText;
+  const description = item.querySelector('p').innerText;
 
-  item.classList.add('text-muted');
-  item.querySelector('textarea').disabled = true;
-  item.querySelector('input[type="number"]').disabled = true;
-  button.disabled = true;
-  button.innerText = "Complété";
-  item.style.backgroundColor = "#d4edda"; // vert pâle pour visuel
+  // Récupérer ID de l'item
+  const id = aFaire.find(r => `${r.unite} - ${r.nom}` === title).id;
 
-  alert(`Réparation complétée!\nNotes: ${note}\nTemps: ${temps} minutes`);
+  // Ajouter à "fait"
+  fait.push({
+    id: id,
+    unite: title.split(" - ")[0],
+    nom: title.split(" - ")[1],
+    date: subtitle,
+    description: description,
+    notes: textarea,
+    temps: temps
+  });
+
+  // Retirer de "aFaire"
+  aFaire = aFaire.filter(r => r.id !== id);
+
+  alert("Réparation complétée!");
+
+  showTab('faire');
 }
 
 // Charger initialement
-renderList();
+showTab('faire');
 </script>
 
 </body>

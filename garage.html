@@ -134,16 +134,24 @@ let fait = [];
 let showAllFait = false;
 
 
-  async function chargerReparations() {
+async function chargerReparations(noReset = false) {
   try {
     const response = await fetch("https://script.google.com/macros/s/AKfycby8eRNmj1-ApWoVYv2JUKhr_FL_q1_AvnNZlRax7nacutt7meMkEc6TE5023aBQTes0/exec?read=1");
     aFaire = await response.json();
-    showTab('faire');
+    aFaire = aFaire.sort((a, b) => new Date(b.date) - new Date(a.date)); // 🔥 auto tri
+
+    if (!noReset) {
+      showTab('faire');
+    } else {
+      renderCurrentTab(); 
+      updateCounters();
+    }
   } catch (error) {
     console.error("Erreur de chargement :", error);
     alert("Erreur lors du chargement des réparations. Veuillez réessayer.");
   }
 }
+
 
 // Charger automatiquement les réparations au démarrage
 chargerReparations();
@@ -454,7 +462,6 @@ function closePopup() {
   overlay.style.display = 'none';
 }
 
-
 function completer(button) {
   const item = button.closest('.list-group-item');
   const textarea = item.querySelector('textarea').value.trim();
@@ -484,9 +491,10 @@ function completer(button) {
     })
   })
   .then(() => {
-    alert("Réparation complétée avec succès!");
-    // 🔥 Recharger les données depuis Google Sheet
-    chargerReparations();
+    showToast("Réparation complétée avec succès ✅");
+    setTimeout(() => {
+      chargerReparations(true); // Recharge rapide (true pour NO RESET)
+    }, 500);
   })
   .catch(error => {
     console.error("Erreur mise à jour:", error);
@@ -503,6 +511,12 @@ function updateCounters() {
   document.getElementById('fait-tab').innerHTML = `Réparé (${faitCount})`;
 }
 
+function showToast(message = "Succès") {
+  const toastEl = document.getElementById('liveToast');
+  toastEl.querySelector('.toast-body').textContent = message;
+  const toast = new bootstrap.Toast(toastEl);
+  toast.show();
+}
 
 
 </script>
@@ -513,6 +527,18 @@ function updateCounters() {
   <div id="popupContent" style="position:relative; max-width:90%; max-height:90%;">
     <button onclick="closePopup()" style="position:absolute; top:-10px; right:-10px; background:red; color:white; border:none; border-radius:50%; width:30px; height:30px; font-weight:bold;">&times;</button>
     <div id="popupInner" style="width:100%; height:100%;"></div>
+  </div>
+</div>
+  
+<!-- Toast Notification -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100;">
+  <div id="liveToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">
+        Réparation enregistrée ✅
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
   </div>
 </div>
 

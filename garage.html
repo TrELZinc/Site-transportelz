@@ -207,7 +207,7 @@ function renderFait() {
         <div>
           <h6 class="mb-1">${item.unite} - ${item.nom}</h6>
           <small class="text-muted">${item.date}</small>
-          p class="mb-1">${truncateText(item.description, 60)}</p>
+          <div class="mb-1">${escapeHtml(truncateText(item.description, 60))}</div>
         </div>
         <div><small class="text-primary">🔽 Voir</small></div>
       </div>

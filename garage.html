@@ -170,12 +170,13 @@ function showTab(tab) {
   if (tab === 'faire') {
     document.getElementById('a-faire-tab').classList.add('active');
     document.getElementById('faireList').classList.remove('d-none');
-    Faire();
+    renderAFaire(); // 👈 la bonne fonction !!
   } else {
     document.getElementById('fait-tab').classList.add('active');
     document.getElementById('faitList').classList.remove('d-none');
     renderFait();
   }
+
   updateCounters();
 
   document.getElementById('toggleFaitView').style.display = (tab === 'fait') ? 'inline-block' : 'none';

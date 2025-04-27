@@ -76,6 +76,15 @@ input[type=range]::-webkit-slider-thumb {
     width: 60px;
   }
 }
+.details {
+  display: none;
+  margin-top: 10px;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+  overflow: hidden;
+}
+.opened .details {
+  display: block;
+}
   </style>
 </head>
 <body>

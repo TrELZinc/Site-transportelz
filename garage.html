@@ -317,18 +317,18 @@ function transformDriveUrl(url, type = "image", full = false) {
   if (!match) {
     match = url.match(/id=([^&]+)/);
   }
-  
+
   if (match && match[1]) {
     const id = match[1];
     if (type.startsWith("video")) {
       return `https://drive.google.com/file/d/${id}/preview`;
     }
     if (full) {
-      // lien IMAGE haute résolution
-      return `https://drive.google.com/thumbnail?id=${id}&sz=w1600-h1200`;
+      // lien FULL SIZE non compressé
+      return `https://drive.google.com/uc?id=${id}`;
     } else {
-      // lien MINIATURE légère
-      return `https://drive.google.com/thumbnail?id=${id}&sz=w400-h400`;
+      // miniature auto-optimisée
+      return `https://drive.google.com/thumbnail?id=${id}`;
     }
   }
 

@@ -32,6 +32,31 @@
       padding: 4px 8px;
       border-radius: 10px;
     }
+    input[type=range] {
+  height: 30px;
+}
+input[type=range]::-webkit-slider-thumb {
+  height: 30px;
+  width: 30px;
+  background: #0d6efd;
+  border: 2px solid white;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-top: -10px;
+}
+#timeDisplay {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #0d6efd;
+  text-align: center;
+}
+.btn-completer {
+  width: 100%;
+  padding: 15px;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
   </style>
 </head>
 <body>
@@ -135,11 +160,10 @@ function renderAFaire() {
       <div class="details">
         <textarea class="form-control mb-2" placeholder="🛠️ Réparations effectuées" oninput="checkFields(this)"></textarea>
 
-        <label class="form-label mt-2">⏱️ Temps de réparation</label>
-        <input type="range" class="form-range" min="0" max="240" step="15" value="0" oninput="updateTimeDisplay(this)">
+       <label class="form-label mt-2">⏱️ Temps de réparation</label>
         <div class="mb-2"><strong id="timeDisplay">Sélectionnez le temps</strong></div>
-
-        <button class="btn btn-success btn-sm" onclick="completer(this)" disabled>✅ Compléter</button>
+        <input type="range" class="form-range" min="0" max="240" step="15" value="0" oninput="updateTimeDisplay(this)">
+        <button class="btn btn-success btn-completer mt-3" onclick="completer(this)" disabled>✅ Compléter</button>
       </div>
     `;
     div.addEventListener('click', function(e) {

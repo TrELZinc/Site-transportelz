@@ -467,11 +467,12 @@ function closePopup() {
 
 function completer(button) {
   const item = button.closest('.list-group-item');
-  const textarea = item.querySelector('textarea').value.trim();
-  const slider = item.querySelector('input[type=range]');
-  const title = item.querySelector('h6').innerText;
-  const subtitle = item.querySelector('small').innerText;
-  const description = item.querySelector('.description-tronquee')?.innerText || "";
+  const textarea = item.querySelector('textarea').value.trim(); // Réparation effectuée
+  const slider = item.querySelector('input[type=range]'); // Temps de réparation
+  const title = item.querySelector('h6').innerText; // Unité - Nom
+  const descriptionElement = item.querySelector('.details span.text-muted'); // Description complète
+
+  const description = descriptionElement ? descriptionElement.innerText : "";
 
   const minutes = parseInt(slider.value);
   const h = Math.floor(minutes / 60);
@@ -490,22 +491,22 @@ function completer(button) {
       update: true,
       id: id,
       notes: textarea,
-      temps: temps
+      temps: temps,
+      description: description // ⚡ On envoie la description complète aussi
     })
   })
-.then(() => {
-  showToast("Réparation complétée avec succès ✅");
-  setTimeout(() => {
-    console.log("Recharge après 2 secondes...");
-    chargerReparations(true);
-  }, 500);
-})
+  .then(() => {
+    showToast("Réparation complétée avec succès ✅");
+    setTimeout(() => {
+      console.log("Recharge après 2 secondes...");
+      chargerReparations(true);
+    }, 500);
+  })
   .catch(error => {
     console.error("Erreur mise à jour:", error);
     alert("Erreur lors de l'envoi au serveur.");
   });
 }
-
 
 function updateCounters() {
   const aFaireCount = aFaire.filter(item => !item.notes || item.notes.trim() === "").length;

@@ -114,7 +114,7 @@ input[type=range]::-webkit-slider-thumb {
 
   <!-- Zone de filtre -->
   <div id="filterZone" class="mb-3">
-    <input type="text" class="form-control" id="searchInput" placeholder="🔎 Filtrer par unité..." oninput="renderCurrentTab()">
+    <input type="text" class="form-control" id="searchInput" placeholder="🔎 Filtrer par unité..." oninput="entTab()">
   </div>
 
   <!-- Contenus -->
@@ -143,7 +143,7 @@ async function chargerReparations(noReset = false) {
     if (!noReset) {
       showTab('faire');
     } else {
-      renderCurrentTab(); 
+      entTab(); 
       updateCounters();
     }
   } catch (error) {
@@ -170,22 +170,23 @@ function showTab(tab) {
   if (tab === 'faire') {
     document.getElementById('a-faire-tab').classList.add('active');
     document.getElementById('faireList').classList.remove('d-none');
-    renderAFaire(); // 👈 la bonne fonction !!
+    renderAFaire(); // ✅ ici aussi
   } else {
     document.getElementById('fait-tab').classList.add('active');
     document.getElementById('faitList').classList.remove('d-none');
     renderFait();
   }
-
   updateCounters();
 
   document.getElementById('toggleFaitView').style.display = (tab === 'fait') ? 'inline-block' : 'none';
 }
 
+
 function renderCurrentTab() {
-  if (currentTab === 'faire') Faire();
+  if (currentTab === 'faire') renderAFaire(); 
   else renderFait();
 }
+
 
 function renderAFaire() {
   const content = document.getElementById('faireList');

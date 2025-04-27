@@ -302,9 +302,9 @@ function completer(button) {
 
   aFaire = aFaire.filter(r => r.id !== id);
 
-  // 🔥 Envoi vers Google Sheet pour compléter la réparation
 fetch("https://script.google.com/macros/s/AKfycbxxJuAqc8-5ZUa0fM0h81CL52_6fl_d5qB_waw0UpnlGztCWVmGusbBoiA-lv0vo02m/exec", {
   method: "POST",
+  mode: "no-cors",
   headers: {
     "Content-Type": "application/json",
   },
@@ -315,8 +315,9 @@ fetch("https://script.google.com/macros/s/AKfycbxxJuAqc8-5ZUa0fM0h81CL52_6fl_d5q
     temps: temps
   })
 })
-.then(response => console.log("Mise à jour réussie"))
+.then(() => console.log("Mise à jour envoyée (mode no-cors)"))
 .catch(error => console.error("Erreur mise à jour:", error));
+
 
 
   alert("Réparation complétée avec succès!");

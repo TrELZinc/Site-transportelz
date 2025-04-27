@@ -560,20 +560,21 @@ function showToast(message = "Succès") {
 <div id="popupContent" style="position:relative; padding:20px; background:transparent;">
 <button onclick="closePopup()" style="
   position: absolute;
-  top: -15px;
-  right: -15px;
+  top: 10px;
+  right: 10px;
   background: red;
   color: white;
   border: none;
   border-radius: 50%;
-  width: 45px;
-  height: 45px;
+  width: 40px;
+  height: 40px;
   font-weight: bold;
   font-size: 1.8rem;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
+  z-index: 9999;
 ">
   &times;
 </button>

@@ -3,89 +3,99 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Réparations - Mobile</title>
+  <title>Réparations Mobile Démo</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .list-group-item {
+      border: none;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      cursor: pointer;
+    }
+    .details {
+      display: none;
+      margin-top: 10px;
+    }
+    .opened .details {
+      display: block;
+    }
+  </style>
 </head>
-<body class="bg-light">
+<body>
 
 <div class="container py-4">
-  <h1 class="text-center mb-4">Réparations</h1>
-  
-  <ul class="nav nav-tabs mb-3" id="tabs">
-    <li class="nav-item">
-      <a class="nav-link active" id="a-faire-tab" href="#" onclick="loadReparations()">À faire</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" id="fait-tab" href="#" onclick="loadFait()">Fait</a>
-    </li>
-  </ul>
+  <h2 class="text-center mb-4">Réparations à traiter</h2>
 
   <div id="content" class="list-group">
-    <!-- Les réparations seront injectées ici -->
+    <!-- Réparations simulées ici -->
   </div>
 </div>
 
 <script>
-const API_URL = "TON_URL_WEB_APP"; // <-- À remplacer
+// Données simulées
+const reparations = [
+  { id: 1, date: "2025-04-25", nom: "Jean Dupont", unite: "Camion 101", description: "Changer l'huile moteur." },
+  { id: 2, date: "2025-04-24", nom: "Marie Tremblay", unite: "Tracteur 302", description: "Remplacer la batterie." },
+  { id: 3, date: "2025-04-23", nom: "Luc Gagnon", unite: "Excavatrice 501", description: "Réparer fuite hydraulique." }
+];
 
-async function loadReparations() {
-  document.getElementById('a-faire-tab').classList.add('active');
-  document.getElementById('fait-tab').classList.remove('active');
-  
-  const res = await fetch(`${API_URL}?action=reparations`);
-  const data = await res.json();
-  
-  renderList(data, true);
-}
-
-async function loadFait() {
-  document.getElementById('fait-tab').classList.add('active');
-  document.getElementById('a-faire-tab').classList.remove('active');
-  
-  const res = await fetch(`${API_URL}?action=fait`);
-  const data = await res.json();
-  
-  renderList(data, false);
-}
-
-function renderList(data, withActions) {
+// Générer l'affichage
+function renderList() {
   const content = document.getElementById('content');
   content.innerHTML = '';
-  
-  data.forEach(item => {
-    const html = `
-      <div class="list-group-item d-flex justify-content-between align-items-start">
+
+  reparations.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'list-group-item';
+    div.innerHTML = `
+      <div class="d-flex justify-content-between align-items-center">
         <div>
-          <h5>${item.unite} - ${item.nom}</h5>
+          <h6 class="mb-1">${item.unite} - ${item.nom}</h6>
+          <small class="text-muted">${item.date}</small>
           <p class="mb-1">${item.description}</p>
-          <small>${item.date}</small>
         </div>
-        ${withActions ? `<button class="btn btn-success btn-sm" onclick="marquerFait(${item.id})">Réparé</button>` : ''}
+        <div><small class="text-primary">Voir</small></div>
+      </div>
+      <div class="details">
+        <textarea class="form-control mb-2" placeholder="Ajouter des détails..."></textarea>
+        <button class="btn btn-success btn-sm" onclick="completer(this)">Compléter</button>
       </div>
     `;
-    content.innerHTML += html;
+
+    div.addEventListener('click', function(e) {
+      if (!e.target.closest('button')) { // ne pas fermer quand on clique sur le bouton
+        this.classList.toggle('opened');
+      }
+    });
+
+    content.appendChild(div);
   });
 }
 
-async function marquerFait(id) {
-  if (!confirm("Confirmer que la réparation est faite ?")) return;
-  
-  await fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify({
-      action: "marquerFait",
-      id: id
-    }),
-    headers: {
-      "Content-Type": "application/json"
-    }
-  });
-  
-  loadReparations();
+function completer(button) {
+  const item = button.closest('.list-group-item');
+  const note = item.querySelector('textarea').value.trim();
+
+  if (note === "") {
+    alert("Merci d'ajouter un commentaire avant de compléter !");
+    return;
+  }
+
+  item.classList.add('text-muted');
+  item.querySelector('textarea').disabled = true;
+  button.disabled = true;
+  button.innerText = "Complété";
+  item.style.backgroundColor = "#d4edda"; // vert pâle pour visuel
+
+  alert("Réparation complétée avec la note : " + note);
 }
 
-// Charger initialement la liste
-loadReparations();
+// Charger initialement
+renderList();
 </script>
 
 </body>

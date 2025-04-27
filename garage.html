@@ -93,13 +93,23 @@ input[type=range]::-webkit-slider-thumb {
 
 <script>
 // Données simulées
-let aFaire = [
-  { id: 1, date: "2025-04-25", nom: "Jean Dupont", unite: "Camion 101", description: "Changer l'huile moteur." },
-  { id: 2, date: "2025-04-22", nom: "Marie Tremblay", unite: "Tracteur 302", description: "Remplacer la batterie." },
-  { id: 3, date: "2025-04-18", nom: "Luc Gagnon", unite: "Excavatrice 501", description: "Réparer fuite hydraulique." }
-];
-
+let aFaire = [];
 let fait = [];
+
+  async function chargerReparations() {
+  try {
+    const response = await fetch("https://script.google.com/macros/s/AKfycbwDywoP6AiqOUfNKiE9MGSppT6WTWP7W-yzfuRyKiAT-2gPp54devDxuI7swrQaYRu3/exec");
+    aFaire = await response.json();
+    showTab('faire');
+  } catch (error) {
+    console.error("Erreur de chargement :", error);
+    alert("Erreur lors du chargement des réparations. Veuillez réessayer.");
+  }
+}
+
+// Charger automatiquement les réparations au démarrage
+chargerReparations();
+
 
 let currentTab = 'faire';
 
@@ -301,8 +311,7 @@ function updateCounters() {
   document.getElementById('a-faire-tab').innerHTML = `À faire (${aFaire.length})`;
 }
 
-// Démarrer
-showTab('faire');
+
 </script>
 
 

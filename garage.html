@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Réparations Mobile Pro</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.min.js"></script>
   <style>
     body {
       background-color: #f8f9fa;
@@ -170,17 +172,17 @@ function renderAFaire() {
         </div>
         <div><small class="text-primary">🔽 Voir</small></div>
       </div>
-      <div class="details mt-2">
-        ${hasFiles ? `
-          <div class="mb-3 d-flex flex-wrap gap-2">
-            ${item.fichiers.map(f => 
-                f.includes('drive.google.com') 
-                ? `<img src="${transformDriveUrl(f)}" style="height: 80px; border-radius: 8px; cursor: pointer;" onclick="openImage('${transformDriveUrl(f)}')">`
-                : `<a href="${f}" target="_blank" class="btn btn-sm btn-outline-primary">Voir fichier</a>`
-            ).join('')}
-          </div>
-        ` : ''}
-        
+<div class="details mt-2">
+  ${hasFiles ? `
+    <div class="mb-3 d-flex flex-wrap gap-2">
+      ${item.fichiers.map((f, index) => `
+        <a href="${f}" data-toggle="lightbox" data-gallery="gallery-${item.id}" class="d-inline-block">
+          <img src="${f}" style="height: 80px; width: 80px; object-fit: cover; border-radius: 8px;">
+        </a>
+      `).join('')}
+    </div>
+  ` : ''}
+  
         <textarea class="form-control mb-2" placeholder="🛠️ Réparations effectuées" oninput="checkFields(this)"></textarea>
 
         <label class="form-label mt-2">⏱️ Temps de réparation</label>
@@ -210,11 +212,6 @@ function transformDriveUrl(url) {
   return url; // fallback: si c'est pas un lien Drive, on retourne normal
 }
 
-// Utilitaire pour ouvrir en grand au clic
-function openImage(url) {
-  const w = window.open();
-  w.document.write('<img src="' + url + '" style="width:100%">');
-}
 
 function renderFait() {
   const content = document.getElementById('faitList');
@@ -381,7 +378,13 @@ function updateCounters() {
 
 
 </script>
-
-
+<script>
+document.addEventListener('click', function (event) {
+  if (event.target.closest('a[data-toggle="lightbox"]')) {
+    event.preventDefault();
+    $(event.target.closest('a[data-toggle="lightbox"]')).ekkoLightbox();
+  }
+});
+</script>
 </body>
 </html>

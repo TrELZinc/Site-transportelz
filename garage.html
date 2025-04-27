@@ -85,6 +85,11 @@ input[type=range]::-webkit-slider-thumb {
 .opened .details {
   display: block;
 }
+.pswp__bg {
+  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.5); /* Un peu de foncé aussi */
+}
+
   </style>
 </head>
 <body>
@@ -201,7 +206,7 @@ function renderAFaire() {
 
       <div class="details mt-2" style="display: none;">
         ${hasFiles ? `
-          <div class="mb-3 d-flex flex-wrap gap-2">
+          <div class="mb-3 d-flex flex-wrap gap-2 gallery" id="gallery-${item.id}">
             ${item.fichiers.map(f => {
               const ext = f.toLowerCase();
               const isVideo = ext.includes(".mp4") || ext.includes(".mov") || ext.includes(".webm");
@@ -481,12 +486,15 @@ function updateCounters() {
 <script type="module">
   import PhotoSwipeLightbox from 'https://unpkg.com/photoswipe@5/dist/photoswipe-lightbox.esm.min.js';
 
-  const lightbox = new PhotoSwipeLightbox({
-    gallery: '#faireList',
-    children: 'a.gallery-link',
-    pswpModule: () => import('https://unpkg.com/photoswipe@5/dist/photoswipe.esm.min.js')
+  document.querySelectorAll('.gallery').forEach(gallery => {
+    const lightbox = new PhotoSwipeLightbox({
+      gallery: '#' + gallery.id,
+      children: 'a.gallery-link',
+      pswpModule: () => import('https://unpkg.com/photoswipe@5/dist/photoswipe.esm.min.js')
+    });
+    lightbox.init();
   });
-  lightbox.init();
+
 </script>
 
 </body>

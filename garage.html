@@ -409,6 +409,417 @@ function updateCounters() {
   document.getElementById('a-faire-tab').innerHTML = `À faire (${aFaire.length})`;
 }
 
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Réparations Mobile Pro</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.min.css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .list-group-item {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    .list-group-item:hover {
+      background-color: #f1f1f1;
+    }
+    .details {
+      display: none;
+      margin-top: 10px;
+    }
+    .opened .details {
+      display: block;
+    }
+    .badge-custom {
+      font-size: 0.8rem;
+      padding: 4px 8px;
+      border-radius: 10px;
+    }
+    input[type=range] {
+  height: 30px;
+}
+input[type=range]::-webkit-slider-thumb {
+  height: 30px;
+  width: 30px;
+  background: #0d6efd;
+  border: 2px solid white;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-top: -10px;
+}
+#timeDisplay {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #0d6efd;
+  text-align: center;
+}
+.btn-completer {
+  width: 100%;
+  padding: 15px;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+.img-thumbnail-mini {
+  height: 80px;
+  width: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  transition: transform 0.2s ease;
+}
+.img-thumbnail-mini:hover {
+  transform: scale(1.05);
+}
+@media (max-width: 768px) {
+  .img-thumbnail-mini {
+    height: 60px;
+    width: 60px;
+  }
+}
+.details {
+  display: none;
+  margin-top: 10px;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+  overflow: hidden;
+}
+.opened .details {
+  display: block;
+}
+  </style>
+</head>
+<body>
+
+<!-- Bannière noire avec logo -->
+<div style="background-color: #111; padding: 10px 0; text-align: center;">
+  <img src="assets/logo.jpeg" alt="Logo" style="height: 60px; object-fit: contain;">
+</div>
+
+<div class="container py-4">
+  <h2 class="text-center mb-4">🔧 Réparations</h2>
+
+  <!-- Onglets -->
+  <ul class="nav nav-pills nav-justified mb-3">
+    <li class="nav-item">
+      <button class="nav-link active" id="a-faire-tab" onclick="showTab('faire')">À faire</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" id="fait-tab" onclick="showTab('fait')">Réparé</button>
+    </li>
+  </ul>
+
+  <!-- Zone de filtre -->
+  <div id="filterZone" class="mb-3">
+    <input type="text" class="form-control" id="searchInput" placeholder="🔎 Filtrer par unité..." oninput="renderCurrentTab()">
+  </div>
+
+  <!-- Contenus -->
+  <div id="faireList" class="list-group"></div>
+  <div id="faitList" class="list-group d-none"></div>
+</div>
+
+<!-- Juste la partie dynamique JS modifiée car le reste du HTML est correct -->
+
+<script>
+// Données simulées
+let aFaire = [];
+let fait = [];
+
+  async function chargerReparations() {
+  try {
+    const response = await fetch("https://script.google.com/macros/s/AKfycby8eRNmj1-ApWoVYv2JUKhr_FL_q1_AvnNZlRax7nacutt7meMkEc6TE5023aBQTes0/exec?read=1");
+    aFaire = await response.json();
+    showTab('faire');
+  } catch (error) {
+    console.error("Erreur de chargement :", error);
+    alert("Erreur lors du chargement des réparations. Veuillez réessayer.");
+  }
+}
+
+// Charger automatiquement les réparations au démarrage
+chargerReparations();
+
+
+let currentTab = 'faire';
+
+function showTab(tab) {
+  currentTab = tab;
+  document.getElementById('a-faire-tab').classList.remove('active');
+  document.getElementById('fait-tab').classList.remove('active');
+  document.getElementById('faireList').classList.add('d-none');
+  document.getElementById('faitList').classList.add('d-none');
+  document.getElementById('filterZone').classList.remove('d-none');
+
+  if (tab === 'faire') {
+    document.getElementById('a-faire-tab').classList.add('active');
+    document.getElementById('faireList').classList.remove('d-none');
+    renderAFaire();
+  } else {
+    document.getElementById('fait-tab').classList.add('active');
+    document.getElementById('faitList').classList.remove('d-none');
+    renderFait();
+  }
+  updateCounters();
+}
+
+function renderCurrentTab() {
+  if (currentTab === 'faire') renderAFaire();
+  else renderFait();
+}
+
+function renderAFaire() {
+  const content = document.getElementById('faireList');
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  content.innerHTML = '';
+
+  let filtered = aFaire.filter(item => item.unite.toLowerCase().includes(search));
+  filtered.sort((a, b) => getUrgenceLevel(b.date) - getUrgenceLevel(a.date));
+
+  if (filtered.length === 0) {
+    content.innerHTML = '<div class="text-center text-muted">Aucune réparation trouvée.</div>';
+    updateCounters();
+    return;
+  }
+
+  filtered.forEach(item => {
+    const diffDays = getDaysSince(item.date);
+    const badge = getDaysBadge(diffDays);
+    const hasFiles = item.fichiers && item.fichiers.length > 0;
+
+    const div = document.createElement('div');
+    div.className = 'list-group-item';
+    div.innerHTML = `
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h6 class="mb-1">${item.unite} - ${item.nom}</h6>
+          ${hasFiles ? '<div class="text-warning small mt-1">📸 Fichiers attachés</div>' : ''}
+          ${badge}<br>
+          <small class="text-muted">${formatDate(item.date)}</small>
+          <p class="mb-1">${item.description}</p>
+        </div>
+        <div><small class="text-primary">🔽 Voir</small></div>
+      </div>
+
+      <div class="details mt-2" style="display: none;">
+        ${hasFiles ? `
+          <div class="mb-3 d-flex flex-wrap gap-2">
+            ${item.fichiers.map(f => `
+            <a href="${transformDriveUrl(f)}" data-gallery="gallery-${item.id}" class="glightbox">
+              <img src="${transformDriveUrl(f)}" class="img-thumbnail-mini">
+            </a>
+          `).join('')}
+          </div>
+        ` : ''}
+        <textarea class="form-control mb-2" placeholder="🛠️ Réparations effectuées" oninput="checkFields(this)"></textarea>
+        <label class="form-label mt-2">⏱️ Temps de réparation</label>
+        <div class="mb-2"><strong id="timeDisplay">Sélectionnez le temps</strong></div>
+        <input type="range" class="form-range" min="0" max="240" step="15" value="0" oninput="updateTimeDisplay(this)">
+        <button class="btn btn-success btn-completer mt-3" onclick="completer(this)" disabled>✅ Compléter</button>
+      </div>
+    `;
+
+    div.addEventListener('click', function(e) {
+      if (!e.target.closest('a') && !e.target.closest('img') && !e.target.closest('textarea') && !e.target.closest('input') && !e.target.closest('button')) {
+        this.classList.toggle('opened');
+        const details = this.querySelector('.details');
+        if (this.classList.contains('opened')) {
+          details.style.display = 'block';
+        } else {
+          details.style.display = 'none';
+        }
+      }
+    });
+
+    content.appendChild(div);
+  });
+
+  updateCounters();
+}
+
+
+function transformDriveUrl(url) {
+  const idMatch = url.match(/\/d\/([^/]+)/);
+  if (idMatch && idMatch[1]) {
+    return `https://drive.google.com/uc?export=view&id=${idMatch[1]}`;
+  }
+  return url; // fallback
+}
+
+
+function renderFait() {
+  const content = document.getElementById('faitList');
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  content.innerHTML = '';
+
+  let filtered = fait.filter(item => item.unite.toLowerCase().includes(search));
+
+  if (filtered.length === 0) {
+    content.innerHTML = '<div class="text-center text-muted">Aucune réparation complétée trouvée.</div>';
+    return;
+  }
+
+  filtered.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'list-group-item';
+    div.innerHTML = `
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="w-100">
+          <h6 class="mb-1">${item.unite} - ${item.nom}</h6>
+          <small class="text-muted">${item.date}</small>
+          <div class="mb-2">${escapeHtml(truncateText(item.description, 60))}</div>
+        </div>
+        <div class="ms-2">
+          <small class="text-primary">🔽 Voir</small>
+        </div>
+      </div>
+      <div class="details mt-2 p-2 bg-light rounded">
+        <hr>
+        <p class="mb-2">
+          <strong>🛠️ Réparations effectuées :</strong><br>
+          <span class="text-muted">${escapeHtml(item.notes)}</span>
+        </p>
+        <p class="mb-0">
+          <strong>⏱️ Temps :</strong> 
+          <span class="text-muted">${item.temps}</span>
+        </p>
+      </div>
+    `;
+    div.addEventListener('click', function(e) {
+      this.classList.toggle('opened');
+    });
+    content.appendChild(div);
+  });
+}
+
+function truncateText(text, maxLength) {
+  if (text.length <= maxLength) return text;
+  return text.substring(0, maxLength) + "...";
+}
+
+  function formatDate(dateStr) {
+  const date = new Date(dateStr);
+  const options = { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+  return date.toLocaleDateString('fr-CA', options).replace(',', ' à');
+}
+
+  
+  function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.innerText = text;
+  return div.innerHTML;
+}
+
+function getDaysSince(dateStr) {
+  const today = new Date();
+  const repairDate = new Date(dateStr);
+  const diffTime = today - repairDate;
+  return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+}
+
+function getUrgenceLevel(dateStr) {
+  return getDaysSince(dateStr);
+}
+
+function getDaysBadge(diffDays) {
+  let color = "bg-success";
+  if (diffDays >= 3 && diffDays <= 5) color = "bg-warning text-dark";
+  if (diffDays > 5) color = "bg-danger";
+
+  return `<span class="badge ${color} rounded-pill">Demandée il y a ${diffDays} jours</span>`;
+}
+
+function updateTimeDisplay(slider) {
+  const display = slider.parentElement.querySelector("#timeDisplay");
+  const minutes = parseInt(slider.value);
+
+  if (minutes === 0) {
+    display.innerText = "Sélectionnez le temps";
+  } else {
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    display.innerText = `${h > 0 ? h + "h" : ""}${m > 0 ? " " + m + "min" : ""}`;
+  }
+  checkFields(slider);
+}
+
+function checkFields(input) {
+  const container = input.closest('.details');
+  const textarea = container.querySelector('textarea');
+  const slider = container.querySelector('input[type=range]');
+  const button = container.querySelector('button');
+
+  if (textarea.value.trim() !== "" && parseInt(slider.value) > 0) {
+    button.disabled = false;
+  } else {
+    button.disabled = true;
+  }
+}
+
+function completer(button) {
+  const item = button.closest('.list-group-item');
+  const textarea = item.querySelector('textarea').value.trim();
+  const slider = item.querySelector('input[type=range]');
+  const title = item.querySelector('h6').innerText;
+  const subtitle = item.querySelectorAll('small')[1].innerText;
+  const description = item.querySelector('p').innerText;
+
+  const minutes = parseInt(slider.value);
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  const temps = `${h > 0 ? h + "h" : ""}${m > 0 ? " " + m + "min" : ""}`;
+
+  const id = aFaire.find(r => title.includes(r.nom)).id;
+
+  fait.push({
+    id: id,
+    unite: title.split(" - ")[0].trim(),
+    nom: title.split(" - ")[1].trim(),
+    date: subtitle,
+    description: description,
+    notes: textarea,
+    temps: temps
+  });
+
+  aFaire = aFaire.filter(r => r.id !== id);
+
+fetch("https://script.google.com/macros/s/AKfycby8eRNmj1-ApWoVYv2JUKhr_FL_q1_AvnNZlRax7nacutt7meMkEc6TE5023aBQTes0/exec", {
+  method: "POST",
+  mode: "no-cors",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    update: true,
+    id: id,
+    notes: textarea,
+    temps: temps
+  })
+})
+.then(() => console.log("Mise à jour envoyée (mode no-cors)"))
+.catch(error => console.error("Erreur mise à jour:", error));
+
+
+
+  alert("Réparation complétée avec succès!");
+
+  showTab('faire');
+}
+
+function updateCounters() {
+  document.getElementById('a-faire-tab').innerHTML = `À faire (${aFaire.length})`;
+}
+
   <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
   
   <script>

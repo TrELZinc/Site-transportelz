@@ -176,7 +176,11 @@ function renderAFaire() {
   const search = document.getElementById('searchInput').value.toLowerCase();
   content.innerHTML = '';
 
-  let filtered = aFaire.filter(item => item.unite.toLowerCase().includes(search));
+  let filtered = aFaire.filter(item => 
+  item.unite.toLowerCase().includes(search) && 
+  (!item.notes || item.notes.trim() === "")
+  );  
+
   filtered.sort((a, b) => getUrgenceLevel(b.date) - getUrgenceLevel(a.date));
 
   if (filtered.length === 0) {
@@ -292,16 +296,16 @@ function transformDriveUrl(url, type = "image") {
   return url; // fallback
 }
 
-
-
-
-
 function renderFait() {
   const content = document.getElementById('faitList');
   const search = document.getElementById('searchInput').value.toLowerCase();
   content.innerHTML = '';
 
-  let filtered = fait.filter(item => item.unite.toLowerCase().includes(search));
+  let filtered = aFaire.filter(item => 
+  item.notes && item.notes.trim() !== "" &&
+  item.unite.toLowerCase().includes(search)
+  );
+
 
   if (filtered.length === 0) {
     content.innerHTML = '<div class="text-center text-muted">Aucune réparation complétée trouvée.</div>';
@@ -481,8 +485,13 @@ fetch("https://script.google.com/macros/s/AKfycby8eRNmj1-ApWoVYv2JUKhr_FL_q1_Avn
 }
 
 function updateCounters() {
-  document.getElementById('a-faire-tab').innerHTML = `À faire (${aFaire.length})`;
+  const aFaireCount = aFaire.filter(item => !item.notes || item.notes.trim() === "").length;
+  const faitCount = aFaire.filter(item => item.notes && item.notes.trim() !== "").length;
+
+  document.getElementById('a-faire-tab').innerHTML = `À faire (${aFaireCount})`;
+  document.getElementById('fait-tab').innerHTML = `Réparé (${faitCount})`;
 }
+
 
 
 </script>

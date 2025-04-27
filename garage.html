@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Réparations - Mobile</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container py-4">
+  <h1 class="text-center mb-4">Réparations</h1>
+  
+  <ul class="nav nav-tabs mb-3" id="tabs">
+    <li class="nav-item">
+      <a class="nav-link active" id="a-faire-tab" href="#" onclick="loadReparations()">À faire</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="fait-tab" href="#" onclick="loadFait()">Fait</a>
+    </li>
+  </ul>
+
+  <div id="content" class="list-group">
+    <!-- Les réparations seront injectées ici -->
+  </div>
+</div>
+
+<script>
+const API_URL = "TON_URL_WEB_APP"; // <-- À remplacer
+
+async function loadReparations() {
+  document.getElementById('a-faire-tab').classList.add('active');
+  document.getElementById('fait-tab').classList.remove('active');
+  
+  const res = await fetch(`${API_URL}?action=reparations`);
+  const data = await res.json();
+  
+  renderList(data, true);
+}
+
+async function loadFait() {
+  document.getElementById('fait-tab').classList.add('active');
+  document.getElementById('a-faire-tab').classList.remove('active');
+  
+  const res = await fetch(`${API_URL}?action=fait`);
+  const data = await res.json();
+  
+  renderList(data, false);
+}
+
+function renderList(data, withActions) {
+  const content = document.getElementById('content');
+  content.innerHTML = '';
+  
+  data.forEach(item => {
+    const html = `
+      <div class="list-group-item d-flex justify-content-between align-items-start">
+        <div>
+          <h5>${item.unite} - ${item.nom}</h5>
+          <p class="mb-1">${item.description}</p>
+          <small>${item.date}</small>
+        </div>
+        ${withActions ? `<button class="btn btn-success btn-sm" onclick="marquerFait(${item.id})">Réparé</button>` : ''}
+      </div>
+    `;
+    content.innerHTML += html;
+  });
+}
+
+async function marquerFait(id) {
+  if (!confirm("Confirmer que la réparation est faite ?")) return;
+  
+  await fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify({
+      action: "marquerFait",
+      id: id
+    }),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
+  
+  loadReparations();
+}
+
+// Charger initialement la liste
+loadReparations();
+</script>
+
+</body>
+</html>

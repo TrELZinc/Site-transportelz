@@ -8,6 +8,7 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.min.css" rel="stylesheet">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" rel="stylesheet">
   <style>
     body {
       background-color: #f8f9fa;
@@ -203,10 +204,10 @@ function renderAFaire() {
         ${hasFiles ? `
           <div class="mb-3 d-flex flex-wrap gap-2">
             ${item.fichiers.map(f => `
-              <a href="${transformDriveUrl(f)}" data-toggle="lightbox" data-gallery="gallery-${item.id}" class="d-inline-block">
+            <a href="${transformDriveUrl(f)}" data-gallery="gallery-${item.id}" class="glightbox">
               <img src="${transformDriveUrl(f)}" class="img-thumbnail-mini">
-              </a>
-            `).join('')}
+            </a>
+          `).join('')}
           </div>
         ` : ''}
         <textarea class="form-control mb-2" placeholder="🛠️ Réparations effectuées" oninput="checkFields(this)"></textarea>
@@ -408,15 +409,13 @@ function updateCounters() {
   document.getElementById('a-faire-tab').innerHTML = `À faire (${aFaire.length})`;
 }
 
-
-</script>
-<script>
-document.addEventListener('click', function (event) {
-  if (event.target.closest('a[data-toggle="lightbox"]')) {
-    event.preventDefault();
-    $(event.target.closest('a[data-toggle="lightbox"]')).ekkoLightbox();
-  }
-});
-</script>
+  <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+  
+  <script>
+  const lightbox = GLightbox({
+    selector: 'a[data-gallery]'
+  });
+  </script>
 </body>
+
 </html>

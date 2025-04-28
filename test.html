@@ -173,6 +173,20 @@ input[type=range].range-ticks::-moz-range-thumb {
 </style>
 </head>
 <body>
+<!-- Loader d'attente -->
+<div id="loadingOverlay" style="
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(255,255,255,0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+">
+  <div class="spinner-border text-primary" style="width: 4rem; height: 4rem;" role="status">
+    <span class="visually-hidden">Chargement...</span>
+  </div>
+</div>
 
 <!-- Bannière noire avec logo -->
 <div style="background-color: #111; padding: 10px 0; text-align: center;">
@@ -205,7 +219,7 @@ input[type=range].range-ticks::-moz-range-thumb {
   </div>
 </div>
 
-<!-- Juste la partie dynamique JS modifiée car le reste du HTML est correct -->
+
 
 <script>
 // Données simulées
@@ -699,18 +713,6 @@ function showToast(message = "Succès") {
   window.PhotoSwipeLightbox = PhotoSwipeLightbox;
 </script>
 
-  <div id="loadingOverlay" style="
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(255,255,255,0.9);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-">
-  <div class="spinner-border text-primary" style="width: 4rem; height: 4rem;" role="status">
-    <span class="visually-hidden">Chargement...</span>
-  </div>
 </div>
 
 </body>

@@ -310,28 +310,28 @@ function renderAFaire() {
     return;
   }
 
-  filtered.forEach(item => {
-    const diffDays = getDaysSince(item.date);
-    const badge = getDaysBadge(diffDays);
-    const hasFiles = item.fichiers && item.fichiers.length > 0;
+filtered.forEach(item => {
+  const diffDays = getDaysSince(item.date);
+  const badge = getDaysBadge(diffDays);
+  const hasFiles = item.fichiers && item.fichiers.length > 0;
 
-    const div = document.createElement('div');
-   div class="list-group-item p-3 position-relative bg-light-custom"
-    div.style.minHeight = "140px";
+  const div = document.createElement('div');
+  div.className = 'list-group-item p-3 position-relative bg-light-custom';  // ✅ ici
+  div.style.minHeight = "140px";
 
-    div.innerHTML = `
-      <div class="d-flex justify-content-between align-items-start">
-        <div class="w-100 pe-4">
-          <h6 class="mb-1">${item.unite} - ${item.nom}</h6>
-          ${hasFiles ? '<div class="text-warning small mt-1">📸 Fichiers attachés</div>' : ''}
-          <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
+  div.innerHTML = `
+    <div class="d-flex justify-content-between align-items-start">
+      <div class="w-100 pe-4">
+        <h6 class="mb-1">${item.unite} - ${item.nom}</h6>
+        ${hasFiles ? '<div class="text-warning small mt-1">📸 Fichiers attachés</div>' : ''}
+        <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
           ${badge}
           <small class="text-muted">${formatDate(item.date)}</small>
         </div>
-          <div class="mb-2 description-tronquee">${escapeHtml(truncateText(item.description, 60))}</div>
-        </div>
-        <div class="position-absolute top-0 end-0 p-2">
-          <small class="text-primary">🔽 Voir</small>
+        <div class="mb-2 description-tronquee">${escapeHtml(truncateText(item.description, 60))}</div>
+      </div>
+      <div class="position-absolute top-0 end-0 p-2">
+        <small class="text-primary">🔽 Voir</small>
         </div>
       </div>
 

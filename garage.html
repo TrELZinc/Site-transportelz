@@ -53,13 +53,17 @@
 }
 
 .list-group-item {
-  border: 2px solid black;
+  border: 2px solid #555; /* gris foncé */
   border-radius: 12px;
   padding: 15px;
-  background-color: #f8f9fa;
+  background-color: #ffffff;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   transition: background-color 0.2s ease, box-shadow 0.2s ease;
-  /* margin-bottom: 15px; ❌ Enlève cette ligne */
+  overflow: hidden; /* 🛠️ clé magique ici */
+}
+
+.list-group-item > div:first-child {
+  margin-top: 5px;
 }
 
 .list-group-item:hover {

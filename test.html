@@ -454,7 +454,7 @@ function renderFait() {
   if (!showAllFait) {
     filtered = filtered.filter(item => {
       const days = getDaysSince(item.date);
-      return days <= 30; // Seulement si 30 jours ou moins
+      return days <= 30;
     });
   }
 
@@ -465,60 +465,63 @@ function renderFait() {
 
   filtered.forEach(item => {
     const div = document.createElement('div');
-    div.className = 'list-group-item';
-  div.innerHTML = `
-<div class="position-relative">
-<div class="d-flex justify-content-between align-items-start">
-  <div class="w-100 pe-4">
-    <div class="d-flex align-items-center mb-1 gap-2 flex-wrap">
-      <h6 class="mb-0">${item.unite} - ${item.nom}</h6>
-      <span class="badge bg-success rounded-pill">
-        📅 Réparé le ${formatDate(item.dateFin)}
-      </span>
-    </div>
-    <small class="text-muted">${formatDate(item.date)}</small>
-    <div class="mb-2 description-tronquee">${escapeHtml(truncateText(item.description, 60))}</div>
-  </div>
-  <div class="position-absolute top-0 end-0 p-2">
-    <small class="text-primary">🔽 Voir</small>
-  </div>
-</div>
+    div.className = 'list-group-item p-3 position-relative bg-light-custom';  // 🛠️ Ajouté ici
+    div.style.minHeight = "140px";
 
+    div.innerHTML = `
+      <div class="position-relative">
+        <div class="d-flex justify-content-between align-items-start">
+          <div class="w-100 pe-4">
+            <div class="d-flex align-items-center mb-1 gap-2 flex-wrap">
+              <h6 class="mb-0">${item.unite} - ${item.nom}</h6>
+              <span class="badge bg-success rounded-pill">
+                📅 Réparé le ${formatDate(item.dateFin)}
+              </span>
+            </div>
+            <small class="text-muted">${formatDate(item.date)}</small>
+            <div class="mb-2 description-tronquee">${escapeHtml(truncateText(item.description, 60))}</div>
+          </div>
+          <div class="position-absolute top-0 end-0 p-2">
+            <small class="text-primary">🔽 Voir</small>
+          </div>
+        </div>
 
-<div class="details mt-2 p-2 bg-light rounded" style="display: none;">
-  <hr>
-  <p class="mb-2">
-    <strong>📄 Description complète :</strong><br>
-    <span class="text-muted">${escapeHtml(item.description)}</span>
-  </p>
-  <p class="mb-2">
-    <strong>🛠️ Réparations effectuées :</strong><br>
-    <span class="text-muted">${escapeHtml(item.notes)}</span>
-  </p>
-  <p class="mb-0">
-    <strong>⏱️ Temps :</strong> 
-    <span class="text-muted">${item.temps}</span>
-  </p>
-</div>
+        <div class="details mt-2 p-2 bg-light rounded" style="display: none;">
+          <hr>
+          <p class="mb-2">
+            <strong>📄 Description complète :</strong><br>
+            <span class="text-muted">${escapeHtml(item.description)}</span>
+          </p>
+          <p class="mb-2">
+            <strong>🛠️ Réparations effectuées :</strong><br>
+            <span class="text-muted">${escapeHtml(item.notes)}</span>
+          </p>
+          <p class="mb-0">
+            <strong>⏱️ Temps :</strong> 
+            <span class="text-muted">${item.temps}</span>
+          </p>
+        </div>
+      </div>
+    `;
 
-</div>
-`;
-div.addEventListener('click', function(e) {
-  this.classList.toggle('opened');
-  const details = this.querySelector('.details');
-  if (this.classList.contains('opened')) {
-    details.style.display = 'block';
-    this.querySelector('.description-tronquee').style.display = 'none';
-  } else {
-    details.style.display = 'none';
-    this.querySelector('.description-tronquee').style.display = 'block';
-  }
-});
+    div.addEventListener('click', function(e) {
+      this.classList.toggle('opened');
+      const details = this.querySelector('.details');
+      if (this.classList.contains('opened')) {
+        details.style.display = 'block';
+        this.querySelector('.description-tronquee').style.display = 'none';
+      } else {
+        details.style.display = 'none';
+        this.querySelector('.description-tronquee').style.display = 'block';
+      }
+    });
+
     content.appendChild(div);
   });
 
   updateCounters();
 }
+
 
 function toggleFaitView() {
   showAllFait = !showAllFait;

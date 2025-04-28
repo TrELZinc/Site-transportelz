@@ -96,34 +96,43 @@ input[type=range]::-webkit-slider-thumb {
   backdrop-filter: blur(8px);
   background: rgba(0, 0, 0, 0.5); /* Un peu de foncé aussi */
 }
+input[type=range].range-ticks {
+  background: #ccc; /* fond de base (ligne grise continue) */
+  height: 8px; /* plus gros pour bien voir */
+  border-radius: 5px;
+}
+
 input[type=range].range-ticks::-webkit-slider-runnable-track {
   background: repeating-linear-gradient(
     to right,
     #ccc,
-    #ccc 1px,
-    transparent 1px,
-    transparent 14px
+    #ccc 2px,
+    transparent 2px,
+    transparent 13px
   );
+  height: 8px;
 }
 
 input[type=range].range-ticks::-moz-range-track {
   background: repeating-linear-gradient(
     to right,
     #ccc,
-    #ccc 1px,
-    transparent 1px,
-    transparent 14px
+    #ccc 2px,
+    transparent 2px,
+    transparent 13px
   );
+  height: 8px;
 }
 
 input[type=range].range-ticks::-ms-track {
   background: repeating-linear-gradient(
     to right,
     #ccc,
-    #ccc 1px,
-    transparent 1px,
-    transparent 14px
+    #ccc 2px,
+    transparent 2px,
+    transparent 13px
   );
+  height: 8px;
 }
   </style>
 </head>

@@ -463,16 +463,22 @@ function renderFait() {
     div.className = 'list-group-item';
   div.innerHTML = `
 <div class="position-relative">
-  <div class="d-flex justify-content-between align-items-start">
-    <div class="w-100 pe-4">
-      <h6 class="mb-1">${item.unite} - ${item.nom}</h6>
-      <small class="text-muted">${formatDate(item.date)}</small>
-      <div class="mb-2 description-tronquee">${escapeHtml(truncateText(item.description, 60))}</div>
+<div class="d-flex justify-content-between align-items-start">
+  <div class="w-100 pe-4">
+    <div class="d-flex align-items-center mb-1 gap-2 flex-wrap">
+      <h6 class="mb-0">${item.unite} - ${item.nom}</h6>
+      <span class="badge bg-success rounded-pill">
+        📅 Réparé le ${formatDate(item.dateFin)}
+      </span>
     </div>
-    <div class="position-absolute top-0 end-0">
-      <small class="text-primary">🔽 Voir</small>
-    </div>
+    <small class="text-muted">${formatDate(item.date)}</small>
+    <div class="mb-2 description-tronquee">${escapeHtml(truncateText(item.description, 60))}</div>
   </div>
+  <div class="position-absolute top-0 end-0 p-2">
+    <small class="text-primary">🔽 Voir</small>
+  </div>
+</div>
+
 
 <div class="details mt-2 p-2 bg-light rounded" style="display: none;">
   <hr>

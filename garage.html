@@ -96,7 +96,45 @@ input[type=range]::-webkit-slider-thumb {
   backdrop-filter: blur(8px);
   background: rgba(0, 0, 0, 0.5); /* Un peu de foncé aussi */
 }
-
+.range-ticks {
+  background: linear-gradient(to right, 
+    #0d6efd 0%, #0d6efd 0.5%, 
+    transparent 0.5%, transparent 6.25%, 
+    #0d6efd 6.25%, #0d6efd 6.75%, 
+    transparent 6.75%, transparent 12.5%, 
+    #0d6efd 12.5%, #0d6efd 13%, 
+    transparent 13%, transparent 18.75%, 
+    #0d6efd 18.75%, #0d6efd 19.25%, 
+    transparent 19.25%, transparent 25%, 
+    #0d6efd 25%, #0d6efd 25.5%, 
+    transparent 25.5%, transparent 31.25%, 
+    #0d6efd 31.25%, #0d6efd 31.75%, 
+    transparent 31.75%, transparent 37.5%, 
+    #0d6efd 37.5%, #0d6efd 38%, 
+    transparent 38%, transparent 43.75%, 
+    #0d6efd 43.75%, #0d6efd 44.25%, 
+    transparent 44.25%, transparent 50%, 
+    #0d6efd 50%, #0d6efd 50.5%, 
+    transparent 50.5%, transparent 56.25%, 
+    #0d6efd 56.25%, #0d6efd 56.75%, 
+    transparent 56.75%, transparent 62.5%, 
+    #0d6efd 62.5%, #0d6efd 63%, 
+    transparent 63%, transparent 68.75%, 
+    #0d6efd 68.75%, #0d6efd 69.25%, 
+    transparent 69.25%, transparent 75%, 
+    #0d6efd 75%, #0d6efd 75.5%, 
+    transparent 75.5%, transparent 81.25%, 
+    #0d6efd 81.25%, #0d6efd 81.75%, 
+    transparent 81.75%, transparent 87.5%, 
+    #0d6efd 87.5%, #0d6efd 88%, 
+    transparent 88%, transparent 93.75%, 
+    #0d6efd 93.75%, #0d6efd 94.25%, 
+    transparent 94.25%, transparent 100%
+  );
+  background-size: 100% 2px;
+  background-repeat: no-repeat;
+  background-position: bottom;
+}
   </style>
 </head>
 <body>
@@ -281,27 +319,7 @@ ${hasFiles ? `
 
 <label class="form-label mt-2">⏱️ Temps de réparation</label>
 <div class="mb-2 text-center" id="timeDisplay">Sélectionnez le temps</div>
-<input type="range" class="form-range mb-3" min="0" max="240" step="15" value="0" oninput="updateTimeDisplay(this)" list="ticks">
-<datalist id="ticks">
-  <option value="0"></option>
-  <option value="15"></option>
-  <option value="30"></option>
-  <option value="45"></option>
-  <option value="60"></option>
-  <option value="75"></option>
-  <option value="90"></option>
-  <option value="105"></option>
-  <option value="120"></option>
-  <option value="135"></option>
-  <option value="150"></option>
-  <option value="165"></option>
-  <option value="180"></option>
-  <option value="195"></option>
-  <option value="210"></option>
-  <option value="225"></option>
-  <option value="240"></option>
-</datalist>
-
+<input type="range" class="form-range mb-3 range-ticks" min="0" max="240" step="15" value="0" oninput="updateTimeDisplay(this)">
         <button class="btn btn-success btn-completer mt-2" onclick="completer(this)" disabled>✅ Compléter</button>
       </div>
     `;

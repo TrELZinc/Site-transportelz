@@ -279,9 +279,28 @@ ${hasFiles ? `
         <label class="form-label mt-2">🛠️ Réparations effectuées</label>
         <textarea class="form-control mb-3" rows="2" placeholder="Décrire la réparation..." oninput="checkFields(this)"></textarea>
 
-        <label class="form-label mt-2">⏱️ Temps de réparation</label>
-        <div class="mb-2 text-center" id="timeDisplay">Sélectionnez le temps</div>
-        <input type="range" class="form-range mb-3" min="0" max="240" step="15" value="0" oninput="updateTimeDisplay(this)">
+<label class="form-label mt-2">⏱️ Temps de réparation</label>
+<div class="mb-2 text-center" id="timeDisplay">Sélectionnez le temps</div>
+<input type="range" class="form-range mb-3" min="0" max="240" step="15" value="0" oninput="updateTimeDisplay(this)" list="ticks">
+<datalist id="ticks">
+  <option value="0"></option>
+  <option value="15"></option>
+  <option value="30"></option>
+  <option value="45"></option>
+  <option value="60"></option>
+  <option value="75"></option>
+  <option value="90"></option>
+  <option value="105"></option>
+  <option value="120"></option>
+  <option value="135"></option>
+  <option value="150"></option>
+  <option value="165"></option>
+  <option value="180"></option>
+  <option value="195"></option>
+  <option value="210"></option>
+  <option value="225"></option>
+  <option value="240"></option>
+</datalist>
 
         <button class="btn btn-success btn-completer mt-2" onclick="completer(this)" disabled>✅ Compléter</button>
       </div>

@@ -318,21 +318,19 @@ function initGalleries() {
 }
 
 function transformDriveUrl(url, type = "image", full = false) {
-  let match = url.match(/\/d\/([^\/]+)/);
-  if (!match) {
-    match = url.match(/id=([^&]+)/);
-  }
-  
+  let match = url.match(/\/d\/([^\/]+)/) || url.match(/id=([^&]+)/);
+
   if (match && match[1]) {
     const id = match[1];
-    if (type.startsWith("video")) {
-      return `https://drive.google.com/file/d/${id}/preview`;
+    if (type === "video") {
+      // 🎯 Pour les vidéos : lien direct download qui marche avec <video>
+      return `https://drive.google.com/uc?export=download&id=${id}`;
     }
     if (full) {
-      // lien IMAGE haute résolution
+      // 🎯 Pour les images grandes tailles
       return `https://drive.google.com/thumbnail?id=${id}&sz=w1600-h1200`;
     } else {
-      // lien MINIATURE légère
+      // 🎯 Pour les miniatures rapides
       return `https://drive.google.com/thumbnail?id=${id}&sz=w400-h400`;
     }
   }
@@ -493,7 +491,7 @@ function openPopupMedia(url, type) {
     `;
   } else if (type.startsWith('video')) {
     content.innerHTML = `
-      <video controls autoplay style="max-width:90vw; max-height:90vh; border-radius:10px; display:block; margin:auto;">
+      <video controls autoplay style="max-width:90vw; max-height:90vh; width:auto; height:auto; border-radius:10px; display:block; margin:auto;">
         <source src="${url}" type="video/mp4">
         Votre navigateur ne supporte pas la lecture vidéo.
       </video>
@@ -502,7 +500,6 @@ function openPopupMedia(url, type) {
 
   overlay.style.display = 'flex';
 }
-
 
 function closePopup() {
   const overlay = document.getElementById('popupOverlay');

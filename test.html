@@ -474,21 +474,30 @@ function renderFait() {
     </div>
   </div>
 
-  <div class="details mt-2 p-2 bg-light rounded" style="display: none;">
-    <hr>
-    <p class="mb-2">
-      <strong>📄 Description complète :</strong><br>
-      <span class="text-muted">${escapeHtml(item.description)}</span>
-    </p>
-    <p class="mb-2">
-      <strong>🛠️ Réparations effectuées :</strong><br>
-      <span class="text-muted">${escapeHtml(item.notes)}</span>
-    </p>
-    <p class="mb-0">
-      <strong>⏱️ Temps :</strong> 
-      <span class="text-muted">${item.temps}</span>
-    </p>
+<div class="details mt-2 p-2 bg-light rounded" style="display: none;">
+  <hr>
+  <p class="mb-2">
+    <strong>📄 Description complète :</strong><br>
+    <span class="text-muted">${escapeHtml(item.description)}</span>
+  </p>
+  <p class="mb-2">
+    <strong>🛠️ Réparations effectuées :</strong><br>
+    <span class="text-muted">${escapeHtml(item.notes)}</span>
+  </p>
+  
+  <!-- 💚 BADGE DATE -->
+  <div class="mb-2">
+    <span class="badge bg-success rounded-pill">
+      📅 Réparé le ${formatDate(item.dateFin)}
+    </span>
   </div>
+  
+  <p class="mb-0">
+    <strong>⏱️ Temps :</strong> 
+    <span class="text-muted">${item.temps}</span>
+  </p>
+</div>
+
 </div>
 `;
 div.addEventListener('click', function(e) {
@@ -606,11 +615,10 @@ function closePopup() {
 
 function completer(button) {
   const item = button.closest('.list-group-item');
-  const textarea = item.querySelector('textarea').value.trim(); // Réparation effectuée
-  const slider = item.querySelector('input[type=range]'); // Temps de réparation
-  const title = item.querySelector('h6').innerText; // Unité - Nom
-  const descriptionElement = item.querySelector('.details span.text-muted'); // Description complète
-
+  const textarea = item.querySelector('textarea').value.trim();
+  const slider = item.querySelector('input[type=range]');
+  const title = item.querySelector('h6').innerText;
+  const descriptionElement = item.querySelector('.details span.text-muted');
   const description = descriptionElement ? descriptionElement.innerText : "";
 
   const minutes = parseInt(slider.value);
@@ -619,6 +627,10 @@ function completer(button) {
   const temps = `${h > 0 ? h + "h" : ""}${m > 0 ? " " + m + "min" : ""}`;
 
   const id = aFaire.find(r => title.includes(r.nom)).id;
+
+  // ✅ Correct ici : date maintenant
+  const now = new Date();
+  const dateFin = now.toISOString(); 
 
   fetch("https://script.google.com/macros/s/AKfycbyas8D75v_swNv6tfVlSzfWsmU0o6xAKGPS9ZkOC9p4wGcchued80uknz4tppMjNWf6/exec", {
     method: "POST",
@@ -631,13 +643,13 @@ function completer(button) {
       id: id,
       notes: textarea,
       temps: temps,
-      description: description // ⚡ On envoie la description complète aussi
+      description: description,
+      dateFin: dateFin
     })
   })
   .then(() => {
     showToast("Réparation complétée avec succès ✅");
     setTimeout(() => {
-      console.log("Recharge après 2 secondes...");
       chargerReparations(true);
     }, 500);
   })
@@ -646,6 +658,7 @@ function completer(button) {
     alert("Erreur lors de l'envoi au serveur.");
   });
 }
+
 
 function updateCounters() {
   const aFaireCount = aFaire.filter(item => !item.notes || item.notes.trim() === "").length;

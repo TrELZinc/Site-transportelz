@@ -41,16 +41,17 @@
       background-color: #f8f9fa;
     }
     .list-group-item {
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      margin-bottom: 15px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-    }
-    .list-group-item:hover {
-      background-color: #f1f1f1;
-    }
+  border: 2px solid #000; /* Contour noir plus épais */
+  border-radius: 12px; /* Plus arrondi pour look moderne */
+  margin-bottom: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Ombre légère */
+  cursor: pointer;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+.list-group-item:hover {
+  background-color: #f1f1f1;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2); /* Ombre plus forte au survol */
+}
     .details {
       max-height: 0;
       overflow: hidden;

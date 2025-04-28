@@ -3,261 +3,674 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Documents Permis - Autochargés</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>Réparations Mécanique</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/photoswipe@5/dist/photoswipe.css">
+
   <style>
-    @media (max-width: 576px) {
-      .btn-group-wrap > a,
-      .btn-group-wrap > button {
-        flex: 1 1 0;
-        white-space: nowrap;
-      }
+    .description-box {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
-.renewal-box {
-  max-width: 95%;
-  font-size: 0.95rem;
-  font-family: system-ui, sans-serif;
-  border-left: 4px solid #dc3545;
-  backdrop-filter: blur(3px);
-  background-color: rgba(255, 0, 0, 0.075) !important;
-  margin-top: 1rem;
-  margin-bottom: 2rem;
-}
+    
+    .badge {
+      font-size: 0.9rem;
+      padding: 6px 12px;
+      font-weight: 600;
+    }
 
-.marquee-container {
+    body {
+      background-color: #f8f9fa;
+    }
+    .list-group-item {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    .list-group-item:hover {
+      background-color: #f1f1f1;
+    }
+    .details {
+      display: none;
+      margin-top: 10px;
+    }
+    .opened .details {
+      display: block;
+    }
+    .badge-custom {
+      font-size: 0.8rem;
+      padding: 4px 8px;
+      border-radius: 10px;
+    }
+    input[type=range] {
+  height: 30px;
+}
+input[type=range]::-webkit-slider-thumb {
+  height: 30px;
+  width: 30px;
+  background: #0d6efd;
+  border: 2px solid white;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-top: -10px;
+}
+#timeDisplay {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #0d6efd;
+  text-align: center;
+}
+.btn-completer {
+  width: 100%;
+  padding: 15px;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+.description-tronquee {
+  min-height: 40px;
+}
+.img-thumbnail-mini {
+  height: 80px;
+  width: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 3px solid #0d6efd; /* bleu vif Bootstrap */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* un effet de profondeur */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.img-thumbnail-mini:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+}
+@media (max-width: 768px) {
+  .img-thumbnail-mini {
+    height: 70px;
+    width: 70px;
+  }
+}
+}
+.details {
+  display: none;
+  margin-top: 10px;
+  transition: max-height 0.3s ease, padding 0.3s ease;
   overflow: hidden;
-  position: relative;
-  height: 1.6em;
+}
+.opened .details {
+  display: block;
+}
+.pswp__bg {
+  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.5); /* Un peu de foncé aussi */
+}
+input[type=range].range-ticks {
+  background: #ccc; /* fond de base (ligne grise continue) */
+  height: 8px; /* plus gros pour bien voir */
+  border-radius: 5px;
 }
 
-.marquee-content {
-  white-space: nowrap;
-  animation: scroll-left 25s linear infinite;
-  display: inline-block;
-  transform: translateX(100%);
+input[type=range].range-ticks::-webkit-slider-runnable-track {
+  background: repeating-linear-gradient(
+    to right,
+    #ccc,
+    #ccc 2px,
+    transparent 2px,
+    transparent 13px
+  );
+  height: 8px;
 }
 
-@keyframes scroll-left {
-  0%   { transform: translateX(0%); }
-  100% { transform: translateX(-100%); }
+input[type=range].range-ticks::-moz-range-track {
+  background: repeating-linear-gradient(
+    to right,
+    #ccc,
+    #ccc 2px,
+    transparent 2px,
+    transparent 13px
+  );
+  height: 8px;
 }
-</style>
 
+input[type=range].range-ticks::-ms-track {
+  background: repeating-linear-gradient(
+    to right,
+    #ccc,
+    #ccc 2px,
+    transparent 2px,
+    transparent 13px
+  );
+  height: 8px;
+}
+  </style>
 </head>
-<body class="bg-light py-4">
-<div id="renewalBanner" class="d-none w-100">
-  <div class="renewal-box mx-auto mt-2 mb-4 px-3 py-2 rounded shadow-sm text-danger bg-danger-subtle bg-opacity-25 text-center">
-    <div class="fw-bold">⚠️ Permis à renouveler ⚠️</div>
-    <div id="renewalMarquee" class="mt-1 text-danger-emphasis marquee-container">
-      <span class="marquee-content d-inline-block"></span>
-    </div>
+<body>
+
+<!-- Bannière noire avec logo -->
+<div style="background-color: #111; padding: 10px 0; text-align: center;">
+  <img src="assets/logo.jpeg" alt="Logo" style="height: 60px; object-fit: contain;">
+</div>
+
+<div class="container py-4">
+  <h2 class="text-center mb-4">🔧 Réparations Mécanique 🔧</h2>
+
+  <!-- Onglets -->
+  <ul class="nav nav-pills nav-justified mb-3">
+    <li class="nav-item">
+      <button class="nav-link active" id="a-faire-tab" onclick="showTab('faire')">À faire</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" id="fait-tab" onclick="showTab('fait')">Réparé</button>
+    </li>
+  </ul>
+
+  <!-- Zone de filtre -->
+  <div id="filterZone" class="mb-3">
+    <input type="text" class="form-control" id="searchInput" placeholder="🔎 Filtrer par unité..." oninput="renderCurrentTab()">
+  </div>
+
+  <!-- Contenus -->
+  <div id="faireList" class="list-group"></div>
+  <div id="faitList" class="list-group d-none"></div>
+  <div class="text-center my-3">
+  <button id="toggleFaitView" class="btn btn-secondary btn-sm" onclick="toggleFaitView()">Afficher tout</button>
   </div>
 </div>
 
-<div class="container">
-  <h1 class="mb-4 text-center">📄 Visualisation des Permis</h1>
-
-  <div class="row g-3 mb-3">
-    <div class="col-md-6">
-      <label class="form-label">Unité</label>
-      <select id="unitSelect" class="form-select">
-        <option disabled selected>Choisir une unité</option>
-      </select>
-    </div>
-    <div class="col-md-6">
-      <label class="form-label">Type de permis</label>
-      <select id="permitSelect" class="form-select">
-        <option disabled selected>Choisir un permis</option>
-      </select>
-    </div>
-  </div>
-
-  <div class="mt-4">
-    <div id="infoBlock" class="d-none">
-      <ul class="list-group">
-        <li class="list-group-item"><strong>Unité :</strong> <span id="unitLabel"></span></li>
-        <li class="list-group-item"><strong>Permis :</strong> <span id="permitLabel"></span></li>
-        <li class="list-group-item"><strong>Expiration :</strong> <span id="expirationLabel"></span></li>
-      </ul>
-      <div class="mt-3 d-flex flex-row flex-wrap justify-content-center gap-2 btn-group-wrap">
-        <a id="openPdf" href="#" target="_blank" class="btn btn-primary">🧾 Voir le PDF</a>
-        <a id="downloadPdf" href="#" class="btn btn-success" download>⬇️ Télécharger</a>
-      </div>
-
-      <div class="mt-3 text-center">
-        <label for="emailInput" class="form-label">✉️ Envoyer le PDF avec pièce jointe à :</label>
-        <div class="input-group mb-2">
-          <input type="email" id="emailInput" class="form-control" placeholder="adresse@email.com">
-          <button id="sendViaScriptBtn" class="btn btn-warning" type="button">📎 Envoyer </button>
-        </div>
-        <small class="form-text text-muted d-block" id="pjStatus"></small>
-      </div>
-    </div>
-  </div>
-</div>
+<!-- Juste la partie dynamique JS modifiée car le reste du HTML est correct -->
 
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbya6pXCawlVp-uoqJWPPZmAtEzSjpRgIQyVrHCaAtVSxz-CtayB8TSTsKtBz6Hbm8jU/exec";
-  let docs = [];
-  let selectedDoc = null;
+// Données simulées
+let aFaire = [];
+let fait = [];
+let showAllFait = false;
 
-async function fetchDocs() {
+
+async function chargerReparations(noReset = false) {
   try {
-    const res = await fetch(API_URL);
-    const data = await res.json();
-    docs = data.docs || data;
+    const response = await fetch("https://script.google.com/macros/s/AKfycbyas8D75v_swNv6tfVlSzfWsmU0o6xAKGPS9ZkOC9p4wGcchued80uknz4tppMjNWf6/exec?read=1");
+    aFaire = await response.json();
+    aFaire = aFaire.sort((a, b) => new Date(b.date) - new Date(a.date)); // 🔥 auto tri
 
-    const unitSelect = document.getElementById('unitSelect');
-    unitSelect.innerHTML = '<option disabled selected>Choisir une unité</option>';
-
-    const unitMap = new Map(); // éviter les doublons réels
-
-    docs.forEach(doc => {
-      if (doc.unit && !unitMap.has(doc.unit)) {
-        unitMap.set(doc.unit, true);
-      }
-    });
-
-    const sortedUnits = Array.from(unitMap.keys()).sort((a, b) => {
-      const getChunks = str => str.match(/\D+|\d+/g).map(s => isNaN(s) ? s : parseInt(s));
-      const ac = getChunks(a);
-      const bc = getChunks(b);
-      for (let i = 0; i < Math.max(ac.length, bc.length); i++) {
-        if (ac[i] === undefined) return -1;
-        if (bc[i] === undefined) return 1;
-        if (ac[i] < bc[i]) return -1;
-        if (ac[i] > bc[i]) return 1;
-      }
-      return 0;
-    });
-
-    sortedUnits.forEach(unit => {
-      unitSelect.innerHTML += `<option value="${unit}">${unit}</option>`;
-    });
-  } catch (e) {
-    alert("Erreur de chargement des données : " + e.message);
-  }
-}
-
-
-function showUpcomingRenewals() {
-  const now = new Date();
-  const threeMonthsLater = new Date();
-  threeMonthsLater.setMonth(now.getMonth() + 3);
-
-  const upcoming = docs.filter(doc => {
-    const exp = new Date(doc.expiration);
-    return exp >= now && exp <= threeMonthsLater;
-  }).sort((a, b) => new Date(a.expiration) - new Date(b.expiration)).slice(0, 2);
-
-  if (upcoming.length > 0) {
-    const messages = upcoming.map(doc =>
-      `${doc.unit} – ${doc.permit} (expire le ${doc.expiration})`
-    );
-    document.querySelector(".marquee-content").textContent = messages.join("   •   ");
-    document.getElementById("renewalBanner").classList.remove("d-none");
-  }
-}
-
-  function updateDisplay() {
-    const unit = document.getElementById("unitSelect").value;
-    const permit = document.getElementById("permitSelect").value;
-    const doc = docs.find(d => d.unit === unit && d.permit === permit);
-    selectedDoc = doc;
-
-    if (doc) {
-      const driveLink = `https://drive.google.com/file/d/${doc.fileId}/preview`;
-      const downloadLink = `https://drive.google.com/uc?export=download&id=${doc.fileId}`;
-
-      document.getElementById("unitLabel").textContent = doc.unit;
-      document.getElementById("permitLabel").textContent = doc.permit;
-      document.getElementById("expirationLabel").textContent = doc.expiration;
-
-      document.getElementById("openPdf").href = driveLink;
-      document.getElementById("downloadPdf").href = downloadLink;
-
-      document.getElementById("infoBlock").classList.remove("d-none");
+    if (!noReset) {
+      showTab('faire');
     } else {
-      document.getElementById("infoBlock").classList.add("d-none");
+      renderCurrentTab();
+      updateCounters();
     }
+
+  } catch (error) {
+    console.error("Erreur de chargement :", error);
+    alert("Erreur lors du chargement des réparations. Veuillez réessayer.");
   }
+}
 
-  document.getElementById("unitSelect").addEventListener("change", () => {
-    const unit = document.getElementById("unitSelect").value;
-  const permitsForUnit = [...new Set(docs.filter(d => d.unit === unit).map(d => d.permit))].sort((a, b) => {
-  const getChunks = str => str.match(/\D+|\d+/g).map(s => isNaN(s) ? s : parseInt(s));
-  const aChunks = getChunks(a);
-  const bChunks = getChunks(b);
-  
-  for (let i = 0; i < Math.max(aChunks.length, bChunks.length); i++) {
-    if (aChunks[i] === undefined) return -1;
-    if (bChunks[i] === undefined) return 1;
-    if (aChunks[i] < bChunks[i]) return -1;
-    if (aChunks[i] > bChunks[i]) return 1;
+
+// Charger automatiquement les réparations au démarrage
+chargerReparations();
+
+
+let currentTab = 'faire';
+
+function showTab(tab) {
+  currentTab = tab;
+  document.getElementById('a-faire-tab').classList.remove('active');
+  document.getElementById('fait-tab').classList.remove('active');
+  document.getElementById('faireList').classList.add('d-none');
+  document.getElementById('faitList').classList.add('d-none');
+  document.getElementById('filterZone').classList.remove('d-none');
+
+  if (tab === 'faire') {
+    document.getElementById('a-faire-tab').classList.add('active');
+    document.getElementById('faireList').classList.remove('d-none');
+    renderAFaire(); // ✅ ici aussi
+  } else {
+    document.getElementById('fait-tab').classList.add('active');
+    document.getElementById('faitList').classList.remove('d-none');
+    renderFait();
   }
-  return 0;
-});
+  updateCounters();
 
-    const permitSelect = document.getElementById("permitSelect");
-    permitSelect.innerHTML = `<option disabled selected>Choisir un permis</option>`;
-    permitsForUnit.forEach(p => {
-      permitSelect.innerHTML += `<option value="${p}">${p}</option>`;
-    });
+  document.getElementById('toggleFaitView').style.display = (tab === 'fait') ? 'inline-block' : 'none';
+}
 
-    document.getElementById("infoBlock").classList.add("d-none");
+
+function renderCurrentTab() {
+  if (currentTab === 'faire') renderAFaire(); 
+  else renderFait();
+}
+
+
+function renderAFaire() {
+  const content = document.getElementById('faireList');
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  content.innerHTML = '';
+
+  let filtered = aFaire.filter(item => {
+    const notes = (item.notes || "").trim();
+    return item.unite.toLowerCase().includes(search) && notes === "";
   });
 
-  document.getElementById("permitSelect").addEventListener("change", updateDisplay);
+  filtered.sort((a, b) => getUrgenceLevel(b.date) - getUrgenceLevel(a.date));
 
-  document.getElementById("sendViaScriptBtn").addEventListener("click", async () => {
-    const emailInput = document.getElementById("emailInput");
-    const statusMsg = document.getElementById("pjStatus");
-    const btn = document.getElementById("sendViaScriptBtn");
+  if (filtered.length === 0) {
+    content.innerHTML = '<div class="text-center text-muted">Aucune réparation trouvée.</div>';
+    updateCounters();
+    return;
+  }
 
-    const email = emailInput.value;
-    if (!email || !selectedDoc) {
-      alert("Veuillez choisir un document et entrer une adresse email.");
-      return;
-    }
+  filtered.forEach(item => {
+    const diffDays = getDaysSince(item.date);
+    const badge = getDaysBadge(diffDays);
+    const hasFiles = item.fichiers && item.fichiers.length > 0;
 
-    btn.disabled = true;
-    statusMsg.textContent = "⏳ Envoi en cours...";
+    const div = document.createElement('div');
+    div.className = 'list-group-item p-3 position-relative';
+    div.style.minHeight = "140px";
 
-    const params = new URLSearchParams({
-      email: email,
-      fileId: selectedDoc.fileId,
-      unit: selectedDoc.unit,
-      permit: selectedDoc.permit
-    });
+    div.innerHTML = `
+      <div class="d-flex justify-content-between align-items-start">
+        <div class="w-100 pe-4">
+          <h6 class="mb-1">${item.unite} - ${item.nom}</h6>
+          ${hasFiles ? '<div class="text-warning small mt-1">📸 Fichiers attachés</div>' : ''}
+          <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
+          ${badge}
+          <small class="text-muted">${formatDate(item.date)}</small>
+        </div>
+          <div class="mb-2 description-tronquee">${escapeHtml(truncateText(item.description, 60))}</div>
+        </div>
+        <div class="position-absolute top-0 end-0 p-2">
+          <small class="text-primary">🔽 Voir</small>
+        </div>
+      </div>
 
-    try {
-      const res = await fetch(API_URL, {
-        method: "POST",
-        body: params
-      });
-      const text = await res.text();
+      <div class="details mt-3 p-2 bg-light rounded" style="display: none;">
+        <hr>
+        <p class="mb-2">
+          <strong>📄 Description complète :</strong><br>
+          <span class="text-muted">${escapeHtml(item.description)}</span>
+        </p>
 
-      if (text === "OK") {
-        statusMsg.textContent = "📧 Envoyé avec pièce jointe !";
-        emailInput.value = "";
-      } else {
-        statusMsg.textContent = "Erreur : " + text;
+${hasFiles ? `
+  <div class="mb-3 d-flex flex-wrap gap-2 gallery" id="gallery-${item.id}">
+    ${item.fichiers.map(f => {
+  const ext = f.toLowerCase();
+  const isVideo = ext.includes(".mp4") || ext.includes(".mov") || ext.includes(".webm");
+  const type = isVideo ? "video" : "image";
+
+  const thumbSrc = transformDriveUrl(f, type, false);
+  const fullSrc = transformDriveUrl(f, type, true);
+
+  if (type === "image") {
+    return `
+      <img src="${thumbSrc}" class="img-thumbnail-mini" onclick="openPopupMedia('${fullSrc}', 'image')">
+    `;
+  } else {
+    return `
+      <div style="position: relative; display: inline-block;">
+        <img src="${thumbSrc}" class="img-thumbnail-mini" onclick="openPopupMedia('${fullSrc}', 'video')">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="white" stroke="black" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="background: rgba(0,0,0,0.5); border-radius: 50%; padding:5px;">
+            <polygon points="6,4 20,12 6,20 6,4"></polygon>
+          </svg>
+        </div>
+      </div>
+    `;
+  }
+}).join('')}
+  </div>
+` : ''}
+
+        <label class="form-label mt-2">🛠️ Réparations effectuées</label>
+        <textarea class="form-control mb-3" rows="2" placeholder="Décrire la réparation..." oninput="checkFields(this)"></textarea>
+
+<label class="form-label mt-2">⏱️ Temps de réparation</label>
+<div class="mb-2 text-center" id="timeDisplay">Sélectionnez le temps</div>
+<input type="range" class="form-range mb-3 range-ticks" min="0" max="240" step="15" value="0" oninput="updateTimeDisplay(this)">
+        <button class="btn btn-success btn-completer mt-2" onclick="completer(this)" disabled>✅ Compléter</button>
+      </div>
+    `;
+
+    div.addEventListener('click', function(e) {
+      if (!e.target.closest('a') && !e.target.closest('textarea') && !e.target.closest('input') && !e.target.closest('button') && !e.target.closest('img')) {
+        this.classList.toggle('opened');
+        const details = this.querySelector('.details');
+        if (this.classList.contains('opened')) {
+          details.style.display = 'block';
+          this.querySelector('.description-tronquee').style.display = 'none';
+        } else {
+          details.style.display = 'none';
+          this.querySelector('.description-tronquee').style.display = 'block';
+        }
       }
-    } catch (e) {
-      statusMsg.textContent = "❌ Erreur réseau : " + e.message;
-    }
+    });
 
-    btn.disabled = false;
+    content.appendChild(div);
   });
 
-  // Exécution correcte séquentielle
-  (async () => {
-    await fetchDocs();
-    showUpcomingRenewals();
-  })();
-</script>
-<div class="container text-center mt-5">
-  <a href="linktree.html" class="btn btn-dark px-4 py-2">⏮️ Retour au menu principal</a>
+  initGalleries();
+  updateCounters();
+}
+
+function initGalleries() {
+  // Détruire d'abord d'éventuelles anciennes instances
+  document.querySelectorAll('.pswp').forEach(el => el.remove());
+
+  document.querySelectorAll('.gallery').forEach(gallery => {
+    const lightbox = new PhotoSwipeLightbox({
+      gallery: '#' + gallery.id,
+      children: 'a.gallery-link',
+      pswpModule: () => import('https://unpkg.com/photoswipe@5/dist/photoswipe.esm.min.js')
+    });
+    lightbox.init();
+  });
+}
+
+function transformDriveUrl(url, type = "image", full = false) {
+  let match = url.match(/\/d\/([^\/]+)/) || url.match(/id=([^&]+)/);
+
+  if (match && match[1]) {
+    const id = match[1];
+    if (type === "video") {
+      // 🎯 Pour les vidéos : lien direct download qui marche avec <video>
+      return `https://drive.google.com/uc?export=download&id=${id}`;
+    }
+    if (full) {
+      // 🎯 Pour les images grandes tailles
+      return `https://drive.google.com/thumbnail?id=${id}&sz=w1600-h1200`;
+    } else {
+      // 🎯 Pour les miniatures rapides
+      return `https://drive.google.com/thumbnail?id=${id}&sz=w400-h400`;
+    }
+  }
+
+  return url; // fallback
+}
+
+function renderFait() {
+  const content = document.getElementById('faitList');
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  content.innerHTML = '';
+
+  let filtered = aFaire.filter(item => 
+    item.notes && item.notes.trim() !== "" &&
+    item.unite.toLowerCase().includes(search)
+  );
+
+  if (!showAllFait) {
+    filtered = filtered.filter(item => {
+      const days = getDaysSince(item.date);
+      return days <= 30; // Seulement si 30 jours ou moins
+    });
+  }
+
+  if (filtered.length === 0) {
+    content.innerHTML = '<div class="text-center text-muted">Aucune réparation complétée trouvée.</div>';
+    return;
+  }
+
+  filtered.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'list-group-item';
+  div.innerHTML = `
+<div class="position-relative">
+  <div class="d-flex justify-content-between align-items-start">
+    <div class="w-100 pe-4">
+      <h6 class="mb-1">${item.unite} - ${item.nom}</h6>
+      <small class="text-muted">${formatDate(item.date)}</small>
+      <div class="mb-2 description-tronquee">${escapeHtml(truncateText(item.description, 60))}</div>
+    </div>
+    <div class="position-absolute top-0 end-0">
+      <small class="text-primary">🔽 Voir</small>
+    </div>
+  </div>
+
+  <div class="details mt-2 p-2 bg-light rounded" style="display: none;">
+    <hr>
+    <p class="mb-2">
+      <strong>📄 Description complète :</strong><br>
+      <span class="text-muted">${escapeHtml(item.description)}</span>
+    </p>
+    <p class="mb-2">
+      <strong>🛠️ Réparations effectuées :</strong><br>
+      <span class="text-muted">${escapeHtml(item.notes)}</span>
+    </p>
+    <p class="mb-0">
+      <strong>⏱️ Temps :</strong> 
+      <span class="text-muted">${item.temps}</span>
+    </p>
+  </div>
 </div>
+`;
+div.addEventListener('click', function(e) {
+  this.classList.toggle('opened');
+  const details = this.querySelector('.details');
+  if (this.classList.contains('opened')) {
+    details.style.display = 'block';
+    this.querySelector('.description-tronquee').style.display = 'none';
+  } else {
+    details.style.display = 'none';
+    this.querySelector('.description-tronquee').style.display = 'block';
+  }
+});
+    content.appendChild(div);
+  });
+
+  updateCounters();
+}
+
+function toggleFaitView() {
+  showAllFait = !showAllFait;
+  document.getElementById('toggleFaitView').innerText = showAllFait ? "Afficher seulement 30 jours" : "Afficher tout";
+  renderFait();
+}
+
+function truncateText(text, maxLength) {
+  if (text.length <= maxLength) return text;
+  return text.substring(0, maxLength) + "...";
+}
+
+  function formatDate(dateStr) {
+  const date = new Date(dateStr);
+  const options = { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+  return date.toLocaleDateString('fr-CA', options).replace(',', ' à');
+}
+
+  
+  function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.innerText = text;
+  return div.innerHTML;
+}
+
+function getDaysSince(dateStr) {
+  const today = new Date();
+  const repairDate = new Date(dateStr);
+  const diffTime = today - repairDate;
+  return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+}
+  
+function getUrgenceLevel(dateStr) {
+  return getDaysSince(dateStr);
+}
+
+function getDaysBadge(diffDays) {
+  let color = "bg-success";
+  if (diffDays >= 3 && diffDays <= 5) color = "bg-warning text-dark";
+  if (diffDays > 5) color = "bg-danger";
+
+  return `<span class="badge ${color} rounded-pill">Demandée il y a ${diffDays} jours</span>`;
+}
+
+function updateTimeDisplay(slider) {
+  const display = slider.parentElement.querySelector("#timeDisplay");
+  const minutes = parseInt(slider.value);
+
+  if (minutes === 0) {
+    display.innerText = "Sélectionnez le temps";
+  } else {
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    display.innerText = `${h > 0 ? h + "h" : ""}${m > 0 ? " " + m + "min" : ""}`;
+  }
+  checkFields(slider);
+}
+
+function checkFields(input) {
+  const container = input.closest('.details');
+  const textarea = container.querySelector('textarea');
+  const slider = container.querySelector('input[type=range]');
+  const button = container.querySelector('button');
+
+  if (textarea.value.trim() !== "" && parseInt(slider.value) > 0) {
+    button.disabled = false;
+  } else {
+    button.disabled = true;
+  }
+}
+
+function openPopupMedia(url, type) {
+  const overlay = document.getElementById('popupOverlay');
+  const content = document.getElementById('popupInner');
+  content.innerHTML = '';
+
+  if (type.startsWith('image')) {
+    content.innerHTML = `
+      <img src="${url}" style="max-width:90vw; max-height:90vh; width:auto; height:auto; object-fit:contain; display:block; margin:auto; border-radius:10px;">
+    `;
+  } else if (type.startsWith('video')) {
+    content.innerHTML = `
+      <video controls autoplay style="max-width:90vw; max-height:90vh; width:auto; height:auto; border-radius:10px; display:block; margin:auto;">
+        <source src="${url}" type="video/mp4">
+        Votre navigateur ne supporte pas la lecture vidéo.
+      </video>
+    `;
+  }
+
+  overlay.style.display = 'flex';
+}
+
+function closePopup() {
+  const overlay = document.getElementById('popupOverlay');
+  overlay.style.display = 'none';
+}
+
+function completer(button) {
+  const item = button.closest('.list-group-item');
+  const textarea = item.querySelector('textarea').value.trim(); // Réparation effectuée
+  const slider = item.querySelector('input[type=range]'); // Temps de réparation
+  const title = item.querySelector('h6').innerText; // Unité - Nom
+  const descriptionElement = item.querySelector('.details span.text-muted'); // Description complète
+
+  const description = descriptionElement ? descriptionElement.innerText : "";
+
+  const minutes = parseInt(slider.value);
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  const temps = `${h > 0 ? h + "h" : ""}${m > 0 ? " " + m + "min" : ""}`;
+
+  const id = aFaire.find(r => title.includes(r.nom)).id;
+
+  fetch("https://script.google.com/macros/s/AKfycbyas8D75v_swNv6tfVlSzfWsmU0o6xAKGPS9ZkOC9p4wGcchued80uknz4tppMjNWf6/exec", {
+    method: "POST",
+    mode: "no-cors",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      update: true,
+      id: id,
+      notes: textarea,
+      temps: temps,
+      description: description // ⚡ On envoie la description complète aussi
+    })
+  })
+  .then(() => {
+    showToast("Réparation complétée avec succès ✅");
+    setTimeout(() => {
+      console.log("Recharge après 2 secondes...");
+      chargerReparations(true);
+    }, 500);
+  })
+  .catch(error => {
+    console.error("Erreur mise à jour:", error);
+    alert("Erreur lors de l'envoi au serveur.");
+  });
+}
+
+function updateCounters() {
+  const aFaireCount = aFaire.filter(item => !item.notes || item.notes.trim() === "").length;
+  const faitCount = aFaire.filter(item => item.notes && item.notes.trim() !== "").length;
+
+  document.getElementById('a-faire-tab').innerHTML = `À faire (${aFaireCount})`;
+  document.getElementById('fait-tab').innerHTML = `Réparé (${faitCount})`;
+}
+
+function showToast(message = "Succès") {
+  const toastEl = document.getElementById('liveToast');
+  toastEl.querySelector('.toast-body').textContent = message;
+  const toast = new bootstrap.Toast(toastEl);
+  toast.show();
+}
+
+
+</script>
+
+
+  <!-- Petit Popup Media -->
+<div id="popupOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); z-index:1050; justify-content:center; align-items:center;">
+<div id="popupContent" style="position:relative; padding:20px; background:transparent;">
+<button onclick="closePopup()" style="
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-weight: bold;
+  font-size: 1.8rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 9999;
+">
+  &times;
+</button>
+  <div id="popupInner" style="display:flex; align-items:center; justify-content:center;"></div>
+</div>
+</div>
+  
+<!-- Toast Notification -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100;">
+  <div id="liveToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">
+        Réparation enregistrée ✅
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+</div>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script type="module">
+  import PhotoSwipeLightbox from 'https://unpkg.com/photoswipe@5/dist/photoswipe-lightbox.esm.min.js';
+  window.PhotoSwipeLightbox = PhotoSwipeLightbox;
+</script>
+
 </body>
+
 </html>

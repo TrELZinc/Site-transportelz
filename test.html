@@ -115,44 +115,58 @@ input[type=range]::-webkit-slider-thumb {
   background: rgba(0, 0, 0, 0.5); /* Un peu de foncé aussi */
 }
 input[type=range].range-ticks {
-  background: #ccc; /* fond de base (ligne grise continue) */
-  height: 8px; /* plus gros pour bien voir */
+  background: #0d6efd; /* couleur de fond principale */
+  height: 8px;
   border-radius: 5px;
+  appearance: none;
 }
 
+/* Track (la ligne du slider) */
 input[type=range].range-ticks::-webkit-slider-runnable-track {
   background: repeating-linear-gradient(
     to right,
-    #ccc,
-    #ccc 2px,
+    #0d6efd,
+    #0d6efd 2px,
     transparent 2px,
     transparent 13px
   );
   height: 8px;
+  border-radius: 5px;
 }
 
 input[type=range].range-ticks::-moz-range-track {
   background: repeating-linear-gradient(
     to right,
-    #ccc,
-    #ccc 2px,
+    #0d6efd,
+    #0d6efd 2px,
     transparent 2px,
     transparent 13px
   );
   height: 8px;
+  border-radius: 5px;
 }
 
-input[type=range].range-ticks::-ms-track {
-  background: repeating-linear-gradient(
-    to right,
-    #ccc,
-    #ccc 2px,
-    transparent 2px,
-    transparent 13px
-  );
-  height: 8px;
+/* Thumb (la boule que tu glisses) */
+input[type=range].range-ticks::-webkit-slider-thumb {
+  background-color: white;
+  border: 3px solid #0d6efd;
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-top: -11px;
+  appearance: none;
 }
-  </style>
+
+input[type=range].range-ticks::-moz-range-thumb {
+  background-color: white;
+  border: 3px solid #0d6efd;
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+</style>
 </head>
 <body>
 

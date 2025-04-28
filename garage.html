@@ -96,44 +96,34 @@ input[type=range]::-webkit-slider-thumb {
   backdrop-filter: blur(8px);
   background: rgba(0, 0, 0, 0.5); /* Un peu de foncé aussi */
 }
-.range-ticks {
-  background: linear-gradient(to right, 
-    #0d6efd 0%, #0d6efd 0.5%, 
-    transparent 0.5%, transparent 6.25%, 
-    #0d6efd 6.25%, #0d6efd 6.75%, 
-    transparent 6.75%, transparent 12.5%, 
-    #0d6efd 12.5%, #0d6efd 13%, 
-    transparent 13%, transparent 18.75%, 
-    #0d6efd 18.75%, #0d6efd 19.25%, 
-    transparent 19.25%, transparent 25%, 
-    #0d6efd 25%, #0d6efd 25.5%, 
-    transparent 25.5%, transparent 31.25%, 
-    #0d6efd 31.25%, #0d6efd 31.75%, 
-    transparent 31.75%, transparent 37.5%, 
-    #0d6efd 37.5%, #0d6efd 38%, 
-    transparent 38%, transparent 43.75%, 
-    #0d6efd 43.75%, #0d6efd 44.25%, 
-    transparent 44.25%, transparent 50%, 
-    #0d6efd 50%, #0d6efd 50.5%, 
-    transparent 50.5%, transparent 56.25%, 
-    #0d6efd 56.25%, #0d6efd 56.75%, 
-    transparent 56.75%, transparent 62.5%, 
-    #0d6efd 62.5%, #0d6efd 63%, 
-    transparent 63%, transparent 68.75%, 
-    #0d6efd 68.75%, #0d6efd 69.25%, 
-    transparent 69.25%, transparent 75%, 
-    #0d6efd 75%, #0d6efd 75.5%, 
-    transparent 75.5%, transparent 81.25%, 
-    #0d6efd 81.25%, #0d6efd 81.75%, 
-    transparent 81.75%, transparent 87.5%, 
-    #0d6efd 87.5%, #0d6efd 88%, 
-    transparent 88%, transparent 93.75%, 
-    #0d6efd 93.75%, #0d6efd 94.25%, 
-    transparent 94.25%, transparent 100%
+input[type=range].range-ticks::-webkit-slider-runnable-track {
+  background: repeating-linear-gradient(
+    to right,
+    #ccc,
+    #ccc 1px,
+    transparent 1px,
+    transparent 14px
   );
-  background-size: 100% 2px;
-  background-repeat: no-repeat;
-  background-position: bottom;
+}
+
+input[type=range].range-ticks::-moz-range-track {
+  background: repeating-linear-gradient(
+    to right,
+    #ccc,
+    #ccc 1px,
+    transparent 1px,
+    transparent 14px
+  );
+}
+
+input[type=range].range-ticks::-ms-track {
+  background: repeating-linear-gradient(
+    to right,
+    #ccc,
+    #ccc 1px,
+    transparent 1px,
+    transparent 14px
+  );
 }
   </style>
 </head>

@@ -9,7 +9,12 @@
   <link rel="stylesheet" href="https://unpkg.com/photoswipe@5/dist/photoswipe.css">
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    
+    .list-group {
+  overflow: visible !important;
+}
+.container {
+  overflow: visible !important;
+}
     body {
         font-family: 'Comfortaa', cursive, sans-serif;
       }
@@ -41,19 +46,21 @@
       background-color: #f8f9fa;
     }
 .list-group {
-  gap: 20px; /* Ajoute un vrai écart entre les éléments */
   display: flex;
   flex-direction: column;
+  gap: 20px;
+  overflow: visible !important; /* ✅ corrige le problème */
 }
 
 .list-group-item {
   border: 2px solid #000;
   border-radius: 12px;
   padding: 15px;
+  background-color: #f8f9fa;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  background-color: #f8f9fa; /* ton gris pâle */
   transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
+
 .list-group-item:hover {
   background-color: #f1f1f1;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);

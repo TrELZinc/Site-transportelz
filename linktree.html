@@ -232,7 +232,13 @@ function afficherBoutonsAdmin() {
   const lienJournal = document.createElement("a");
   lienJournal.href = "mathieu.html";
   lienJournal.className = "button";
-  lienJournal.innerHTML = `<img src="assets/icones/feuille.png" alt=""> Paie`;
+  lienJournal.innerHTML = `<img src="assets/icones/feuille.png" alt=""> Gestion de la paie`;
+  btnContainer.appendChild(lienJournal);
+}
+  const lienGarage = document.createElement("a");
+  lienJournal.href = "garage.html";
+  lienJournal.className = "button";
+  lienJournal.innerHTML = `<img src="assets/icones/feuille.png" alt=""> Réparations mécanique`;
   btnContainer.appendChild(lienJournal);
 }
 

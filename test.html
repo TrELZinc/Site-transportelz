@@ -233,7 +233,7 @@ async function chargerReparations(noReset = false) {
     // 👉 Montre le loader
     document.getElementById('loadingOverlay').style.display = 'flex';
 
-    const response = await fetch("https://script.google.com/macros/s/AKfycbyas8D75v_swNv6tfVlSzfWsmU0o6xAKGPS9ZkOC9p4wGcchued80uknz4tppMjNWf6/exec?read=1");
+    const response = await fetch("https://script.google.com/macros/s/AKfycbwPl2vIGjDnXEUYJwBeUzPoHcY4TjTfX1XC9dHq-2Zr0OIUWQ2VfPxBDJpBgOKyslU/exec?read=1");
     aFaire = await response.json();
     aFaire = aFaire.sort((a, b) => new Date(b.date) - new Date(a.date));
 
@@ -632,7 +632,7 @@ function completer(button) {
   const now = new Date();
   const dateFin = now.toISOString(); 
 
-  fetch("https://script.google.com/macros/s/AKfycbyas8D75v_swNv6tfVlSzfWsmU0o6xAKGPS9ZkOC9p4wGcchued80uknz4tppMjNWf6/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbwPl2vIGjDnXEUYJwBeUzPoHcY4TjTfX1XC9dHq-2Zr0OIUWQ2VfPxBDJpBgOKyslU/exec", {
     method: "POST",
     mode: "no-cors",
     headers: {

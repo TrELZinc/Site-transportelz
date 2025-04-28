@@ -9,6 +9,11 @@
   <link rel="stylesheet" href="https://unpkg.com/photoswipe@5/dist/photoswipe.css">
 
   <style>
+    
+    .bg-light-custom {
+        background-color: #f8f9fa !important;
+      }
+
     .opened {
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       }
@@ -311,7 +316,7 @@ function renderAFaire() {
     const hasFiles = item.fichiers && item.fichiers.length > 0;
 
     const div = document.createElement('div');
-    div.className = 'list-group-item p-3 position-relative';
+   <div class="list-group-item p-3 position-relative bg-light-custom">
     div.style.minHeight = "140px";
 
     div.innerHTML = `

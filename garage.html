@@ -493,7 +493,10 @@ function openPopupMedia(url, type) {
     `;
   } else if (type.startsWith('video')) {
     content.innerHTML = `
-      <iframe src="${url}" frameborder="0" allow="autoplay; fullscreen" allowfullscreen style="width:90vw; height:50vh; border-radius:10px; display:block; margin:auto;"></iframe>
+      <video controls autoplay style="max-width:90vw; max-height:90vh; border-radius:10px; display:block; margin:auto;">
+        <source src="${url}" type="video/mp4">
+        Votre navigateur ne supporte pas la lecture vidéo.
+      </video>
     `;
   }
 

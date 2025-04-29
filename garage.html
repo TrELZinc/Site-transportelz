@@ -9,88 +9,135 @@
   <link rel="stylesheet" href="https://unpkg.com/photoswipe@5/dist/photoswipe.css">
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    .list-group {
-  overflow: visible !important;
+  /* Styles généraux */
+body {
+  font-family: 'Comfortaa', cursive, sans-serif;
+  background-color: #ffffff; /* Gris très doux */
+  margin: 0;
+  padding: 0;
 }
+
 .container {
   overflow: visible !important;
 }
-    body {
-        font-family: 'Comfortaa', cursive, sans-serif;
-      }
 
-    .bg-light-custom {
-        background-color: #f8f9fa !important;
-      }
-
-    .opened {
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      }
-
-      .description-box {
-        background: #fff;
-        border-left: 5px solid #0d6efd; /* une bordure bleue */
-        padding: 20px;
-      }
-
-    
-    .badge {
-      font-size: 0.9rem;
-      padding: 6px 12px;
-      font-weight: 600;
-      box-shadow: 0px 2px 6px rgba(0,0,0,0.15); /* léger relief */
-    }
-
-
-body {
-  background-color: #ffffff; /* ✅ Un gris très doux */
+.bg-light-custom {
+  background-color: #f8f9fa !important;
 }
 
+.bg-white {
+  background-color: #ffffff !important;
+}
+
+/* Listes */
 .list-group {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 20px; /* Espacement uniforme entre les éléments */
   padding-top: 10px;
   padding-bottom: 10px;
 }
 
 .list-group-item {
   background-color: #ffffff;
-  border: 1px solid #b0b0b0; /* ✅ Un contour gris plus foncé mais doux */
-  border-radius: 15px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08); /* ✅ Une ombre très légère */
-  padding: 15px;
-  margin-bottom: 15px; /* ✅ Garde un espacement confortable */
-  transition: all 0.3s ease;
+  border: 2px solid #4a4a4a; /* Contour gris foncé */
+  border-radius: 10px; /* Coins arrondis */
+  margin: 10px 0; /* Espacement vertical uniforme */
+  padding: 15px; /* Espacement interne */
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08); /* Légère ombre */
+  box-sizing: border-box; /* Inclut la bordure dans la taille totale */
+  overflow: hidden; /* Évite les débordements de contenu */
+  transition: all 0.3s ease; /* Animation fluide sur les interactions */
 }
 
 .list-group-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12); /* ✅ Ombre plus forte au survol */
+  transform: translateY(-2px); /* Légère élévation au survol */
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12); /* Ombre plus forte au survol */
 }
 
-    .details {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.5s ease, padding 0.5s ease;
-    }
-    .opened .details {
-      max-height: 1000px; /* Assez grand pour tout afficher */
-      padding-top: 10px;
-    }
+.list-group-item h6 {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
 
-    .badge-custom {
-      font-size: 0.8rem;
-      padding: 4px 8px;
-      border-radius: 10px;
-    }
-    input[type=range] {
+.list-group-item p {
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+/* Description détaillée */
+.description-tronquee {
+  min-height: 40px; /* Assure une hauteur minimale */
+}
+
+.details {
+  max-height: 0; /* Masqué par défaut */
+  overflow: hidden; /* Cache le contenu */
+  transition: max-height 0.5s ease, padding 0.5s ease; /* Animation fluide */
+}
+
+.opened .details {
+  max-height: 1000px; /* Affiche tout le contenu */
+  padding-top: 10px;
+}
+
+/* Badges */
+.badge {
+  font-size: 0.9rem;
+  padding: 6px 12px;
+  font-weight: 600;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.15); /* Léger relief */
+}
+
+.badge-custom {
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  border-radius: 10px;
+}
+
+.badge.bg-success {
+  background-color: #28a745;
+}
+
+.badge.bg-warning {
+  background-color: #ffc107;
+  color: #212529; /* Texte noir */
+}
+
+.badge.bg-danger {
+  background-color: #dc3545;
+}
+
+/* Images */
+.img-thumbnail-mini {
+  height: 80px;
+  width: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 3px solid #0d6efd; /* Bleu vif */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Effet de profondeur */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.img-thumbnail-mini:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Adaptation mobile */
+@media (max-width: 768px) {
+  .img-thumbnail-mini {
+    height: 70px;
+    width: 70px;
+  }
+}
+
+/* Sliders */
+input[type=range] {
   height: 30px;
-    }    
-    #loadingOverlay {
-      background: rgba(255,255,255,0.9);
-      z-index: 2000;
-    }
+}
 
 input[type=range]::-webkit-slider-thumb {
   height: 30px;
@@ -101,58 +148,7 @@ input[type=range]::-webkit-slider-thumb {
   cursor: pointer;
   margin-top: -10px;
 }
-#timeDisplay {
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin-bottom: 10px;
-  color: #0d6efd;
-  text-align: center;
-}
-.btn-completer {
-  width: 100%;
-  padding: 15px;
-  font-size: 1.2rem;
-  font-weight: bold;
-}
-.description-tronquee {
-  min-height: 40px;
-}
-.img-thumbnail-mini {
-  height: 80px;
-  width: 80px;
-  object-fit: cover;
-  border-radius: 8px;
-  border: 3px solid #0d6efd; /* bleu vif Bootstrap */
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* un effet de profondeur */
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.img-thumbnail-mini:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.3);
-}
-@media (max-width: 768px) {
-  .img-thumbnail-mini {
-    height: 70px;
-    width: 70px;
-  }
-}
-    
-.bg-white {
-  background-color: #ffffff !important;
-}
 
-.pswp__bg {
-  backdrop-filter: blur(8px);
-  background: rgba(0, 0, 0, 0.5); /* Un peu de foncé aussi */
-}
-input[type=range].range-ticks {
-  background: #0d6efd; /* couleur de fond principale */
-  height: 8px;
-  border-radius: 5px;
-  appearance: none;
-}
-
-/* Track (la ligne du slider) */
 input[type=range].range-ticks::-webkit-slider-runnable-track {
   background: repeating-linear-gradient(
     to right,
@@ -165,19 +161,6 @@ input[type=range].range-ticks::-webkit-slider-runnable-track {
   border-radius: 5px;
 }
 
-input[type=range].range-ticks::-moz-range-track {
-  background: repeating-linear-gradient(
-    to right,
-    #0d6efd,
-    #0d6efd 2px,
-    transparent 2px,
-    transparent 13px
-  );
-  height: 8px;
-  border-radius: 5px;
-}
-
-/* Thumb (la boule que tu glisses) */
 input[type=range].range-ticks::-webkit-slider-thumb {
   background-color: white;
   border: 3px solid #0d6efd;
@@ -186,16 +169,32 @@ input[type=range].range-ticks::-webkit-slider-thumb {
   border-radius: 50%;
   cursor: pointer;
   margin-top: -11px;
-  appearance: none;
 }
 
-input[type=range].range-ticks::-moz-range-thumb {
-  background-color: white;
-  border: 3px solid #0d6efd;
-  height: 30px;
-  width: 30px;
-  border-radius: 50%;
-  cursor: pointer;
+/* Loader */
+#loadingOverlay {
+  background: rgba(255, 255, 255, 0.9);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+/* Toast notifications */
+.toast {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  z-index: 1050;
+}
+
+.toast-body {
+  font-size: 1rem;
 }
 </style>
 </head>
@@ -260,7 +259,7 @@ async function chargerReparations(noReset = false) {
     // 👉 Montre le loader
     document.getElementById('loadingOverlay').style.display = 'flex';
 
-    const response = await fetch("https://script.google.com/macros/s/AKfycbxP1HkPIUXX031R4R6YH-9-5f2mPC0iSPL1tpXY0UrW-PKJBd-88C0figC5YwGMv6LN/exec?read=1");
+    const response = await fetch("https://script.google.com/macros/s/AKfycbyVpy20kpu02A-WQZSmiGF0_lyYTTO1L_NQ-Z58SVFr_wRygt_P9pCLx3FE8yQ-cEQ/exec?read=1");
     aFaire = await response.json();
     aFaire = aFaire.sort((a, b) => new Date(b.date) - new Date(a.date));
 
@@ -660,7 +659,7 @@ function completer(button) {
   const now = new Date();
   const dateFin = now.toISOString(); 
 
-  fetch("https://script.google.com/macros/s/AKfycbxP1HkPIUXX031R4R6YH-9-5f2mPC0iSPL1tpXY0UrW-PKJBd-88C0figC5YwGMv6LN/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbyVpy20kpu02A-WQZSmiGF0_lyYTTO1L_NQ-Z58SVFr_wRygt_P9pCLx3FE8yQ-cEQ/exec", {
     method: "POST",
     mode: "no-cors",
     headers: {

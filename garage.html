@@ -663,22 +663,23 @@ function completer(button) {
   const itemEl = button.closest('.list-group-item');
   const textarea = itemEl.querySelector('textarea').value.trim();
   const slider = itemEl.querySelector('input[type=range]');
-
   const descriptionEl = itemEl.querySelector('.details span.text-dark');
   const description = descriptionEl ? descriptionEl.innerText : "";
   const id = itemEl.dataset.id;
   const item = aFaire.find(r => r.id === id);
+
+  if (!item) {
+    alert("Erreur : élément introuvable.");
+    return;
+  }
+
   const minutes = parseInt(slider.value);
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
   const temps = `${h > 0 ? h + "h" : ""}${m > 0 ? " " + m + "min" : ""}`;
-
   const now = new Date();
   const dateFin = now.toISOString();
 
-  if (!item) return;
-
-  // ✅ On envoie d'abord au serveur
   fetch("https://script.google.com/macros/s/AKfycbyVpy20kpu02A-WQZSmiGF0_lyYTTO1L_NQ-Z58SVFr_wRygt_P9pCLx3FE8yQ-cEQ/exec", {
     method: "POST",
     mode: "no-cors",
@@ -697,10 +698,13 @@ function completer(button) {
   .then(() => {
     showToast("Réparation complétée ✅");
 
-    // Recharge les données du serveur pour mise à jour fiable
+    // ✅ Supprime visuellement la carte immédiatement
+    itemEl.remove();
+
+    // ✅ Recharge les données après un court délai pour laisser le temps à Google Sheet
     setTimeout(() => {
-      chargerReparations(true); // recharge à partir du serveur
-    }, 1500);
+      chargerReparations(true);
+    }, 3000);
   })
   .catch(error => {
     console.error("Erreur lors de l'envoi :", error);

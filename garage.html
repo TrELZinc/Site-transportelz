@@ -42,29 +42,31 @@
     }
 
 
-    body {
-      background-color: #f8f9fa;
-    }
+body {
+  background-color: #f3f4f6; /* ✅ Un gris très doux */
+}
+
 .list-group {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding-top: 10px; /* ✅ espace haut pour éviter l'écrasement visuel */
+  padding-top: 10px;
   padding-bottom: 10px;
 }
 
 .list-group-item {
-  border: 1px solid #ddd;
+  background-color: #ffffff; /* ✅ Vrai blanc pour se détacher du fond */
+  border: 1px solid #e0e0e0;
   border-radius: 15px;
-  background: #f8f9fa;
-  box-shadow: 0px 2px 5px rgba(0,0,0,0.12); /* ✅ plus doux */
-  transition: all 0.2s ease-in-out;
-}
-.list-group-item:hover {
-  transform: scale(1.01);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.07); /* ✅ ombre subtile */
+  padding: 15px;
+  transition: all 0.3s ease;
 }
 
+.list-group-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0px 6px 14px rgba(0, 0, 0, 0.12);
+}
 
     .details {
       max-height: 0;

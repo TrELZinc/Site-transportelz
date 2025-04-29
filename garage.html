@@ -687,25 +687,35 @@ function completer(button) {
   showToast("Réparation complétée ✅");
 
   // Envoi au serveur (async)
-  fetch("https://script.google.com/macros/s/AKfycbyVpy20kpu02A-WQZSmiGF0_lyYTTO1L_NQ-Z58SVFr_wRygt_P9pCLx3FE8yQ-cEQ/exec", {
-    method: "POST",
-    mode: "no-cors",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      update: true,
-      id: item.id,
-      notes: textarea,
-      temps: temps,
-      description: description,
-      dateFin: dateFin
-    })
-  }).catch(error => {
-    console.error("Erreur mise à jour:", error);
-    alert("Erreur lors de l'envoi au serveur.");
-  });
-}
+fetch("https://script.google.com/macros/s/AKfycbyVpy20kpu02A-WQZSmiGF0_lyYTTO1L_NQ-Z58SVFr_wRygt_P9pCLx3FE8yQ-cEQ/exec", {
+  method: "POST",
+  mode: "no-cors",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    update: true,
+    id: item.id,
+    notes: textarea,
+    temps: temps,
+    description: description,
+    dateFin: dateFin
+  })
+})
+.then(() => {
+  // Mise à jour locale après l'envoi (sécurité)
+  item.notes = textarea;
+  item.temps = temps;
+  item.dateFin = dateFin;
+
+  renderCurrentTab();
+  updateCounters();
+  showToast("Réparation complétée avec succès ✅");
+})
+.catch(error => {
+  console.error("Erreur mise à jour:", error);
+  alert("Erreur lors de l'envoi au serveur.");
+});
 
 
 function updateCounters() {

@@ -680,6 +680,15 @@ function completer(button) {
   const now = new Date();
   const dateFin = now.toISOString();
 
+  // ✅ Mise à jour locale avant suppression DOM
+  item.notes = textarea;
+  item.temps = temps;
+  item.description = description;
+  item.dateFin = dateFin;
+
+  // ✅ Supprime visuellement la carte immédiatement
+  itemEl.remove();
+
   fetch("https://script.google.com/macros/s/AKfycbyVpy20kpu02A-WQZSmiGF0_lyYTTO1L_NQ-Z58SVFr_wRygt_P9pCLx3FE8yQ-cEQ/exec", {
     method: "POST",
     mode: "no-cors",
@@ -698,10 +707,7 @@ function completer(button) {
   .then(() => {
     showToast("Réparation complétée ✅");
 
-    // ✅ Supprime visuellement la carte immédiatement
-    itemEl.remove();
-
-    // ✅ Recharge les données après un court délai pour laisser le temps à Google Sheet
+    // ✅ Recharge les données après délai
     setTimeout(() => {
       chargerReparations(true);
     }, 3000);

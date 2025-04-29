@@ -662,7 +662,7 @@ function completer(button) {
   const textarea = itemEl.querySelector('textarea').value.trim();
   const slider = itemEl.querySelector('input[type=range]');
   const title = itemEl.querySelector('h6').innerText;
-  const descriptionEl = itemEl.querySelector('.details span.text-dark'); // description originale
+  const descriptionEl = itemEl.querySelector('.details span.text-dark');
   const description = descriptionEl ? descriptionEl.innerText : "";
 
   const minutes = parseInt(slider.value);
@@ -673,49 +673,41 @@ function completer(button) {
   const now = new Date();
   const dateFin = now.toISOString();
 
-  // Trouver et modifier l'élément dans aFaire
   const item = aFaire.find(r => title.includes(r.nom));
   if (!item) return;
 
-  item.notes = textarea;
-  item.temps = temps;
-  item.description = description;
-  item.dateFin = dateFin;
-
-  // Mettre à jour l'affichage immédiatement
-  renderCurrentTab(); // mettra à jour la liste "à faire" en retirant celle complétée
-  showToast("Réparation complétée ✅");
-
-  // Envoi au serveur (async)
-fetch("https://script.google.com/macros/s/AKfycbyVpy20kpu02A-WQZSmiGF0_lyYTTO1L_NQ-Z58SVFr_wRygt_P9pCLx3FE8yQ-cEQ/exec", {
-  method: "POST",
-  mode: "no-cors",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    update: true,
-    id: item.id,
-    notes: textarea,
-    temps: temps,
-    description: description,
-    dateFin: dateFin
+  // ✅ On envoie d'abord au serveur
+  fetch("https://script.google.com/macros/s/AKfycbyVpy20kpu02A-WQZSmiGF0_lyYTTO1L_NQ-Z58SVFr_wRygt_P9pCLx3FE8yQ-cEQ/exec", {
+    method: "POST",
+    mode: "no-cors",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      update: true,
+      id: item.id,
+      notes: textarea,
+      temps: temps,
+      description: description,
+      dateFin: dateFin
+    })
   })
-})
-.then(() => {
-  // Mise à jour locale après l'envoi (sécurité)
-  item.notes = textarea;
-  item.temps = temps;
-  item.dateFin = dateFin;
+  .then(() => {
+    // ✅ Mise à jour locale SÛRE après le succès serveur
+    item.notes = textarea;
+    item.temps = temps;
+    item.description = description;
+    item.dateFin = dateFin;
 
-  renderCurrentTab();
-  updateCounters();
-  showToast("Réparation complétée avec succès ✅");
-})
-.catch(error => {
-  console.error("Erreur mise à jour:", error);
-  alert("Erreur lors de l'envoi au serveur.");
-});
+    showToast("Réparation complétée ✅");
+    renderCurrentTab();
+    updateCounters();
+  })
+  .catch(error => {
+    console.error("Erreur mise à jour:", error);
+    alert("Erreur lors de l'envoi au serveur.");
+  });
+}
 
 
 function updateCounters() {

@@ -51,19 +51,25 @@
   overflow: visible !important;
 }
 
+.container, .list-group {
+  position: relative;
+  overflow: visible !important;
+}
+
 .list-group-item {
   position: relative;
   background: #ffffff;
   border: 2px solid #555;
   border-radius: 12px;
-  padding: 15px;
-  margin-top: 12px; /* Fixe le chevauchement */
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   overflow: visible;
+  margin-top: 0;
 }
 
-.list-group-item:first-child {
-  margin-top: 0; /* Pas de marge au tout premier élément */
+/* Appliquer une marge spécifique SEULEMENT à partir de la 2ᵉ carte */
+.list-group-item + .list-group-item {
+  margin-top: 20px;
 }
     .details {
       max-height: 0;

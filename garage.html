@@ -39,15 +39,16 @@ body {
 }
 
 .list-group-item {
-  background-color: #ffffff;
+  background-color: #ffffff; /* Couleur de fond */
   border: 2px solid #4a4a4a; /* Contour gris foncé */
   border-radius: 10px; /* Coins arrondis */
-  margin: 10px 0; /* Espacement vertical uniforme */
+  margin: 10px 0; /* Espacement uniforme entre les demandes */
   padding: 15px; /* Espacement interne */
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08); /* Légère ombre */
   box-sizing: border-box; /* Inclut la bordure dans la taille totale */
   overflow: hidden; /* Évite les débordements de contenu */
-  transition: all 0.3s ease; /* Animation fluide sur les interactions */
+  position: relative; /* Assure que les éléments internes ne débordent pas */
+  z-index: 1; /* Assure que cet élément reste au-dessus des autres */
 }
 
 .list-group-item:hover {
@@ -55,16 +56,20 @@ body {
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12); /* Ombre plus forte au survol */
 }
 
-.list-group-item h6 {
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin-bottom: 5px;
+.list-group {
+  display: flex; /* Affichage en flexbox */
+  flex-direction: column; /* Orientation verticale */
+  gap: 15px; /* Espacement uniforme entre les demandes */
+  padding: 10px; /* Espacement interne pour le conteneur */
+  margin: 0; /* Supprime les marges inutiles */
 }
 
-.list-group-item p {
-  margin: 0;
-  font-size: 1rem;
-  color: #333;
+.list-group-item:first-child {
+  margin-top: 0; /* Supprime la marge en haut du premier élément */
+}
+
+.list-group-item:last-child {
+  margin-bottom: 0; /* Supprime la marge en bas du dernier élément */
 }
 
 /* Description détaillée */

@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
   /* Styles généraux */
+/* Styles généraux */
 body {
   font-family: 'Comfortaa', cursive, sans-serif;
   background-color: #ffffff; /* Gris très doux */
@@ -32,17 +33,16 @@ body {
 /* Listes */
 .list-group {
   display: flex;
-  flex-direction: column;
-  gap: 20px; /* Espacement uniforme entre les éléments */
-  padding-top: 10px;
-  padding-bottom: 10px;
+  flex-direction: column; /* Alignement vertical */
+  gap: 15px; /* Espacement uniforme entre les éléments */
+  padding: 10px 0; /* Espacement interne pour le conteneur */
 }
 
 .list-group-item {
   background-color: #ffffff; /* Couleur de fond */
   border: 2px solid #4a4a4a; /* Contour gris foncé */
   border-radius: 10px; /* Coins arrondis */
-  margin: 10px 0; /* Espacement uniforme entre les demandes */
+  margin: 0; /* Supprime les marges entre les éléments */
   padding: 15px; /* Espacement interne */
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08); /* Légère ombre */
   box-sizing: border-box; /* Inclut la bordure dans la taille totale */
@@ -56,20 +56,16 @@ body {
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12); /* Ombre plus forte au survol */
 }
 
-.list-group {
-  display: flex; /* Affichage en flexbox */
-  flex-direction: column; /* Orientation verticale */
-  gap: 15px; /* Espacement uniforme entre les demandes */
-  padding: 10px; /* Espacement interne pour le conteneur */
-  margin: 0; /* Supprime les marges inutiles */
+.list-group-item h6 {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 5px;
 }
 
-.list-group-item:first-child {
-  margin-top: 0; /* Supprime la marge en haut du premier élément */
-}
-
-.list-group-item:last-child {
-  margin-bottom: 0; /* Supprime la marge en bas du dernier élément */
+.list-group-item p {
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
 }
 
 /* Description détaillée */
@@ -141,7 +137,17 @@ body {
 
 /* Sliders */
 input[type=range] {
-  height: 30px;
+  height: 8px; /* Réduit la hauteur du slider */
+  background: repeating-linear-gradient(
+    to right,
+    #0d6efd,
+    #0d6efd 2px,
+    transparent 2px,
+    transparent 13px
+  ); /* Ticks visibles seulement toutes les 15 minutes */
+  border-radius: 5px;
+  appearance: none;
+  outline: none;
 }
 
 input[type=range]::-webkit-slider-thumb {
@@ -151,29 +157,34 @@ input[type=range]::-webkit-slider-thumb {
   border: 2px solid white;
   border-radius: 50%;
   cursor: pointer;
-  margin-top: -10px;
+  margin-top: -11px;
+  appearance: none;
 }
 
-input[type=range].range-ticks::-webkit-slider-runnable-track {
-  background: repeating-linear-gradient(
-    to right,
-    #0d6efd,
-    #0d6efd 2px,
-    transparent 2px,
-    transparent 13px
-  );
-  height: 8px;
-  border-radius: 5px;
-}
-
-input[type=range].range-ticks::-webkit-slider-thumb {
-  background-color: white;
-  border: 3px solid #0d6efd;
+input[type=range]::-moz-range-thumb {
   height: 30px;
   width: 30px;
+  background: #0d6efd;
+  border: 2px solid white;
   border-radius: 50%;
   cursor: pointer;
-  margin-top: -11px;
+}
+
+/* Boutons */
+.btn-completer {
+  width: 100%; /* Largeur maximale */
+  padding: 15px; /* Augmente le padding */
+  font-size: 1.2rem; /* Taille du texte plus grande */
+  font-weight: bold; /* Texte en gras */
+  background-color: #28a745; /* Vert pour le bouton */
+  color: white;
+  border-radius: 8px; /* Coins arrondis */
+  border: none;
+  transition: background-color 0.3s ease; /* Transition pour les interactions */
+}
+
+.btn-completer:hover {
+  background-color: #218838; /* Couleur plus foncée au survol */
 }
 
 /* Loader */

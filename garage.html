@@ -693,19 +693,16 @@ function completer(button) {
     })
   })
   .then(() => {
-    // ✅ Mise à jour locale SÛRE après le succès serveur
-    item.notes = textarea;
-    item.temps = temps;
-    item.description = description;
-    item.dateFin = dateFin;
-
     showToast("Réparation complétée ✅");
-    renderCurrentTab();
-    updateCounters();
+
+    // Recharge les données du serveur pour mise à jour fiable
+    setTimeout(() => {
+      chargerReparations(true); // recharge à partir du serveur
+    }, 1500);
   })
   .catch(error => {
-    console.error("Erreur mise à jour:", error);
-    alert("Erreur lors de l'envoi au serveur.");
+    console.error("Erreur lors de l'envoi :", error);
+    alert("Une erreur est survenue pendant l'envoi.");
   });
 }
 

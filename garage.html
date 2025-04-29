@@ -9,7 +9,6 @@
   <link rel="stylesheet" href="https://unpkg.com/photoswipe@5/dist/photoswipe.css">
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-  /* Styles généraux */
 /* Styles généraux */
 body {
   font-family: 'Comfortaa', cursive, sans-serif;
@@ -34,17 +33,17 @@ body {
 .list-group {
   display: flex;
   flex-direction: column; /* Alignement vertical */
-  gap: 15px; /* Espacement uniforme entre les éléments */
-  padding: 10px 0; /* Espacement interne pour le conteneur */
+  gap: 25px; /* Augmente l'espacement entre les éléments */
+  padding: 20px 0; /* Espacement interne pour le conteneur */
 }
 
 .list-group-item {
   background-color: #ffffff; /* Couleur de fond */
   border: 2px solid #4a4a4a; /* Contour gris foncé */
   border-radius: 10px; /* Coins arrondis */
-  margin: 0; /* Supprime les marges entre les éléments */
-  padding: 15px; /* Espacement interne */
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08); /* Légère ombre */
+  margin: 0; /* Supprime les marges inutiles entre les éléments */
+  padding: 20px; /* Augmente l'espacement interne */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Légère ombre pour un effet visuel */
   box-sizing: border-box; /* Inclut la bordure dans la taille totale */
   overflow: hidden; /* Évite les débordements de contenu */
   position: relative; /* Assure que les éléments internes ne débordent pas */
@@ -53,19 +52,19 @@ body {
 
 .list-group-item:hover {
   transform: translateY(-2px); /* Légère élévation au survol */
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12); /* Ombre plus forte au survol */
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15); /* Ombre plus forte au survol */
 }
 
 .list-group-item h6 {
-  font-size: 1.2rem;
+  font-size: 1.2rem; /* Taille du texte */
   font-weight: bold;
-  margin-bottom: 5px;
+  margin-bottom: 10px; /* Espacement sous le titre */
 }
 
 .list-group-item p {
   margin: 0;
-  font-size: 1rem;
-  color: #333;
+  font-size: 1rem; /* Taille du texte */
+  color: #333; /* Couleur du texte */
 }
 
 /* Description détaillée */
@@ -137,14 +136,14 @@ body {
 
 /* Sliders */
 input[type=range] {
-  height: 8px; /* Réduit la hauteur du slider */
+  height: 8px; /* Hauteur du slider */
   background: repeating-linear-gradient(
     to right,
     #0d6efd,
     #0d6efd 2px,
     transparent 2px,
     transparent 13px
-  ); /* Ticks visibles seulement toutes les 15 minutes */
+  ); /* Ticks visibles toutes les 15 minutes */
   border-radius: 5px;
   appearance: none;
   outline: none;
@@ -173,7 +172,7 @@ input[type=range]::-moz-range-thumb {
 /* Boutons */
 .btn-completer {
   width: 100%; /* Largeur maximale */
-  padding: 15px; /* Augmente le padding */
+  padding: 20px; /* Augmente le padding pour agrandir le bouton */
   font-size: 1.2rem; /* Taille du texte plus grande */
   font-weight: bold; /* Texte en gras */
   background-color: #28a745; /* Vert pour le bouton */

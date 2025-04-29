@@ -56,26 +56,28 @@ body {
 
 
 .list-group-item {
-  border: 2px solid #0d6efd;
-  border-radius: 15px;
+  border: 1px solid #dee2e6; /* plus léger que le bleu vif initial */
+  border-radius: 20px; /* coins plus doux */
   background-color: #ffffff;
-  box-shadow: 0 4px 10px rgba(13, 110, 253, 0.08);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05); /* ombre plus douce */
   transition: all 0.3s ease;
   overflow: hidden;
-  padding: 20px;
+  padding: 25px; /* plus spacieux */
+  position: relative;
   z-index: 0;
 }
+
+.list-group-item:hover {
+  transform: translateY(-5px) scale(1.01);
+  border: 1px solid #0d6efd; /* survol : bordure bleue fine */
+  box-shadow: 0 8px 24px rgba(13, 110, 253, 0.15); /* ombre plus présente au survol */
+  background: linear-gradient(135deg, #f1f7ff, #ffffff);
+}
+
 
 /* Empêche les cartes suivantes de chevaucher */
 .list-group-item + .list-group-item {
   margin-top: 0;
-}
-
-  
-.list-group-item:hover {
-  transform: translateY(-4px) scale(1.02); /* Effet hover agréable */
-  box-shadow: 0 8px 18px rgba(13, 110, 253, 0.3);
-  background: linear-gradient(to bottom right, #e6f0ff, #ffffff); /* Fond plus clair au survol */
 }
 
 .list-group-item.opened {
@@ -84,11 +86,26 @@ body {
   z-index: 2; /* S'assure que l'élément est bien au-dessus des autres */
 }
 
-    .details {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.5s ease, padding 0.5s ease;
-    }
+.details {
+  background: #f9fbfd;
+  border-top: 1px solid #dde7f1;
+  margin-top: 10px;
+  padding: 15px;
+  border-radius: 0 0 20px 20px; /* coins arrondis seulement en bas */
+}
+.list-group-item::before {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 5px;
+  background: #0d6efd;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
     .opened .details {
       max-height: 1000px; /* Assez grand pour tout afficher */
       padding-top: 10px;

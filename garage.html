@@ -355,6 +355,7 @@ function renderAFaire() {
 
     const div = document.createElement('div');
     div.className = 'list-group-item p-3 position-relative';
+    div.dataset.id = item.id;
     div.style.minHeight = "140px";
 
     div.innerHTML = `

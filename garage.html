@@ -353,7 +353,6 @@ filtered.forEach(item => {
   const hasFiles = item.fichiers && item.fichiers.length > 0;
 
   const div = document.createElement('div');
-  div.className = 'list-group-item p-3 position-relative bg-light-custom';  // ✅ ici
   div.style.minHeight = "140px";
 
   div.innerHTML = `
@@ -502,7 +501,6 @@ function renderFait() {
 
   filtered.forEach(item => {
     const div = document.createElement('div');
-    div.className = 'list-group-item p-3 position-relative bg-light-custom';  // 🛠️ Ajouté ici
     div.style.minHeight = "140px";
 
     div.innerHTML = `

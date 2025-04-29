@@ -48,29 +48,22 @@
 .list-group {
   display: flex;
   flex-direction: column;
-  gap: 48px; /* Espace plus grand pour respirer */
-  padding: 20px 0; /* Sécurité haut et bas */
   overflow: visible !important;
 }
 
 .list-group-item {
   position: relative;
+  background: #ffffff;
   border: 2px solid #555;
-  border-radius: 16px; /* un peu plus doux */
-  padding: 20px;
-  background-color: #ffffff;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease-in-out;
-  overflow: visible; /* CORRIGE le bug visuel ! */
-  z-index: 1; /* monte chaque carte par-dessus */
+  border-radius: 12px;
+  padding: 15px;
+  margin-top: 12px; /* Fixe le chevauchement */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  overflow: visible;
 }
 
-.list-group-item.opened {
-  z-index: 2; /* la carte ouverte passe au dessus */
-}
-.list-group-item:hover {
-  background-color: #f1f1f1;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+.list-group-item:first-child {
+  margin-top: 0; /* Pas de marge au tout premier élément */
 }
     .details {
       max-height: 0;

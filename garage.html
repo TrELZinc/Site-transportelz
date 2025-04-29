@@ -55,18 +55,24 @@ body {
 }
 
 .list-group-item {
-  background-color: #ffffff;
-  border: 1px solid #b0b0b0; /* ✅ Un contour gris plus foncé mais doux */
+  background: linear-gradient(to bottom right, #ffffff, #f0f4ff); /* Fond léger en dégradé */
+  border: 2px solid #0d6efd; /* Bordure bleue pour bien encadrer */
   border-radius: 15px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08); /* ✅ Une ombre très légère */
-  padding: 15px;
-  margin-bottom: 15px; /* ✅ Garde un espacement confortable */
+  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2); /* Légère ombre bleutée */
+  padding: 20px;
   transition: all 0.3s ease;
 }
 
 .list-group-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12); /* ✅ Ombre plus forte au survol */
+  transform: translateY(-4px) scale(1.02); /* Effet hover agréable */
+  box-shadow: 0 8px 18px rgba(13, 110, 253, 0.3);
+  background: linear-gradient(to bottom right, #e6f0ff, #ffffff); /* Fond plus clair au survol */
+}
+
+/* Quand une carte est ouverte */
+.list-group-item.opened {
+  background: #e7f0ff;
+  border: 2px solid #0d6efd;
 }
 
     .details {

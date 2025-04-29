@@ -55,17 +55,18 @@ body {
 }
 
 .list-group-item {
-  background-color: #ffffff; /* ✅ Vrai blanc pour se détacher du fond */
-  border: 1px solid #e0e0e0;
+  background-color: #ffffff;
+  border: 1px solid #b0b0b0; /* ✅ Un contour gris plus foncé mais doux */
   border-radius: 15px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.07); /* ✅ ombre subtile */
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08); /* ✅ Une ombre très légère */
   padding: 15px;
+  margin-bottom: 15px; /* ✅ Garde un espacement confortable */
   transition: all 0.3s ease;
 }
 
 .list-group-item:hover {
   transform: translateY(-2px);
-  box-shadow: 0px 6px 14px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12); /* ✅ Ombre plus forte au survol */
 }
 
     .details {

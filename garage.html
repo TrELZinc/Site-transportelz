@@ -55,10 +55,13 @@ body {
 }
 
 .list-group-item {
-  background: linear-gradient(to bottom right, #ffffff, #f0f4ff); /* Fond léger en dégradé */
-  border: 2px solid #0d6efd; /* Bordure bleue pour bien encadrer */
+  position: relative;
+  background-color: #ffffff;
+  background-clip: padding-box; /* ✅ garde les coins arrondis nets */
+  border: 2px solid #0d6efd;
   border-radius: 15px;
-  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2); /* Légère ombre bleutée */
+  box-shadow: 0 4px 10px rgba(13, 110, 253, 0.1);
+  margin-bottom: 20px; /* ✅ pour éviter le chevauchement de bordures */
   padding: 20px;
   transition: all 0.3s ease;
 }

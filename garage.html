@@ -55,27 +55,23 @@ body {
 }
 
 .list-group-item {
-  position: relative;
-  background-color: #ffffff;
-  background-clip: padding-box; /* ✅ garde les coins arrondis nets */
-  border: 2px solid #0d6efd;
+  border: 2px solid #0d6efd;  /* ✅ toujours bleu */
+  background-color: #ffffff;  /* ou #f8faff pour très léger bleu */
   border-radius: 15px;
-  box-shadow: 0 4px 10px rgba(13, 110, 253, 0.1);
-  margin-bottom: 20px; /* ✅ pour éviter le chevauchement de bordures */
-  padding: 20px;
+  box-shadow: 0 4px 8px rgba(13, 110, 253, 0.05); /* très doux */
   transition: all 0.3s ease;
+  margin-bottom: 20px;
 }
 
+  
 .list-group-item:hover {
   transform: translateY(-4px) scale(1.02); /* Effet hover agréable */
   box-shadow: 0 8px 18px rgba(13, 110, 253, 0.3);
   background: linear-gradient(to bottom right, #e6f0ff, #ffffff); /* Fond plus clair au survol */
 }
 
-/* Quand une carte est ouverte */
 .list-group-item.opened {
-  background: #e7f0ff;
-  border: 2px solid #0d6efd;
+  background-color: #e7f2ff;
 }
 
     .details {

@@ -45,25 +45,29 @@
     body {
       background-color: #f8f9fa;
     }
-/* Augmente l'espacement entre les cartes pour éviter que l'ombre du dessus ne masque le contour */
 .list-group {
   display: flex;
   flex-direction: column;
-  gap: 40px; /* Augmentation de l'espace pour corriger parfaitement */
+  gap: 48px; /* Espace plus grand pour respirer */
+  padding: 20px 0; /* Sécurité haut et bas */
   overflow: visible !important;
 }
 
-/* Optionnel: Adoucir légèrement l'ombre pour plus de finesse */
 .list-group-item {
+  position: relative;
   border: 2px solid #555;
-  border-radius: 12px;
-  padding: 15px;
+  border-radius: 16px; /* un peu plus doux */
+  padding: 20px;
   background-color: #ffffff;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.12); /* adoucie légèrement l'ombre */
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
-  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease-in-out;
+  overflow: visible; /* CORRIGE le bug visuel ! */
+  z-index: 1; /* monte chaque carte par-dessus */
 }
 
+.list-group-item.opened {
+  z-index: 2; /* la carte ouverte passe au dessus */
+}
 .list-group-item:hover {
   background-color: #f1f1f1;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);

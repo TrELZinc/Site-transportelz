@@ -55,12 +55,16 @@ body {
 }
 
 .list-group-item {
-  border: 2px solid #0d6efd;  /* ✅ toujours bleu */
-  background-color: #ffffff;  /* ou #f8faff pour très léger bleu */
+  position: relative;
+  background-color: #ffffff;
+  border: 2px solid #0d6efd;
   border-radius: 15px;
-  box-shadow: 0 4px 8px rgba(13, 110, 253, 0.05); /* très doux */
-  transition: all 0.3s ease;
   margin-bottom: 20px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(13, 110, 253, 0.08);
+  overflow: hidden;
+  z-index: 1;
+  transition: all 0.3s ease;
 }
 
   
@@ -71,7 +75,9 @@ body {
 }
 
 .list-group-item.opened {
-  background-color: #e7f2ff;
+  background-color: #e9f3ff;
+  box-shadow: 0 6px 16px rgba(13, 110, 253, 0.15);
+  z-index: 2; /* S'assure que l'élément est bien au-dessus des autres */
 }
 
     .details {

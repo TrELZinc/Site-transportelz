@@ -504,6 +504,7 @@ function renderFait() {
   filtered.forEach(item => {
     const div = document.createElement('div');
     div.className = 'list-group-item p-3 position-relative';
+    div.dataset.id = item.id;
     div.style.minHeight = "140px";
 
     div.innerHTML = `
@@ -661,10 +662,11 @@ function completer(button) {
   const itemEl = button.closest('.list-group-item');
   const textarea = itemEl.querySelector('textarea').value.trim();
   const slider = itemEl.querySelector('input[type=range]');
-  const title = itemEl.querySelector('h6').innerText;
+
   const descriptionEl = itemEl.querySelector('.details span.text-dark');
   const description = descriptionEl ? descriptionEl.innerText : "";
-
+  const id = itemEl.dataset.id;
+  const item = aFaire.find(r => r.id === id);
   const minutes = parseInt(slider.value);
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
@@ -673,7 +675,6 @@ function completer(button) {
   const now = new Date();
   const dateFin = now.toISOString();
 
-  const item = aFaire.find(r => title.includes(r.nom));
   if (!item) return;
 
   // ✅ On envoie d'abord au serveur

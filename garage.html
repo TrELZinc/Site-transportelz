@@ -9,145 +9,88 @@
   <link rel="stylesheet" href="https://unpkg.com/photoswipe@5/dist/photoswipe.css">
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-/* Styles généraux */
-body {
-  font-family: 'Comfortaa', cursive, sans-serif;
-  background-color: #ffffff; /* Gris très doux */
-  margin: 0;
-  padding: 0;
+    .list-group {
+  overflow: visible !important;
 }
-
 .container {
   overflow: visible !important;
 }
+    body {
+        font-family: 'Comfortaa', cursive, sans-serif;
+      }
 
-.bg-light-custom {
-  background-color: #f8f9fa !important;
+    .bg-light-custom {
+        background-color: #f8f9fa !important;
+      }
+
+    .opened {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      }
+
+      .description-box {
+        background: #fff;
+        border-left: 5px solid #0d6efd; /* une bordure bleue */
+        padding: 20px;
+      }
+
+    
+    .badge {
+      font-size: 0.9rem;
+      padding: 6px 12px;
+      font-weight: 600;
+      box-shadow: 0px 2px 6px rgba(0,0,0,0.15); /* léger relief */
+    }
+
+
+body {
+  background-color: #f3f4f6; /* ✅ Un gris très doux */
 }
 
-.bg-white {
-  background-color: #ffffff !important;
-}
-
-/* Listes */
 .list-group {
   display: flex;
-  flex-direction: column; /* Alignement vertical */
-  gap: 25px; /* Augmente l'espacement entre les éléments */
-  padding: 20px 0; /* Espacement interne pour le conteneur */
+  flex-direction: column;
+  gap: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .list-group-item {
-  background-color: #ffffff; /* Couleur de fond */
-  border: 2px solid #4a4a4a; /* Contour gris foncé */
-  border-radius: 10px; /* Coins arrondis */
-  margin: 0; /* Supprime les marges inutiles entre les éléments */
-  padding: 20px; /* Augmente l'espacement interne */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Légère ombre pour un effet visuel */
-  box-sizing: border-box; /* Inclut la bordure dans la taille totale */
-  overflow: hidden; /* Évite les débordements de contenu */
-  position: relative; /* Assure que les éléments internes ne débordent pas */
-  z-index: 1; /* Assure que cet élément reste au-dessus des autres */
+  background-color: #ffffff;
+  border: 1px solid #b0b0b0; /* ✅ Un contour gris plus foncé mais doux */
+  border-radius: 15px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08); /* ✅ Une ombre très légère */
+  padding: 15px;
+  margin-bottom: 15px; /* ✅ Garde un espacement confortable */
+  transition: all 0.3s ease;
 }
 
 .list-group-item:hover {
-  transform: translateY(-2px); /* Légère élévation au survol */
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15); /* Ombre plus forte au survol */
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12); /* ✅ Ombre plus forte au survol */
 }
 
-.list-group-item h6 {
-  font-size: 1.2rem; /* Taille du texte */
-  font-weight: bold;
-  margin-bottom: 10px; /* Espacement sous le titre */
-}
+    .details {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease, padding 0.5s ease;
+    }
+    .opened .details {
+      max-height: 1000px; /* Assez grand pour tout afficher */
+      padding-top: 10px;
+    }
 
-.list-group-item p {
-  margin: 0;
-  font-size: 1rem; /* Taille du texte */
-  color: #333; /* Couleur du texte */
-}
-
-/* Description détaillée */
-.description-tronquee {
-  min-height: 40px; /* Assure une hauteur minimale */
-}
-
-.details {
-  max-height: 0; /* Masqué par défaut */
-  overflow: hidden; /* Cache le contenu */
-  transition: max-height 0.5s ease, padding 0.5s ease; /* Animation fluide */
-}
-
-.opened .details {
-  max-height: 1000px; /* Affiche tout le contenu */
-  padding-top: 10px;
-}
-
-/* Badges */
-.badge {
-  font-size: 0.9rem;
-  padding: 6px 12px;
-  font-weight: 600;
-  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.15); /* Léger relief */
-}
-
-.badge-custom {
-  font-size: 0.8rem;
-  padding: 4px 8px;
-  border-radius: 10px;
-}
-
-.badge.bg-success {
-  background-color: #28a745;
-}
-
-.badge.bg-warning {
-  background-color: #ffc107;
-  color: #212529; /* Texte noir */
-}
-
-.badge.bg-danger {
-  background-color: #dc3545;
-}
-
-/* Images */
-.img-thumbnail-mini {
-  height: 80px;
-  width: 80px;
-  object-fit: cover;
-  border-radius: 8px;
-  border: 3px solid #0d6efd; /* Bleu vif */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Effet de profondeur */
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.img-thumbnail-mini:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-}
-
-/* Adaptation mobile */
-@media (max-width: 768px) {
-  .img-thumbnail-mini {
-    height: 70px;
-    width: 70px;
-  }
-}
-
-/* Sliders */
-input[type=range] {
-  height: 8px; /* Hauteur du slider */
-  background: repeating-linear-gradient(
-    to right,
-    #0d6efd,
-    #0d6efd 2px,
-    transparent 2px,
-    transparent 13px
-  ); /* Ticks visibles toutes les 15 minutes */
-  border-radius: 5px;
-  appearance: none;
-  outline: none;
-}
+    .badge-custom {
+      font-size: 0.8rem;
+      padding: 4px 8px;
+      border-radius: 10px;
+    }
+    input[type=range] {
+  height: 30px;
+    }    
+    #loadingOverlay {
+      background: rgba(255,255,255,0.9);
+      z-index: 2000;
+    }
 
 input[type=range]::-webkit-slider-thumb {
   height: 30px;
@@ -156,60 +99,103 @@ input[type=range]::-webkit-slider-thumb {
   border: 2px solid white;
   border-radius: 50%;
   cursor: pointer;
+  margin-top: -10px;
+}
+#timeDisplay {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #0d6efd;
+  text-align: center;
+}
+.btn-completer {
+  width: 100%;
+  padding: 15px;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+.description-tronquee {
+  min-height: 40px;
+}
+.img-thumbnail-mini {
+  height: 80px;
+  width: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 3px solid #0d6efd; /* bleu vif Bootstrap */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* un effet de profondeur */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.img-thumbnail-mini:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+}
+@media (max-width: 768px) {
+  .img-thumbnail-mini {
+    height: 70px;
+    width: 70px;
+  }
+}
+    
+.bg-white {
+  background-color: #ffffff !important;
+}
+
+.pswp__bg {
+  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.5); /* Un peu de foncé aussi */
+}
+input[type=range].range-ticks {
+  background: #0d6efd; /* couleur de fond principale */
+  height: 8px;
+  border-radius: 5px;
+  appearance: none;
+}
+
+/* Track (la ligne du slider) */
+input[type=range].range-ticks::-webkit-slider-runnable-track {
+  background: repeating-linear-gradient(
+    to right,
+    #0d6efd,
+    #0d6efd 2px,
+    transparent 2px,
+    transparent 13px
+  );
+  height: 8px;
+  border-radius: 5px;
+}
+
+input[type=range].range-ticks::-moz-range-track {
+  background: repeating-linear-gradient(
+    to right,
+    #0d6efd,
+    #0d6efd 2px,
+    transparent 2px,
+    transparent 13px
+  );
+  height: 8px;
+  border-radius: 5px;
+}
+
+/* Thumb (la boule que tu glisses) */
+input[type=range].range-ticks::-webkit-slider-thumb {
+  background-color: white;
+  border: 3px solid #0d6efd;
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  cursor: pointer;
   margin-top: -11px;
   appearance: none;
 }
 
-input[type=range]::-moz-range-thumb {
+input[type=range].range-ticks::-moz-range-thumb {
+  background-color: white;
+  border: 3px solid #0d6efd;
   height: 30px;
   width: 30px;
-  background: #0d6efd;
-  border: 2px solid white;
   border-radius: 50%;
   cursor: pointer;
-}
-
-/* Boutons */
-.btn-completer {
-  width: 100%; /* Largeur maximale */
-  padding: 20px; /* Augmente le padding pour agrandir le bouton */
-  font-size: 1.2rem; /* Taille du texte plus grande */
-  font-weight: bold; /* Texte en gras */
-  background-color: #28a745; /* Vert pour le bouton */
-  color: white;
-  border-radius: 8px; /* Coins arrondis */
-  border: none;
-  transition: background-color 0.3s ease; /* Transition pour les interactions */
-}
-
-.btn-completer:hover {
-  background-color: #218838; /* Couleur plus foncée au survol */
-}
-
-/* Loader */
-#loadingOverlay {
-  background: rgba(255, 255, 255, 0.9);
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-}
-
-/* Toast notifications */
-.toast {
-  position: fixed;
-  bottom: 10px;
-  right: 10px;
-  z-index: 1050;
-}
-
-.toast-body {
-  font-size: 1rem;
 }
 </style>
 </head>

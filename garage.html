@@ -348,31 +348,32 @@ function renderAFaire() {
     return;
   }
 
-filtered.forEach(item => {
-  const diffDays = getDaysSince(item.date);
-  const badge = getDaysBadge(diffDays);
-  const hasFiles = item.fichiers && item.fichiers.length > 0;
+  filtered.forEach(item => {
+    const diffDays = getDaysSince(item.date);
+    const badge = getDaysBadge(diffDays);
+    const hasFiles = item.fichiers && item.fichiers.length > 0;
 
- const div = document.createElement('div');
-  div.className = 'list-group-item p-3 position-relative';
-  div.style.minHeight = "140px";
+    const div = document.createElement('div');
+    div.className = 'list-group-item p-3 position-relative';
+    div.style.minHeight = "140px";
 
-  div.innerHTML = `
-    <div class="d-flex justify-content-between align-items-start">
-      <div class="w-100 pe-4">
-        <h6 class="mb-1">${item.unite} - ${item.nom}</h6>
-        ${hasFiles ? '<div class="text-warning small mt-1">📸 Fichiers attachés</div>' : ''}
-        <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
-          ${badge}
-          <small class="text-muted">${formatDate(item.date)}</small>
+    div.innerHTML = `
+      <div class="d-flex justify-content-between align-items-start">
+        <div class="w-100 pe-4">
+          <h6 class="mb-1">${item.unite} - ${item.nom}</h6>
+          ${hasFiles ? '<div class="text-warning small mt-1">📸 Fichiers attachés</div>' : ''}
+          <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
+            ${badge}
+            <small class="text-muted">${formatDate(item.date)}</small>
+          </div>
+          <div class="mb-2 description-tronquee">${escapeHtml(truncateText(item.description, 60))}</div>
         </div>
-        <div class="mb-2 description-tronquee">${escapeHtml(truncateText(item.description, 60))}</div>
-      </div>
-      <div class="position-absolute top-0 end-0 p-2">
-        <small class="text-primary">🔽 Voir</small>
+        <div class="position-absolute top-0 end-0 p-2">
+          <small class="text-primary">🔽 Voir</small>
         </div>
       </div>
 
+      <div class="details mt-2" style="display: none;">
         <hr>
         <p class="mb-2">
           <strong>📄 Description complète :</strong><br>
@@ -381,52 +382,45 @@ filtered.forEach(item => {
           </div>
         </p>
 
+        ${hasFiles ? `
+          <div class="mb-3 d-flex flex-wrap gap-2 gallery" id="gallery-${item.id}">
+            ${item.fichiers.map(f => {
+              const ext = f.toLowerCase();
+              const isVideo = ext.includes(".mp4") || ext.includes(".mov") || ext.includes(".webm");
+              const type = isVideo ? "video" : "image";
 
-${hasFiles ? `
-  <div class="mb-3 d-flex flex-wrap gap-2 gallery" id="gallery-${item.id}">
-    ${item.fichiers.map(f => {
-  const ext = f.toLowerCase();
-  const isVideo = ext.includes(".mp4") || ext.includes(".mov") || ext.includes(".webm");
-  const type = isVideo ? "video" : "image";
+              const thumbSrc = transformDriveUrl(f, type, false);
+              const fullSrc = transformDriveUrl(f, type, true);
 
-  const thumbSrc = transformDriveUrl(f, type, false);
-  const fullSrc = transformDriveUrl(f, type, true);
-
-  if (type === "image") {
-    return `
-      <img src="${thumbSrc}" class="img-thumbnail-mini" onclick="openPopupMedia('${fullSrc}', 'image')">
-    `;
-  } else {
-    return `
-      <div style="position: relative; display: inline-block;">
-        <img src="${thumbSrc}" class="img-thumbnail-mini" onclick="openPopupMedia('${fullSrc}', 'video')">
-        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="white" stroke="black" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="background: rgba(0,0,0,0.5); border-radius: 50%; padding:5px;">
-            <polygon points="6,4 20,12 6,20 6,4"></polygon>
-          </svg>
-        </div>
-      </div>
-    `;
-  }
-}).join('')}
-  </div>
-` : ''}
+              if (type === "image") {
+                return `<img src="${thumbSrc}" class="img-thumbnail-mini" onclick="openPopupMedia('${fullSrc}', 'image')">`;
+              } else {
+                return `
+                  <div style="position: relative; display: inline-block;">
+                    <img src="${thumbSrc}" class="img-thumbnail-mini" onclick="openPopupMedia('${fullSrc}', 'video')">
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="white" stroke="black" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="background: rgba(0,0,0,0.5); border-radius: 50%; padding:5px;">
+                        <polygon points="6,4 20,12 6,20 6,4"></polygon>
+                      </svg>
+                    </div>
+                  </div>
+                `;
+              }
+            }).join('')}
+          </div>
+        ` : ''}
 
         <label class="form-label mt-2"><strong>🛠️ Réparations effectuées</strong></label>
         <textarea class="form-control mb-3" rows="2" placeholder="Décrire la réparation..." oninput="checkFields(this)"></textarea>
 
-<label class="form-label mt-2 fw-bold">⏱️ Temps de réparation</label>
-<div class="mb-2 text-center" id="timeDisplay">Sélectionnez le temps</div>
-<input type="range" class="form-range mb-3 range-ticks" min="0" max="240" step="15" value="0" oninput="updateTimeDisplay(this)">
+        <label class="form-label mt-2 fw-bold">⏱️ Temps de réparation</label>
+        <div class="mb-2 text-center" id="timeDisplay">Sélectionnez le temps</div>
+        <input type="range" class="form-range mb-3 range-ticks" min="0" max="240" step="15" value="0" oninput="updateTimeDisplay(this)">
         <button class="btn btn-success btn-completer mt-2" onclick="completer(this)" disabled>✅ Compléter</button>
       </div>
     `;
-  
-div.classList.remove('opened');
-const detailsElement = div.querySelector('.details');
-if (detailsElement) {
-  detailsElement.style.display = 'none';
-}
+
+    div.classList.remove('opened');
 
     div.addEventListener('click', function(e) {
       if (!e.target.closest('a') && !e.target.closest('textarea') && !e.target.closest('input') && !e.target.closest('button') && !e.target.closest('img')) {
@@ -448,6 +442,7 @@ if (detailsElement) {
   initGalleries();
   updateCounters();
 }
+
 
 function initGalleries() {
   // Détruire d'abord d'éventuelles anciennes instances

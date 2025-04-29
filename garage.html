@@ -45,25 +45,23 @@
     body {
       background-color: #f8f9fa;
     }
+/* Augmente l'espacement entre les cartes pour éviter que l'ombre du dessus ne masque le contour */
 .list-group {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  overflow: visible !important; /* ✅ corrige le problème */
+  gap: 40px; /* Augmentation de l'espace pour corriger parfaitement */
+  overflow: visible !important;
 }
 
+/* Optionnel: Adoucir légèrement l'ombre pour plus de finesse */
 .list-group-item {
-  border: 2px solid #555; /* gris foncé */
+  border: 2px solid #555;
   border-radius: 12px;
   padding: 15px;
   background-color: #ffffff;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12); /* adoucie légèrement l'ombre */
   transition: background-color 0.2s ease, box-shadow 0.2s ease;
-  overflow: hidden; /* 🛠️ clé magique ici */
-}
-
-.list-group-item > div:first-child {
-  margin-top: 5px;
+  overflow: hidden;
 }
 
 .list-group-item:hover {

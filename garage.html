@@ -421,6 +421,12 @@ ${hasFiles ? `
         <button class="btn btn-success btn-completer mt-2" onclick="completer(this)" disabled>✅ Compléter</button>
       </div>
     `;
+  
+div.classList.remove('opened');
+const detailsElement = div.querySelector('.details');
+if (detailsElement) {
+  detailsElement.style.display = 'none';
+}
 
     div.addEventListener('click', function(e) {
       if (!e.target.closest('a') && !e.target.closest('textarea') && !e.target.closest('input') && !e.target.closest('button') && !e.target.closest('img')) {

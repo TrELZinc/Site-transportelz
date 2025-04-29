@@ -49,6 +49,9 @@
   padding-top: 12px;
   padding-bottom: 12px;
   background-color: #f8f9fa;
+  gap: 20px; /* ✅ espace naturel entre chaque pastille */
+  display: flex;
+  flex-direction: column;
 }
 
 .container, .list-group {
@@ -70,9 +73,7 @@
   box-shadow: 0 6px 14px rgba(0,0,0,0.2);
 }
 
-.list-group-item:not(:last-child) {
-  margin-bottom: 20px;
-}
+
     .details {
       max-height: 0;
       overflow: hidden;

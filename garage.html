@@ -46,9 +46,9 @@
       background-color: #f8f9fa;
     }
 .list-group {
-  display: flex;
-  flex-direction: column;
-  overflow: visible !important;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  background-color: #f8f9fa;
 }
 
 .container, .list-group {
@@ -57,19 +57,17 @@
 }
 
 .list-group-item {
-  position: relative;
-  background: #ffffff;
-  border: 2px solid #555;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  overflow: visible;
-  margin-top: 0;
+  background-color: #ffffff;
+  border: 1.5px solid rgba(0,0,0,0.25);
+  border-radius: 14px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+  padding: 16px;
+  transition: transform 0.2s ease;
 }
 
-/* Appliquer une marge spécifique SEULEMENT à partir de la 2ᵉ carte */
-.list-group-item + .list-group-item {
-  margin-top: 20px;
+.list-group-item:hover {
+  transform: scale(1.01);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.2);
 }
     .details {
       max-height: 0;

@@ -228,6 +228,13 @@ function afficherBoutonsAdmin() {
   lienRapport.innerHTML = `<img src="assets/icones/feuille.png" alt=""> Gestion des permis`;
   btnContainer.appendChild(lienRapport);
 
+    // Pastille 3 : Réparation mécanique
+  const lienGarage = document.createElement("a");
+  lienGarage.href = "garage.html";
+  lienGarage.className = "button";
+  lienGarage.innerHTML = `<img src="assets/icones/outil.png" alt=""> Réparation mécanique`;
+  btnContainer.appendChild(lienGarage);
+
   // Pastille 2 : Paie
   const lienJournal = document.createElement("a");
   lienJournal.href = "mathieu.html";

@@ -313,6 +313,7 @@ async function chargerReparations(noReset = false) {
 
     const response = await fetch("https://script.google.com/macros/s/AKfycbyVpy20kpu02A-WQZSmiGF0_lyYTTO1L_NQ-Z58SVFr_wRygt_P9pCLx3FE8yQ-cEQ/exec?read=1");
     const data = await response.json();
+    console.log("🧪 Données reçues :", data[0]);
 
     // ✅ Nettoyage et filtrage fiable
     aFaire = data.filter(r => !r.notes || r.notes.trim().length === 0);

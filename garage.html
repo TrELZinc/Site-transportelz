@@ -720,24 +720,28 @@ function completer(button) {
   const now = new Date();
   const dateFin = now.toISOString();
 
-  // ✅ Mise à jour locale immédiate
+  // Mise à jour immédiate locale
   item.notes = textarea;
   item.temps = temps;
   item.description = description;
   item.dateFin = dateFin;
 
-aFaire = aFaire.filter(r => r.id !== item.id);
-fait.push(item);
-itemEl.remove();
-renderCurrentTab();
-updateCounters();
-showToast("Réparation complétée ✅");
+  aFaire = aFaire.filter(r => r.id !== item.id);
+  fait.push(item);
 
-  // ✅ Envoi au serveur (sans reload)
+  itemEl.remove();
+  renderCurrentTab();
+  updateCounters();
+
+  showToast("Réparation en cours d’enregistrement...");
+
+  // Envoi au serveur
   fetch("https://script.google.com/macros/s/AKfycbyVpy20kpu02A-WQZSmiGF0_lyYTTO1L_NQ-Z58SVFr_wRygt_P9pCLx3FE8yQ-cEQ/exec", {
     method: "POST",
     mode: "no-cors",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({
       update: true,
       id: item.id,
@@ -746,10 +750,17 @@ showToast("Réparation complétée ✅");
       description: description,
       dateFin: dateFin
     })
-  }).catch(error => {
+  })
+  .catch(error => {
     console.error("Erreur lors de l'envoi :", error);
     alert("Erreur pendant l'envoi au serveur.");
   });
+
+  // 🔁 Délai de relecture pour éviter cache ou delay d'écriture Google Sheets
+  setTimeout(() => {
+    chargerReparations(true);
+    showToast("Réparation enregistrée avec succès ✅");
+  }, 2000);
 }
 
 

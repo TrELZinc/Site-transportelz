@@ -308,28 +308,32 @@ let showAllFait = false;
 
 async function chargerReparations(noReset = false) {
   try {
-    // 👉 Montre le loader
+    // ✅ Affiche le loader
     document.getElementById('loadingOverlay').style.display = 'flex';
 
-const response = await fetch("https://script.google.com/macros/s/AKfycbyVpy20kpu02A-WQZSmiGF0_lyYTTO1L_NQ-Z58SVFr_wRygt_P9pCLx3FE8yQ-cEQ/exec?read=1");
-const data = await response.json();
+    const response = await fetch("https://script.google.com/macros/s/AKfycbyVpy20kpu02A-WQZSmiGF0_lyYTTO1L_NQ-Z58SVFr_wRygt_P9pCLx3FE8yQ-cEQ/exec?read=1");
+    const data = await response.json();
 
-// Séparation immédiate
-aFaire = data.filter(r => !r.notes || r.notes.trim() === "");
-fait = data.filter(r => r.notes && r.notes.trim() !== "");
+    // ✅ Nettoyage et filtrage fiable
+    aFaire = data.filter(r => !r.notes || r.notes.trim().length === 0);
+    fait = data.filter(r => r.notes && r.notes.trim().length > 0);
 
-aFaire = aFaire.sort((a, b) => new Date(b.date) - new Date(a.date));
+    // ✅ Tri décroissant par date
+    aFaire = aFaire.sort((a, b) => new Date(b.date) - new Date(a.date));
+    fait = fait.sort((a, b) => new Date(b.dateFin || b.date) - new Date(a.dateFin || a.date));
+
+    // ✅ Rendu initial ou refresh
     if (!noReset) {
       showTab('faire');
     } else {
       renderCurrentTab();
       updateCounters();
     }
+
   } catch (error) {
     console.error("Erreur de chargement :", error);
     alert("Erreur lors du chargement des réparations. Veuillez réessayer.");
   } finally {
-    // 👉 Cache le loader
     document.getElementById('loadingOverlay').style.display = 'none';
   }
 }

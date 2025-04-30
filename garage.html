@@ -706,12 +706,6 @@ function completer(button) {
   const descriptionEl = itemEl.querySelector('.details span.text-dark');
   const description = descriptionEl ? descriptionEl.innerText : "";
   const id = itemEl.dataset.id;
-  const item = aFaire.find(r => r.id === id);
-
-  if (!item) {
-    alert("Erreur : élément introuvable.");
-    return;
-  }
 
   const minutes = parseInt(slider.value);
   const h = Math.floor(minutes / 60);
@@ -720,22 +714,30 @@ function completer(button) {
   const now = new Date();
   const dateFin = now.toISOString();
 
-  // Mise à jour immédiate locale
-  item.notes = textarea;
-  item.temps = temps;
-  item.description = description;
-  item.dateFin = dateFin;
+  // ✅ TROUVER L’ÉLÉMENT
+  const index = aFaire.findIndex(r => r.id === id);
+  if (index === -1) {
+    alert("Erreur : impossible de trouver cette réparation.");
+    return;
+  }
 
-  aFaire = aFaire.filter(r => r.id !== item.id);
+  // ✅ MISE À JOUR LOCALE
+  aFaire[index].notes = textarea;
+  aFaire[index].temps = temps;
+  aFaire[index].description = description;
+  aFaire[index].dateFin = dateFin;
+
+  // ✅ DÉPLACEMENT VERS `fait`
+  const item = aFaire.splice(index, 1)[0];
   fait.push(item);
 
+  // ✅ UI immédiate
   itemEl.remove();
   renderCurrentTab();
   updateCounters();
+  showToast("Réparation enregistrée ✅");
 
-  showToast("Réparation en cours d’enregistrement...");
-
-  // Envoi au serveur
+  // ✅ Envoi serveur
   fetch("https://script.google.com/macros/s/AKfycbyVpy20kpu02A-WQZSmiGF0_lyYTTO1L_NQ-Z58SVFr_wRygt_P9pCLx3FE8yQ-cEQ/exec", {
     method: "POST",
     mode: "no-cors",
@@ -750,17 +752,15 @@ function completer(button) {
       description: description,
       dateFin: dateFin
     })
-  })
-  .catch(error => {
-    console.error("Erreur lors de l'envoi :", error);
-    alert("Erreur pendant l'envoi au serveur.");
+  }).catch(err => {
+    console.error("Erreur d’envoi :", err);
+    alert("Erreur d’enregistrement côté serveur");
   });
 
-  // 🔁 Délai de relecture pour éviter cache ou delay d'écriture Google Sheets
+  // ✅ Optionnel : relancer le rechargement pour synchroniser
   setTimeout(() => {
     chargerReparations(true);
-    showToast("Réparation enregistrée avec succès ✅");
-  }, 2000);
+  }, 1500);
 }
 
 

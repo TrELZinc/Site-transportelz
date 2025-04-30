@@ -308,32 +308,27 @@ let showAllFait = false;
 
 async function chargerReparations(noReset = false) {
   try {
-    // Affiche le loader
+    // ✅ Affiche le loader
     document.getElementById('loadingOverlay').style.display = 'flex';
 
-    // Ajouter un paramètre timestamp pour éviter le cache
-    const timestamp = new Date().getTime();
-    const response = await fetch(`https://script.google.com/macros/s/AKfycbyVpy20kpu02A-WQZSmiGF0_lyYTTO1L_NQ-Z58SVFr_wRygt_P9pCLx3FE8yQ-cEQ/exec?read=1&t=${timestamp}`);
-    
+    const response = await fetch("https://script.google.com/macros/s/AKfycbyVpy20kpu02A-WQZSmiGF0_lyYTTO1L_NQ-Z58SVFr_wRygt_P9pCLx3FE8yQ-cEQ/exec?read=1");
     const data = await response.json();
 
-    // Nettoyage et filtrage fiable
+    // ✅ Nettoyage et filtrage fiable
     aFaire = data.filter(r => !r.notes || r.notes.trim().length === 0);
     fait = data.filter(r => r.notes && r.notes.trim().length > 0);
 
-    // Tri décroissant par date
+    // ✅ Tri décroissant par date
     aFaire = aFaire.sort((a, b) => new Date(b.date) - new Date(a.date));
     fait = fait.sort((a, b) => new Date(b.dateFin || b.date) - new Date(a.dateFin || a.date));
 
-    // Rendu initial ou refresh
+    // ✅ Rendu initial ou refresh
     if (!noReset) {
       showTab('faire');
     } else {
       renderCurrentTab();
       updateCounters();
     }
-
-    console.log(`Données chargées: ${aFaire.length} à faire, ${fait.length} fait`);
 
   } catch (error) {
     console.error("Erreur de chargement :", error);
@@ -343,7 +338,12 @@ async function chargerReparations(noReset = false) {
   }
 }
 
-  
+
+chargerReparations();
+
+
+let currentTab = 'faire';
+
 function showTab(tab) {
   currentTab = tab;
   document.getElementById('a-faire-tab').classList.remove('active');
@@ -720,60 +720,49 @@ function completer(button) {
   const now = new Date();
   const dateFin = now.toISOString();
 
-  // Désactiver le bouton et afficher un indicateur
-  button.disabled = true;
-  button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Enregistrement...';
-  showToast("Réparation en cours d'enregistrement...");
+  // Mise à jour immédiate locale
+  item.notes = textarea;
+  item.temps = temps;
+  item.description = description;
+  item.dateFin = dateFin;
 
-  // Préparation des données à envoyer
-  const updateData = {
-    update: true,
-    id: item.id,
-    notes: textarea,
-    temps: temps,
-    description: description,
-    dateFin: dateFin
-  };
+  aFaire = aFaire.filter(r => r.id !== item.id);
+  fait.push(item);
+
+  itemEl.remove();
+  renderCurrentTab();
+  updateCounters();
+
+  showToast("Réparation en cours d’enregistrement...");
 
   // Envoi au serveur
   fetch("https://script.google.com/macros/s/AKfycbyVpy20kpu02A-WQZSmiGF0_lyYTTO1L_NQ-Z58SVFr_wRygt_P9pCLx3FE8yQ-cEQ/exec", {
     method: "POST",
+    mode: "no-cors",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(updateData)
-  })
-  .then(response => {
-    console.log("Réponse du serveur reçue");
-    
-    // Mise à jour locale des données
-    item.notes = textarea;
-    item.temps = temps;
-    item.description = description;
-    item.dateFin = dateFin;
-
-    // Déplacer l'élément de aFaire vers fait
-    aFaire = aFaire.filter(r => r.id !== item.id);
-    fait.push(item);
-
-    // Mettre à jour l'UI
-    itemEl.remove();
-    renderCurrentTab();
-    updateCounters();
-    showToast("Réparation enregistrée avec succès ✅");
-    
-    // Délai plus long avant de recharger les données
-    setTimeout(() => {
-      chargerReparations(true);
-    }, 5000); // 5 secondes au lieu de 2
+    body: JSON.stringify({
+      update: true,
+      id: item.id,
+      notes: textarea,
+      temps: temps,
+      description: description,
+      dateFin: dateFin
+    })
   })
   .catch(error => {
     console.error("Erreur lors de l'envoi :", error);
-    alert("Erreur pendant l'envoi au serveur. Veuillez réessayer.");
-    button.disabled = false;
-    button.innerHTML = '✅ Compléter';
+    alert("Erreur pendant l'envoi au serveur.");
   });
+
+  // 🔁 Délai de relecture pour éviter cache ou delay d'écriture Google Sheets
+  setTimeout(() => {
+    chargerReparations(true);
+    showToast("Réparation enregistrée avec succès ✅");
+  }, 2000);
 }
+
 
 function updateCounters() {
   const aFaireCount = aFaire.filter(item => !item.notes || item.notes.trim() === "").length;

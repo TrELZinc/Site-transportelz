@@ -722,23 +722,12 @@ function completer(button) {
   item.description = description;
   item.dateFin = dateFin;
 
-  // ✅ Visuel: animation de validation
-  itemEl.style.transition = "background-color 0.4s, transform 0.3s";
-  itemEl.style.backgroundColor = "#d4edda"; // vert pâle
-  itemEl.style.transform = "scale(1.02)";
-  itemEl.innerHTML += `
-    <div style="position:absolute; top:10px; right:10px; font-size:24px; color:#28a745; font-weight:bold;">✔️</div>
-  `;
-
-  // ✅ Attente visuelle avant suppression
-  setTimeout(() => {
-    aFaire = aFaire.filter(r => r.id !== item.id);
-    fait.push(item);
-    itemEl.remove();
-    renderCurrentTab();
-    updateCounters();
-    showToast("Réparation complétée ✅");
-  }, 800);
+aFaire = aFaire.filter(r => r.id !== item.id);
+fait.push(item);
+itemEl.remove();
+renderCurrentTab();
+updateCounters();
+showToast("Réparation complétée ✅");
 
   // ✅ Envoi au serveur (sans reload)
   fetch("https://script.google.com/macros/s/AKfycbyVpy20kpu02A-WQZSmiGF0_lyYTTO1L_NQ-Z58SVFr_wRygt_P9pCLx3FE8yQ-cEQ/exec", {

@@ -681,26 +681,27 @@ function completer(button) {
   const now = new Date();
   const dateFin = now.toISOString();
 
-  // ✅ Mise à jour locale avant suppression DOM
-   // ✅ Mise à jour locale immédiate
+  // ✅ Mise à jour locale immédiate
   item.notes = textarea;
   item.temps = temps;
   item.description = description;
   item.dateFin = dateFin;
 
-  // Supprime de la liste "à faire"
+  // ✅ Supprime de la liste "à faire"
   aFaire = aFaire.filter(r => r.id !== item.id);
-  // Ajoute à la liste "fait"
+
+  // ✅ Ajoute à la liste "fait"
   fait.push(item);
 
-  // Supprime visuellement
+  // ✅ Supprime visuellement
   itemEl.remove();
 
-  // Rafraîchit l'affichage
+  // ✅ Mise à jour immédiate de l'interface
   renderCurrentTab();
   updateCounters();
+  showToast("Réparation complétée ✅");
 
-  // Envoie au serveur
+  // ✅ Envoi au serveur (sans attente)
   fetch("https://script.google.com/macros/s/AKfycbyVpy20kpu02A-WQZSmiGF0_lyYTTO1L_NQ-Z58SVFr_wRygt_P9pCLx3FE8yQ-cEQ/exec", {
     method: "POST",
     mode: "no-cors",
@@ -715,13 +716,12 @@ function completer(button) {
       description: description,
       dateFin: dateFin
     })
-  })
-  .then(() => showToast("Réparation complétée ✅"))
-  .catch(error => {
+  }).catch(error => {
     console.error("Erreur lors de l'envoi :", error);
     alert("Erreur pendant l'envoi au serveur.");
   });
 }
+
 
 function updateCounters() {
   const aFaireCount = aFaire.filter(item => !item.notes || item.notes.trim() === "").length;

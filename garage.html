@@ -213,6 +213,41 @@ input[type=range].range-ticks::-moz-range-thumb {
   border-radius: 50%;
   cursor: pointer;
 }
+
+#toastConfirm {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3000;
+  background-color: #28a745;
+  color: white;
+  padding: 14px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  display: none;
+  align-items: center;
+  gap: 12px;
+  animation: slideDownFade 0.5s ease forwards;
+}
+
+#toastConfirm svg {
+  width: 24px;
+  height: 24px;
+}
+
+@keyframes slideDownFade {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
 </style>
 </head>
 <body>
@@ -734,10 +769,13 @@ const faitCount = fait.length;
 }
 
 function showToast(message = "Succès") {
-  const toastEl = document.getElementById('liveToast');
-  toastEl.querySelector('.toast-body').textContent = message;
-  const toast = new bootstrap.Toast(toastEl);
-  toast.show();
+  const toast = document.getElementById('toastConfirm');
+  toast.querySelector('div')?.textContent = message;
+  toast.style.display = 'flex';
+
+  setTimeout(() => {
+    toast.style.display = 'none';
+  }, 3000);
 }
 
 
@@ -791,6 +829,13 @@ function showToast(message = "Succès") {
   window.PhotoSwipeLightbox = PhotoSwipeLightbox;
 </script>
 
+</div>
+
+<div id="toastConfirm">
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="white">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+  </svg>
+  Réparation enregistrée
 </div>
 
 </body>

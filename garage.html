@@ -316,8 +316,8 @@ async function chargerReparations(noReset = false) {
     console.log("🧪 Données reçues :", data[0]);
 
     // ✅ Nettoyage et filtrage fiable
-    aFaire = data.filter(r => !r.notes || r.notes.trim().length === 0);
-    fait = data.filter(r => r.notes && r.notes.trim().length > 0);
+    aFaire = data.filter(r => !String(r.notes || "").trim().length);
+    fait = data.filter(r => String(r.notes || "").trim().length > 0);
 
     // ✅ Tri décroissant par date
     aFaire = aFaire.sort((a, b) => new Date(b.date) - new Date(a.date));

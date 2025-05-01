@@ -309,22 +309,36 @@ garageBody.innerHTML = "";
         <tbody id="tableBody"></tbody>
       </table>
     </div>
-    <div class="buttons">
-      <button class="reset-btn" id="resetBtn">Reset</button>
-      <button class="save-btn" id="saveBtn">Save</button>
-      <button class="send-btn" id="sendBtn">Send</button>
-    </div>
-      <h3>Unités au garage</h3>
+<h3 style="text-align: center; font-size: 18px;">🛠️ Unités au garage</h3>
 <div class="table-wrapper">
   <table id="garageTable">
     <thead>
       <tr>
-        <th>UNITÉ</th>
-        <th>RAISON</th>
+        <th style="width: 30%;">UNITÉ</th>
+        <th style="width: 70%;">RAISON</th>
       </tr>
     </thead>
-    <tbody id="garageBody"></tbody>
+    <tbody id="garageBody">
+      <tr>
+        <td contenteditable style="height: 36px;"></td>
+        <td contenteditable style="height: 36px;"></td>
+      </tr>
+      <tr>
+        <td contenteditable style="height: 36px;"></td>
+        <td contenteditable style="height: 36px;"></td>
+      </tr>
+      <tr>
+        <td contenteditable style="height: 36px;"></td>
+        <td contenteditable style="height: 36px;"></td>
+      </tr>
+    </tbody>
   </table>
+</div>
+
+<div class="buttons" style="margin-top: 16px;">
+  <button class="reset-btn" id="resetBtn">Reset</button>
+  <button class="save-btn" id="saveBtn">Save</button>
+  <button class="send-btn" id="sendBtn">Send</button>
 </div>
 
   </div>

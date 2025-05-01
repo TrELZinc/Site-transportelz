@@ -708,18 +708,20 @@ const data = {
     elements.noteField.value = data.note || "";
 
     data.rows.forEach(row => {
-      const tr = createRow();
-      const cells = tr.querySelectorAll("td");
-      cells[0].textContent = row.rang || "";
-      cells[1].textContent = row.client || "";
-      cells[2].textContent = row.type || "";
-      cells[3].textContent = row.depart || "";
-      cells[4].textContent = row.livraison || "";
-      cells[5].textContent = row.chauffeur || "";
-      cells[6].textContent = row.camion || "";
-      cells[7].textContent = row.remorque || "";
-      elements.tableBody.appendChild(tr);
-    });
+    const tr = createRow();
+    const cells = tr.querySelectorAll("td");
+    cells[0].textContent = row.rang || "";
+    cells[1].textContent = row.client || "";
+    cells[2].textContent = row.type || "";
+    cells[3].textContent = row.depart || "";
+    cells[4].textContent = row.livraison || "";
+    cells[5].textContent = row.chauffeur || "";
+    cells[6].textContent = row.camion || "";
+    cells[7].textContent = row.remorque || "";
+    elements.tableBody.appendChild(tr);
+  });
+} else {
+  generateDefaultRows(9); // Ajoute 9 lignes si aucune donnée
 
     // ✅ Charger garage ici
     const garageBody = document.getElementById("garageBody");

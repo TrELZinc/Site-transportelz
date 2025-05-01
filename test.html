@@ -484,7 +484,7 @@ function generateGarageRows(n = 3) {
 }
 
 
-    function saveData() {
+function saveData() {
   try {
     const note = elements.noteField.value;
     const date = elements.dateSelect.value;
@@ -503,30 +503,27 @@ function generateGarageRows(n = 3) {
       };
     });
 
-const garageRows = Array.from(document.querySelectorAll("#garageTable tbody tr")).map(tr => {
-  const tds = tr.querySelectorAll("td");
-  return {
-    unite: tds[0]?.textContent.trim() || "",
-    raison: tds[1]?.textContent.trim() || ""
-  };
-});
-data.garage = garageRows;
-localStorage.setItem("garage_rows", JSON.stringify(garageRows));
+    const garageRows = Array.from(document.querySelectorAll("#garageTable tbody tr")).map(tr => {
+      const tds = tr.querySelectorAll("td");
+      return {
+        unite: tds[0]?.textContent.trim() || "",
+        raison: tds[1]?.textContent.trim() || ""
+      };
+    });
 
-const data = {
-  note,
-  date,
-  rows,
-  garage: garageRows,
-  timestamp: new Date().toISOString()
-};
+    const data = {
+      note,
+      date,
+      rows,
+      garage: garageRows,
+      timestamp: new Date().toISOString()
+    };
 
-    // Sauvegarde locale
+    localStorage.setItem("garage_rows", JSON.stringify(garageRows));
     localStorage.setItem(STORAGE_KEYS.note, note);
     localStorage.setItem(STORAGE_KEYS.date, date);
     localStorage.setItem(STORAGE_KEYS.rows, JSON.stringify(rows));
 
-    // Sauvegarde Firebase, avec un seul message après succès
     if (window.saveToFirebase) {
       window.saveToFirebase(data, () => {
         alert("✅ Données sauvegardées localement ET dans Firebase !");
@@ -537,6 +534,8 @@ const data = {
     alert("Erreur lors de la sauvegarde : " + err.message);
   }
 }
+
+
 function sendForm() {
   const tableClone = document.getElementById("dispoTable").cloneNode(true);
   const rows = tableClone.querySelectorAll("tbody tr");

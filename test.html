@@ -169,7 +169,9 @@
 }
 
 #garageTable th, #garageTable td {
-  padding: 6px;
+  padding: 4px;
+  height: 34px; /* plus bas */
+  font-size: 13px;
   text-align: center;
   word-break: break-word;
 }
@@ -249,7 +251,7 @@ garageBody.innerHTML = "";
           console.log("✅ Données chargées depuis Firebase !");
         } else {
           generateDefaultRows(9);
-          generateGarageRows(5);
+          generateGarageRows(3);
           console.log("📭 Aucune donnée trouvée dans Firebase.");
         }
       })
@@ -368,7 +370,7 @@ garageBody.innerHTML = "";
   return tr;
 }
 
-function generateGarageRows(n = 5) {
+function generateGarageRows(n = 3) {
   const garageBody = document.getElementById("garageBody");
   garageBody.innerHTML = "";
   for (let i = 0; i < n; i++) {
@@ -727,7 +729,7 @@ const data = {
   });
 
   setupArrowNavigation();
-  generateGarageRows(5);
+  generateGarageRows(3);
 }
 
 

@@ -67,7 +67,6 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
     table {
-      min-width: 900px;
       width: 100%;
       border-collapse: collapse;
     }
@@ -161,38 +160,41 @@
       }
     }
     
-/* Table garage ultra-compacte */
-table.garage-only {
-  width: 100%;
-  min-width: unset !important;
+#garageTable {
   table-layout: fixed;
+  width: 100%;
+  max-width: 100%;
   border-collapse: collapse;
+  font-size: 13px;
 }
 
-table.garage-only th,
-table.garage-only td {
-  padding: 8px;
-  font-size: 14px;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
+#garageTable th, #garageTable td {
+  padding: 6px;
+  text-align: center;
+  word-break: break-word;
 }
 
-table.garage-only th:first-child,
-table.garage-only td:first-child {
-  width: 35%; /* unité */
+#garageTable th:first-child,
+#garageTable td:first-child {
+  width: 30%;
 }
 
-table.garage-only th:last-child,
-table.garage-only td:last-child {
-  width: 65%; /* raison */
-  text-align: left;
+#garageTable th:last-child,
+#garageTable td:last-child {
+  width: 70%;
 }
+
 @media (max-width: 600px) {
   #garageTable th, #garageTable td {
     font-size: 13px;
     padding: 6px;
   }
 }
+
+#dispoTable {
+  min-width: 900px;
+}
+
   </style>
   <!-- Firebase SDKs en mode compat pour HTML classique -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -322,7 +324,7 @@ garageBody.innerHTML = "";
     <tbody id="garageBody"></tbody>
   </table>
 </div>
-<table id="garageTable" class="garage-only">
+
   </div>
 
   <script>

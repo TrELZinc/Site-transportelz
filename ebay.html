@@ -375,11 +375,14 @@ function updateEquipementStatus(camionsSet, remorquesSet, garageMap) {
       badge.style.color = "#fff";
 
       const reason = document.createElement("div");
-      reason.className = "garage-reason";
-      reason.textContent = `Raison : ${garageMap.get(unit)}`;
-      reason.style.fontSize = "13px";
-      reason.style.color = "#d32f2f";
-      row.appendChild(reason);
+reason.className = "garage-reason";
+reason.textContent = `Raison : ${garageMap.get(unit)}`;
+reason.style.fontSize = "13px";
+reason.style.color = "#d32f2f";
+
+// On insère la raison avant le badge
+row.insertBefore(reason, badge);
+
     } else {
       const isPlanned = camionsSet.has(unit) || remorquesSet.has(unit);
       badge.textContent = isPlanned ? "PLANIFIÉ" : "DISPONIBLE";

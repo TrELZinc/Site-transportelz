@@ -2,162 +2,404 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Transport ELZ – Portail Employés</title>
-  <link rel="icon" type="image/png" href="assets/favicon.png">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Équipements Disponibles</title>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet">
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <style>
+    
+  .row span:first-child {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+
     body {
-      font-family: 'Comfortaa', sans-serif;
-      background-color: #f8f8f8;
-      color: #111;
+      margin: 0;
+      font-family: 'Comfortaa', cursive;
+      background: #f5f5f5;
+      padding: 0;
     }
-    .logo {
-      height: 80px;
+    header {
+      background-color: #111;
+      text-align: center;
+      padding: 20px 10px;
     }
-    .button-custom {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem 1.5rem;
-      padding-left: 70px;
-      background-color: #ff281e;
+    header img {
+      height: 50px;
+      display: block;
+      margin: 0 auto 10px;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 24px;
       color: white;
-      text-decoration: none;
-      border-radius: 0.75rem;
+      letter-spacing: 1px;
+    }
+    .date-select input {
+      padding: 10px 18px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 18px;
+      font-family: 'Comfortaa', cursive;
+      text-align: center;
+    }
+    .section {
+      max-width: 800px;
+      margin: 20px auto;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+    }
+    .section-title {
+      background: #848484;
+      padding: 12px 16px;
       font-weight: bold;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      transition: background 0.3s ease;
-      height: 55px;
-      white-space: normal;
+      font-size: 16px;
+      text-transform: uppercase;
+      display: flex;
+      justify-content: center;
+      color: white;
+      border-bottom: 1px solid #ddd;
       text-align: center;
     }
-    .button-custom:hover {
-      background-color: #d31e15;
+    .row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid #eee;
+      font-size: 16px;
+      cursor: pointer;
+      align-items: center;
     }
-    .button-custom img {
-      position: absolute;
-      left: 20px;
+    .status {
+      font-weight: bold;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+    }
+    .planifie {
+      background: #ffd6d6;
+      color: #c62828;
+    }
+    .disponible {
+      background: #d9fdd3;
+      color: #2e7d32;
+    }
+    @media (max-width: 600px) {
+  .section-title {
+    flex-direction: column;
+    gap: 6px;
+  }
+  .row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0;
+  }
+}
+
+    .popup {
+      position: fixed;
       top: 50%;
-      transform: translateY(-50%);
-      height: 36px;
-      width: 36px;
-    }
-    footer {
-      margin-top: 50px;
-      padding: 20px 0 10px;
-      font-size: 12px;
-      color: #888;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      border: 2px solid #d32f2f;
+      border-radius: 12px;
+      padding: 20px;
+      z-index: 9999;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      display: none;
       text-align: center;
+    }
+    .popup button {
+      margin: 10px;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      font-family: 'Comfortaa';
+      cursor: pointer;
+    }
+    .popup .use-btn {
+      background: #2e7d32;
+      color: white;
+    }
+    .popup .free-btn {
+      background: #d32f2f;
+      color: white;
     }
   </style>
-</head>
-<body>
-
-<header class="bg-dark text-center py-3">
-  <img src="assets/logo.jpeg" alt="Logo Transport ELZ" class="logo">
-</header>
-
-<main class="container my-5">
-  <h1 class="text-center mb-4">Portail des employés</h1>
-
-  <div class="d-grid gap-3 col-12 col-md-6 mx-auto" id="liens">
-    <a href="paie.html" class="button-custom">
-      <img src="assets/icones/feuille.png" alt="Feuille"> Envoyer une feuille de route
-    </a>
-    <a href="reparation.html" class="button-custom">
-      <img src="assets/icones/outil.png" alt="Outil"> Envoyer une demande de réparation
-    </a>
-    <a href="equipements.html" class="button-custom">
-      <img src="assets/icones/camion.png" alt="Camion"> Disponibilité des équipements
-    </a>
-    <a href="fuel.html" class="button-custom">
-      <img src="assets/icones/fuel.png" alt="Fuel"> Afficher le prix du diesel
-    </a>
-    <a href="poids.html" class="button-custom">
-      <img src="assets/icones/liste.png" alt="Liste"> Consulter la liste des charges
-    </a>
-    <button onclick="ouvrirPopup()" class="btn btn-secondary mt-3">🔐 Accès administrateur</button>
-  </div>
-
-  <div class="text-center mt-4">
-    <button onclick="deconnexion()" class="btn btn-dark">Se déconnecter</button>
-  </div>
-
-  <footer>
-    Transport ELZ inc. – Tous droits réservés
-  </footer>
-</main>
-
-<!-- Popup NIP -->
-<div id="popupNIP" class="modal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Accès Administrateur</h5>
-        <button type="button" class="btn-close" onclick="fermerPopup()"></button>
-      </div>
-      <div class="modal-body text-center">
-        <p>Entrez le NIP pour accéder à cette section :</p>
-        <input id="nipInput" type="tel" inputmode="numeric" maxlength="6" class="form-control mx-auto" style="max-width:200px;">
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" onclick="validerNIP()">Valider</button>
-      </div>
-    </div>
-  </div>
-</div>
+  <!-- Firebase SDKs -->
+<!-- Firebase SDK (mode compat) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
-function ouvrirPopup() {
-  var popup = new bootstrap.Modal(document.getElementById('popupNIP'));
-  popup.show();
-  setTimeout(() => document.getElementById("nipInput").focus(), 500);
-}
+  const firebaseConfig = {
+    apiKey: "AIzaSyD4U85mokKXsAP1AdwClWtcbt8udZrwlAw",
+    authDomain: "sommaireelz.firebaseapp.com",
+    projectId: "sommaireelz",
+    storageBucket: "sommaireelz.firebasestorage.app",
+    messagingSenderId: "171788284751",
+    appId: "1:171788284751:web:694f070d1cafe8b7c04b3a"
+  };
 
-function fermerPopup() {
-  var popup = bootstrap.Modal.getInstance(document.getElementById('popupNIP'));
-  popup.hide();
-}
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
 
-function validerNIP() {
-  fermerPopup();
-  // Plus besoin de stocker adminValid
-}
+  // 🔍 Marquer les remorques planifiées
+  function majRemorquesPlanifiees() {
+    db.collection("disponibilites")
+      .orderBy("timestamp", "desc")
+      .limit(10)
+      .get()
+      .then(snapshot => {
+        const remorquesUtilisées = new Set();
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          if (Array.isArray(data.rows)) {
+            data.rows.forEach(row => {
+              if (row.remorque) remorquesUtilisées.add(row.remorque.trim());
+            });
+          }
+        });
 
-function afficherBoutonsAdmin() {
-  const btnContainer = document.getElementById("liens");
+        // Appliquer l'état "PLANIFIÉ" aux remorques utilisées
+        document.querySelectorAll(".row").forEach(row => {
+          const unit = row.querySelector("span")?.textContent?.trim();
+          if (remorquesUtilisées.has(unit)) {
+            const badge = row.querySelector(".status");
+            badge.textContent = "PLANIFIÉ";
+            badge.classList.remove("disponible");
+            badge.classList.add("planifie");
+          }
+        });
+      })
+      .catch(error => {
+        console.error("Erreur Firestore :", error);
+      });
+  }
 
-  if (document.getElementById("admin-btn-dispatch")) return;
 
-  const boutons = [
-    {href: "dispos.html", img: "dispatch.png", text: "Dispatch interne", id: "admin-btn-dispatch"},
-    {href: "permis.html", img: "feuille.png", text: "Gestion des permis"},
-    {href: "mathieu.html", img: "feuille.png", text: "Gestion de la paie"},
-    {href: "garage.html", img: "outil.png", text: "Réparations mécanique"}
-  ];
-
-  boutons.forEach(b => {
-    const lien = document.createElement("a");
-    if (b.id) lien.id = b.id;
-    lien.href = b.href;
-    lien.className = "button-custom";
-    lien.innerHTML = `<img src="assets/icones/${b.img}" alt=""> ${b.text}`;
-    btnContainer.appendChild(lien);
-  });
-}
-
-function deconnexion() {
-  window.location.href = "index.html"; // Plus besoin de removeItem
-}
-
-// Charger directement les boutons admin sans contrôle
-window.onload = afficherBoutonsAdmin;
 </script>
 
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+  <header>
+    <img src="assets/logo.jpeg" alt="Logo ELZ">
+    <h1>Disponibilité des équipements</h1>
+  </header>
+  
+<div class="text-center mt-3">
+  <h5 id="dateAffichee" style="font-weight:bold; font-size: 18px;"></h5>
+</div>
+
+  <div class="section" id="equipementList">
+    <div class="section-title">3 ESSIEUX</div>
+    <div class="row" onclick="toggleStatus(this)"><span>1806</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>1906</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>2006</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>2506</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>2706</span><span class="status planifie">PLANIFIÉ</span></div>
+
+    <div class="section-title">4 ESSIEUX</div>
+    <div class="row" onclick="toggleStatus(this)"><span>1505</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>1605</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>1805</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>1905</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>2205</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>2405</span><span class="status disponible">DISPONIBLE</span></div>
+
+    <div class="section-title">CAMIONS</div>
+    <div class="row" onclick="toggleStatus(this)"><span>1103</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>1202</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>1203</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>1303</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>1404</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>1502</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>1503</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>1603</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>1703</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row" onclick="toggleStatus(this)"><span>1803</span><span class="status disponible">DISPONIBLE</span></div>
+  </div>
+
+  <div class="popup" id="popup">
+    <p id="popupText"></p>
+    <button class="use-btn" onclick="confirmToggle('planifie')">Utiliser</button>
+    <button class="free-btn" onclick="confirmToggle('disponible')">Libérer</button>
+  </div>
+
+  <div class="text-center my-5">
+    <a href="linktree.html" class="btn btn-dark">Retour au menu principal</a>
+  </div>
+
+  <script>
+    let currentRow = null;
+
+    function toggleStatus(row) {
+      currentRow = row;
+      const unit = row.querySelector('span').textContent;
+      const status = row.querySelector('.status').classList.contains('planifie') ? 'planifie' : 'disponible';
+
+      document.getElementById('popupText').textContent = status === 'planifie'
+        ? `Libérer ${unit}?`
+        : `Utiliser ${unit}?`;
+
+      document.querySelector('.use-btn').style.display = status === 'disponible' ? 'inline-block' : 'none';
+      document.querySelector('.free-btn').style.display = status === 'planifie' ? 'inline-block' : 'none';
+
+      document.getElementById('popup').style.display = 'block';
+    }
+
+    function confirmToggle(action) {
+      const statusEl = currentRow.querySelector('.status');
+      if (action === 'planifie') {
+        statusEl.textContent = 'PLANIFIÉ';
+        statusEl.classList.remove('disponible');
+        statusEl.classList.add('planifie');
+      } else {
+        statusEl.textContent = 'DISPONIBLE';
+        statusEl.classList.remove('planifie');
+        statusEl.classList.add('disponible');
+      }
+      document.getElementById('popup').style.display = 'none';
+    }
+    async function fetchPlannedEquipments(date) {
+  const usedCamions = new Set();
+  const usedRemorques = new Set();
+
+  try {
+    const snapshot = await db.collection("disponibilites")
+      .where("date", "==", date)
+      .get();
+
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      (data.rows || []).forEach(row => {
+        const camion = String(row.camion || "").trim().toLowerCase();
+        const remorque = String(row.remorque || "").trim().toLowerCase();
+        if (camion) usedCamions.add(camion);
+        if (remorque) usedRemorques.add(remorque);
+      });
+    });
+
+    updateEquipementStatus(usedCamions, usedRemorques);
+  } catch (error) {
+    console.error("Erreur de lecture Firebase:", error);
+  }
+}
+
+
+function updateEquipementStatus(camionsSet, remorquesSet) {
+  const rows = document.querySelectorAll("#equipementList .row");
+
+  rows.forEach(row => {
+    const unit = row.querySelector("span")?.textContent?.trim().toLowerCase();
+    const badge = row.querySelector(".status");
+
+    if (!unit || !badge) return;
+
+    const estPlanifie = camionsSet.has(unit) || remorquesSet.has(unit);
+
+    badge.textContent = estPlanifie ? "PLANIFIÉ" : "DISPONIBLE";
+    badge.classList.toggle("planifie", estPlanifie);
+    badge.classList.toggle("disponible", !estPlanifie);
+  });
+}
+
+  </script>
+<script>
+
+  async function getLastRecordedEquipments() {
+  try {
+    const snapshot = await db.collection("disponibilites")
+      .orderBy("timestamp", "desc")
+      .limit(1)
+      .get();
+
+    if (snapshot.empty) return null;
+
+    const doc = snapshot.docs[0];
+    const data = doc.data();
+
+    const usedCamions = new Set();
+    const usedRemorques = new Set();
+
+    (data.rows || []).forEach(row => {
+      if (row.camion) usedCamions.add(row.camion.trim());
+      if (row.remorque) usedRemorques.add(row.remorque.trim());
+    });
+
+    const garageSet = new Map();
+    (data.garage || []).forEach(item => {
+      if (item.unite) {
+        garageSet.set(item.unite.trim(), item.raison || "Garage");
+      }
+    });
+
+    return {
+      date: data.date || "Date inconnue",
+      camions: usedCamions,
+      remorques: usedRemorques,
+      garage: garageSet
+    };
+  } catch (error) {
+    console.error("Erreur Firebase:", error);
+    return null;
+  }
+}
+
+
+function updateEquipementStatus(camionsSet, remorquesSet, garageMap) {
+  const rows = document.querySelectorAll("#equipementList .row");
+
+  rows.forEach(row => {
+    const unit = row.querySelector("span")?.textContent?.trim();
+    const badge = row.querySelector(".status");
+
+    // Supprimer raison précédente si présente
+    const oldReason = row.querySelector(".garage-reason");
+    if (oldReason) oldReason.remove();
+
+    if (!unit || !badge) return;
+
+    if (garageMap.has(unit)) {
+      // GARAGE prioritaire
+      badge.textContent = "GARAGE";
+      badge.className = "status garage"; // redéfinit complètement
+      badge.style.background = "#f44336";
+      badge.style.color = "#fff";
+
+      const reason = document.createElement("div");
+      reason.className = "garage-reason";
+      reason.textContent = `Raison : ${garageMap.get(unit)}`;
+      reason.style.fontSize = "13px";
+      reason.style.color = "#d32f2f";
+      row.appendChild(reason);
+    } else {
+      const isPlanned = camionsSet.has(unit) || remorquesSet.has(unit);
+      badge.textContent = isPlanned ? "PLANIFIÉ" : "DISPONIBLE";
+      badge.className = `status ${isPlanned ? "planifie" : "disponible"}`;
+    }
+  });
+}
+</script>
+<script>
+  window.addEventListener("DOMContentLoaded", async () => {
+    const info = await getLastRecordedEquipments();
+    const dateEl = document.getElementById("dateAffichee");
+
+    if (info) {
+      dateEl.textContent = `Dernière mise à jour : ${info.date}`;
+      updateEquipementStatus(info.camions, info.remorques, info.garage);
+    } else {
+      dateEl.textContent = "Aucune donnée disponible.";
+    }
+  });
+</script>
 </body>
 </html>

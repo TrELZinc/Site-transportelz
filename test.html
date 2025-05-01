@@ -161,18 +161,21 @@
       }
     }
     
-    #garageTable th:first-child,
+#garageTable {
+  width: 100%;
+  table-layout: fixed;
+}
+
+#garageTable th:first-child,
 #garageTable td:first-child {
-  width: 50px;
+  width: 30%; /* UNITÉ */
 }
 
 #garageTable th:last-child,
 #garageTable td:last-child {
-  width: 75px;
-}
-
-#garageTable td {
-  min-height: 44px;
+  width: 70%; /* RAISON */
+  text-align: left;
+  padding-left: 8px;
 }
   </style>
   <!-- Firebase SDKs en mode compat pour HTML classique -->

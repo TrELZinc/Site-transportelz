@@ -702,48 +702,52 @@ const data = {
     .limit(1)
     .get()
     .then(snapshot => {
-      if (!snapshot.empty) {
-        const data = snapshot.docs[0].data();
-        elements.dateSelect.value = data.date || "";
-        elements.noteField.value = data.note || "";
+  if (!snapshot.empty) {
+    const data = snapshot.docs[0].data();
+    elements.dateSelect.value = data.date || "";
+    elements.noteField.value = data.note || "";
 
-        data.rows.forEach(row => {
-          const tr = createRow();
-          const cells = tr.querySelectorAll("td");
-          cells[0].textContent = row.rang || "";
-          cells[1].textContent = row.client || "";
-          cells[2].textContent = row.type || "";
-          cells[3].textContent = row.depart || "";
-          cells[4].textContent = row.livraison || "";
-          cells[5].textContent = row.chauffeur || "";
-          cells[6].textContent = row.camion || "";
-          cells[7].textContent = row.remorque || "";
-          elements.tableBody.appendChild(tr);
-        });
-
-        // 💾 On met aussi à jour le localStorage (pour les copier-coller)
-        localStorage.setItem(STORAGE_KEYS.note, data.note || "");
-        localStorage.setItem(STORAGE_KEYS.date, data.date || "");
-        localStorage.setItem(STORAGE_KEYS.rows, JSON.stringify(data.rows || []));
-
-        console.log("🟢 Dernières données Firebase chargées et localStorage mis à jour.");
-      } else {
-        generateDefaultRows(9);
-        console.log("📭 Aucune donnée dans Firebase.");
-      }
+    data.rows.forEach(row => {
+      const tr = createRow();
+      const cells = tr.querySelectorAll("td");
+      cells[0].textContent = row.rang || "";
+      cells[1].textContent = row.client || "";
+      cells[2].textContent = row.type || "";
+      cells[3].textContent = row.depart || "";
+      cells[4].textContent = row.livraison || "";
+      cells[5].textContent = row.chauffeur || "";
+      cells[6].textContent = row.camion || "";
+      cells[7].textContent = row.remorque || "";
+      elements.tableBody.appendChild(tr);
     });
 
-  // 🔁 Si l'utilisateur sélectionne une date manuellement
-  elements.dateSelect.addEventListener("change", () => {
-    const newDate = elements.dateSelect.value;
-    if (newDate) {
-      loadFromFirebase(newDate);
-    }
-  });
+    // ✅ Charger garage ici
+    const garageBody = document.getElementById("garageBody");
+    garageBody.innerHTML = "";
 
-  setupArrowNavigation();
-  generateGarageRows(3);
-}
+    if (Array.isArray(data.garage) && data.garage.length > 0) {
+      data.garage.forEach(item => {
+        const tr = createGarageRow();
+        const cells = tr.querySelectorAll("td");
+        cells[0].textContent = item.unite || "";
+        cells[1].textContent = item.raison || "";
+        garageBody.appendChild(tr);
+      });
+    } else {
+      generateGarageRows(3);
+    }
+
+    localStorage.setItem(STORAGE_KEYS.note, data.note || "");
+    localStorage.setItem(STORAGE_KEYS.date, data.date || "");
+    localStorage.setItem(STORAGE_KEYS.rows, JSON.stringify(data.rows || []));
+
+    console.log("🟢 Dernières données Firebase chargées et localStorage mis à jour.");
+  } else {
+    generateDefaultRows(9);
+    generateGarageRows(3);
+    console.log("📭 Aucune donnée dans Firebase.");
+  }
+});
 
 
     

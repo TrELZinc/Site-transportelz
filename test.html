@@ -161,28 +161,31 @@
       }
     }
     
-#garageTable {
+/* Table garage ultra-compacte */
+table.garage-only {
   width: 100%;
+  min-width: unset !important;
   table-layout: fixed;
   border-collapse: collapse;
 }
 
-#garageTable th,
-#garageTable td {
+table.garage-only th,
+table.garage-only td {
   padding: 8px;
   font-size: 14px;
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
 
-#garageTable th:first-child,
-#garageTable td:first-child {
-  width: 30%; /* UNITÉ */
+table.garage-only th:first-child,
+table.garage-only td:first-child {
+  width: 35%; /* unité */
 }
 
-#garageTable th:last-child,
-#garageTable td:last-child {
-  width: 70%; /* RAISON */
+table.garage-only th:last-child,
+table.garage-only td:last-child {
+  width: 65%; /* raison */
+  text-align: left;
 }
 @media (max-width: 600px) {
   #garageTable th, #garageTable td {
@@ -319,7 +322,7 @@ garageBody.innerHTML = "";
     <tbody id="garageBody"></tbody>
   </table>
 </div>
-
+<table id="garageTable" class="garage-only">
   </div>
 
   <script>

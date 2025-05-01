@@ -164,6 +164,15 @@
 #garageTable {
   width: 100%;
   table-layout: fixed;
+  border-collapse: collapse;
+}
+
+#garageTable th,
+#garageTable td {
+  padding: 8px;
+  font-size: 14px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 #garageTable th:first-child,
@@ -174,8 +183,12 @@
 #garageTable th:last-child,
 #garageTable td:last-child {
   width: 70%; /* RAISON */
-  text-align: left;
-  padding-left: 8px;
+}
+@media (max-width: 600px) {
+  #garageTable th, #garageTable td {
+    font-size: 13px;
+    padding: 6px;
+  }
 }
   </style>
   <!-- Firebase SDKs en mode compat pour HTML classique -->

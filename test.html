@@ -688,8 +688,7 @@ const data = {
     });
   
     
-    // Initialisation
-    function init() {
+function init() {
   elements.resetBtn.addEventListener("click", resetForm);
   elements.saveBtn.addEventListener("click", saveData);
   elements.sendBtn.addEventListener("click", sendForm);
@@ -702,57 +701,56 @@ const data = {
     .limit(1)
     .get()
     .then(snapshot => {
-  if (!snapshot.empty) {
-    const data = snapshot.docs[0].data();
-    elements.dateSelect.value = data.date || "";
-    elements.noteField.value = data.note || "";
+      if (!snapshot.empty) {
+        const data = snapshot.docs[0].data();
+        elements.dateSelect.value = data.date || "";
+        elements.noteField.value = data.note || "";
 
-    data.rows.forEach(row => {
-    const tr = createRow();
-    const cells = tr.querySelectorAll("td");
-    cells[0].textContent = row.rang || "";
-    cells[1].textContent = row.client || "";
-    cells[2].textContent = row.type || "";
-    cells[3].textContent = row.depart || "";
-    cells[4].textContent = row.livraison || "";
-    cells[5].textContent = row.chauffeur || "";
-    cells[6].textContent = row.camion || "";
-    cells[7].textContent = row.remorque || "";
-    elements.tableBody.appendChild(tr);
-  });
-} else {
-  generateDefaultRows(9); // Ajoute 9 lignes si aucune donnée
+        if (Array.isArray(data.rows) && data.rows.length > 0) {
+          data.rows.forEach(row => {
+            const tr = createRow();
+            const cells = tr.querySelectorAll("td");
+            cells[0].textContent = row.rang || "";
+            cells[1].textContent = row.client || "";
+            cells[2].textContent = row.type || "";
+            cells[3].textContent = row.depart || "";
+            cells[4].textContent = row.livraison || "";
+            cells[5].textContent = row.chauffeur || "";
+            cells[6].textContent = row.camion || "";
+            cells[7].textContent = row.remorque || "";
+            elements.tableBody.appendChild(tr);
+          });
+        } else {
+          generateDefaultRows(9);
+        }
+
+        const garageBody = document.getElementById("garageBody");
+        garageBody.innerHTML = "";
+
+        if (Array.isArray(data.garage) && data.garage.length > 0) {
+          data.garage.forEach(item => {
+            const tr = createGarageRow();
+            const cells = tr.querySelectorAll("td");
+            cells[0].textContent = item.unite || "";
+            cells[1].textContent = item.raison || "";
+            garageBody.appendChild(tr);
+          });
+        } else {
+          generateGarageRows(3);
+        }
+
+        localStorage.setItem(STORAGE_KEYS.note, data.note || "");
+        localStorage.setItem(STORAGE_KEYS.date, data.date || "");
+        localStorage.setItem(STORAGE_KEYS.rows, JSON.stringify(data.rows || []));
+
+        console.log("🟢 Données chargées depuis Firebase.");
+      } else {
+        generateDefaultRows(9);
+        generateGarageRows(3);
+        console.log("📭 Aucune donnée trouvée.");
+      }
+    });
 }
-
-    // ✅ Charger garage ici
-    const garageBody = document.getElementById("garageBody");
-    garageBody.innerHTML = "";
-
-    if (Array.isArray(data.garage) && data.garage.length > 0) {
-      data.garage.forEach(item => {
-        const tr = createGarageRow();
-        const cells = tr.querySelectorAll("td");
-        cells[0].textContent = item.unite || "";
-        cells[1].textContent = item.raison || "";
-        garageBody.appendChild(tr);
-      });
-    } else {
-      generateGarageRows(3);
-    }
-
-    localStorage.setItem(STORAGE_KEYS.note, data.note || "");
-    localStorage.setItem(STORAGE_KEYS.date, data.date || "");
-    localStorage.setItem(STORAGE_KEYS.rows, JSON.stringify(data.rows || []));
-
-    console.log("🟢 Dernières données Firebase chargées et localStorage mis à jour.");
-  } else {
-    generateDefaultRows(9);
-    generateGarageRows(3);
-    console.log("📭 Aucune donnée dans Firebase.");
-  }
-});
-
-
     
   // Démarrer l'application quand la page est chargée
 document.addEventListener("DOMContentLoaded", init);

@@ -1,155 +1,165 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Équipements Disponibles</title>
-  <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Disponibilité des Équipements</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
   <style>
-body {
-  font-family: 'Comfortaa', cursive;
-  background-color: #f8f9fa;
-  margin: 0;
-  padding: 0;
-}
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
 
-header {
-  background-color: #111;
-  padding: 1rem;
-  text-align: center;
-}
+    header {
+      background-color: #111;
+      text-align: center;
+      padding: 2rem 1rem 1.5rem;
+    }
 
-header img {
-  height: 50px;
-  margin-bottom: 0.5rem;
-}
+    header img {
+      height: 60px;
+      margin-bottom: 0.75rem;
+    }
 
-header h1 {
-  font-size: 1.5rem;
-  color: white;
-  margin: 0;
-}
+    header h1 {
+      color: #fff;
+      font-size: 1.8rem;
+      margin: 0;
+    }
 
-.section {
-  max-width: 800px;
-  margin: 1rem auto;
-  background-color: #fff;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-  overflow: hidden;
-}
+    #dateAffichee {
+      text-align: center;
+      font-weight: 600;
+      font-size: 1rem;
+      margin: 1.5rem 0;
+    }
 
-.section-title {
-  background-color: #6c757d;
-  color: white;
-  font-weight: bold;
-  text-align: center;
-  text-transform: uppercase;
-  padding: 0.75rem;
-  font-size: 0.95rem;
-}
+    .section {
+      max-width: 900px;
+      margin: 1rem auto;
+      background-color: #fff;
+      border-radius: 0.75rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+    }
 
-.row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid #e9ecef;
-  font-size: 1rem;
-}
+    .section-title {
+      background-color: #e9ecef;
+      color: #333;
+      font-weight: 600;
+      text-align: left;
+      padding: 1rem 1.5rem;
+      font-size: 1rem;
+      border-bottom: 1px solid #dee2e6;
+      text-transform: uppercase;
+    }
 
-.row:last-child {
-  border-bottom: none;
-}
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid #f1f1f1;
+      transition: background 0.2s;
+      cursor: pointer;
+    }
 
-.row span:first-child {
-  font-weight: bold;
-  font-size: 1.1rem;
-}
+    .row:hover {
+      background-color: #f8f9fa;
+    }
 
-.status {
-  font-size: 0.85rem;
-  font-weight: 600;
-  padding: 0.35rem 0.65rem;
-  border-radius: 50rem;
-}
+    .row span:first-child {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
 
-.status.planifie {
-  background-color: #f8d7da;
-  color: #842029;
-}
+    .status {
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.4rem 0.8rem;
+      border-radius: 50rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
 
-.status.disponible {
-  background-color: #d1e7dd;
-  color: #0f5132;
-}
+    .status.planifie {
+      background-color: #fde2e1;
+      color: #b02a37;
+    }
 
-.status.garage {
-  background-color: #dc3545;
-  color: #fff;
-}
+    .status.disponible {
+      background-color: #d1f2e5;
+      color: #0f5132;
+    }
 
-.garage-reason {
-  font-size: 0.8rem;
-  color: #6c757d;
-  margin-top: 0.25rem;
-}
+    .status.garage {
+      background-color: #f44336;
+      color: #fff;
+    }
 
-#dateAffichee {
-  font-size: 0.95rem;
-  font-weight: bold;
-  margin-top: 1rem;
-}
+    .garage-reason {
+      font-size: 0.75rem;
+      color: #6c757d;
+      margin-top: 0.25rem;
+    }
 
-.popup {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: white;
-  border: 2px solid #d32f2f;
-  border-radius: 1rem;
-  padding: 1rem;
-  z-index: 9999;
-  box-shadow: 0 0 20px rgba(0,0,0,0.2);
-  display: none;
-  text-align: center;
-}
+    .popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      border: 2px solid #dc3545;
+      border-radius: 1rem;
+      padding: 2rem;
+      z-index: 9999;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+      display: none;
+      text-align: center;
+    }
 
-.popup button {
-  margin: 0.5rem;
-  padding: 0.5rem 1rem;
-  font-weight: bold;
-  border-radius: 0.5rem;
-  border: none;
-}
+    .popup button {
+      margin: 0.5rem;
+      padding: 0.6rem 1.2rem;
+      font-weight: bold;
+      border-radius: 0.5rem;
+      border: none;
+      font-size: 0.9rem;
+    }
 
-.popup .use-btn {
-  background-color: #198754;
-  color: white;
-}
+    .popup .use-btn {
+      background-color: #198754;
+      color: white;
+    }
 
-.popup .free-btn {
-  background-color: #dc3545;
-  color: white;
-}
+    .popup .free-btn {
+      background-color: #dc3545;
+      color: white;
+    }
 
-@media (max-width: 600px) {
-  .row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.25rem;
-  }
+    .text-center.my-5 a.btn {
+      font-size: 1rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+    }
 
-  .row span:first-child {
-    font-size: 1rem;
-  }
+    @media (max-width: 600px) {
+      .row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+      }
 
-  .status {
-    align-self: flex-end;
-  }
-}
+      .status {
+        align-self: flex-end;
+      }
+    }
   </style>
   <!-- Firebase SDKs -->
 <!-- Firebase SDK (mode compat) -->
@@ -207,43 +217,29 @@ header h1 {
 
 
 </head>
+
 <body>
+
   <header>
     <img src="assets/logo.jpeg" alt="Logo ELZ">
     <h1>Disponibilité des équipements</h1>
   </header>
-  
-<div class="text-center mt-3">
-  <h5 id="dateAffichee" style="font-weight:bold; font-size: 18px;"></h5>
-</div>
+
+  <div id="dateAffichee"></div>
 
   <div class="section" id="equipementList">
     <div class="section-title">3 ESSIEUX</div>
     <div class="row" onclick="toggleStatus(this)"><span>1806</span><span class="status planifie">PLANIFIÉ</span></div>
     <div class="row" onclick="toggleStatus(this)"><span>1906</span><span class="status planifie">PLANIFIÉ</span></div>
     <div class="row" onclick="toggleStatus(this)"><span>2006</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>2506</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>2706</span><span class="status planifie">PLANIFIÉ</span></div>
 
     <div class="section-title">4 ESSIEUX</div>
     <div class="row" onclick="toggleStatus(this)"><span>1505</span><span class="status disponible">DISPONIBLE</span></div>
     <div class="row" onclick="toggleStatus(this)"><span>1605</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>1805</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>1905</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>2205</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>2405</span><span class="status disponible">DISPONIBLE</span></div>
 
     <div class="section-title">CAMIONS</div>
     <div class="row" onclick="toggleStatus(this)"><span>1103</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>1202</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>1203</span><span class="status disponible">DISPONIBLE</span></div>
     <div class="row" onclick="toggleStatus(this)"><span>1303</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>1404</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>1502</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>1503</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>1603</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>1703</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>1803</span><span class="status disponible">DISPONIBLE</span></div>
   </div>
 
   <div class="popup" id="popup">
@@ -255,7 +251,7 @@ header h1 {
   <div class="text-center my-5">
     <a href="linktree.html" class="btn btn-dark">Retour au menu principal</a>
   </div>
-
+  
   <script>
     let currentRow = null;
 

@@ -488,7 +488,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   const dateEl = document.getElementById("dateAffichee");
 
   if (info) {
-    dateEl.textContent = `Dernière mise à jour : ${info.date}`;
+    dateEl.textContent = `Pour la journée du : ${info.date}`;
     updateEquipementStatus(info.camions, info.remorques, info.garage);
   } else {
     dateEl.textContent = "Aucune donnée disponible.";

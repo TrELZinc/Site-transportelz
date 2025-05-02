@@ -311,7 +311,7 @@ async function chargerReparations(noReset = false) {
     // ✅ Affiche le loader
     document.getElementById('loadingOverlay').style.display = 'flex';
 
-    const response = await fetch("https://script.google.com/macros/s/AKfycbyqRVUTiREKf4ND52gXfFaE9nEn0P21xJByw7yzMrfLSjTqa4BEVqPBKtht9Xq3Q40t/exec?read=1&ts=" + Date.now());
+    const response = await fetch("https://script.google.com/macros/s/AKfycbwbo0wGDy6qzmM6dY_ugUDK6po4jhw4fKl6LPD6dFwQEPXjIsa2tl_OZMGtuqSDFIOu/exec?read=1&ts=" + Date.now());
     const data = await response.json();
     console.log("🧪 Données reçues :", data[0]);
 
@@ -752,7 +752,7 @@ function completer(button) {
   showToast("Réparation enregistrée ✅");
 
   // ✅ Envoi serveur
-  fetch("https://script.google.com/macros/s/AKfycbyqRVUTiREKf4ND52gXfFaE9nEn0P21xJByw7yzMrfLSjTqa4BEVqPBKtht9Xq3Q40t/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbwbo0wGDy6qzmM6dY_ugUDK6po4jhw4fKl6LPD6dFwQEPXjIsa2tl_OZMGtuqSDFIOu/exec", {
     method: "POST",
     mode: "no-cors",
     headers: {

@@ -309,26 +309,6 @@ async function fetchGarageEquipments() {
   }
 }
 
-function updateGarageStatus(garageMap) {
-  document.querySelectorAll("#equipementList .row").forEach(row => {
-    const unit = row.querySelector("span")?.textContent?.trim();
-    const badge = row.querySelector(".status");
-
-    if (garageMap.has(unit)) {
-      const reasonText = document.createElement("span");
-      reasonText.className = "reason";
-      reasonText.textContent = `(${garageMap.get(unit)})`;
-      if (!row.querySelector(".reason")) {
-        row.appendChild(reasonText);
-      }
-
-      badge.textContent = "AU GARAGE";
-      badge.classList.remove("planifie", "disponible");
-      badge.classList.add("garage");
-    }
-  });
-}
-
   </script>
 <script>
 
@@ -377,10 +357,10 @@ function updateEquipementStatus(camionsSet, remorquesSet, garageMap) {
 
   rows.forEach(row => {
     const unit = row.querySelector("span")?.textContent?.trim();
-    const badge = row.querySelector(".status");
+    let badge = row.querySelector(".status");
 
     // Supprimer raison précédente si présente
-    const oldReason = row.querySelector(".garage-reason");
+    const oldReason = row.querySelector(".reason");
     if (oldReason) oldReason.remove();
 
     if (!unit || !badge) return;
@@ -390,22 +370,17 @@ function updateEquipementStatus(camionsSet, remorquesSet, garageMap) {
       reasonSpan.className = "reason";
       reasonSpan.textContent = `🛠 ${garageMap.get(unit)}`;
     
-      badge.textContent = "GARAGE";
-      badge.className = "status garage";
+      const badgeClone = badge.cloneNode(true);
+      badgeClone.textContent = "GARAGE";
+      badgeClone.className = "status garage";
     
       const group = document.createElement("div");
       group.className = "status-group";
       group.appendChild(reasonSpan);
-      group.appendChild(badge);
+      group.appendChild(badgeClone);
     
-      // Supprimer l'ancien badge
       badge.remove();
-    
-      // Insérer le groupe à la fin de la ligne
       row.appendChild(group);
-    }
-
-
     } else {
       const isPlanned = camionsSet.has(unit) || remorquesSet.has(unit);
       badge.textContent = isPlanned ? "PLANIFIÉ" : "DISPONIBLE";
@@ -413,6 +388,7 @@ function updateEquipementStatus(camionsSet, remorquesSet, garageMap) {
     }
   });
 }
+
 </script>
 
 

@@ -386,24 +386,25 @@ function updateEquipementStatus(camionsSet, remorquesSet, garageMap) {
     if (!unit || !badge) return;
 
     if (garageMap.has(unit)) {
-      badge.textContent = "GARAGE";
-      badge.className = "status garage";
-      badge.style.background = "#f44336";
-      badge.style.color = "#fff";
-    
-      const group = document.createElement("div");
-      group.className = "status-group";
-    
       const reasonSpan = document.createElement("span");
       reasonSpan.className = "reason";
       reasonSpan.textContent = `🛠 ${garageMap.get(unit)}`;
     
-      // Ajoute raison puis badge dans le groupe
+      badge.textContent = "GARAGE";
+      badge.className = "status garage";
+    
+      const group = document.createElement("div");
+      group.className = "status-group";
       group.appendChild(reasonSpan);
       group.appendChild(badge);
     
-      // Remplace le badge dans le DOM par le groupe
-      badge.parentNode.replaceChild(group, badge);
+      // Supprimer l'ancien badge
+      badge.remove();
+    
+      // Insérer le groupe à la fin de la ligne
+      row.appendChild(group);
+    }
+
 
     } else {
       const isPlanned = camionsSet.has(unit) || remorquesSet.has(unit);

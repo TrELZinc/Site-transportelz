@@ -1,136 +1,227 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Équipements Disponibles</title>
-  <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Disponibilité des Équipements</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
   <style>
-    
-  .row span:first-child {
-  font-size: 22px;
-  font-weight: bold;
-}
+
+    .garage {
+      background: #fff4ce;
+      color: #a85f00;
+    }
+    .reason {
+      font-size: 13px;
+      color: #d32f2f;
+      font-weight: 500;
+      white-space: nowrap;
+      margin-right: 8px; /* 👈 Ajoute cette ligne */
+    }
 
 
     body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f4f6f8;
       margin: 0;
-      font-family: 'Comfortaa', cursive;
-      background: #f5f5f5;
       padding: 0;
+      color: #333;
     }
+
     header {
       background-color: #111;
       text-align: center;
-      padding: 20px 10px;
+      padding: 2rem 1rem 1.5rem;
     }
+
     header img {
-      height: 50px;
-      display: block;
-      margin: 0 auto 10px;
+      height: 60px;
+      margin-bottom: 0.75rem;
     }
+
     header h1 {
+      color: #fff;
+      font-size: 1.8rem;
       margin: 0;
-      font-size: 24px;
-      color: white;
-      letter-spacing: 1px;
     }
-    .date-select input {
-      padding: 10px 18px;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-      font-size: 18px;
-      font-family: 'Comfortaa', cursive;
+
+    #dateAffichee {
       text-align: center;
+      font-weight: 600;
+      font-size: 1rem;
+      margin: 1.5rem 0;
     }
+
     .section {
-      max-width: 800px;
-      margin: 20px auto;
-      background: white;
-      border-radius: 10px;
+      max-width: 900px;
+      margin: 1rem auto;
+      background-color: #fff;
+      border-radius: 0.75rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
       overflow: hidden;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.05);
     }
-    .section-title {
-      background: #848484;
-      padding: 12px 16px;
-      font-weight: bold;
-      font-size: 16px;
-      text-transform: uppercase;
-      display: flex;
-      justify-content: center;
-      color: white;
-      border-bottom: 1px solid #ddd;
-      text-align: center;
+
+      .section-title {
+        background-color: #e9ecef;
+        color: #333;
+        font-weight: 600;
+        text-align: center; /* ✅ centré horizontalement */
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
+        border-bottom: 1px solid #dee2e6;
+        text-transform: uppercase;
+      }
+    
+      .row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #f1f1f1;
+        transition: background 0.2s;
+        cursor: pointer;
+        flex-wrap: wrap;
+        position: relative;
+      }
+            .row:hover {
+        background-color: #f8f9fa;
+      }
+
+      .row span:first-child {
+        font-weight: 700;
+        font-size: 1.3rem; /* ✅ plus gros pour le numéro */
+        flex: 1;
+      }
+    
+      .status {
+        font-size: 0.8rem;
+        font-weight: 600;
+        padding: 0.4rem 0.8rem;
+        border-radius: 50rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-right: 0.5rem; /* ✅ sépare de la raison */
+      }
+
+    .status.planifie {
+      background-color: #fde2e1;
+      color: #b02a37;
     }
-    .row {
-      display: flex;
-      justify-content: space-between;
-      padding: 12px 16px;
-      border-bottom: 1px solid #eee;
-      font-size: 16px;
-      cursor: pointer;
-      align-items: center;
+
+    .status.disponible {
+      background-color: #d1f2e5;
+      color: #0f5132;
     }
-    .status {
-      font-weight: bold;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 14px;
+
+    .status.garage {
+      background-color: #f44336;
+      color: #fff;
     }
-    .planifie {
-      background: #ffd6d6;
-      color: #c62828;
+
+    .garage-reason {
+      font-size: 0.75rem;
+      color: #6c757d;
+      margin-top: 0.25rem;
     }
-    .disponible {
-      background: #d9fdd3;
-      color: #2e7d32;
+
+    .text-center.my-5 a.btn {
+      font-size: 1rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
     }
-    @media (max-width: 600px) {
-  .section-title {
-    flex-direction: column;
-    gap: 6px;
-  }
-  .row {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0;
-  }
+
+/* Styles généraux */
+.status-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
 }
 
-    .popup {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: white;
-      border: 2px solid #d32f2f;
-      border-radius: 12px;
-      padding: 20px;
-      z-index: 9999;
-      box-shadow: 0 0 20px rgba(0,0,0,0.2);
-      display: none;
-      text-align: center;
-    }
-    .popup button {
-      margin: 10px;
-      padding: 8px 16px;
-      border: none;
-      border-radius: 8px;
-      font-weight: bold;
-      font-family: 'Comfortaa';
-      cursor: pointer;
-    }
-    .popup .use-btn {
-      background: #2e7d32;
-      color: white;
-    }
-    .popup .free-btn {
-      background: #d32f2f;
-      color: white;
-    }
+.reason {
+  font-size: 0.75rem;
+  color: #d32f2f; /* 🔴 rouge vif */
+  margin-right: 8px;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .status-group {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    margin-left: auto;
+  }
+
+  .reason {
+    font-size: 0.65rem;           /* 👌 plus petit */
+    color: #d32f2f;               /* 🔴 rouge */
+    white-space: normal;
+    word-break: break-word;
+    max-width: 150px;
+    margin-right: 8px;
+
+    /* Limiter à 2 lignes */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+    
+.row.expandable {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.row .garage-note {
+  font-size: 0.65rem;
+  color: #d32f2f;
+  margin-left: 8px;
+  margin-right: 6px;
+  cursor: pointer;
+  font-style: italic;
+  white-space: nowrap;
+}
+
+.row .garage-reason {
+  display: none;
+  font-size: 0.85rem;
+  color: #d32f2f;
+  margin-top: 0.5rem;
+  width: 100%;
+  padding-left: 1.2rem;
+}
+
+.row.expanded .garage-reason {
+  display: block;
+}
+
+.row-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* 👈 ajoute ceci */
+  flex: 1;
+  gap: 8px;
+  width: 100%; /* 👈 ajoute ceci aussi */
+}
+
+
+.row .garage-note {
+  font-size: 0.65rem;
+  color: #d32f2f;
+  font-style: italic;
+  white-space: nowrap;
+}
+
+.status-group {
+  margin-left: auto;
+}
+
+
   </style>
   <!-- Firebase SDKs -->
 <!-- Firebase SDK (mode compat) -->
@@ -188,87 +279,58 @@
 
 
 </head>
+
 <body>
+
   <header>
     <img src="assets/logo.jpeg" alt="Logo ELZ">
-    <h1>Disponibilité des équipements</h1>
   </header>
+
+  <h1 style="text-align:center; font-size: 1.8rem; font-weight:600; margin-top: 1rem; margin-bottom: 0.5rem;">
+  Disponibilité des équipements
+  </h1>
   
-<div class="text-center mt-3">
-  <h5 id="dateAffichee" style="font-weight:bold; font-size: 18px;"></h5>
-</div>
+  <div id="dateAffichee" style="text-align:center; font-weight:600; font-size: 1rem; margin-bottom: 1.5rem;"></div>
 
   <div class="section" id="equipementList">
-    <div class="section-title">3 ESSIEUX</div>
-    <div class="row" onclick="toggleStatus(this)"><span>1806</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>1906</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>2006</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>2506</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>2706</span><span class="status planifie">PLANIFIÉ</span></div>
+  <div class="section-title">CAMIONS</div>
+  <div class="row"><span>1103</span><span class="status disponible">DISPONIBLE</span></div>
+  <div class="row"><span>1202</span><span class="status disponible">DISPONIBLE</span></div>
+  <div class="row"><span>1203</span><span class="status disponible">DISPONIBLE</span></div>
+  <div class="row"><span>1303</span><span class="status planifie">PLANIFIÉ</span></div>
+  <div class="row"><span>1404</span><span class="status disponible">DISPONIBLE</span></div>
+  <div class="row"><span>1502</span><span class="status planifie">PLANIFIÉ</span></div>
+  <div class="row"><span>1503</span><span class="status planifie">PLANIFIÉ</span></div>
+  <div class="row"><span>1603</span><span class="status disponible">DISPONIBLE</span></div>
+  <div class="row"><span>1703</span><span class="status disponible">DISPONIBLE</span></div>
+  <div class="row"><span>1803</span><span class="status disponible">DISPONIBLE</span></div>
+    
+  <div class="section-title">3 ESSIEUX</div>
+  <div class="row"><span>1806</span><span class="status planifie">PLANIFIÉ</span></div>
+  <div class="row"><span>1906</span><span class="status planifie">PLANIFIÉ</span></div>
+  <div class="row"><span>2006</span><span class="status disponible">DISPONIBLE</span></div>
+  <div class="row"><span>2506</span><span class="status planifie">PLANIFIÉ</span></div>
+  <div class="row"><span>2706</span><span class="status planifie">PLANIFIÉ</span></div>
 
-    <div class="section-title">4 ESSIEUX</div>
-    <div class="row" onclick="toggleStatus(this)"><span>1505</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>1605</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>1805</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>1905</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>2205</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>2405</span><span class="status disponible">DISPONIBLE</span></div>
+  <div class="section-title">4 ESSIEUX</div>
+  <div class="row"><span>1505</span><span class="status disponible">DISPONIBLE</span></div>
+  <div class="row"><span>1605</span><span class="status disponible">DISPONIBLE</span></div>
+  <div class="row"><span>1805</span><span class="status planifie">PLANIFIÉ</span></div>
+  <div class="row"><span>1905</span><span class="status planifie">PLANIFIÉ</span></div>
+  <div class="row"><span>2205</span><span class="status disponible">DISPONIBLE</span></div>
+  <div class="row"><span>2405</span><span class="status disponible">DISPONIBLE</span></div>
 
-    <div class="section-title">CAMIONS</div>
-    <div class="row" onclick="toggleStatus(this)"><span>1103</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>1202</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>1203</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>1303</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>1404</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>1502</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>1503</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>1603</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>1703</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>1803</span><span class="status disponible">DISPONIBLE</span></div>
-  </div>
+</div>
 
-  <div class="popup" id="popup">
-    <p id="popupText"></p>
-    <button class="use-btn" onclick="confirmToggle('planifie')">Utiliser</button>
-    <button class="free-btn" onclick="confirmToggle('disponible')">Libérer</button>
-  </div>
 
   <div class="text-center my-5">
     <a href="linktree.html" class="btn btn-dark">Retour au menu principal</a>
   </div>
-
+  
   <script>
     let currentRow = null;
 
-    function toggleStatus(row) {
-      currentRow = row;
-      const unit = row.querySelector('span').textContent;
-      const status = row.querySelector('.status').classList.contains('planifie') ? 'planifie' : 'disponible';
-
-      document.getElementById('popupText').textContent = status === 'planifie'
-        ? `Libérer ${unit}?`
-        : `Utiliser ${unit}?`;
-
-      document.querySelector('.use-btn').style.display = status === 'disponible' ? 'inline-block' : 'none';
-      document.querySelector('.free-btn').style.display = status === 'planifie' ? 'inline-block' : 'none';
-
-      document.getElementById('popup').style.display = 'block';
-    }
-
-    function confirmToggle(action) {
-      const statusEl = currentRow.querySelector('.status');
-      if (action === 'planifie') {
-        statusEl.textContent = 'PLANIFIÉ';
-        statusEl.classList.remove('disponible');
-        statusEl.classList.add('planifie');
-      } else {
-        statusEl.textContent = 'DISPONIBLE';
-        statusEl.classList.remove('planifie');
-        statusEl.classList.add('disponible');
-      }
-      document.getElementById('popup').style.display = 'none';
-    }
-    async function fetchPlannedEquipments(date) {
+ async function fetchPlannedEquipments(date) {
   const usedCamions = new Set();
   const usedRemorques = new Set();
 
@@ -293,86 +355,147 @@
   }
 }
 
+async function fetchGarageEquipments() {
+  try {
+    const snapshot = await db.collection("garage").get();
+    const garageMap = new Map();
 
-function updateEquipementStatus(camionsSet, remorquesSet) {
-  const rows = document.querySelectorAll("#equipementList .row");
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const unit = data.unit?.trim();
+      const reason = data.reason || "Pas de raison précisée";
+      if (unit) {
+        garageMap.set(unit, reason);
+      }
+    });
 
-  rows.forEach(row => {
-    const unit = row.querySelector("span")?.textContent?.trim().toLowerCase();
-    const badge = row.querySelector(".status");
-
-    if (!unit || !badge) return;
-
-    const estPlanifie = camionsSet.has(unit) || remorquesSet.has(unit);
-
-    badge.textContent = estPlanifie ? "PLANIFIÉ" : "DISPONIBLE";
-    badge.classList.toggle("planifie", estPlanifie);
-    badge.classList.toggle("disponible", !estPlanifie);
-  });
+    updateGarageStatus(garageMap);
+  } catch (error) {
+    console.error("Erreur lors du chargement des données garage:", error);
+  }
 }
 
   </script>
 <script>
 
   async function getLastRecordedEquipments() {
-    try {
-      const snapshot = await db.collection("disponibilites")
-        .orderBy("timestamp", "desc")
-        .limit(1)
-        .get();
+  try {
+    const snapshot = await db.collection("disponibilites")
+      .orderBy("timestamp", "desc")
+      .limit(1)
+      .get();
 
-      if (snapshot.empty) return null;
+    if (snapshot.empty) return null;
 
-      const doc = snapshot.docs[0];
-      const data = doc.data();
+    const doc = snapshot.docs[0];
+    const data = doc.data();
 
-      const usedCamions = new Set();
-      const usedRemorques = new Set();
+    const usedCamions = new Set();
+    const usedRemorques = new Set();
 
-      (data.rows || []).forEach(row => {
-        if (row.camion) usedCamions.add(row.camion.trim());
-        if (row.remorque) usedRemorques.add(row.remorque.trim());
-      });
-
-      return {
-        date: data.date || "Date inconnue",
-        camions: usedCamions,
-        remorques: usedRemorques
-      };
-    } catch (error) {
-      console.error("Erreur Firebase:", error);
-      return null;
-    }
-  }
-
-  function updateEquipementStatus(camionsSet, remorquesSet) {
-    const rows = document.querySelectorAll("#equipementList .row");
-
-    rows.forEach(row => {
-      const unit = row.querySelector("span")?.textContent?.trim();
-      const badge = row.querySelector(".status");
-      if (!unit || !badge) return;
-
-      const estPlanifie = camionsSet.has(unit) || remorquesSet.has(unit);
-
-      badge.textContent = estPlanifie ? "PLANIFIÉ" : "DISPONIBLE";
-      badge.classList.toggle("planifie", estPlanifie);
-      badge.classList.toggle("disponible", !estPlanifie);
+    (data.rows || []).forEach(row => {
+      if (row.camion) usedCamions.add(row.camion.trim());
+      if (row.remorque) usedRemorques.add(row.remorque.trim());
     });
+
+    const garageSet = new Map();
+    (data.garage || []).forEach(item => {
+      if (item.unite) {
+        garageSet.set(item.unite.trim(), item.raison || "Garage");
+      }
+    });
+
+    return {
+      date: data.date || "Date inconnue",
+      camions: usedCamions,
+      remorques: usedRemorques,
+      garage: garageSet
+    };
+  } catch (error) {
+    console.error("Erreur Firebase:", error);
+    return null;
   }
+}
 
-  window.addEventListener("DOMContentLoaded", async () => {
-    const info = await getLastRecordedEquipments();
-    const dateEl = document.getElementById("dateAffichee");
 
-    if (info) {
-      dateEl.textContent = `Dernière mise à jour : ${info.date}`;
-      updateEquipementStatus(info.camions, info.remorques);
+function updateEquipementStatus(camionsSet, remorquesSet, garageMap) {
+  const rows = document.querySelectorAll("#equipementList .row");
+
+  rows.forEach(row => {
+    const unit = row.querySelector("span")?.textContent?.trim();
+    let badge = row.querySelector(".status");
+
+    row.classList.remove("expanded");
+
+    const oldNote = row.querySelector(".garage-note");
+    const oldReason = row.querySelector(".garage-reason");
+    if (oldNote) oldNote.remove();
+    if (oldReason) oldReason.remove();
+
+    if (!unit || !badge) return;
+
+    if (garageMap.has(unit)) {
+      badge.textContent = "GARAGE";
+      badge.className = "status garage";
+
+    const contentWrapper = document.createElement("div");
+    contentWrapper.className = "row-content";
+    
+    // Note
+    const note = document.createElement("span");
+    note.className = "garage-note";
+    note.textContent = "(Cliquez pour voir la raison)";
+    
+    // Remplace l'ordre : [ unité ][ note ][ pastille ]
+    const unitSpan = row.querySelector("span:first-child");
+    const badgeClone = badge.cloneNode(true);
+    badge.remove();
+    
+    contentWrapper.appendChild(unitSpan.cloneNode(true));
+    contentWrapper.appendChild(note);
+    contentWrapper.appendChild(badgeClone);
+    
+    // Vider la ligne et la reconstruire
+    row.innerHTML = "";
+    row.appendChild(contentWrapper);
+    
+    // Raison étendue (ajoutée UNE seule fois)
+    const reason = document.createElement("div");
+    reason.className = "garage-reason";
+    reason.textContent = `🛠 ${garageMap.get(unit)}`;
+    row.appendChild(reason);
+      
+      row.classList.add("expandable");
+      row.onclick = () => row.classList.toggle("expanded");
     } else {
-      dateEl.textContent = "Aucune donnée disponible.";
+      badge.textContent = camionsSet.has(unit) || remorquesSet.has(unit) ? "PLANIFIÉ" : "DISPONIBLE";
+      badge.className = `status ${camionsSet.has(unit) || remorquesSet.has(unit) ? "planifie" : "disponible"}`;
     }
   });
+}
+
+
 </script>
 
+
+<script>
+  
+window.addEventListener("DOMContentLoaded", async () => {
+  const info = await getLastRecordedEquipments();
+  const dateEl = document.getElementById("dateAffichee");
+
+  if (info) {
+    dateEl.textContent = `Dernière mise à jour : ${info.date}`;
+    updateEquipementStatus(info.camions, info.remorques, info.garage);
+  } else {
+    dateEl.textContent = "Aucune donnée disponible.";
+  }
+
+  await fetchGarageEquipments();
+});
+
+
+
+</script>
 </body>
 </html>

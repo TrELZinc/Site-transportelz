@@ -120,40 +120,6 @@
       margin-top: 0.25rem;
     }
 
-    .popup {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #fff;
-      border: 2px solid #dc3545;
-      border-radius: 1rem;
-      padding: 2rem;
-      z-index: 9999;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-      display: none;
-      text-align: center;
-    }
-
-    .popup button {
-      margin: 0.5rem;
-      padding: 0.6rem 1.2rem;
-      font-weight: bold;
-      border-radius: 0.5rem;
-      border: none;
-      font-size: 0.9rem;
-    }
-
-    .popup .use-btn {
-      background-color: #198754;
-      color: white;
-    }
-
-    .popup .free-btn {
-      background-color: #dc3545;
-      color: white;
-    }
-
     .text-center.my-5 a.btn {
       font-size: 1rem;
       padding: 0.75rem 1.5rem;
@@ -240,23 +206,19 @@
 
   <div class="section" id="equipementList">
     <div class="section-title">3 ESSIEUX</div>
-    <div class="row" onclick="toggleStatus(this)"><span>1806</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>1906</span><span class="status planifie">PLANIFIÉ</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>2006</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row"><span>1806</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row"><span>1906</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row"><span>2006</span><span class="status planifie">PLANIFIÉ</span></div>
+
 
     <div class="section-title">4 ESSIEUX</div>
-    <div class="row" onclick="toggleStatus(this)"><span>1505</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>1605</span><span class="status disponible">DISPONIBLE</span></div>
+    <div class="row"><span>1505</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row"><span>1605</span><span class="status planifie">PLANIFIÉ</span></div>
 
     <div class="section-title">CAMIONS</div>
-    <div class="row" onclick="toggleStatus(this)"><span>1103</span><span class="status disponible">DISPONIBLE</span></div>
-    <div class="row" onclick="toggleStatus(this)"><span>1303</span><span class="status planifie">PLANIFIÉ</span></div>
-  </div>
+    <div class="row"><span>1103</span><span class="status planifie">PLANIFIÉ</span></div>
+    <div class="row"><span>1303</span><span class="status planifie">PLANIFIÉ</span></div>
 
-  <div class="popup" id="popup">
-    <p id="popupText"></p>
-    <button class="use-btn" onclick="confirmToggle('planifie')">Utiliser</button>
-    <button class="free-btn" onclick="confirmToggle('disponible')">Libérer</button>
   </div>
 
   <div class="text-center my-5">
@@ -266,35 +228,7 @@
   <script>
     let currentRow = null;
 
-    function toggleStatus(row) {
-      currentRow = row;
-      const unit = row.querySelector('span').textContent;
-      const status = row.querySelector('.status').classList.contains('planifie') ? 'planifie' : 'disponible';
-
-      document.getElementById('popupText').textContent = status === 'planifie'
-        ? `Libérer ${unit}?`
-        : `Utiliser ${unit}?`;
-
-      document.querySelector('.use-btn').style.display = status === 'disponible' ? 'inline-block' : 'none';
-      document.querySelector('.free-btn').style.display = status === 'planifie' ? 'inline-block' : 'none';
-
-      document.getElementById('popup').style.display = 'block';
-    }
-
-    function confirmToggle(action) {
-      const statusEl = currentRow.querySelector('.status');
-      if (action === 'planifie') {
-        statusEl.textContent = 'PLANIFIÉ';
-        statusEl.classList.remove('disponible');
-        statusEl.classList.add('planifie');
-      } else {
-        statusEl.textContent = 'DISPONIBLE';
-        statusEl.classList.remove('planifie');
-        statusEl.classList.add('disponible');
-      }
-      document.getElementById('popup').style.display = 'none';
-    }
-    async function fetchPlannedEquipments(date) {
+ async function fetchPlannedEquipments(date) {
   const usedCamions = new Set();
   const usedRemorques = new Set();
 

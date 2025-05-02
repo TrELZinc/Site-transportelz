@@ -201,12 +201,16 @@
 
   <header>
     <img src="assets/logo.jpeg" alt="Logo ELZ">
-    <h1>Disponibilité des équipements</h1>
   </header>
 
   <div id="dateAffichee"></div>
 
-<div class="section" id="equipementList">
+  <h1 style="text-align:center; font-size: 1.8rem; font-weight:600; margin-bottom: 1rem;">
+    Disponibilité des équipements
+  </h1>
+
+
+  <div class="section" id="equipementList">
   <div class="section-title">3 ESSIEUX</div>
   <div class="row"><span>1806</span><span class="status planifie">PLANIFIÉ</span></div>
   <div class="row"><span>1906</span><span class="status planifie">PLANIFIÉ</span></div>
@@ -395,7 +399,10 @@ window.addEventListener("DOMContentLoaded", async () => {
   } else {
     dateEl.textContent = "Aucune donnée disponible.";
   }
+
+  await fetchGarageEquipments();
 });
+
 
 
 </script>

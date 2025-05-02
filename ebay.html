@@ -322,8 +322,10 @@ document.getElementById("unite").addEventListener("change", async (e) => {
         item.classList.add("mb-2");
         const summary = document.createElement("summary");
         summary.innerHTML = `🔧 ${rep.description}`;
+        const dateObj = new Date(rep.date);
+        const dateLocale = dateObj.toLocaleDateString("fr-CA", { year: "numeric", month: "2-digit", day: "2-digit" });
         const contenu = document.createElement("div");
-        contenu.innerHTML = `<small><strong>Demandeur :</strong> ${rep.nom}<br><strong>ID :</strong> ${rep.id}</small>`;
+        contenu.innerHTML = `<small><strong>Demandeur :</strong> ${rep.nom}<br><strong>Date :</strong> ${dateLocale}</small>`;
         item.appendChild(summary);
         item.appendChild(contenu);
         reparationsListe.appendChild(item);

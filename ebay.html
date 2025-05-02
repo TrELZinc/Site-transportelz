@@ -1,533 +1,339 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Disponibilité des Équipements</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-
+  <title>Réparation mécanique</title>
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
-
-    .garage {
-      background: #fff4ce;
-      color: #a85f00;
-    }
-    .reason {
-      font-size: 13px;
-      color: #d32f2f;
-      font-weight: 500;
-      white-space: nowrap;
-      margin-right: 8px; /* 👈 Ajoute cette ligne */
-    }
-
-
     body {
-      font-family: 'Inter', sans-serif;
-      background-color: #f4f6f8;
-      margin: 0;
-      padding: 0;
-      color: #333;
+      font-family: 'Comfortaa', cursive;
+      background-color: #fefefe;
     }
 
     header {
-      background-color: #111;
+      background-color: #141414;
+      color: white;
+      padding: 20px;
       text-align: center;
-      padding: 2rem 1rem 1.5rem;
     }
 
     header img {
       height: 60px;
-      margin-bottom: 0.75rem;
+      margin-bottom: 10px;
     }
 
-    header h1 {
-      color: #fff;
-      font-size: 1.8rem;
-      margin: 0;
+    .preview-image img {
+      height: 80px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
     }
 
-    #dateAffichee {
-      text-align: center;
-      font-weight: 600;
-      font-size: 1rem;
-      margin: 1.5rem 0;
-    }
-
-    .section {
-      max-width: 900px;
-      margin: 1rem auto;
-      background-color: #fff;
-      border-radius: 0.75rem;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-      overflow: hidden;
-    }
-
-      .section-title {
-        background-color: #e9ecef;
-        color: #333;
-        font-weight: 600;
-        text-align: center; /* ✅ centré horizontalement */
-        padding: 1rem 1.5rem;
-        font-size: 1rem;
-        border-bottom: 1px solid #dee2e6;
-        text-transform: uppercase;
-      }
-    
-      .row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem 1.5rem;
-        border-bottom: 1px solid #f1f1f1;
-        transition: background 0.2s;
-        cursor: pointer;
-        flex-wrap: wrap;
-        position: relative;
-      }
-            .row:hover {
-        background-color: #f8f9fa;
-      }
-
-      .row span:first-child {
-        font-weight: 700;
-        font-size: 1.3rem; /* ✅ plus gros pour le numéro */
-        flex: 1;
-      }
-    
-      .status {
-        font-size: 0.8rem;
-        font-weight: 600;
-        padding: 0.4rem 0.8rem;
-        border-radius: 50rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-right: 0.5rem; /* ✅ sépare de la raison */
-      }
-
-    .status.planifie {
-      background-color: #fde2e1;
-      color: #b02a37;
-    }
-
-    .status.disponible {
-      background-color: #d1f2e5;
-      color: #0f5132;
-    }
-
-    .status.garage {
-      background-color: #f44336;
-      color: #fff;
-    }
-
-    .garage-reason {
-      font-size: 0.75rem;
-      color: #6c757d;
-      margin-top: 0.25rem;
-    }
-
-    .text-center.my-5 a.btn {
-      font-size: 1rem;
-      padding: 0.75rem 1.5rem;
-      border-radius: 0.5rem;
-    }
-
-/* Styles généraux */
-.status-group {
+.remove-btn {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-left: auto;
-}
-
-.reason {
-  font-size: 0.75rem;
-  color: #d32f2f; /* 🔴 rouge vif */
-  margin-right: 8px;
-  white-space: nowrap;
-}
-
-@media (max-width: 600px) {
-  .status-group {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: flex-end;
-    margin-left: auto;
-  }
-
-  .reason {
-    font-size: 0.65rem;           /* 👌 plus petit */
-    color: #d32f2f;               /* 🔴 rouge */
-    white-space: normal;
-    word-break: break-word;
-    max-width: 150px;
-    margin-right: 8px;
-
-    /* Limiter à 2 lignes */
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-}
-    
-.row.expandable {
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.row .garage-note {
-  font-size: 0.65rem;
-  color: #d32f2f;
-  margin-left: 8px;
-  margin-right: 6px;
+  justify-content: center;
+  font-size: 18px;
   cursor: pointer;
-  font-style: italic;
-  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  z-index: 2;
+  border: 2px solid white;
+  transition: transform 0.2s ease;
 }
 
-.row .garage-reason {
-  display: none;
-  font-size: 0.85rem;
-  color: #d32f2f;
-  margin-top: 0.5rem;
-  width: 100%;
-  padding-left: 1.2rem;
+.remove-btn:hover {
+  transform: scale(1.1);
 }
 
-.row.expanded .garage-reason {
-  display: block;
-}
+    .confirmation-popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #141414;
+      color: white;
+      padding: 20px 30px;
+      border-radius: 16px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+      font-size: 18px;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
 
-.row-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between; /* 👈 ajoute ceci */
-  flex: 1;
-  gap: 8px;
-  width: 100%; /* 👈 ajoute ceci aussi */
-}
+    .confirmation-popup.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
 
+    #loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.85);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9998;
+    }
 
-.row .garage-note {
-  font-size: 0.65rem;
-  color: #d32f2f;
-  font-style: italic;
-  white-space: nowrap;
-}
+    #loading-screen.show {
+      display: flex;
+    }
 
-.status-group {
-  margin-left: auto;
-}
+    .loader {
+      border: 6px solid #ccc;
+      border-top: 6px solid #141414;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
 
-.status.garage-expanded {
-  display: flex;
-  align-items: center;
-  justify-content: center; /* 👈 pour le centrage horizontal ET vertical */
-  background-color: #f44336;
-  color: #000;
-  white-space: normal;
-  text-align: center;
-  font-size: 0.7rem;
-  padding: 0.6rem;
-  max-width: 200px;
-  border-radius: 50rem;
-  line-height: 1.2;
-  transition: all 0.2s ease-in-out;
-}
-
-
-
-  </style>
-  <!-- Firebase SDKs -->
-<!-- Firebase SDK (mode compat) -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyD4U85mokKXsAP1AdwClWtcbt8udZrwlAw",
-    authDomain: "sommaireelz.firebaseapp.com",
-    projectId: "sommaireelz",
-    storageBucket: "sommaireelz.firebasestorage.app",
-    messagingSenderId: "171788284751",
-    appId: "1:171788284751:web:694f070d1cafe8b7c04b3a"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-
-  // 🔍 Marquer les remorques planifiées
-  function majRemorquesPlanifiees() {
-    db.collection("disponibilites")
-      .orderBy("timestamp", "desc")
-      .limit(10)
-      .get()
-      .then(snapshot => {
-        const remorquesUtilisées = new Set();
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          if (Array.isArray(data.rows)) {
-            data.rows.forEach(row => {
-              if (row.remorque) remorquesUtilisées.add(row.remorque.trim());
-            });
-          }
-        });
-
-        // Appliquer l'état "PLANIFIÉ" aux remorques utilisées
-        document.querySelectorAll(".row").forEach(row => {
-          const unit = row.querySelector("span")?.textContent?.trim();
-          if (remorquesUtilisées.has(unit)) {
-            const badge = row.querySelector(".status");
-            badge.textContent = "PLANIFIÉ";
-            badge.classList.remove("disponible");
-            badge.classList.add("planifie");
-          }
-        });
-      })
-      .catch(error => {
-        console.error("Erreur Firestore :", error);
-      });
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    @media (max-width: 576px) {
+  .form-control, .form-select, textarea, button {
+    font-size: 1rem;
+    padding: 12px;
   }
 
+  .btn {
+    font-size: 1.1rem;
+  }
 
-</script>
+  header h1 {
+    font-size: 1.25rem;
+  }
 
+  .preview-image img {
+    height: 70px;
+  }
 
+  .confirmation-popup {
+    width: 90%;
+    font-size: 1rem;
+    padding: 16px;
+  }
+}
+
+.preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.preview-image {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  overflow: visible; /* Autorise le X à dépasser */
+  margin-right: 4px;
+}
+
+.preview-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+  </style>
 </head>
-
 <body>
 
   <header>
-    <img src="assets/logo.jpeg" alt="Logo ELZ">
+    <img src="assets/logo.jpeg" alt="Logo ELZ"/>
   </header>
 
-  <h1 style="text-align:center; font-size: 1.8rem; font-weight:600; margin-top: 1rem; margin-bottom: 0.5rem;">
-  Disponibilité des équipements
-  </h1>
+  <div class="container my-5">
+    <form id="repair-form" class="bg-white p-4 rounded shadow-sm">
+      <h2 class="h5 text-center mb-4">📋 Demande de réparation mécanique</h2>
+      <div class="mb-3">
+        <label for="nom" class="form-label">Nom complet</label>
+        <input type="text" class="form-control" id="nom" name="nom" required />
+      </div>
+
+      <div class="mb-3">
+        <label for="unite" class="form-label">Numéro de l'unité</label>
+        <select class="form-select" id="unite" name="unite" required>
+          <option value="">-- Sélectionner une unité --</option>
+          <option>Camion 1103</option>
+          <option>Camion 1202</option>
+          <option>Camion 1203</option>
+          <option>Camion 1303</option>
+          <option>Camion 1404</option>
+          <option>Camion 1502</option>
+          <option>Camion 1503</option>
+          <option>Camion 1602</option>
+          <option>Camion 1603</option>
+          <option>Camion 1703</option>
+          <option>Camion 1803</option>
+          <option>Remorque 1505</option>
+          <option>Remorque 1605</option>
+          <option>Remorque 1805</option>
+          <option>Remorque 1806</option>
+          <option>Remorque 1905</option>
+          <option>Remorque 1906</option>
+          <option>Remorque 2006</option>
+          <option>Remorque 2205</option>
+          <option>Remorque 2405</option>
+          <option>Remorque 2506</option>
+          <option>Remorque 2706</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="description" class="form-label">Description du problème</label>
+        <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+      </div>
+
+<div class="mb-3">
+  <label class="form-label">Ajouter des  ou vidéos</label>
   
-  <div id="dateAffichee" style="text-align:center; font-weight:600; font-size: 1rem; margin-bottom: 1.5rem;"></div>
+  <!-- Bouton customisé -->
+  <div class="d-flex flex-column gap-2">
+    <button type="button" class="btn btn-outline-primary" id="fileTrigger">Choisir des fichiers</button>
+    <input type="file" id="photos" name="photos" accept="image/*,video/mp4,video/quicktime" multiple hidden />
+    <div id="fileNames" class="text-muted small"></div>
+  </div>
 
-  <div class="section" id="equipementList">
-  <div class="section-title">CAMIONS</div>
-  <div class="row"><span>1103</span><span class="status disponible">DISPONIBLE</span></div>
-  <div class="row"><span>1202</span><span class="status disponible">DISPONIBLE</span></div>
-  <div class="row"><span>1203</span><span class="status disponible">DISPONIBLE</span></div>
-  <div class="row"><span>1303</span><span class="status planifie">PLANIFIÉ</span></div>
-  <div class="row"><span>1404</span><span class="status disponible">DISPONIBLE</span></div>
-  <div class="row"><span>1502</span><span class="status planifie">PLANIFIÉ</span></div>
-  <div class="row"><span>1503</span><span class="status planifie">PLANIFIÉ</span></div>
-  <div class="row"><span>1603</span><span class="status disponible">DISPONIBLE</span></div>
-  <div class="row"><span>1703</span><span class="status disponible">DISPONIBLE</span></div>
-  <div class="row"><span>1803</span><span class="status disponible">DISPONIBLE</span></div>
-    
-  <div class="section-title">3 ESSIEUX</div>
-  <div class="row"><span>1806</span><span class="status planifie">PLANIFIÉ</span></div>
-  <div class="row"><span>1906</span><span class="status planifie">PLANIFIÉ</span></div>
-  <div class="row"><span>2006</span><span class="status disponible">DISPONIBLE</span></div>
-  <div class="row"><span>2506</span><span class="status planifie">PLANIFIÉ</span></div>
-  <div class="row"><span>2706</span><span class="status planifie">PLANIFIÉ</span></div>
-
-  <div class="section-title">4 ESSIEUX</div>
-  <div class="row"><span>1505</span><span class="status disponible">DISPONIBLE</span></div>
-  <div class="row"><span>1605</span><span class="status disponible">DISPONIBLE</span></div>
-  <div class="row"><span>1805</span><span class="status planifie">PLANIFIÉ</span></div>
-  <div class="row"><span>1905</span><span class="status planifie">PLANIFIÉ</span></div>
-  <div class="row"><span>2205</span><span class="status disponible">DISPONIBLE</span></div>
-  <div class="row"><span>2405</span><span class="status disponible">DISPONIBLE</span></div>
-
+  <!-- Preview ici -->
+  <div class="d-flex flex-wrap gap-2 mt-2" id="preview"></div>
 </div>
 
+      <button type="submit" class="btn btn-dark w-100">Envoyer</button>
+    </form>
 
-  <div class="text-center my-5">
-    <a href="linktree.html" class="btn btn-dark">Retour au menu principal</a>
+    <a href="linktree.html" class="btn btn-outline-dark w-100 mt-3">Retour au menu principal</a>
   </div>
-  
+
+  <div id="confirmation" class="confirmation-popup">
+    ✅ Demande envoyée avec succès !
+  </div>
+
+  <div id="loading-screen">
+    <div class="loader"></div>
+  </div>
+
   <script>
-    let currentRow = null;
+const form = document.getElementById("repair-form");
+const photosInput = document.getElementById("photos");
+const preview = document.getElementById("preview");
+const confirmation = document.getElementById("confirmation");
+const loading = document.getElementById("loading-screen");
+let imageList = [];
 
- async function fetchPlannedEquipments(date) {
-  const usedCamions = new Set();
-  const usedRemorques = new Set();
+const fileTrigger = document.getElementById("fileTrigger");
+const fileNames = document.getElementById("fileNames");
 
-  try {
-    const snapshot = await db.collection("disponibilites")
-      .where("date", "==", date)
-      .get();
+// Bouton customisé déclenche l'input
+fileTrigger.addEventListener("click", () => {
+  photosInput.click();
+});
 
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      (data.rows || []).forEach(row => {
-        const camion = String(row.camion || "").trim().toLowerCase();
-        const remorque = String(row.remorque || "").trim().toLowerCase();
-        if (camion) usedCamions.add(camion);
-        if (remorque) usedRemorques.add(remorque);
-      });
-    });
+// Affiche les noms des fichiers
+photosInput.addEventListener("change", (e) => {
+  preview.innerHTML = "";
 
-    updateEquipementStatus(usedCamions, usedRemorques);
-  } catch (error) {
-    console.error("Erreur de lecture Firebase:", error);
-  }
-}
+  const files = Array.from(e.target.files);
+  const MAX_FILE_SIZE = 12 * 1024 * 1024;
 
-async function fetchGarageEquipments() {
-  try {
-    const snapshot = await db.collection("garage").get();
-    const garageMap = new Map();
-
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      const unit = data.unit?.trim();
-      const reason = data.reason || "Pas de raison précisée";
-      if (unit) {
-        garageMap.set(unit, reason);
-      }
-    });
-
-    updateGarageStatus(garageMap);
-  } catch (error) {
-    console.error("Erreur lors du chargement des données garage:", error);
-  }
-}
-
-  </script>
-<script>
-
-  async function getLastRecordedEquipments() {
-  try {
-    const snapshot = await db.collection("disponibilites")
-      .orderBy("timestamp", "desc")
-      .limit(1)
-      .get();
-
-    if (snapshot.empty) return null;
-
-    const doc = snapshot.docs[0];
-    const data = doc.data();
-
-    const usedCamions = new Set();
-    const usedRemorques = new Set();
-
-    (data.rows || []).forEach(row => {
-      if (row.camion) usedCamions.add(row.camion.trim());
-      if (row.remorque) usedRemorques.add(row.remorque.trim());
-    });
-
-    const garageSet = new Map();
-    (data.garage || []).forEach(item => {
-      if (item.unite) {
-        garageSet.set(item.unite.trim(), item.raison || "Garage");
-      }
-    });
-
-    return {
-      date: data.date || "Date inconnue",
-      camions: usedCamions,
-      remorques: usedRemorques,
-      garage: garageSet
-    };
-  } catch (error) {
-    console.error("Erreur Firebase:", error);
-    return null;
-  }
-}
-
-
-function updateEquipementStatus(camionsSet, remorquesSet, garageMap) {
-  const rows = document.querySelectorAll("#equipementList .row");
-
-  rows.forEach(row => {
-    const unit = row.querySelector("span")?.textContent?.trim();
-    let badge = row.querySelector(".status");
-
-    row.classList.remove("expanded");
-
-    const oldNote = row.querySelector(".garage-note");
-    const oldReason = row.querySelector(".garage-reason");
-    if (oldNote) oldNote.remove();
-    if (oldReason) oldReason.remove();
-
-    if (!unit || !badge) return;
-
-    if (garageMap.has(unit)) {
-      badge.textContent = "GARAGE";
-      badge.className = "status garage";
-
-    const contentWrapper = document.createElement("div");
-    contentWrapper.className = "row-content";
-    
-    // Note
-    const note = document.createElement("span");
-    note.className = "garage-note";
-    note.textContent = "(Cliquez pour voir la raison)";
-    
-    // Remplace l'ordre : [ unité ][ note ][ pastille ]
-    const unitSpan = row.querySelector("span:first-child");
-    const badgeClone = badge.cloneNode(true);
-    badge.remove();
-    
-    contentWrapper.appendChild(unitSpan.cloneNode(true));
-    contentWrapper.appendChild(note);
-    contentWrapper.appendChild(badgeClone);
-    
-    // Vider la ligne et la reconstruire
-    row.innerHTML = "";
-    row.appendChild(contentWrapper);
-    
-    // Raison étendue (ajoutée UNE seule fois)
-    const reason = document.createElement("div");
-    reason.className = "garage-reason";
-    reason.textContent = `🛠 ${garageMap.get(unit)}`;
-    row.appendChild(reason);
-      
-      row.classList.add("expandable");
-      row.onclick = () => {
-      row.classList.toggle("expanded");
-      const expanded = row.classList.contains("expanded");
-    
-      const badge = row.querySelector(".status.garage");
-      const reasonText = garageMap.get(unit);
-    
-      if (expanded) {
-        badge.textContent = `🛠 ${reasonText}`;
-        badge.classList.add("garage-expanded");
-      } else {
-        badge.textContent = "GARAGE";
-        badge.classList.remove("garage-expanded");
-      }
-    };
-
-    } else {
-      badge.textContent = camionsSet.has(unit) || remorquesSet.has(unit) ? "PLANIFIÉ" : "DISPONIBLE";
-      badge.className = `status ${camionsSet.has(unit) || remorquesSet.has(unit) ? "planifie" : "disponible"}`;
+  files.forEach((file) => {
+    if (file.size > MAX_FILE_SIZE) {
+      alert(`⛔ Le fichier "${file.name}" dépasse la limite de 12 Mo et a été ignoré.`);
+      return;
     }
+
+    const container = document.createElement("div");
+    container.className = "preview-image";
+
+    if (file.type.startsWith("image/")) {
+      const img = document.createElement("img");
+      img.src = URL.createObjectURL(file); // ✅ plus rapide que FileReader
+      container.appendChild(img);
+    } else if (file.type.startsWith("video/")) {
+      const videoIcon = document.createElement("div");
+      videoIcon.style.width = "100%";
+      videoIcon.style.height = "100%";
+      videoIcon.style.display = "flex";
+      videoIcon.style.alignItems = "center";
+      videoIcon.style.justifyContent = "center";
+      videoIcon.style.fontSize = "26px";
+      videoIcon.style.background = "#e9ecef";
+      videoIcon.style.borderRadius = "6px";
+      videoIcon.textContent = "🎥";
+      container.appendChild(videoIcon);
+    }
+
+    const removeBtn = document.createElement("div");
+    removeBtn.className = "remove-btn";
+    removeBtn.innerHTML = `<i class="bi bi-x-lg"></i>`;
+    removeBtn.onclick = () => container.remove();
+
+    container.appendChild(removeBtn);
+    preview.appendChild(container);
   });
-}
 
-
-</script>
-
-
-<script>
-  
-window.addEventListener("DOMContentLoaded", async () => {
-  const info = await getLastRecordedEquipments();
-  const dateEl = document.getElementById("dateAffichee");
-
-  if (info) {
-    dateEl.textContent = `Dernière mise à jour : ${info.date}`;
-    updateEquipementStatus(info.camions, info.remorques, info.garage);
-  } else {
-    dateEl.textContent = "Aucune donnée disponible.";
-  }
-
-  await fetchGarageEquipments();
+  fileNames.textContent = ""; // Pas besoin d'afficher les noms ici
 });
 
 
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-</script>
+  const formData = new FormData();
+  formData.append("nom", form.nom.value);
+  formData.append("unite", form.unite.value);
+  formData.append("description", form.description.value);
+
+  Array.from(photosInput.files).forEach((file, index) => {
+    formData.append("fichier" + index, file);
+  });
+
+  try {
+    loading.classList.add("show");
+
+    await fetch("https://script.google.com/macros/s/AKfycbyXmAWNNYW4K1pmo1KvlJ3a64nu2LxlpQ0kWx4IY5etcQ1liUaUBm2g2z8XLmlMi240/exec", {
+      method: "POST",
+      body: formData
+    });
+
+    loading.classList.remove("show");
+    confirmation.classList.add("show");
+
+    setTimeout(() => {
+      confirmation.classList.remove("show");
+    }, 4000);
+
+    form.reset();
+    preview.innerHTML = "";
+    fileNames.textContent = "";
+  } catch (error) {
+    loading.classList.remove("show");
+    alert("Erreur lors de l'envoi du formulaire : " + error.message);
+  }
+});
+
+ </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

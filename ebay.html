@@ -14,10 +14,12 @@
       color: #a85f00;
     }
     .reason {
-      font-size: 12px;
-      color: #a85f00;
-      margin-left: 10px;
+      font-size: 13px;
+      color: #d32f2f;
+      font-weight: 500;
+      margin-left: 8px;
     }
+
 
     body {
       font-family: 'Inter', sans-serif;
@@ -363,20 +365,15 @@ function updateEquipementStatus(camionsSet, remorquesSet, garageMap) {
     if (!unit || !badge) return;
 
     if (garageMap.has(unit)) {
-      // GARAGE prioritaire
       badge.textContent = "GARAGE";
-      badge.className = "status garage"; // redéfinit complètement
+      badge.className = "status garage";
       badge.style.background = "#f44336";
       badge.style.color = "#fff";
+    
+      const nameSpan = row.querySelector("span:first-child");
+      nameSpan.innerHTML += ` <span class="reason">🛠 ${garageMap.get(unit)}</span>`;
+    }
 
-      const reason = document.createElement("div");
-reason.className = "garage-reason";
-reason.textContent = `Raison : ${garageMap.get(unit)}`;
-reason.style.fontSize = "13px";
-reason.style.color = "#d32f2f";
-
-// On insère la raison APRÈS le badge
-badge.insertAdjacentElement("afterend", reason);
 
     } else {
       const isPlanned = camionsSet.has(unit) || remorquesSet.has(unit);

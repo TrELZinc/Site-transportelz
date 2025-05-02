@@ -132,26 +132,30 @@
       border-radius: 0.5rem;
     }
 
-       .status-group {
+    .status-group {
       display: flex;
       align-items: center;
       gap: 6px;
       margin-left: auto;
-      flex-wrap: wrap; /* ✅ permet le retour à la ligne de la raison */
+      flex-wrap: wrap;
       justify-content: flex-end;
-      max-width: 60%; /* ✅ limite l'espace pour forcer le wrap */
+      max-width: 60%;
+      padding-left: 7px; /* 👉 tasse vers la gauche un peu */
     }
     
     .status-group .reason {
       white-space: normal;
       word-break: break-word;
       max-width: 100%;
+      font-size: 12px;           /* ⬅️ plus petit par défaut */
+      color: #d32f2f;
+      font-weight: 500;
+      line-height: 1.2;
     }
     
     @media (max-width: 600px) {
       .status-group .reason {
-        font-size: 11px;
-        line-height: 1.2;
+        font-size: 11px;         /* ✅ encore plus petit sur mobile */
       }
     }
 

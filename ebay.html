@@ -378,8 +378,8 @@ function updateEquipementStatus(camionsSet, remorquesSet, garageMap) {
      const reasonSpan = document.createElement("span");
       reasonSpan.className = "reason";
       reasonSpan.textContent = `🛠 ${garageMap.get(unit)}`;
-      badge.insertAdjacentElement("afterend", reasonSpan);
-    
+      badge.parentNode.insertBefore(reasonSpan, badge);
+
     } else {
       const isPlanned = camionsSet.has(unit) || remorquesSet.has(unit);
       badge.textContent = isPlanned ? "PLANIFIÉ" : "DISPONIBLE";

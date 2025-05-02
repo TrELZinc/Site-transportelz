@@ -336,25 +336,97 @@ document.getElementById("unite").addEventListener("change", async (e) => {
     console.error("Erreur lors de la vérification des réparations :", err);
   }
 });
+const form = document.getElementById("repair-form");
+const photosInput = document.getElementById("photos");
+const preview = document.getElementById("preview");
+const confirmation = document.getElementById("confirmation");
+const loading = document.getElementById("loading-screen");
+const fileTrigger = document.getElementById("fileTrigger");
+const fileNames = document.getElementById("fileNames");
+
+let imageList = [];
+
+fileTrigger.addEventListener("click", () => {
+  photosInput.click();
+});
+
+photosInput.addEventListener("change", async (e) => {
+  preview.innerHTML = "";
+  imageList = [];
+
+  const files = Array.from(e.target.files);
+  const MAX_FILE_SIZE = 12 * 1024 * 1024;
+
+  for (const file of files) {
+    if (file.size > MAX_FILE_SIZE) {
+      alert(`⛔ Le fichier "${file.name}" dépasse la limite de 12 Mo et a été ignoré.`);
+      continue;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const mediaUrl = reader.result;
+      imageList.push({
+        name: file.name,
+        type: file.type,
+        data: mediaUrl.split(",")[1]
+      });
+
+      const container = document.createElement("div");
+      container.className = "preview-image";
+
+      if (file.type.startsWith("image/")) {
+        const img = document.createElement("img");
+        img.src = mediaUrl;
+        container.appendChild(img);
+      } else {
+        const videoIcon = document.createElement("div");
+        videoIcon.textContent = "🎥";
+        Object.assign(videoIcon.style, {
+          width: "100%", height: "100%", display: "flex", alignItems: "center",
+          justifyContent: "center", fontSize: "26px", background: "#e9ecef", borderRadius: "6px"
+        });
+        container.appendChild(videoIcon);
+      }
+
+      const removeBtn = document.createElement("div");
+      removeBtn.className = "remove-btn";
+      removeBtn.innerHTML = `<i class="bi bi-x-lg"></i>`;
+      removeBtn.onclick = () => {
+        container.remove();
+        imageList = imageList.filter(i => i.name !== file.name);
+      };
+
+      container.appendChild(removeBtn);
+      preview.appendChild(container);
+    };
+
+    reader.readAsDataURL(file);
+  }
+
+  photosInput.value = "";
+});
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const formData = new FormData();
-  formData.append("nom", form.nom.value);
-  formData.append("unite", form.unite.value);
-  formData.append("description", form.description.value);
-
-  Array.from(photosInput.files).forEach((file, index) => {
-    formData.append("fichier" + index, file);
-  });
+  const data = {
+    nom: form.nom.value,
+    unite: form.unite.value,
+    description: form.description.value,
+    images: imageList
+  };
 
   try {
     loading.classList.add("show");
 
-    await fetch("https://script.google.com/macros/s/AKfycbxklFqMIR0AOcC483KMDc3Z1AF1oo8NktxisDmXxG2_n_WU7qqxTAuaPeQiUV1NS1Fu/exec", {
+    await fetch("https://script.google.com/macros/s/AKfycbzAKW969WZq99Zm6_pQoLHAime0-xo6OtpuNtZ-ouoOG7MEVIKo-SPJ3lcbIbYyHJkP/exec", {
       method: "POST",
-      body: formData
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
     });
 
     loading.classList.remove("show");
@@ -367,9 +439,10 @@ form.addEventListener("submit", async (e) => {
     form.reset();
     preview.innerHTML = "";
     fileNames.textContent = "";
-  } catch (error) {
+    imageList = [];
+  } catch (err) {
     loading.classList.remove("show");
-    alert("Erreur lors de l'envoi du formulaire : " + error.message);
+    alert("Erreur lors de l'envoi : " + err.message);
   }
 });
 

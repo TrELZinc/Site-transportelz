@@ -134,15 +134,28 @@
 
     @media (max-width: 600px) {
       .row {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.25rem;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
       }
-
-      .status {
-        align-self: flex-end;
+    
+      .row span:first-child {
+        margin-bottom: 0.5rem;
+      }
+    
+      .status-group {
+        margin-left: auto;
       }
     }
+
+    
+    .status-group {
+      display: flex;    
+      align-items: center;
+      gap: 6px;
+      margin-left: auto;
+    }
+
   </style>
   <!-- Firebase SDKs -->
 <!-- Firebase SDK (mode compat) -->
@@ -377,10 +390,20 @@ function updateEquipementStatus(camionsSet, remorquesSet, garageMap) {
       badge.style.background = "#f44336";
       badge.style.color = "#fff";
     
-     const reasonSpan = document.createElement("span");
+      const group = document.createElement("div");
+      group.className = "status-group";
+      
+      const reasonSpan = document.createElement("span");
       reasonSpan.className = "reason";
       reasonSpan.textContent = `🛠 ${garageMap.get(unit)}`;
-      badge.parentNode.insertBefore(reasonSpan, badge);
+      
+      // Ajoute les 2 éléments dans le bon ordre : raison PUIS pastille
+      group.appendChild(reasonSpan);
+      group.appendChild(badge);
+      
+      // Remplace le badge seul par le group
+      badge.parentNode.appendChild(group);
+
 
     } else {
       const isPlanned = camionsSet.has(unit) || remorquesSet.has(unit);

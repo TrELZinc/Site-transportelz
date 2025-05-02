@@ -227,6 +227,18 @@
   <div id="dateAffichee" style="text-align:center; font-weight:600; font-size: 1rem; margin-bottom: 1.5rem;"></div>
 
   <div class="section" id="equipementList">
+  <div class="section-title">CAMIONS</div>
+  <div class="row"><span>1103</span><span class="status disponible">DISPONIBLE</span></div>
+  <div class="row"><span>1202</span><span class="status disponible">DISPONIBLE</span></div>
+  <div class="row"><span>1203</span><span class="status disponible">DISPONIBLE</span></div>
+  <div class="row"><span>1303</span><span class="status planifie">PLANIFIÉ</span></div>
+  <div class="row"><span>1404</span><span class="status disponible">DISPONIBLE</span></div>
+  <div class="row"><span>1502</span><span class="status planifie">PLANIFIÉ</span></div>
+  <div class="row"><span>1503</span><span class="status planifie">PLANIFIÉ</span></div>
+  <div class="row"><span>1603</span><span class="status disponible">DISPONIBLE</span></div>
+  <div class="row"><span>1703</span><span class="status disponible">DISPONIBLE</span></div>
+  <div class="row"><span>1803</span><span class="status disponible">DISPONIBLE</span></div>
+    
   <div class="section-title">3 ESSIEUX</div>
   <div class="row"><span>1806</span><span class="status planifie">PLANIFIÉ</span></div>
   <div class="row"><span>1906</span><span class="status planifie">PLANIFIÉ</span></div>
@@ -242,17 +254,6 @@
   <div class="row"><span>2205</span><span class="status disponible">DISPONIBLE</span></div>
   <div class="row"><span>2405</span><span class="status disponible">DISPONIBLE</span></div>
 
-  <div class="section-title">CAMIONS</div>
-  <div class="row"><span>1103</span><span class="status disponible">DISPONIBLE</span></div>
-  <div class="row"><span>1202</span><span class="status disponible">DISPONIBLE</span></div>
-  <div class="row"><span>1203</span><span class="status disponible">DISPONIBLE</span></div>
-  <div class="row"><span>1303</span><span class="status planifie">PLANIFIÉ</span></div>
-  <div class="row"><span>1404</span><span class="status disponible">DISPONIBLE</span></div>
-  <div class="row"><span>1502</span><span class="status planifie">PLANIFIÉ</span></div>
-  <div class="row"><span>1503</span><span class="status planifie">PLANIFIÉ</span></div>
-  <div class="row"><span>1603</span><span class="status disponible">DISPONIBLE</span></div>
-  <div class="row"><span>1703</span><span class="status disponible">DISPONIBLE</span></div>
-  <div class="row"><span>1803</span><span class="status disponible">DISPONIBLE</span></div>
 </div>
 
 
@@ -392,18 +393,17 @@ function updateEquipementStatus(camionsSet, remorquesSet, garageMap) {
     
       const group = document.createElement("div");
       group.className = "status-group";
-      
+    
       const reasonSpan = document.createElement("span");
       reasonSpan.className = "reason";
       reasonSpan.textContent = `🛠 ${garageMap.get(unit)}`;
-      
-      // Ajoute les 2 éléments dans le bon ordre : raison PUIS pastille
+    
+      // Ajoute raison puis badge dans le groupe
       group.appendChild(reasonSpan);
       group.appendChild(badge);
-      
-      // Remplace le badge seul par le group
-      badge.parentNode.appendChild(group);
-
+    
+      // Remplace le badge dans le DOM par le groupe
+      badge.parentNode.replaceChild(group, badge);
 
     } else {
       const isPlanned = camionsSet.has(unit) || remorquesSet.has(unit);

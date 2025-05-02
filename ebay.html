@@ -17,9 +17,8 @@
       font-size: 13px;
       color: #d32f2f;
       font-weight: 500;
-      margin-left: 8px;
+      white-space: nowrap;
     }
-
 
     body {
       font-family: 'Inter', sans-serif;
@@ -62,44 +61,47 @@
       overflow: hidden;
     }
 
-    .section-title {
-      background-color: #e9ecef;
-      color: #333;
-      font-weight: 600;
-      text-align: left;
-      padding: 1rem 1.5rem;
-      font-size: 1rem;
-      border-bottom: 1px solid #dee2e6;
-      text-transform: uppercase;
-    }
+      .section-title {
+        background-color: #e9ecef;
+        color: #333;
+        font-weight: 600;
+        text-align: center; /* ✅ centré horizontalement */
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
+        border-bottom: 1px solid #dee2e6;
+        text-transform: uppercase;
+      }
 
-    .row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 1.5rem;
-      border-bottom: 1px solid #f1f1f1;
-      transition: background 0.2s;
-      cursor: pointer;
-    }
+      .row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center; /* ✅ centre verticalement */
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #f1f1f1;
+        transition: background 0.2s;
+        cursor: pointer;
+        flex-wrap: wrap;
+      }
 
-    .row:hover {
-      background-color: #f8f9fa;
-    }
+      .row:hover {
+        background-color: #f8f9fa;
+      }
 
-    .row span:first-child {
-      font-weight: 600;
-      font-size: 1.1rem;
-    }
-
-    .status {
-      font-size: 0.8rem;
-      font-weight: 600;
-      padding: 0.4rem 0.8rem;
-      border-radius: 50rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
+      .row span:first-child {
+        font-weight: 700;
+        font-size: 1.3rem; /* ✅ plus gros pour le numéro */
+        flex: 1;
+      }
+    
+      .status {
+        font-size: 0.8rem;
+        font-weight: 600;
+        padding: 0.4rem 0.8rem;
+        border-radius: 50rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-right: 0.5rem; /* ✅ sépare de la raison */
+      }
 
     .status.planifie {
       background-color: #fde2e1;
@@ -374,8 +376,10 @@ function updateEquipementStatus(camionsSet, remorquesSet, garageMap) {
       badge.style.background = "#f44336";
       badge.style.color = "#fff";
     
-      const nameSpan = row.querySelector("span:first-child");
-      nameSpan.innerHTML += ` <span class="reason">🛠 ${garageMap.get(unit)}</span>`;
+     const reasonSpan = document.createElement("span");
+      reasonSpan.className = "reason";
+      reasonSpan.textContent = `🛠 ${garageMap.get(unit)}`;
+      badge.insertAdjacentElement("afterend", reasonSpan);
     
     } else {
       const isPlanned = camionsSet.has(unit) || remorquesSet.has(unit);

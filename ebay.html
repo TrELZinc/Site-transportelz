@@ -73,19 +73,19 @@
         border-bottom: 1px solid #dee2e6;
         text-transform: uppercase;
       }
-
+    
       .row {
         display: flex;
         justify-content: space-between;
-        align-items: center; /* ✅ centre verticalement */
+        align-items: center;
         padding: 1rem 1.5rem;
         border-bottom: 1px solid #f1f1f1;
         transition: background 0.2s;
         cursor: pointer;
         flex-wrap: wrap;
+        position: relative;
       }
-
-      .row:hover {
+            .row:hover {
         background-color: #f8f9fa;
       }
 
@@ -178,10 +178,12 @@
 }
 
 .row .garage-note {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: #888;
-  margin-left: auto;
+  margin-left: 12px;
+  margin-right: auto;
   cursor: pointer;
+  font-style: italic;
 }
 
 .row .garage-reason {
@@ -189,7 +191,8 @@
   font-size: 0.85rem;
   color: #d32f2f;
   margin-top: 0.5rem;
-  padding-left: 1rem;
+  width: 100%;
+  padding-left: 1.2rem;
 }
 
 .row.expanded .garage-reason {
@@ -401,8 +404,8 @@ function updateEquipementStatus(camionsSet, remorquesSet, garageMap) {
     const unit = row.querySelector("span")?.textContent?.trim();
     let badge = row.querySelector(".status");
 
-    // Reset state
     row.classList.remove("expanded");
+
     const oldNote = row.querySelector(".garage-note");
     const oldReason = row.querySelector(".garage-reason");
     if (oldNote) oldNote.remove();
@@ -411,31 +414,24 @@ function updateEquipementStatus(camionsSet, remorquesSet, garageMap) {
     if (!unit || !badge) return;
 
     if (garageMap.has(unit)) {
-      // Ajout note
+      badge.textContent = "GARAGE";
+      badge.className = "status garage";
+
+      // Ajouter la note (entre l'unité et la pastille)
       const note = document.createElement("span");
       note.className = "garage-note";
       note.textContent = "(Cliquez pour voir la raison)";
-      row.appendChild(note);
+      badge.parentNode.insertBefore(note, badge);
 
-      // Ajout raison (cachée)
+      // Ajouter la raison (en-dessous, cachée)
       const reason = document.createElement("div");
       reason.className = "garage-reason";
       reason.textContent = `🛠 ${garageMap.get(unit)}`;
       row.appendChild(reason);
 
-      // Update badge
-      badge.textContent = "GARAGE";
-      badge.className = "status garage";
-
-      // Marque la ligne comme expandable
       row.classList.add("expandable");
-
-      // Ajoute le comportement d'expand
-      row.onclick = () => {
-        row.classList.toggle("expanded");
-      };
+      row.onclick = () => row.classList.toggle("expanded");
     } else {
-      row.classList.remove("expandable", "expanded");
       badge.textContent = camionsSet.has(unit) || remorquesSet.has(unit) ? "PLANIFIÉ" : "DISPONIBLE";
       badge.className = `status ${camionsSet.has(unit) || remorquesSet.has(unit) ? "planifie" : "disponible"}`;
     }

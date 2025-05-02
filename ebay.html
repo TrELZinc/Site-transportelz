@@ -135,37 +135,36 @@
     .status-group {
       display: flex;
       align-items: center;
-      gap: 6px;
-      margin-left: auto;
-      flex-wrap: wrap;
       justify-content: flex-end;
-      max-width: 60%;
-      padding-left: 7px; /* 👉 tasse vers la gauche un peu */
+      margin-left: auto;
+      gap: 6px;
+      max-width: 100%;
+      flex-wrap: wrap;
     }
     
     .status-group .reason {
-      white-space: normal;
-      word-break: break-word;
-      max-width: 100%;
-      font-size: 12px;           /* ⬅️ plus petit par défaut */
+      font-size: 12px;                /* ✅ plus petit par défaut */
       color: #d32f2f;
       font-weight: 500;
-      line-height: 1.2;
+      white-space: normal;
+      word-break: break-word;
+      max-width: 130px;
+      text-align: right;
     }
     
     @media (max-width: 600px) {
+      .status-group {
+        flex-direction: row;
+        justify-content: flex-end;
+        align-items: center;
+      }
+    
       .status-group .reason {
-        font-size: 11px;         /* ✅ encore plus petit sur mobile */
+        font-size: 10px;              /* ✅ plus petit sur mobile */
+        max-width: 100px;             /* ✅ plus étroit */
       }
     }
 
-    
-    .status-group {
-      display: flex;    
-      align-items: center;
-      gap: 6px;
-      margin-left: auto;
-    }
 
   </style>
   <!-- Firebase SDKs -->

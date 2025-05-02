@@ -306,23 +306,6 @@ function updateGarageStatus(garageMap) {
   });
 }
 
-function updateEquipementStatus(camionsSet, remorquesSet) {
-  const rows = document.querySelectorAll("#equipementList .row");
-
-  rows.forEach(row => {
-    const unit = row.querySelector("span")?.textContent?.trim().toLowerCase();
-    const badge = row.querySelector(".status");
-
-    if (!unit || !badge) return;
-
-    const estPlanifie = camionsSet.has(unit) || remorquesSet.has(unit);
-
-    badge.textContent = estPlanifie ? "PLANIFIÉ" : "DISPONIBLE";
-    badge.classList.toggle("planifie", estPlanifie);
-    badge.classList.toggle("disponible", !estPlanifie);
-  });
-}
-
   </script>
 <script>
 
@@ -403,47 +386,7 @@ row.insertBefore(reason, badge);
   });
 }
 </script>
-  <script>
-  async function markGarageUnits() {
-    try {
-      const snapshot = await db.collection("disponibilites")
-        .orderBy("timestamp", "desc")
-        .limit(1)
-        .get();
 
-      if (snapshot.empty) return;
-
-      const data = snapshot.docs[0].data();
-      const garageList = data.garage || [];
-
-      document.querySelectorAll("#equipementList .row").forEach(row => {
-        const unit = row.querySelector("span")?.textContent?.trim();
-        const badge = row.querySelector(".status");
-
-        const garageEntry = garageList.find(g => g.unite?.trim() === unit);
-        if (garageEntry) {
-          badge.textContent = "AU GARAGE";
-          badge.className = "status garage";
-
-          // Ajouter la raison si absente
-          if (!row.querySelector(".reason")) {
-            const reason = document.createElement("span");
-            reason.className = "reason";
-            reason.textContent = `(${garageEntry.raison || "raison inconnue"})`;
-            row.appendChild(reason);
-          }
-        }
-      });
-    } catch (error) {
-      console.error("Erreur récupération garage:", error);
-    }
-  }
-
-  // Exécution lors du chargement
-  window.addEventListener("DOMContentLoaded", () => {
-    markGarageUnits();
-  });
-</script>
 
 <script>
   
@@ -453,13 +396,12 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   if (info) {
     dateEl.textContent = `Dernière mise à jour : ${info.date}`;
-    updateEquipementStatus(info.camions, info.remorques);
+    updateEquipementStatus(info.camions, info.remorques, info.garage);
   } else {
     dateEl.textContent = "Aucune donnée disponible.";
   }
-
-  await fetchGarageEquipments(); // <- appel ici
 });
+
 
 </script>
 </body>

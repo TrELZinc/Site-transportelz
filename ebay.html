@@ -142,17 +142,12 @@
 
 .reason {
   font-size: 0.75rem;
-  color: #6c757d;
+  color: #d32f2f; /* 🔴 rouge vif */
   margin-right: 8px;
   white-space: nowrap;
 }
 
-/* Styles spécifiques pour les petits écrans */
 @media (max-width: 600px) {
-  .row {
-    flex-wrap: wrap;
-  }
-
   .status-group {
     flex-direction: row;
     flex-wrap: wrap;
@@ -162,11 +157,18 @@
   }
 
   .reason {
-    font-size: 0.65rem;
+    font-size: 0.65rem;           /* 👌 plus petit */
+    color: #d32f2f;               /* 🔴 rouge */
     white-space: normal;
     word-break: break-word;
     max-width: 150px;
     margin-right: 8px;
+
+    /* Limiter à 2 lignes */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 }
 

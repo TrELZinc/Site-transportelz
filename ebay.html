@@ -132,29 +132,29 @@
       border-radius: 0.5rem;
     }
 
-    .status-group {
+       .status-group {
       display: flex;
       align-items: center;
       gap: 6px;
       margin-left: auto;
+      flex-wrap: wrap; /* ✅ permet le retour à la ligne de la raison */
+      justify-content: flex-end;
+      max-width: 60%; /* ✅ limite l'espace pour forcer le wrap */
+    }
+    
+    .status-group .reason {
+      white-space: normal;
+      word-break: break-word;
+      max-width: 100%;
     }
     
     @media (max-width: 600px) {
-      .status-group {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        margin-left: auto;
-      }
-    
-      .reason {
-        white-space: normal;
-        word-break: break-word;
-        max-width: 120px;
+      .status-group .reason {
         font-size: 11px;
-        line-height: 1.1;
+        line-height: 1.2;
       }
     }
+
     
     .status-group {
       display: flex;    

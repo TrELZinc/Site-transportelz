@@ -142,13 +142,24 @@
       .row span:first-child {
         margin-bottom: 0.5rem;
       }
-    
+      
+    .status-group {
+      flex-direction: column;
+      align-items: flex-end;
+      text-align: right;
+    }
+      
+      .reason {
+        white-space: normal;
+        word-break: break-word;
+        max-width: 150px; /* ou ce que tu juges joli sur ton design */
+      }
+
       .status-group {
         margin-left: auto;
       }
     }
 
-    
     .status-group {
       display: flex;    
       align-items: center;

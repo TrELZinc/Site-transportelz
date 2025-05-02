@@ -171,6 +171,30 @@
     overflow: hidden;
   }
 }
+    
+.row.expandable {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.row .garage-note {
+  font-size: 0.75rem;
+  color: #888;
+  margin-left: auto;
+  cursor: pointer;
+}
+
+.row .garage-reason {
+  display: none;
+  font-size: 0.85rem;
+  color: #d32f2f;
+  margin-top: 0.5rem;
+  padding-left: 1rem;
+}
+
+.row.expanded .garage-reason {
+  display: block;
+}
 
 
 
@@ -377,35 +401,47 @@ function updateEquipementStatus(camionsSet, remorquesSet, garageMap) {
     const unit = row.querySelector("span")?.textContent?.trim();
     let badge = row.querySelector(".status");
 
-    // Supprimer raison précédente si présente
-    const oldReason = row.querySelector(".reason");
+    // Reset state
+    row.classList.remove("expanded");
+    const oldNote = row.querySelector(".garage-note");
+    const oldReason = row.querySelector(".garage-reason");
+    if (oldNote) oldNote.remove();
     if (oldReason) oldReason.remove();
 
     if (!unit || !badge) return;
 
     if (garageMap.has(unit)) {
-      const reasonSpan = document.createElement("span");
-      reasonSpan.className = "reason";
-      reasonSpan.textContent = `🛠 ${garageMap.get(unit)}`;
-    
-      const badgeClone = badge.cloneNode(true);
-      badgeClone.textContent = "GARAGE";
-      badgeClone.className = "status garage";
-    
-      const group = document.createElement("div");
-      group.className = "status-group";
-      group.appendChild(reasonSpan);
-      group.appendChild(badgeClone);
-    
-      badge.remove();
-      row.appendChild(group);
+      // Ajout note
+      const note = document.createElement("span");
+      note.className = "garage-note";
+      note.textContent = "(Cliquez pour voir la raison)";
+      row.appendChild(note);
+
+      // Ajout raison (cachée)
+      const reason = document.createElement("div");
+      reason.className = "garage-reason";
+      reason.textContent = `🛠 ${garageMap.get(unit)}`;
+      row.appendChild(reason);
+
+      // Update badge
+      badge.textContent = "GARAGE";
+      badge.className = "status garage";
+
+      // Marque la ligne comme expandable
+      row.classList.add("expandable");
+
+      // Ajoute le comportement d'expand
+      row.onclick = () => {
+        row.classList.toggle("expanded");
+      };
     } else {
-      const isPlanned = camionsSet.has(unit) || remorquesSet.has(unit);
-      badge.textContent = isPlanned ? "PLANIFIÉ" : "DISPONIBLE";
-      badge.className = `status ${isPlanned ? "planifie" : "disponible"}`;
+      row.classList.remove("expandable", "expanded");
+      badge.textContent = camionsSet.has(unit) || remorquesSet.has(unit) ? "PLANIFIÉ" : "DISPONIBLE";
+      badge.className = `status ${camionsSet.has(unit) || remorquesSet.has(unit) ? "planifie" : "disponible"}`;
     }
   });
 }
+
 
 </script>
 

@@ -8,6 +8,17 @@
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
   <style>
+
+    .garage {
+      background: #fff4ce;
+      color: #a85f00;
+    }
+    .reason {
+      font-size: 12px;
+      color: #a85f00;
+      margin-left: 10px;
+    }
+
     body {
       font-family: 'Inter', sans-serif;
       background-color: #f4f6f8;
@@ -308,6 +319,45 @@
   }
 }
 
+async function fetchGarageEquipments() {
+  try {
+    const snapshot = await db.collection("garage").get();
+    const garageMap = new Map();
+
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const unit = data.unit?.trim();
+      const reason = data.reason || "Pas de raison précisée";
+      if (unit) {
+        garageMap.set(unit, reason);
+      }
+    });
+
+    updateGarageStatus(garageMap);
+  } catch (error) {
+    console.error("Erreur lors du chargement des données garage:", error);
+  }
+}
+
+function updateGarageStatus(garageMap) {
+  document.querySelectorAll("#equipementList .row").forEach(row => {
+    const unit = row.querySelector("span")?.textContent?.trim();
+    const badge = row.querySelector(".status");
+
+    if (garageMap.has(unit)) {
+      const reasonText = document.createElement("span");
+      reasonText.className = "reason";
+      reasonText.textContent = `(${garageMap.get(unit)})`;
+      if (!row.querySelector(".reason")) {
+        row.appendChild(reasonText);
+      }
+
+      badge.textContent = "AU GARAGE";
+      badge.classList.remove("planifie", "disponible");
+      badge.classList.add("garage");
+    }
+  });
+}
 
 function updateEquipementStatus(camionsSet, remorquesSet) {
   const rows = document.querySelectorAll("#equipementList .row");
@@ -407,17 +457,21 @@ row.insertBefore(reason, badge);
 }
 </script>
 <script>
-  window.addEventListener("DOMContentLoaded", async () => {
-    const info = await getLastRecordedEquipments();
-    const dateEl = document.getElementById("dateAffichee");
+  
+window.addEventListener("DOMContentLoaded", async () => {
+  const info = await getLastRecordedEquipments();
+  const dateEl = document.getElementById("dateAffichee");
 
-    if (info) {
-      dateEl.textContent = `Dernière mise à jour : ${info.date}`;
-      updateEquipementStatus(info.camions, info.remorques, info.garage);
-    } else {
-      dateEl.textContent = "Aucune donnée disponible.";
-    }
-  });
+  if (info) {
+    dateEl.textContent = `Dernière mise à jour : ${info.date}`;
+    updateEquipementStatus(info.camions, info.remorques);
+  } else {
+    dateEl.textContent = "Aucune donnée disponible.";
+  }
+
+  await fetchGarageEquipments(); // <- appel ici
+});
+
 </script>
 </body>
 </html>

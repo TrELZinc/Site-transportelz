@@ -372,9 +372,7 @@ function updateEquipementStatus(camionsSet, remorquesSet, garageMap) {
     
       const nameSpan = row.querySelector("span:first-child");
       nameSpan.innerHTML += ` <span class="reason">🛠 ${garageMap.get(unit)}</span>`;
-    }
-
-
+    
     } else {
       const isPlanned = camionsSet.has(unit) || remorquesSet.has(unit);
       badge.textContent = isPlanned ? "PLANIFIÉ" : "DISPONIBLE";

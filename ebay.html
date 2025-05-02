@@ -132,38 +132,44 @@
       border-radius: 0.5rem;
     }
 
-    .status-group {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      margin-left: auto;
-      gap: 6px;
-      max-width: 100%;
-      flex-wrap: wrap;
-    }
-    
-    .status-group .reason {
-      font-size: 12px;                /* ✅ plus petit par défaut */
-      color: #d32f2f;
-      font-weight: 500;
-      white-space: normal;
-      word-break: break-word;
-      max-width: 130px;
-      text-align: right;
-    }
-    
-    @media (max-width: 600px) {
-      .status-group {
-        flex-direction: row;
-        justify-content: flex-end;
-        align-items: center;
-      }
-    
-      .status-group .reason {
-        font-size: 10px;              /* ✅ plus petit sur mobile */
-        max-width: 100px;             /* ✅ plus étroit */
-      }
-    }
+/* Styles généraux */
+.status-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.reason {
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin-right: 8px;
+  white-space: nowrap;
+}
+
+/* Styles spécifiques pour les petits écrans */
+@media (max-width: 600px) {
+  .row {
+    flex-wrap: wrap;
+  }
+
+  .status-group {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    margin-left: auto;
+  }
+
+  .reason {
+    font-size: 0.65rem;
+    white-space: normal;
+    word-break: break-word;
+    max-width: 150px;
+    margin-right: 8px;
+  }
+}
+
 
 
   </style>

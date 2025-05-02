@@ -200,6 +200,23 @@
   display: block;
 }
 
+.row-content {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 8px;
+}
+
+.row .garage-note {
+  font-size: 0.65rem;
+  color: #d32f2f;
+  font-style: italic;
+  white-space: nowrap;
+}
+
+.status-group {
+  margin-left: auto;
+}
 
 
   </style>
@@ -418,18 +435,33 @@ function updateEquipementStatus(camionsSet, remorquesSet, garageMap) {
       badge.textContent = "GARAGE";
       badge.className = "status garage";
 
-      // Ajouter la note (entre l'unité et la pastille)
-      const note = document.createElement("span");
-      note.className = "garage-note";
-      note.textContent = "(Cliquez pour voir la raison)";
-      badge.parentNode.insertBefore(note, badge);
-
-      // Ajouter la raison (en-dessous, cachée)
-      const reason = document.createElement("div");
-      reason.className = "garage-reason";
-      reason.textContent = `🛠 ${garageMap.get(unit)}`;
-      row.appendChild(reason);
-
+    const contentWrapper = document.createElement("div");
+    contentWrapper.className = "row-content";
+    
+    // Note
+    const note = document.createElement("span");
+    note.className = "garage-note";
+    note.textContent = "(Cliquez pour voir la raison)";
+    
+    // Remplace l'ordre : [ unité ][ note ][ pastille ]
+    const unitSpan = row.querySelector("span:first-child");
+    const badgeClone = badge.cloneNode(true);
+    badge.remove();
+    
+    contentWrapper.appendChild(unitSpan.cloneNode(true));
+    contentWrapper.appendChild(note);
+    contentWrapper.appendChild(badgeClone);
+    
+    // Vider la ligne et la reconstruire
+    row.innerHTML = "";
+    row.appendChild(contentWrapper);
+    
+    // Raison étendue (ajoutée UNE seule fois)
+    const reason = document.createElement("div");
+    reason.className = "garage-reason";
+    reason.textContent = `🛠 ${garageMap.get(unit)}`;
+    row.appendChild(reason);
+      
       row.classList.add("expandable");
       row.onclick = () => row.classList.toggle("expanded");
     } else {

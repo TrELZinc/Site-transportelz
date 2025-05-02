@@ -375,8 +375,8 @@ reason.textContent = `Raison : ${garageMap.get(unit)}`;
 reason.style.fontSize = "13px";
 reason.style.color = "#d32f2f";
 
-// On insère la raison avant le badge
-row.insertBefore(reason, badge);
+// On insère la raison APRÈS le badge
+badge.insertAdjacentElement("afterend", reason);
 
     } else {
       const isPlanned = camionsSet.has(unit) || remorquesSet.has(unit);

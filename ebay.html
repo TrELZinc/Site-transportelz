@@ -132,33 +132,27 @@
       border-radius: 0.5rem;
     }
 
+    .status-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: auto;
+    }
+    
     @media (max-width: 600px) {
-      .row {
-        flex-direction: row;
-        flex-wrap: wrap;
-        align-items: center;
+      .status-group {
+        flex-direction: column;
+        align-items: flex-end;
+        text-align: right;
       }
     
-      .row span:first-child {
-        margin-bottom: 0.5rem;
-      }
-      
-    .status-group {
-      flex-direction: column;
-      align-items: flex-end;
-      text-align: right;
-    }
-      
       .reason {
         white-space: normal;
         word-break: break-word;
-        max-width: 150px; /* ou ce que tu juges joli sur ton design */
-      }
-
-      .status-group {
-        margin-left: auto;
+        max-width: 150px;
       }
     }
+
 
     .status-group {
       display: flex;    

@@ -221,6 +221,23 @@
   margin-left: auto;
 }
 
+.status.garage-expanded {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* 👈 pour le centrage horizontal ET vertical */
+  background-color: #f44336;
+  color: #000;
+  white-space: normal;
+  text-align: center;
+  font-size: 0.7rem;
+  padding: 0.6rem;
+  max-width: 200px;
+  border-radius: 50rem;
+  line-height: 1.2;
+  transition: all 0.2s ease-in-out;
+}
+
+
 
   </style>
   <!-- Firebase SDKs -->
@@ -466,7 +483,22 @@ function updateEquipementStatus(camionsSet, remorquesSet, garageMap) {
     row.appendChild(reason);
       
       row.classList.add("expandable");
-      row.onclick = () => row.classList.toggle("expanded");
+      row.onclick = () => {
+      row.classList.toggle("expanded");
+      const expanded = row.classList.contains("expanded");
+    
+      const badge = row.querySelector(".status.garage");
+      const reasonText = garageMap.get(unit);
+    
+      if (expanded) {
+        badge.textContent = `🛠 ${reasonText}`;
+        badge.classList.add("garage-expanded");
+      } else {
+        badge.textContent = "GARAGE";
+        badge.classList.remove("garage-expanded");
+      }
+    };
+
     } else {
       badge.textContent = camionsSet.has(unit) || remorquesSet.has(unit) ? "PLANIFIÉ" : "DISPONIBLE";
       badge.className = `status ${camionsSet.has(unit) || remorquesSet.has(unit) ? "planifie" : "disponible"}`;

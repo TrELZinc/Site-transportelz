@@ -8,54 +8,34 @@
   <style>
   
 
-@media print {
-  /* Grille d'impression propre */
-  .print-pastilles {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr); /* 3 pastilles par ligne */
-    gap: 16px;
-    max-width: 960px;
-    margin: auto;
-    page-break-inside: avoid;
+  @media print {
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .printZone {
+    padding: 0 !important;
+    margin: 0 auto !important;
+    width: 100% !important;
   }
 
   .pastille {
-    break-inside: avoid;
-    page-break-inside: avoid;
-    padding: 10px !important;
-    font-size: 0.85rem;
-    min-height: auto !important;
-    max-height: none !important;
+    padding: 8px !important;
+    font-size: 0.78rem !important;
+    min-height: unset !important;
     height: auto !important;
   }
 
-  .pastille h5 {
-    font-size: 1rem;
-    margin-bottom: 0.4rem;
-  }
-
-  .pastille .details div {
-    margin-bottom: 2px !important;
-    font-size: 0.85rem;
-  }
-
-  .date-header {
-    font-size: 0.9rem !important;
-    padding: 4px 6px !important;
-  }
-
-  .print-summary {
-    page-break-before: avoid;
-    margin-top: 2rem;
-  }
-
   .summary-box {
-    page-break-before: always;
-    padding: 0.75rem !important;
+    background: #e6f4ea;
     font-size: 0.9rem;
+    padding: 12px !important;
+    margin-top: 16px !important;
+    page-break-inside: avoid;
   }
 
-  .summary-box .ajustements-manuels,
+  .ajustements-manuels,
   .summary-box .mt-4,
   .summary-box h6,
   .summary-box .row {
@@ -63,10 +43,6 @@
   }
 }
 
-/* Par défaut : les taux sont à leur position normale */
-.order-mobile-last {
-  order: 0;
-}
 
 /* Sur mobile : on les pousse après le bouton */
 @media (max-width: 767.98px) {
@@ -351,7 +327,7 @@ body {
   const db = firebase.firestore();
 </script>
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbyNCeOMXPM8v-eG_X_x56RgninO1LWAMNAOZyQ7mHPUY22KyDvCd8_2HeDUh-E07v7C/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzr-IZHNMZYnrzyCDqqyaPwgokJDlT5dd9jYLivINM_FUSAVvZ0fgtNrvLnUZEFnbt3/exec";
 
 let primeDouane = 0;
 let primeForfait = 0;
@@ -467,67 +443,70 @@ let index = 0;
     `;
     }
   let jourKm = 0, jourMin = 0, jourForfait = 0, jourDouane = 0, jourPrime = 0;
-
-voyages.forEach((voyage, idx) => {
-  let forfait = 0;
-  let douane = 0;
-
-  // ⚠️ Exception spéciale : Saint-Basile → Stanstead
-  if (
-    voyage.type === "kilometrage" &&
-    voyage.origine?.toLowerCase().includes("st-basile") &&
-    voyage.destination?.toLowerCase().includes("stanstead")
-  ) {
-    const prochain = voyages[idx + 1];
-    if (prochain?.origine?.toLowerCase().includes("st-basile")) {
-      // KM x2 et ajout du forfait
-      voyage.km = parseFloat(voyage.km) * 2;
-      voyage.prime_forfait = primeForfait;
-    } else if (prochain?.origine?.toLowerCase().includes("stanstead")) {
-      // KM normaux et pas de forfait
-      voyage.prime_forfait = 0;
-    }
+  let parsedAjustForfait = 0;
+  if (voyages.length > 0) {
+    parsedAjustForfait = parseFloat((voyages[0].ajust_forfait ?? 0).toString().replace(",", "."));
   }
+
+  // Trouver la somme forfait du jour → prendre une seule fois (ex: première ligne du jour)
+  const ligneDuJour = voyages[0];
+  const totalForfaitJour = parseFloat(ligneDuJour?.prime_forfait?.toString().replace(",", ".")) || 0;
+  const nbKmVoyages = voyages.filter(v => v.type === "kilometrage").length;
+  const forfaitParVoyage = nbKmVoyages > 0 ? totalForfaitJour / nbKmVoyages : 0;
+
+  console.log(`✅ Forfait réparti : ${totalForfaitJour.toFixed(2)} $ ÷ ${nbKmVoyages} = ${forfaitParVoyage.toFixed(2)} $/voyage`);
+
+
+    voyages.forEach((voyage, idx) => {
+    let forfait = 0;
+    let douane = 0;
+    let km = 0;
 
   details.innerHTML += `<div class="fw-bold mb-1">Voyage ${idx + 1} :</div>`;
   details.innerHTML += `<div class="mb-1">(${voyage.origine} → ${voyage.destination})</div>`;
 
   const parsedAjustHr = parseFloat((voyage.ajust_hr ?? 0).toString().replace(",", "."));
   const parsedAjustKm = parseFloat((voyage.ajust_km ?? 0).toString().replace(",", "."));
+  const parsedAjustForfaitVoyage = parseFloat((voyage.ajust_forfait ?? 0).toString().replace(",", "."));
 
-  if (!isNaN(parsedAjustKm)) {
-    jourAjustKm += parsedAjustKm;
-  }
-  if (!isNaN(parsedAjustHr)) {
-    jourAjustMin += parsedAjustHr * 60;
-  }
+  if (!isNaN(parsedAjustKm)) jourAjustKm += parsedAjustKm;
+  if (!isNaN(parsedAjustHr)) jourAjustMin += parsedAjustHr * 60;
+  if (voyage.ajust_raison && !jourAjustRaison) jourAjustRaison = voyage.ajust_raison;
 
-  if (voyage.ajust_raison && !jourAjustRaison) {
-    jourAjustRaison = voyage.ajust_raison;
-  }
+  if (voyage.type === "kilometrage") {
+  km = parseFloat(voyage.km) || 0;
+  forfait = forfaitParVoyage;
 
-  if (voyage.type === "kilometrage" || voyage.type === "retour") {
-    const km = parseFloat(voyage.km) || 0;
-    jourKm += km;
 
-    forfait = parseFloat(voyage.prime_forfait) || 0;
-    douane = parseFloat(voyage.prime_douane) || 0;
-
-    if (voyage.origine?.toLowerCase().includes("vimont")) {
+  // Cas spécial : St-Basile → Stanstead
+  if (
+    voyage.origine?.toLowerCase().includes("st-basile") &&
+    voyage.destination?.toLowerCase().includes("stanstead")
+  ) {
+    const prochain = voyages[idx + 1];
+    if (prochain?.origine?.toLowerCase().includes("st-basile")) {
+      km *= 2;
+      forfait = primeForfait;
+    } else if (prochain?.origine?.toLowerCase().includes("stanstead")) {
       forfait = 0;
     }
+  }
 
-    jourForfait += forfait;
+    douane = parseFloat(voyage.prime_douane) || 0;
+
+    voyage.prime_forfait = forfait;
     jourDouane += douane;
+    jourKm += km;
+    jourForfait += forfait;
+    jourDouane += parseFloat(voyage.prime_douane) || 0;
 
     details.innerHTML += `<div><strong>KM:</strong> ${km}</div>`;
     details.innerHTML += `<div><strong>Forfait:</strong> ${forfait.toFixed(2)} $</div>`;
-    if (douane > 0) {
-      details.innerHTML += `<div><strong>Douane:</strong> ${douane.toFixed(2)} $</div>`;
+    if (voyage.prime_douane > 0) {
+      details.innerHTML += `<div><strong>Douane:</strong> ${parseFloat(voyage.prime_douane).toFixed(2)} $</div>`;
     }
-  }
 
-  else if (voyage.type === "heure") {
+  } else if (voyage.type === "heure") {
     const minutes = parseFloat(voyage.minutes) || 0;
     const h = Math.floor(minutes / 60);
     const m = minutes % 60;
@@ -556,6 +535,13 @@ voyages.forEach((voyage, idx) => {
 
   jourPrime += forfait + douane;
 });
+
+
+if (parsedAjustForfait > 0) {
+  jourForfait += parsedAjustForfait;
+  details.innerHTML += `<div class="text-primary"><strong>Ajustement forfait total:</strong> +${parsedAjustForfait.toFixed(2)} $</div>`;
+}
+
 
 // Limite visuelle pour impression (si trop de voyages)
 if (voyages.length > 6) {
@@ -646,9 +632,11 @@ if (ajustBonus !== 0) recap.push(`${ajustBonus > 0 ? "+" : ""}${ajustBonus.toFix
 const recapText = recap.length ? `Ajustements appliqués : ${recap.join(", ")}` : "";
 document.getElementById("ajustementsRecap").innerHTML = recapText;
 
-if (ajustNote) {
+const recapEl = document.getElementById("ajustementsRecap");
+if (recapEl && ajustNote) {
   recapEl.innerHTML += ` <span class="badge bg-success ms-2">${ajustNote}</span>`;
 }
+
 
 
 
@@ -885,32 +873,81 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 function genererPDF() {
-  const printZone = document.createElement('div');
-  printZone.id = 'print-temp';
-  printZone.style.position = 'fixed';
-  printZone.style.left = '-9999px';
-  printZone.style.top = '0';
-  printZone.style.width = '1000px';
-  printZone.style.background = 'white';
-  printZone.style.zIndex = '9999';
-  document.body.appendChild(printZone);
+  const chauffeur = document.getElementById("chauffeurSelect").value;
+  const semaine = document.getElementById("dateInput").value;
 
-  // Cloner les pastilles et le résumé
-  const sections = document.querySelectorAll('.print-pastilles, .print-summary');
-  sections.forEach(el => {
-    const clone = el.cloneNode(true);
-    clone.classList.remove('d-none', 'd-print-grid', 'd-print-block');
+  if (!chauffeur || !semaine) {
+    alert("Sélectionnez un chauffeur et une date.");
+    return;
+  }
 
-    // Affichage de secours
-    clone.style.display = el.classList.contains('print-pastilles') ? 'grid' : 'block';
-    printZone.appendChild(clone);
+  const allPastilles = [...document.querySelectorAll('.pastille')];
+  const summaryClone = document.querySelector('.summary-box.no-print').cloneNode(true);
+  summaryClone.classList.remove('no-print');
+  summaryClone.style.fontSize = '0.85rem';
+  summaryClone.style.margin = '0';
+  summaryClone.style.padding = '1rem';
+
+  // ✅ PAGE 1 – entête + 6 pastilles
+  const page1 = document.createElement('div');
+  page1.style.width = '100%';
+  page1.style.boxSizing = 'border-box';
+  page1.style.padding = '20px';
+  page1.style.pageBreakAfter = 'always';
+  page1.style.fontFamily = 'Arial, sans-serif';
+
+  const header = document.createElement('div');
+  header.style.display = "flex";
+  header.style.justifyContent = "space-between";
+  header.style.alignItems = "center";
+  header.style.marginBottom = "16px";
+  header.innerHTML = `
+    <div><strong>Nom du chauffeur :</strong> ${chauffeur}</div>
+    <div><strong>Semaine du :</strong> ${semaine}</div>
+    <div style="display: flex; gap: 8px;">
+      <span style="background: #007bff; color: white; padding: 4px 10px; border-radius: 20px;">🚚 ${tauxActuel.taux_km.toFixed(2)} $/km</span>
+      <span style="background: #007bff; color: white; padding: 4px 10px; border-radius: 20px;">💰 ${tauxActuel.taux_h.toFixed(2)} $/h</span>
+    </div>
+  `;
+  page1.appendChild(header);
+
+  const grid = document.createElement('div');
+  grid.style.display = 'grid';
+  grid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+  grid.style.gap = '12px';
+
+  allPastilles.slice(0, 6).forEach(p => {
+    const clone = p.cloneNode(true);
+    clone.style.minHeight = '300px';
+    clone.style.fontSize = '0.85rem';
+    grid.appendChild(clone);
   });
 
-  // Laisser le temps au DOM d'insérer le contenu dans le document
+  page1.appendChild(grid);
+
+  // ✅ PAGE 2 – Sommaire
+  const page2 = document.createElement('div');
+  page2.style.width = '100%';
+  page2.style.boxSizing = 'border-box';
+  page2.style.padding = '30px';
+  page2.style.fontFamily = 'Arial, sans-serif';
+
+  const titre = document.createElement('h5');
+  titre.textContent = "Récapitulatif de la semaine";
+  titre.style.marginBottom = '16px';
+  page2.appendChild(titre);
+  page2.appendChild(summaryClone);
+
+  // ✅ Wrap final
+  const printZone = document.createElement('div');
+  printZone.appendChild(page1);
+  printZone.appendChild(page2);
+
+  // ✅ Générer le PDF
   setTimeout(() => {
     const opt = {
-      margin: 0.5,
-      filename: `${document.getElementById("dateInput").value || 'date'} - ${document.getElementById("chauffeurSelect").value || 'chauffeur'}.pdf`,
+      margin: 0,
+      filename: `${semaine} - ${chauffeur}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true },
       jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
@@ -923,7 +960,7 @@ function genererPDF() {
       printZone.remove();
       window.print();
     });
-  }, 500); // ← important: attendre un peu avant capture
+  }, 300);
 }
 
 

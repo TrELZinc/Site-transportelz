@@ -214,9 +214,11 @@
             <option value="">-- Sélectionner --</option>
             <option value="1103">Camion 1103</option>
             <option value="1202">Camion 1202</option>
+            <option value="1203">Camion 1203</option>
             <option value="1303">Camion 1303</option>
             <option value="1404">Camion 1404</option>
             <option value="1502">Camion 1502</option>
+            <option value="1503">Camion 1503</option>
             <option value="1603">Camion 1603</option>
             <option value="1703">Camion 1703</option>
             <option value="1803">Camion 1803</option>
@@ -238,6 +240,10 @@
 </div>
   <script>
     let voyages = []; // GLOBAL
+    let montantKm = 0;
+    let montantH = 0;
+    let totalPrime = 0;
+
     function normalizeStr(str) {
     return (str || "")
     .normalize("NFD")
@@ -772,22 +778,24 @@ if (!formEl.checkValidity()) {
 // Si le formulaire est valide, on cache l'erreur si affichée
 formError.classList.add("d-none");
 
-  const data = new FormData(formEl);
-  const chauffeur = data.get("nom");
-  const taux = tauxMap[chauffeur] || { taux_h: 0, taux_km: 0 };
+    const formData = new FormData(formEl);
+    const data = {};
+    formData.forEach((val, key) => data[key] = val);
+    const chauffeur = data["nom"];
+    const taux = tauxMap[chauffeur] || { taux_h: 0, taux_km: 0 };
 
-  let html = "";
-  let totalMinutes = 0;
-  let totalKm = 0;
-  let totalPrime = 0;
-  voyages = [];
+    let html = "";
+    let totalMinutes = 0;
+    let totalKm = 0;
+    let totalPrime = 0;
+    voyages = [];
 
   for (let i = 1; i <= 3; i++) {
-    const type = data.get(`type_voyage_${i}`);
+    const type = data[`type_voyage_${i}`];
     if (!type) continue;
 
-    const origine = data.get(`origine_${i}`);
-    const destination = data.get(`destination_${i}`);
+    const origine = data[`origine_${i}`];
+    const destination = data[`destination_${i}`];
     const normOrigine = normalizeStr(origine);
     const normDestination = normalizeStr(destination);
     const kmVal = kmMap[normOrigine]?.[normDestination] || 0;
@@ -888,8 +896,9 @@ if (nbPrimesDouane > 0) {
 // Recalcule après boucle complétée
 const totalH = Math.floor(totalMinutes / 60);
 const totalM = totalMinutes % 60;
-const montantKm = totalKm * taux.taux_km;
-const montantH = (totalMinutes / 60) * taux.taux_h;
+montantKm = totalKm * taux.taux_km;
+montantH = (totalMinutes / 60) * taux.taux_h;
+
 
 // Ajout des ajustements (avant montantFinal)
 const ajustHr = parseFloat(document.getElementById("ajust_hr")?.value || "0");
@@ -897,10 +906,11 @@ const ajustKm = parseFloat(document.getElementById("ajust_km")?.value || "0");
 const ajustForfait = parseFloat(document.getElementById("ajust_forfait")?.value || "0");
 const ajustRaison = document.getElementById("ajust_raison")?.value.trim();
 
-if ((ajustHr > 0 || ajustKm > 0) && ajustRaison.length === 0) {
+if ((ajustHr > 0 || ajustKm > 0 || ajustForfait > 0) && ajustRaison.length === 0) {
   alert("Merci d’ajouter une justification pour les ajustements manuels.");
   return;
 }
+
 
 // Ajoute les valeurs aux totaux
 if (ajustKm > 0) totalKm += ajustKm;
@@ -926,6 +936,13 @@ const nbForfaits = voyages.filter(v =>
     !(normalizeStr(v.origine) === "st-basile" && normalizeStr(v.destination) === "stanstead")
   )
 ).length;
+
+data["prime_forfait"] = nbForfaits * parametresMap.prime_forfait;
+data["nb_forfaits"] = nbForfaits;
+data["prime_douane"] = nbPrimesDouane * parametresMap.prime_douane;
+data["nb_primes_douane"] = nbPrimesDouane;
+
+
 
 if (nbForfaits > 0) {
   const montantForfait = parametresMap.prime_forfait * nbForfaits;
@@ -1000,52 +1017,69 @@ function calculerResumeAvecAjustements() {
 });
 });
 
-const ajHr = parseFloat(document.getElementById("ajust_hr")?.value || "0");
-const ajKm = parseFloat(document.getElementById("ajust_km")?.value || "0");
-const ajRaison = document.getElementById("ajust_raison")?.value.trim();
 
-  document.getElementById("btn-confirm").addEventListener("click", () => {
+document.getElementById("btn-confirm").addEventListener("click", async () => {
   const ajustHr = parseFloat(document.getElementById("ajust_hr")?.value || "0");
   const ajustKm = parseFloat(document.getElementById("ajust_km")?.value || "0");
+  const ajustForfait = parseFloat(document.getElementById("ajust_forfait")?.value || "0");
   const ajustRaison = document.getElementById("ajust_raison")?.value.trim();
 
+  if ((ajustHr > 0 || ajustKm > 0 || ajustForfait > 0) && ajustRaison.length === 0) {
+  alert("Merci d’ajouter une justification pour les ajustements manuels.");
+  return;
+}
 
-  if ((ajustHr > 0 || ajustKm > 0) && ajustRaison.length === 0) {
-    alert("Merci d’ajouter une justification pour les ajustements manuels.");
-    return; // <-- ❗ Stoppe ici
-  }
-  const ajustForfait = parseFloat(document.getElementById("ajust_forfait")?.value || "0");
 
+  const chauffeur = document.getElementById("nom")?.value;
+  const tauxChauffeur = tauxMap[chauffeur] || { taux_h: 0, taux_km: 0 };
+
+  const bonusKm = ajustKm * tauxChauffeur.taux_km;
+  const bonusH = ajustHr * tauxChauffeur.taux_h;
 
   const totalFinal = montantKm + montantH + totalPrime + bonusKm + bonusH + ajustForfait;
 
   const formData = new FormData(document.getElementById("formulaire"));
   const data = {};
   formData.forEach((val, key) => data[key] = val);
-data["unite_diesel"] = document.querySelector('select[name="unite_diesel"]')?.value || "L";
-data["ajust_hr"] = document.getElementById("ajust_hr")?.value || "";
-data["ajust_km"] = document.getElementById("ajust_km")?.value || "";
-data["ajust_raison"] = document.getElementById("ajust_raison")?.value || "";
-data["ajust_forfait"] = document.getElementById("ajust_forfait")?.value || "";
-data["prime_forfait"] = voyages.some(v =>
-  v.type === "kilometrage" &&
-  !(normalizeStr(v.origine) === "st-basile" && normalizeStr(v.destination) === "stanstead")
-) ? parametresMap.prime_forfait : 0;
 
-data["prime_douane"] = voyages.some(v => v.douane) ? parametresMap.prime_douane : 0;
+  // Comptage des primes identique à la prévisualisation
+  const nbForfaits = voyages.filter(v =>
+    v.type === "kilometrage" &&
+    (
+      normalizeStr(v.origine) === "vimont" ||
+      !(normalizeStr(v.origine) === "st-basile" && normalizeStr(v.destination) === "stanstead")
+    )
+  ).length;
+
+  const nbPrimesDouaneLocal = voyages.filter(v => v.douane).length;
+
+    data["prime_douane"] = nbPrimesDouaneLocal * parametresMap.prime_douane;
+    data["nb_primes_douane"] = nbPrimesDouaneLocal;
+    data["unite_diesel"] = document.querySelector('select[name="unite_diesel"]')?.value || "L";
+    data["ajust_hr"] = ajustHr.toString();
+    data["ajust_km"] = ajustKm.toString();
+    data["ajust_raison"] = ajustRaison;
+    data["ajust_forfait"] = ajustForfait.toFixed(2);
+    data["prime_forfait"] = nbForfaits * parametresMap.prime_forfait;
+    data["nb_forfaits"] = nbForfaits;
 
 
+  try {
+    await fetch("https://script.google.com/macros/s/AKfycbw52ei3j5Obj0Yl37Jds-4kbyXUqzEyQu7OqVRErQbsEy8yGwS3TTkAz5P5T-ov_E5-/exec", {
+      method: "POST",
+      mode: "no-cors",
+      body: JSON.stringify(data),
+      headers: { "Content-Type": "application/json" }
+    });
 
-  fetch("https://script.google.com/macros/s/AKfycbw52ei3j5Obj0Yl37Jds-4kbyXUqzEyQu7OqVRErQbsEy8yGwS3TTkAz5P5T-ov_E5-/exec", {
-    method: "POST",
-    mode: "no-cors",
-    body: JSON.stringify(data),
-    headers: { "Content-Type": "application/json" }
-  });
-
-  resumeContainer.classList.add("d-none");
-  document.getElementById("confirmationContainer").classList.remove("d-none");
+    document.getElementById("resumeContainer").classList.add("d-none");
+    document.getElementById("confirmationContainer").classList.remove("d-none");
+  } catch (err) {
+    console.error("❌ Erreur lors de l’envoi :", err);
+    alert("Erreur lors de l’envoi du formulaire.");
+  }
 });
+
 });
   
   let parametresMap = { prime_forfait: 60.85, prime_douane: 15 }; // Valeurs par défaut
@@ -1054,7 +1088,6 @@ data["prime_douane"] = voyages.some(v => v.douane) ? parametresMap.prime_douane 
 <script>
 let tauxMap = {};
 let kmMap = {};
-let  = {};
 
 fetch("https://script.google.com/macros/s/AKfycbw52ei3j5Obj0Yl37Jds-4kbyXUqzEyQu7OqVRErQbsEy8yGwS3TTkAz5P5T-ov_E5-/exec")
   .then(res => res.json())

@@ -321,6 +321,10 @@ body {
       <label class="form-label">Bonus / Vacances</label>
       <input type="number" step="0.01" id="ajustBonusInput" class="form-control" value="0">
     </div>
+    <div class="col-md-12">
+      <label class="form-label">Justification</label>
+      <textarea id="ajustNoteInput" class="form-control" rows="2" placeholder="Expliquer l'ajustement..."></textarea>
+    </div>    
   </div>
 </div>
   </div>
@@ -642,10 +646,10 @@ if (ajustBonus !== 0) recap.push(`${ajustBonus > 0 ? "+" : ""}${ajustBonus.toFix
 const recapText = recap.length ? `Ajustements appliqués : ${recap.join(", ")}` : "";
 document.getElementById("ajustementsRecap").innerHTML = recapText;
 
-if (recap.length) {
-  document.getElementById("ajustementsRecap").innerHTML +=
-    ' <span class="badge bg-success ms-2">Ajustements appliqués</span>';
+if (ajustNote) {
+  recapEl.innerHTML += ` <span class="badge bg-success ms-2">${ajustNote}</span>`;
 }
+
 
 
 // ➤ Totaux affichés
@@ -714,6 +718,10 @@ function resetAjustementsManuels() {
 
   const elLigne = document.getElementById("montantAjusteLigne");
   if (elLigne) elLigne.style.display = "none";
+
+  const noteInput = document.getElementById("ajustNoteInput");
+  if (noteInput) noteInput.value = "";
+
 }
 
 function sauvegarderSemaine() {
@@ -744,7 +752,7 @@ async function chargerChauffeursDansSelect() {
 }
 
 function recalculerMontant(taux, totalKm, totalMin, totalForfait, totalDouane) {
-  const { ajustKm, ajustH, ajustForfait, ajustBonus } = getAjustements(); // D'abord !
+  const { ajustKm, ajustH, ajustForfait, ajustBonus, ajustNote } = getAjustements();
 
   console.log("🔥 Ajustements récupérés:", {
     ajustKm, ajustH, ajustForfait, ajustBonus
@@ -797,9 +805,9 @@ const recapText = recap.length ? `Ajustements appliqués : ${recap.join(", ")}` 
 const recapEl = document.getElementById("ajustementsRecap");
 if (recapEl) {
   recapEl.innerHTML = recapText;
-  if (recap.length) {
-    recapEl.innerHTML += ' <span class="badge bg-success ms-2">Ajustements appliqués</span>';
-  }
+  if (ajustNote) {
+      recapEl.innerHTML += ` <span class="badge bg-success ms-2">${ajustNote}</span>`;
+    }
 }
 }
   
@@ -808,7 +816,8 @@ function getAjustements() {
     ajustKm: parseFloat(document.getElementById("ajustKmInput").value) || 0,
     ajustH: parseFloat(document.getElementById("ajustHInput").value) || 0,
     ajustForfait: parseFloat(document.getElementById("ajustForfaitInput").value) || 0,
-    ajustBonus: parseFloat(document.getElementById("ajustBonusInput").value) || 0
+    ajustBonus: parseFloat(document.getElementById("ajustBonusInput").value) || 0,
+    ajustNote: document.getElementById("ajustNoteInput").value.trim()
   };
 }
 
@@ -816,7 +825,12 @@ function getAjustements() {
   console.log("Configuration des écouteurs d'ajustement");
   
   const ajustIds = ["ajustKmInput", "ajustHInput", "ajustForfaitInput", "ajustBonusInput"];
-  
+
+  const noteEl = document.getElementById("ajustNoteInput");
+    if (noteEl) {
+      noteEl.addEventListener("input", recalculHandler);
+    }
+
   ajustIds.forEach(id => {
     const el = document.getElementById(id);
     if (el) {

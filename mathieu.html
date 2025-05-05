@@ -1000,52 +1000,58 @@ function calculerResumeAvecAjustements() {
 });
 });
 
-const ajHr = parseFloat(document.getElementById("ajust_hr")?.value || "0");
-const ajKm = parseFloat(document.getElementById("ajust_km")?.value || "0");
-const ajRaison = document.getElementById("ajust_raison")?.value.trim();
 
-  document.getElementById("btn-confirm").addEventListener("click", () => {
+document.getElementById("btn-confirm").addEventListener("click", async () => {
   const ajustHr = parseFloat(document.getElementById("ajust_hr")?.value || "0");
   const ajustKm = parseFloat(document.getElementById("ajust_km")?.value || "0");
+  const ajustForfait = parseFloat(document.getElementById("ajust_forfait")?.value || "0");
   const ajustRaison = document.getElementById("ajust_raison")?.value.trim();
-
 
   if ((ajustHr > 0 || ajustKm > 0) && ajustRaison.length === 0) {
     alert("Merci d’ajouter une justification pour les ajustements manuels.");
-    return; // <-- ❗ Stoppe ici
+    return;
   }
-  const ajustForfait = parseFloat(document.getElementById("ajust_forfait")?.value || "0");
 
+  const chauffeur = document.getElementById("nom")?.value;
+  const tauxChauffeur = tauxMap[chauffeur] || { taux_h: 0, taux_km: 0 };
+
+  const bonusKm = ajustKm * tauxChauffeur.taux_km;
+  const bonusH = ajustHr * tauxChauffeur.taux_h;
 
   const totalFinal = montantKm + montantH + totalPrime + bonusKm + bonusH + ajustForfait;
 
   const formData = new FormData(document.getElementById("formulaire"));
   const data = {};
   formData.forEach((val, key) => data[key] = val);
-data["unite_diesel"] = document.querySelector('select[name="unite_diesel"]')?.value || "L";
-data["ajust_hr"] = document.getElementById("ajust_hr")?.value || "";
-data["ajust_km"] = document.getElementById("ajust_km")?.value || "";
-data["ajust_raison"] = document.getElementById("ajust_raison")?.value || "";
-data["ajust_forfait"] = document.getElementById("ajust_forfait")?.value || "";
-data["prime_forfait"] = voyages.some(v =>
-  v.type === "kilometrage" &&
-  !(normalizeStr(v.origine) === "st-basile" && normalizeStr(v.destination) === "stanstead")
-) ? parametresMap.prime_forfait : 0;
 
-data["prime_douane"] = voyages.some(v => v.douane) ? parametresMap.prime_douane : 0;
+  data["unite_diesel"] = document.querySelector('select[name="unite_diesel"]')?.value || "L";
+  data["ajust_hr"] = ajustHr.toString();
+  data["ajust_km"] = ajustKm.toString();
+  data["ajust_raison"] = ajustRaison;
+  data["ajust_forfait"] = ajustForfait.toFixed(2);
+  data["prime_forfait"] = voyages.some(v =>
+    v.type === "kilometrage" &&
+    !(normalizeStr(v.origine) === "st-basile" && normalizeStr(v.destination) === "stanstead")
+  ) ? parametresMap.prime_forfait : 0;
 
+  data["prime_douane"] = voyages.some(v => v.douane) ? parametresMap.prime_douane : 0;
 
+  try {
+    await fetch("https://script.google.com/macros/s/AKfycbw52ei3j5Obj0Yl37Jds-4kbyXUqzEyQu7OqVRErQbsEy8yGwS3TTkAz5P5T-ov_E5-/exec", {
+      method: "POST",
+      mode: "no-cors",
+      body: JSON.stringify(data),
+      headers: { "Content-Type": "application/json" }
+    });
 
-  fetch("https://script.google.com/macros/s/AKfycbw52ei3j5Obj0Yl37Jds-4kbyXUqzEyQu7OqVRErQbsEy8yGwS3TTkAz5P5T-ov_E5-/exec", {
-    method: "POST",
-    mode: "no-cors",
-    body: JSON.stringify(data),
-    headers: { "Content-Type": "application/json" }
-  });
-
-  resumeContainer.classList.add("d-none");
-  document.getElementById("confirmationContainer").classList.remove("d-none");
+    resumeContainer.classList.add("d-none");
+    document.getElementById("confirmationContainer").classList.remove("d-none");
+  } catch (err) {
+    console.error("❌ Erreur lors de l’envoi :", err);
+    alert("Erreur lors de l’envoi du formulaire.");
+  }
 });
+
 });
   
   let parametresMap = { prime_forfait: 60.85, prime_douane: 15 }; // Valeurs par défaut

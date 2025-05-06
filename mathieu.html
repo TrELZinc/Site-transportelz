@@ -327,7 +327,16 @@ body {
   const db = firebase.firestore();
 </script>
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbzr-IZHNMZYnrzyCDqqyaPwgokJDlT5dd9jYLivINM_FUSAVvZ0fgtNrvLnUZEFnbt3/exec";
+  function normalizeStr(str) {
+    return (str || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") // supprime accents
+      .toLowerCase()
+      .trim();
+  }
+  </script>  
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycby9utNdAetIrc1RKOhXY4itejhND__y19u-X6w_7JjQuj6v8tYWCH0WPqhqcz63FeGN/exec";
 
 let primeDouane = 0;
 let primeForfait = 0;
@@ -336,6 +345,8 @@ let totalKmActuel = 0;
 let totalMinActuel = 0;
 let totalForfaitActuel = 0;
 let totalDouaneActuel = 0;
+let kmMap = {};
+
 
 
 function parseLocalDate(str) {
@@ -362,8 +373,12 @@ async function fetchSemaineData(chauffeur, lundi) {
 async function fetchTauxChauffeurs() {
   const res = await fetch(API_URL);
   const json = await res.json();
+
   primeDouane = parseFloat(json.parametres.prime_douane);
   primeForfait = parseFloat(json.parametres.prime_forfait);
+
+  // ✅ on garde une copie globale de kmMap
+  kmMap = json.kmMap || {}; 
 
   const map = {};
   json.chauffeurs.forEach(c => {
@@ -371,6 +386,7 @@ async function fetchTauxChauffeurs() {
   });
   return map;
 }
+
 
 async function loadSemaine() {
   const chauffeur = document.getElementById("chauffeurSelect").value;
@@ -390,7 +406,9 @@ tauxBox.innerHTML = `
   </div>
 `;
 
-  const semaineData = await fetchSemaineData(chauffeur, lundi);
+  const { resultats, kmMap: mapFromAPI } = await fetchSemaineData(chauffeur, lundi);
+  kmMap = mapFromAPI || {};
+  const semaineData = resultats;
   console.log("📤 Requête envoyée à l'API avec :", chauffeur, lundi);
   console.log("📦 Données reçues du serveur :", semaineData);
   const container = document.getElementById("pastillesContainer");
@@ -457,10 +475,10 @@ let index = 0;
   console.log(`✅ Forfait réparti : ${totalForfaitJour.toFixed(2)} $ ÷ ${nbKmVoyages} = ${forfaitParVoyage.toFixed(2)} $/voyage`);
 
 
-    voyages.forEach((voyage, idx) => {
-    let forfait = 0;
-    let douane = 0;
-    let km = 0;
+  voyages.forEach((voyage, idx) => {
+  let forfait = 0;
+  let douane = 0;
+  let km = 0;
 
   details.innerHTML += `<div class="fw-bold mb-1">Voyage ${idx + 1} :</div>`;
   details.innerHTML += `<div class="mb-1">(${voyage.origine} → ${voyage.destination})</div>`;
@@ -474,60 +492,62 @@ let index = 0;
   if (voyage.ajust_raison && !jourAjustRaison) jourAjustRaison = voyage.ajust_raison;
 
   if (voyage.type === "kilometrage") {
-  km = parseFloat(voyage.km) || 0;
-  forfait = forfaitParVoyage;
+  const origine = normalizeStr(voyage.origine);
+  const destination = normalizeStr(voyage.destination);
+  const suivant = voyages[idx + 1];
+  const suivantOrigine = suivant ? normalizeStr(suivant.origine) : "";
 
+  let kmSimple = parseFloat(kmMap?.[origine]?.[destination]) || 0;
+  let km, forfait;
 
-  // Cas spécial : St-Basile → Stanstead
-  if (
-    voyage.origine?.toLowerCase().includes("st-basile") &&
-    voyage.destination?.toLowerCase().includes("stanstead")
-  ) {
-    const prochain = voyages[idx + 1];
-    if (prochain?.origine?.toLowerCase().includes("st-basile")) {
-      km *= 2;
-      forfait = primeForfait;
-    } else if (prochain?.origine?.toLowerCase().includes("stanstead")) {
-      forfait = 0;
-    }
+  // Cas clairement définis
+  const casSpecial1 = origine === "st-basile" && destination === "stanstead" && suivantOrigine === "stanstead";
+  const casSpecial2 = origine === "stanstead" && destination === "st-basile";
+
+  if (casSpecial1 || casSpecial2) {
+    km = kmSimple; // ✅ km simple sans forfait
+    forfait = 0;
+  } else {
+    km = kmSimple * 2; // ✅ aller-retour normal avec forfait
+    forfait = primeForfait;
   }
 
-    douane = parseFloat(voyage.prime_douane) || 0;
+  const douane = kmMap?.[origine]?.[`${destination}_DOUANE`] ? primeDouane : 0;
 
-    voyage.prime_forfait = forfait;
-    jourDouane += douane;
-    jourKm += km;
-    jourForfait += forfait;
-    jourDouane += parseFloat(voyage.prime_douane) || 0;
+  jourKm += km;
+  jourForfait += forfait;
+  jourDouane += douane;
 
-    details.innerHTML += `<div><strong>KM:</strong> ${km}</div>`;
-    details.innerHTML += `<div><strong>Forfait:</strong> ${forfait.toFixed(2)} $</div>`;
-    if (voyage.prime_douane > 0) {
-      details.innerHTML += `<div><strong>Douane:</strong> ${parseFloat(voyage.prime_douane).toFixed(2)} $</div>`;
-    }
-
-  } else if (voyage.type === "heure") {
-    const minutes = parseFloat(voyage.minutes) || 0;
-    const h = Math.floor(minutes / 60);
-    const m = minutes % 60;
-    jourMin += minutes;
-
-    forfait = parseFloat(voyage.prime_forfait) || 0;
-    douane = parseFloat(voyage.prime_douane) || 0;
-
-    if (voyage.origine?.toLowerCase().includes("vimont")) {
-      forfait = 0;
-    }
-
-    jourForfait += forfait;
-    jourDouane += douane;
-
-    details.innerHTML += `<div><strong>Heures:</strong> ${h}h${String(m).padStart(2, '0')}</div>`;
-    details.innerHTML += `<div><strong>Forfait:</strong> ${forfait.toFixed(2)} $</div>`;
-    if (douane > 0) {
-      details.innerHTML += `<div><strong>Douane:</strong> ${douane.toFixed(2)} $</div>`;
-    }
+  details.innerHTML += `<div><strong>KM:</strong> ${km}</div>`;
+  details.innerHTML += `<div><strong>Forfait:</strong> ${forfait.toFixed(2)} $</div>`;
+  if (douane > 0) {
+    details.innerHTML += `<div><strong>Douane:</strong> ${douane.toFixed(2)} $</div>`;
   }
+
+} else if (voyage.type === "heure") {
+  const minutes = parseFloat(voyage.minutes) || 0;
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  jourMin += minutes;
+
+  forfait = parseFloat(voyage.prime_forfait) || 0;
+  douane = parseFloat(voyage.prime_douane) || 0;
+
+  if (normalizeStr(voyage.origine).includes("vimont")) {
+    forfait = 0;
+  }
+
+  jourForfait += forfait;
+  jourDouane += douane;
+
+  details.innerHTML += `<div><strong>Heures:</strong> ${h}h${String(m).padStart(2, '0')}</div>`;
+  details.innerHTML += `<div><strong>Forfait:</strong> ${forfait.toFixed(2)} $</div>`;
+  if (douane > 0) {
+    details.innerHTML += `<div><strong>Douane:</strong> ${douane.toFixed(2)} $</div>`;
+  }
+}
+
+
 
   if (idx < voyages.length - 1) {
     details.innerHTML += `<hr class="my-2">`;
@@ -535,6 +555,7 @@ let index = 0;
 
   jourPrime += forfait + douane;
 });
+
 
 
 if (parsedAjustForfait > 0) {

@@ -847,6 +847,10 @@ for (let i = 0; i < voyages.length; i++) {
                                 next?.type === "kilometrage" &&
                                 normalizeStr(next.origine) === "stanstead";
 
+    const isStansteadNoNext = normalizeStr(v.origine) === "st-basile" &&
+                              normalizeStr(v.destination) === "stanstead" &&
+                              (!next || normalizeStr(next.origine) !== "stanstead");
+
     const isRetourStanstead = normalizeStr(v.origine) === "stanstead" &&
                               normalizeStr(v.destination) === "st-basile";
 
@@ -854,11 +858,14 @@ for (let i = 0; i < voyages.length; i++) {
 
     if (isRetourStanstead) {
       label += " (aller simple retour de Stanstead)";
-      afficherPrime = false; // pas de prime
-      // pas de double km non plus
+      afficherPrime = false;
     } else if (isStansteadTransfer) {
       label += " (aller simple)";
       afficherPrime = false;
+    } else if (isStansteadNoNext) {
+      label += " (aller-retour)";
+      afficherPrime = true;
+      kmPayes *= 2; // 👈 Ajoute cette ligne ici
     } else if (next?.type === "heure" && normalizeStr(next.origine) === "vimont") {
       label += " (aller simple)";
     } else {
@@ -929,13 +936,22 @@ const montantFinal = montantKmFinal + montantHFinal + totalPrime + ajustForfait;
 // Génération HTML
 html += `<hr/><p><strong>KM Payés:</strong> ${totalKm}km</p>`;
 html += `<p><strong>Heures Payées:</strong> ${Math.floor(totalMinutes / 60)}h${String(totalMinutes % 60).padStart(2, "0")}</p>`;
-const nbForfaits = voyages.filter(v =>
-  v.type === "kilometrage" &&
-  (
-    normalizeStr(v.origine) === "vimont" ||
-    !(normalizeStr(v.origine) === "st-basile" && normalizeStr(v.destination) === "stanstead")
-  )
-).length;
+const nbForfaits = voyages.filter((v, idx) => {
+  if (v.type !== "kilometrage") return false;
+
+  const origine = normalizeStr(v.origine);
+  const destination = normalizeStr(v.destination);
+
+  const isVimont = origine === "vimont";
+  const isRetourStanstead = origine === "stanstead" && destination === "st-basile";
+  const isStansteadTransfer = origine === "st-basile" && destination === "stanstead" &&
+                               voyages[idx + 1]?.type === "kilometrage" &&
+                               normalizeStr(voyages[idx + 1].origine) === "stanstead";
+
+  return isVimont || (!isRetourStanstead && !isStansteadTransfer);
+}).length;
+
+
 
 data["prime_forfait"] = nbForfaits * parametresMap.prime_forfait;
 data["nb_forfaits"] = nbForfaits;

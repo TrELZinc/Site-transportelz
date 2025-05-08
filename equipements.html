@@ -28,6 +28,7 @@
       margin: 0;
       padding: 0;
       color: #333;
+      padding-top: calc(60px + env(safe-area-inset-top));
     }
 
     header {
@@ -284,10 +285,12 @@
 </head>
 
 <body>
-
-  <header>
-    <img src="assets/logo.jpeg" alt="Logo ELZ">
-  </header>
+<div id="customHeader"></div>
+<script>
+  fetch("assets/header.html")
+    .then(res => res.text())
+    .then(html => document.getElementById("customHeader").innerHTML = html);
+</script>
 
   <h1 style="text-align:center; font-size: 1.8rem; font-weight:600; margin-top: 1rem; margin-bottom: 0.5rem;">
   Disponibilité des équipements

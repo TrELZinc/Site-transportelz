@@ -767,24 +767,24 @@ async function chargerSemaineIntelligente() {
     alert("Erreur lors du chargement des ajustements Firebase.");
   }
 
-await loadSemaine(); // recharge les pastilles et les totaux depuis Google Sheets
+  // ⚠️ IMPORTANT : Charger les pastilles EN DERNIER, sinon ça écrase les ajustements
+  await loadSemaine();
 
-// Après le load, on force le recalcul avec les valeurs mises à jour :
-recalculerMontant(
-  tauxActuel,
-  totalKmActuel,
-  totalMinActuel,
-  totalForfaitActuel,
-  totalDouaneActuel
-);
+  // Ensuite forcer le recalcul avec les valeurs rechargées
+  recalculerMontant(
+    tauxActuel,
+    totalKmActuel,
+    totalMinActuel,
+    totalForfaitActuel,
+    totalDouaneActuel
+  );
 
-// Afficher le badge
-const badge = document.getElementById("firebaseBadge");
-if (ajustementsTrouvés) {
-  badge.innerHTML = `<span class="badge bg-success">Ajustements Firebase appliqués</span>`;
-} else {
-  badge.innerHTML = `<span class="badge bg-secondary">Aucun ajustement enregistré</span>`;
-}
+  const badge = document.getElementById("firebaseBadge");
+  if (ajustementsTrouvés) {
+    badge.innerHTML = `<span class="badge bg-success">Ajustements Firebase appliqués</span>`;
+  } else {
+    badge.innerHTML = `<span class="badge bg-secondary">Aucun ajustement enregistré</span>`;
+  }
 }
 
 async function chargerSemaineDepuisFirebase() {

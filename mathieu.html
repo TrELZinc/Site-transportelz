@@ -25,6 +25,8 @@
     font-size: 0.78rem !important;
     min-height: unset !important;
     height: auto !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
   }
 
   .summary-box {
@@ -204,6 +206,10 @@ body {
   width: 100%;
 }
 
+.fade-out {
+  transition: opacity 0.8s ease;
+}
+
 @media (max-width: 768px) {
   .taux-row {
     flex-direction: row;
@@ -311,7 +317,7 @@ body {
   </div>
 
  <div class="mt-4 d-flex flex-column flex-md-row justify-content-md-end gap-2 text-center">
-  <button class="btn btn-success" onclick="sauvegarderSemaine()">Sauvegarder dans Firebase</button>
+  <button class="btn btn-success" onclick="sauvegarderSemaine()">Sauvegarder</button>
   <button class="btn btn-outline-secondary" onclick="genererPDF()">Exporter en PDF</button>
 </div>
 
@@ -794,9 +800,15 @@ async function chargerSemaineIntelligente() {
 
   const badge = document.getElementById("firebaseBadge");
   badge.innerHTML = ajustementsTrouvés
-    ? `<span class="badge bg-success">Ajustements Firebase appliqués</span>`
-    : `<span class="badge bg-secondary">Aucun ajustement enregistré</span>`;
+    ? `<span class="badge bg-success fade-out">Ajustements appliqués</span>`
+    : `<span class="badge bg-secondary fade-out">Aucun enregistrement trouvé</span>`;
+
+  // ✅ Faire disparaître le badge après 4 secondes
+  setTimeout(() => {
+    badge.innerHTML = "";
+  }, 4000);
 }
+
 
 async function chargerSemaineDepuisFirebase() {
   const chauffeur = document.getElementById("chauffeurSelect").value;
@@ -1054,27 +1066,15 @@ document.addEventListener("DOMContentLoaded", () => {
 function genererPDF() {
   const chauffeur = document.getElementById("chauffeurSelect").value;
   const semaine = document.getElementById("dateInput").value;
-
   if (!chauffeur || !semaine) {
     alert("Sélectionnez un chauffeur et une date.");
     return;
   }
 
   const allPastilles = [...document.querySelectorAll('.pastille')];
-  const summaryClone = document.querySelector('.summary-box.no-print').cloneNode(true);
-  summaryClone.classList.remove('no-print');
-  summaryClone.style.fontSize = '0.85rem';
-  summaryClone.style.margin = '0';
-  summaryClone.style.padding = '1rem';
+  const taux = tauxActuel;
 
-  // ✅ PAGE 1 – entête + 6 pastilles
-  const page1 = document.createElement('div');
-  page1.style.width = '100%';
-  page1.style.boxSizing = 'border-box';
-  page1.style.padding = '20px';
-  page1.style.pageBreakAfter = 'always';
-  page1.style.fontFamily = 'Arial, sans-serif';
-
+  // 🟦 En-tête
   const header = document.createElement('div');
   header.style.display = "flex";
   header.style.justifyContent = "space-between";
@@ -1084,52 +1084,72 @@ function genererPDF() {
     <div><strong>Nom du chauffeur :</strong> ${chauffeur}</div>
     <div><strong>Semaine du :</strong> ${semaine}</div>
     <div style="display: flex; gap: 8px;">
-      <span style="background: #007bff; color: white; padding: 4px 10px; border-radius: 20px;">🚚 ${tauxActuel.taux_km.toFixed(2)} $/km</span>
-      <span style="background: #007bff; color: white; padding: 4px 10px; border-radius: 20px;">💰 ${tauxActuel.taux_h.toFixed(2)} $/h</span>
+      <span style="background: #007bff; color: white; padding: 4px 10px; border-radius: 20px;">🚚 ${taux.taux_km.toFixed(2)} $/km</span>
+      <span style="background: #007bff; color: white; padding: 4px 10px; border-radius: 20px;">💰 ${taux.taux_h.toFixed(2)} $/h</span>
     </div>
   `;
-  page1.appendChild(header);
 
+  // 🟩 Grille des 6 pastilles
   const grid = document.createElement('div');
   grid.style.display = 'grid';
   grid.style.gridTemplateColumns = 'repeat(3, 1fr)';
   grid.style.gap = '12px';
+  grid.style.marginBottom = '20px';
 
   allPastilles.slice(0, 6).forEach(p => {
     const clone = p.cloneNode(true);
     clone.style.minHeight = '300px';
     clone.style.fontSize = '0.85rem';
+    clone.style.pageBreakInside = 'avoid';
+    clone.style.breakInside = 'avoid';
     grid.appendChild(clone);
   });
 
+  // 📄 Page 1
+  const page1 = document.createElement('div');
+  page1.style.padding = '30px';
+  page1.style.pageBreakAfter = 'always';
+  page1.style.width = '210mm'; // largeur exacte A4
+  page1.style.boxSizing = 'border-box';
+  page1.appendChild(header);
   page1.appendChild(grid);
 
-  // ✅ PAGE 2 – Sommaire
-  const page2 = document.createElement('div');
-  page2.style.width = '100%';
-  page2.style.boxSizing = 'border-box';
-  page2.style.padding = '30px';
-  page2.style.fontFamily = 'Arial, sans-serif';
+  // 📄 Page 2 (sommaire)
+  const summary = document.querySelector('.summary-box.no-print').cloneNode(true);
+  summary.classList.remove('no-print');
+  summary.style.fontSize = '0.9rem';
+  summary.style.margin = '0 auto';
+  summary.style.maxWidth = '700px';
+  summary.style.pageBreakInside = 'avoid';
 
+  const page2 = document.createElement('div');
+  page2.style.padding = '30px';
+  page2.style.width = '210mm';
+  page2.style.boxSizing = 'border-box';
   const titre = document.createElement('h5');
   titre.textContent = "Récapitulatif de la semaine";
   titre.style.marginBottom = '16px';
   page2.appendChild(titre);
-  page2.appendChild(summaryClone);
+  page2.appendChild(summary);
 
-  // ✅ Wrap final
+  // 🖨 Zone à imprimer
   const printZone = document.createElement('div');
+  printZone.classList.add("printZone");
+  printZone.style.width = "210mm";
+  printZone.style.margin = "0 auto";
+  printZone.style.boxSizing = "border-box";
   printZone.appendChild(page1);
   printZone.appendChild(page2);
+  document.body.appendChild(printZone);
 
-  // ✅ Générer le PDF
+  // ⬇️ Export PDF
   setTimeout(() => {
     const opt = {
       margin: 0,
       filename: `${semaine} - ${chauffeur}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
     html2pdf().set(opt).from(printZone).save().then(() => {

@@ -307,6 +307,7 @@ body {
 
  <div class="mt-4 d-flex flex-column flex-md-row justify-content-md-end gap-2 text-center">
   <button class="btn btn-success" onclick="sauvegarderSemaine()">Sauvegarder dans Firebase</button>
+  <button class="btn btn-primary" onclick="chargerSemaineDepuisFirebase()">Charger depuis Firebase</button>
   <button class="btn btn-outline-secondary" onclick="genererPDF()">Exporter en PDF</button>
 </div>
 
@@ -730,6 +731,51 @@ setupAjustementListeners();
 
 }  
 
+async function chargerSemaineDepuisFirebase() {
+  const chauffeur = document.getElementById("chauffeurSelect").value;
+  const dateInput = document.getElementById("dateInput").value;
+  if (!chauffeur || !dateInput) return alert("Sélectionnez un chauffeur et une date.");
+
+  const semaine = getWeekMonday(dateInput);
+  const docId = `${chauffeur}_${semaine}`;
+
+  try {
+    const doc = await db.collection("sommateurs").doc(docId).get();
+    if (!doc.exists) {
+      alert("Aucune donnée trouvée pour cette semaine.");
+      return;
+    }
+
+    const data = doc.data();
+
+    // Remplir les champs d’ajustements
+    document.getElementById("ajustKmInput").value = data.ajustKm || 0;
+    document.getElementById("ajustHInput").value = data.ajustH || 0;
+    document.getElementById("ajustForfaitInput").value = data.ajustForfait || 0;
+    document.getElementById("ajustBonusInput").value = data.ajustBonus || 0;
+    document.getElementById("ajustNoteInput").value = data.ajustNote || "";
+
+    // Recalculer avec les données chargées
+    recalculerMontant(
+      tauxActuel,
+      data.totalKm || 0,
+      data.totalMin || 0,
+      data.totalForfait || 0,
+      data.totalDouane || 0
+    );
+
+    totalKmActuel = data.totalKm || 0;
+    totalMinActuel = data.totalMin || 0;
+    totalForfaitActuel = data.totalForfait || 0;
+    totalDouaneActuel = data.totalDouane || 0;
+
+    alert("Semaine chargée depuis Firebase.");
+  } catch (error) {
+    console.error("Erreur lors du chargement depuis Firebase :", error);
+    alert("Erreur lors du chargement. Vérifiez la console.");
+  }
+}
+
 function resetAjustementsManuels() {
   ["ajustKmInput", "ajustHInput", "ajustForfaitInput", "ajustBonusInput"].forEach(id => {
     const input = document.getElementById(id);
@@ -747,8 +793,44 @@ function resetAjustementsManuels() {
 
 }
 
-function sauvegarderSemaine() {
-  alert("Fonction de sauvegarde activée (Firebase). Implémentation personnalisable.");
+async function sauvegarderSemaine() {
+  const chauffeur = document.getElementById("chauffeurSelect").value;
+  const dateInput = document.getElementById("dateInput").value;
+
+  if (!chauffeur || !dateInput) {
+    alert("Sélectionnez un chauffeur et une date.");
+    return;
+  }
+
+  const semaine = getWeekMonday(dateInput);
+  const docId = `${chauffeur}_${semaine}`;
+
+  const { ajustKm, ajustH, ajustForfait, ajustBonus, ajustNote } = getAjustements();
+
+  const data = {
+    chauffeur,
+    semaine,
+    totalKm: totalKmActuel,
+    totalMin: totalMinActuel,
+    totalForfait: totalForfaitActuel,
+    totalDouane: totalDouaneActuel,
+    taux_km: tauxActuel.taux_km,
+    taux_h: tauxActuel.taux_h,
+    ajustKm,
+    ajustH,
+    ajustForfait,
+    ajustBonus,
+    ajustNote,
+    dateEnregistrement: new Date().toISOString()
+  };
+
+  try {
+    await db.collection("sommateurs").doc(docId).set(data);
+    alert("Semaine sauvegardée dans Firebase.");
+  } catch (error) {
+    console.error("Erreur lors de la sauvegarde :", error);
+    alert("Erreur lors de la sauvegarde dans Firebase.");
+  }
 }
 
 async function chargerChauffeursDansSelect() {

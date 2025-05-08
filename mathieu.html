@@ -756,22 +756,34 @@ async function chargerSemaineIntelligente() {
       document.getElementById("ajustBonusInput").value = data.ajustBonus || 0;
       document.getElementById("ajustNoteInput").value = data.ajustNote || "";
 
-
       ajustementsTrouvés = true;
-      console.log("✅ Ajustements chargés depuis Firebase.");
     } else {
-      resetAjustementsManuels(); // remet à zéro s'il n'y en a pas
-      console.log("ℹ️ Aucun ajustement trouvé dans Firebase.");
+      resetAjustementsManuels();
     }
   } catch (error) {
     console.error("❌ Erreur Firebase :", error);
     alert("Erreur lors du chargement des ajustements Firebase.");
   }
 
-  // ⚠️ IMPORTANT : Charger les pastilles EN DERNIER, sinon ça écrase les ajustements
+  // ⚠️ Charger ensuite la semaine (écrase tout)
   await loadSemaine();
 
-  // Ensuite forcer le recalcul avec les valeurs rechargées
+  // ➕ Recharger à nouveau les ajustements (par sécurité)
+  try {
+    const doc = await db.collection("sommateurs").doc(docId).get();
+    if (doc.exists) {
+      const data = doc.data();
+      document.getElementById("ajustKmInput").value = data.ajustKm || 0;
+      document.getElementById("ajustHInput").value = data.ajustH || 0;
+      document.getElementById("ajustForfaitInput").value = data.ajustForfait || 0;
+      document.getElementById("ajustBonusInput").value = data.ajustBonus || 0;
+      document.getElementById("ajustNoteInput").value = data.ajustNote || "";
+    }
+  } catch (e) {
+    console.warn("Problème de relecture d’ajustements :", e);
+  }
+
+  // ➕ Forcer le recalcul avec les bonnes valeurs
   recalculerMontant(
     tauxActuel,
     totalKmActuel,
@@ -781,11 +793,9 @@ async function chargerSemaineIntelligente() {
   );
 
   const badge = document.getElementById("firebaseBadge");
-  if (ajustementsTrouvés) {
-    badge.innerHTML = `<span class="badge bg-success">Ajustements Firebase appliqués</span>`;
-  } else {
-    badge.innerHTML = `<span class="badge bg-secondary">Aucun ajustement enregistré</span>`;
-  }
+  badge.innerHTML = ajustementsTrouvés
+    ? `<span class="badge bg-success">Ajustements Firebase appliqués</span>`
+    : `<span class="badge bg-secondary">Aucun ajustement enregistré</span>`;
 }
 
 async function chargerSemaineDepuisFirebase() {

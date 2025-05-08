@@ -2,21 +2,22 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="theme-color" content="#000000" />
   <title>Transport ELZ</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    html {
+      background-color: #f4f4f4;
     }
 
     body {
-      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding-top: calc(60px + env(safe-area-inset-top));
       background-color: #f4f4f4;
-      padding-top: 70px;
+      font-family: 'Segoe UI', sans-serif;
     }
 
     header {
@@ -24,152 +25,133 @@
       top: 0;
       left: 0;
       width: 100%;
-      height: 70px;
       background-color: #111;
       color: white;
+      padding-top: env(safe-area-inset-top);
+      height: calc(60px + env(safe-area-inset-top));
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      padding: 0 20px;
-      z-index: 1000;
+      align-items: center;
+      padding-left: 20px;
+      padding-right: 20px;
+      box-sizing: border-box;
+      z-index: 9999;
     }
 
     .header-logo img {
-      height: 45px;
+      height: 40px;
     }
 
     .hamburger {
       display: flex;
       flex-direction: column;
-      justify-content: center;
       gap: 5px;
       cursor: pointer;
+      z-index: 10001;
     }
 
-    .hamburger span {
+    .hamburger div {
       width: 25px;
       height: 3px;
       background-color: white;
-      border-radius: 2px;
       transition: all 0.3s ease;
     }
 
-    nav.nav-links {
+    .nav-links {
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
       position: fixed;
       top: 0;
       right: -100%;
       height: 100vh;
       width: 280px;
       background-color: #111;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      padding: 80px 25px;
-      transition: right 0.4s ease-in-out;
+      padding: 80px 25px 30px;
+      box-shadow: -6px 0 20px rgba(0, 0, 0, 0.5);
+      transition: right 0.3s ease;
+      z-index: 10000;
       overflow-y: auto;
-      z-index: 999;
     }
 
-    nav.nav-links.active {
+    .nav-links.show {
       right: 0;
-    }
-
-    .close-btn {
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      background: none;
-      border: none;
-      font-size: 2rem;
-      color: white;
-      cursor: pointer;
     }
 
     .nav-section {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
 
     .nav-title {
-      font-size: 0.95rem;
+      color: #84b6f4;
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 4px;
       text-transform: uppercase;
-      color: #6cb2eb;
-      margin-bottom: 5px;
       border-bottom: 1px solid #333;
       padding-bottom: 3px;
     }
 
-    nav a {
-      text-decoration: none;
-      color: white;
-      background: #1a1a1a;
-      padding: 10px 14px;
-      border-radius: 6px;
+    .nav-links a {
       display: flex;
       align-items: center;
       gap: 10px;
-      font-weight: 500;
-      transition: background 0.3s ease;
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      background-color: #1a1a1a;
+      padding: 10px 14px;
+      border-radius: 8px;
+      transition: background 0.3s, transform 0.2s;
     }
 
-    nav a:hover {
+    .nav-links a:hover {
       background-color: #0d6efd;
+      transform: translateX(5px);
     }
 
-    nav a i {
-      width: 20px;
-      text-align: center;
+    .nav-links a::before {
+      content: "👉";
+      font-size: 1rem;
     }
-
-    /* ✅ Garder le menu hamburger visible partout */
   </style>
 </head>
 <body>
   <header>
     <div class="header-logo">
-      <img src="assets/logo.jpeg" alt="Logo ELZ" />
+      <img src="assets/logo.jpeg" alt="Logo ELZ">
     </div>
-    <div class="hamburger" id="hamburger">
-      <span></span><span></span><span></span>
+
+    <div class="hamburger" onclick="document.querySelector('.nav-links').classList.toggle('show')">
+      <div></div><div></div><div></div>
     </div>
-    <nav class="nav-links" id="navMenu">
-      <button class="close-btn" id="closeBtn">&times;</button>
+
+    <nav class="nav-links">
+      <button onclick="document.querySelector('.nav-links').classList.remove('show')" 
+        style="background:none; border:none; color:white; font-size:1.8rem; align-self:flex-end; cursor:pointer;">
+        &times;
+      </button>
+
       <div class="nav-section">
         <div class="nav-title">Dispatch</div>
-        <a href="dispos.html"><i class="fas fa-calendar-check"></i>Disponibilités</a>
-        <a href="sommaire.html"><i class="fas fa-list-ul"></i>Sommaire</a>
+        <a href="dispos.html">Disponibilités</a>
+        <a href="sommaire.html">Sommaire</a>
       </div>
+
       <div class="nav-section">
         <div class="nav-title">Réparations</div>
-        <a href="garage.html"><i class="fas fa-tools"></i>Garage</a>
-        <a href="equipements.html"><i class="fas fa-cogs"></i>Flotte</a>
+        <a href="garage.html">Garage</a>
+        <a href="equipements.html">Flotte</a>
       </div>
+
       <div class="nav-section">
         <div class="nav-title">Administration</div>
-        <a href="mathieu.html"><i class="fas fa-money-check-alt"></i>Paye</a>
-        <a href="permis.html"><i class="fas fa-id-card"></i>Permis</a>
+        <a href="mathieu.html">Paye</a>
+        <a href="permis.html">Permis</a>
       </div>
     </nav>
   </header>
-
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const hamburger = document.getElementById('hamburger');
-    const navMenu = document.getElementById('navMenu');
-    const closeBtn = document.getElementById('closeBtn');
-
-    if (hamburger && navMenu && closeBtn) {
-      hamburger.addEventListener('click', function () {
-        navMenu.classList.add('active');
-      });
-
-      closeBtn.addEventListener('click', function () {
-        navMenu.classList.remove('active');
-      });
-    }
-  });
-</script>
-
-</body>
-</html>
+  

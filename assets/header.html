@@ -1,29 +1,47 @@
-<style>
-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  background-color: #000;
-  color: white;
-  padding: env(safe-area-inset-top) 20px 0 20px;
-  min-height: calc(60px + env(safe-area-inset-top));
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-sizing: border-box;
-  z-index: 9999;
-}
-  
-body {
-  margin: 0;
-  padding-top: calc(60px + env(safe-area-inset-top));
-}
-  
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="theme-color" content="#000000" />
+  <title>Transport ELZ</title>
+
+  <style>
+    html {
+      background-color: black;
+    }
+
+    body {
+      margin: 0;
+      padding-top: calc(60px + env(safe-area-inset-top));
+      background-color: #f4f4f4;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: #000;
+      color: white;
+      padding-top: env(safe-area-inset-top);
+      height: calc(60px + env(safe-area-inset-top));
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-left: 20px;
+      padding-right: 20px;
+      box-sizing: border-box;
+      z-index: 9999;
+    }
+
     .header-logo img {
       height: 40px;
     }
-  
+
     .hamburger {
       display: flex;
       flex-direction: column;
@@ -31,21 +49,21 @@ body {
       cursor: pointer;
       z-index: 10001;
     }
-  
+
     .hamburger div {
       width: 25px;
       height: 3px;
       background-color: white;
       transition: all 0.3s ease;
     }
-  
+
     .nav-links {
       display: flex;
       flex-direction: column;
       gap: 25px;
       position: fixed;
       top: 0;
-      right: -300px; /* caché par défaut */
+      right: -100%;
       height: 100vh;
       width: 280px;
       background-color: #111;
@@ -54,21 +72,18 @@ body {
       transition: right 0.3s ease;
       z-index: 10000;
       overflow-y: auto;
-      right: -100%;
-      box-shadow: none;
     }
-  
+
     .nav-links.show {
       right: 0;
-      box-shadow: -6px 0 20px rgba(0, 0, 0, 0.5);
     }
-  
+
     .nav-section {
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
-  
+
     .nav-title {
       color: #84b6f4;
       font-weight: 700;
@@ -78,7 +93,7 @@ body {
       border-bottom: 1px solid #333;
       padding-bottom: 3px;
     }
-  
+
     .nav-links a {
       display: flex;
       align-items: center;
@@ -92,21 +107,19 @@ body {
       border-radius: 8px;
       transition: background 0.3s, transform 0.2s;
     }
-  
+
     .nav-links a:hover {
       background-color: #0d6efd;
       transform: translateX(5px);
     }
-  
+
     .nav-links a::before {
       content: "👉";
       font-size: 1rem;
     }
   </style>
-  
+</head>
   <header>
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <div class="header-logo">
       <img src="assets/logo.jpeg" alt="Logo ELZ">
     </div>

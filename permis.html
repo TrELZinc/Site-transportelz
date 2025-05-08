@@ -55,11 +55,17 @@
         setTimeout(() => {
           const header = document.querySelector("header");
           if (header) {
-            document.body.style.paddingTop = `${header.offsetHeight + 10}px`;
+            const height = header.offsetHeight;
+            document.body.style.paddingTop = `${height + 10}px`;
+  
+            // ✅ Décale la bannière rouge vers le bas
+            const banner = document.getElementById("renewalBanner");
+            if (banner) banner.style.marginTop = `${height + 10}px`;
           }
         }, 100);
       });
   </script>
+
 <div id="renewalBanner" class="d-none w-100">
   <div class="renewal-box mx-auto mt-2 mb-4 px-3 py-2 rounded shadow-sm text-danger bg-danger-subtle bg-opacity-25 text-center">
     <div class="fw-bold">⚠️ Permis à renouveler ⚠️</div>

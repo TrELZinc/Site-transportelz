@@ -45,6 +45,21 @@
 
 </head>
 <body class="bg-light py-4">
+  <!-- 🔼 Header HTML inclus dynamiquement -->
+  <div id="customHeader"></div>
+  <script>
+    fetch("assets/header.html")
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById("customHeader").innerHTML = html;
+        setTimeout(() => {
+          const header = document.querySelector("header");
+          if (header) {
+            document.body.style.paddingTop = `${header.offsetHeight + 10}px`;
+          }
+        }, 100);
+      });
+  </script>
 <div id="renewalBanner" class="d-none w-100">
   <div class="renewal-box mx-auto mt-2 mb-4 px-3 py-2 rounded shadow-sm text-danger bg-danger-subtle bg-opacity-25 text-center">
     <div class="fw-bold">⚠️ Permis à renouveler ⚠️</div>
@@ -256,6 +271,38 @@ function showUpcomingRenewals() {
     showUpcomingRenewals();
   })();
 </script>
+  <script>
+  async function afficherAlertesPermis() {
+    const API_URL = "https://script.google.com/macros/s/AKfycbya6pXCawlVp-uoqJWPPZmAtEzSjpRgIQyVrHCaAtVSxz-CtayB8TSTsKtBz6Hbm8jU/exec";
+    try {
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      const docs = data.docs || data;
+
+      const now = new Date();
+      const dans3mois = new Date();
+      dans3mois.setMonth(now.getMonth() + 3);
+
+      const prochains = docs.filter(doc => {
+        const exp = new Date(doc.expiration);
+        return exp >= now && exp <= dans3mois;
+      }).sort((a, b) => new Date(a.expiration) - new Date(b.expiration)).slice(0, 2);
+
+      if (prochains.length > 0) {
+        const messages = prochains.map(doc =>
+          `${doc.unit} – ${doc.permit} (expire le ${doc.expiration})`
+        );
+        document.querySelector(".marquee-content").textContent = messages.join("   •   ");
+        document.getElementById("renewalBanner").classList.remove("d-none");
+      }
+    } catch (e) {
+      console.warn("Impossible d’afficher les alertes de renouvellement :", e);
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", afficherAlertesPermis);
+</script>
+
 <div class="container text-center mt-5">
   <a href="linktree.html" class="btn btn-dark px-4 py-2">⏮️ Retour au menu principal</a>
 </div>

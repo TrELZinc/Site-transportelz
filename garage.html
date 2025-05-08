@@ -251,6 +251,7 @@ input[type=range].range-ticks::-moz-range-thumb {
 </style>
 </head>
 <body>
+  
 <!-- Loader d'attente -->
 <div id="loadingOverlay" style="
   position: fixed;
@@ -265,11 +266,13 @@ input[type=range].range-ticks::-moz-range-thumb {
     <span class="visually-hidden">Chargement...</span>
   </div>
 </div>
-
-<!-- Bannière noire avec logo -->
-<div style="background-color: #111; padding: 10px 0; text-align: center;">
-  <img src="assets/logo.jpeg" alt="Logo" style="height: 60px; object-fit: contain;">
-</div>
+<!-- Header dynamique avec menu hamburger -->
+<div id="customHeader"></div>
+<script>
+  fetch("assets/header.html")
+    .then(res => res.text())
+    .then(html => document.getElementById("customHeader").innerHTML = html);
+</script>
 
 <div class="container py-4">
   <h2 class="text-center mb-4">🔧 Réparations Mécanique 🔧</h2>

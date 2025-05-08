@@ -258,7 +258,6 @@ body {
     Charger la semaine
   </button>
   <div id="firebaseBadge" class="text-center" style="margin-top: 0;"></div>
-  <div id="debugBonus" class="mt-1 text-muted small fst-italic"></div>
 </div>
   </div>
 </div>
@@ -757,8 +756,6 @@ async function chargerSemaineIntelligente() {
       document.getElementById("ajustBonusInput").value = data.ajustBonus || 0;
       document.getElementById("ajustNoteInput").value = data.ajustNote || "";
 
-      const debug = document.getElementById("debugBonus");
-      debug.textContent = `Bonus rechargé : ${data.ajustBonus || 0} $`;
 
       ajustementsTrouvés = true;
       console.log("✅ Ajustements chargés depuis Firebase.");

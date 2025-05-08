@@ -769,7 +769,10 @@ async function chargerSemaineDepuisFirebase() {
     totalForfaitActuel = data.totalForfait || 0;
     totalDouaneActuel = data.totalDouane || 0;
 
-    alert("Semaine chargée depuis Firebase.");
+    alert("Ajustements chargés depuis Firebase. Les données de la semaine vont maintenant s'afficher.");
+
+    await loadSemaine(); // ✅ Recharge les pastilles depuis Google Sheets
+
   } catch (error) {
     console.error("Erreur lors du chargement depuis Firebase :", error);
     alert("Erreur lors du chargement. Vérifiez la console.");

@@ -253,7 +253,8 @@ body {
   <div id="chauffeurTauxBox" class="taux-btns-container w-100"></div>
   </div>
   <div class="col-md-3 d-flex align-items-end">
-    <button class="btn btn-primary w-100" style="font-size: 1.05rem;" onclick="loadSemaine()">Afficher la semaine</button>
+  <div id="firebaseBadge" class="mb-2 text-center"></div>
+  <button class="btn btn-primary" onclick="chargerSemaineIntelligente()">Charger la semaine</button>
   </div>
 </div>
     </div>
@@ -307,7 +308,6 @@ body {
 
  <div class="mt-4 d-flex flex-column flex-md-row justify-content-md-end gap-2 text-center">
   <button class="btn btn-success" onclick="sauvegarderSemaine()">Sauvegarder dans Firebase</button>
-  <button class="btn btn-primary" onclick="chargerSemaineDepuisFirebase()">Charger depuis Firebase</button>
   <button class="btn btn-outline-secondary" onclick="genererPDF()">Exporter en PDF</button>
 </div>
 
@@ -730,6 +730,48 @@ resetAjustementsManuels();
 setupAjustementListeners();
 
 }  
+
+async function chargerSemaineIntelligente() {
+  const chauffeur = document.getElementById("chauffeurSelect").value;
+  const dateInput = document.getElementById("dateInput").value;
+  if (!chauffeur || !dateInput) return alert("Sélectionnez un chauffeur et une date.");
+
+  const semaine = getWeekMonday(dateInput);
+  const docId = `${chauffeur}_${semaine}`;
+
+  let ajustementsTrouvés = false;
+
+  try {
+    const doc = await db.collection("sommateurs").doc(docId).get();
+    if (doc.exists) {
+      const data = doc.data();
+
+      document.getElementById("ajustKmInput").value = data.ajustKm || 0;
+      document.getElementById("ajustHInput").value = data.ajustH || 0;
+      document.getElementById("ajustForfaitInput").value = data.ajustForfait || 0;
+      document.getElementById("ajustBonusInput").value = data.ajustBonus || 0;
+      document.getElementById("ajustNoteInput").value = data.ajustNote || "";
+
+      ajustementsTrouvés = true;
+      console.log("✅ Ajustements chargés depuis Firebase.");
+    } else {
+      resetAjustementsManuels(); // remet à zéro s'il n'y en a pas
+      console.log("ℹ️ Aucun ajustement trouvé dans Firebase.");
+    }
+  } catch (error) {
+    console.error("❌ Erreur Firebase :", error);
+    alert("Erreur lors du chargement des ajustements Firebase.");
+  }
+
+  await loadSemaine(); // ✅ Affiche les pastilles à partir de Google Sheets
+
+    const badge = document.getElementById("firebaseBadge");
+  if (ajustementsTrouvés) {
+    badge.innerHTML = `<span class="badge bg-success">Ajustements Firebase appliqués</span>`;
+  } else {
+    badge.innerHTML = `<span class="badge bg-secondary">Aucun ajustement enregistré</span>`;
+  }
+}
 
 async function chargerSemaineDepuisFirebase() {
   const chauffeur = document.getElementById("chauffeurSelect").value;

@@ -206,13 +206,6 @@ body {
   width: 100%;
 }
 
-  footer {
-    background: none !important;
-    height: 0 !important;
-    padding: 0 !important;
-    border: none !important;
-  }
-
 .fade-out {
   transition: opacity 0.8s ease;
 }
@@ -248,53 +241,51 @@ body {
 
   </style>
 </head>
-  <body>
-<div id="customHeader"></div>
-<script>
-  fetch("assets/header.html")
-    .then(res => res.text())
-    .then(html => {
-      document.getElementById("customHeader").innerHTML = html;
-      setTimeout(() => {
-        const header = document.querySelector("header");
-        if (header) {
-          const height = header.offsetHeight;
-          document.body.style.paddingTop = `${height + 10}px`;
-        }
-      }, 100);
-    });
-</script>
-<div class="container p-4">
-  <div class="row g-3 align-items-end mb-4">
-    <div class="col-md-3">
-      <label class="form-label">Nom du chauffeur</label>
-      <select id="chauffeurSelect" class="form-select">
-        <option value="">-- Choisir --</option>
-      </select>
-    </div>
-    <div class="col-md-3">
-      <label class="form-label">Date de la semaine</label>
-      <input type="date" id="dateInput" class="form-control" />
-    </div>
-    <div class="col-md-3 order-mobile-last">
-      <label class="form-label invisible">Taux</label>
-      <div id="chauffeurTauxBox" class="taux-btns-container w-100"></div>
-    </div>
-    <div class="col-md-3 d-flex align-items-end">
-      <div class="w-100 d-flex flex-column align-items-center mb-1">
-        <button class="btn btn-primary w-100 w-md-auto mb-1" onclick="chargerSemaineIntelligente()" style="font-size: 1.05rem;">
-          Charger la semaine
-        </button>
-        <div id="firebaseBadge" class="text-center" style="margin-top: 0;"></div>
-      </div>
-    </div>
+<body>
+  <div id="customHeader"></div>
+  <script>
+    fetch("assets/header.html")
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById("customHeader").innerHTML = html;
+        setTimeout(() => {
+          const header = document.querySelector("header");
+          if (header) {
+            const height = header.offsetHeight;
+            document.body.style.paddingTop = `${height + 10}px`;
+          }
+        }, 100);
+      });
+  </script>
+
+  <div class="container">
+    <div class="row g-3 align-items-end mb-4">
+  <div class="col-md-3">
+    <label class="form-label">Nom du chauffeur</label>
+    <select id="chauffeurSelect" class="form-select">
+      <option value="">-- Choisir --</option>
+    </select>
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Date de la semaine</label>
+    <input type="date" id="dateInput" class="form-control" />
+  </div>
+  <div class="col-md-3 order-mobile-last">
+  <label class="form-label invisible">Taux</label>
+  <div id="chauffeurTauxBox" class="taux-btns-container w-100"></div>
+  </div>
+  <div class="col-md-3 d-flex align-items-end">
+<div class="w-100 d-flex flex-column align-items-center mb-1">
+  <button class="btn btn-primary w-100 w-md-auto mb-1" onclick="chargerSemaineIntelligente()" style="font-size: 1.05rem;">
+    Charger la semaine
+  </button>
+  <div id="firebaseBadge" class="text-center" style="margin-top: 0;"></div>
+</div>
   </div>
 </div>
-    
-<div class="container">
-  <div class="grid-week" id="pastillesContainer"></div>
-</div>
+    </div>
 
+<div class="grid-week" id="pastillesContainer"></div>
 
 <!-- Pour l'impression uniquement -->
       <div class="pastilles-page1 d-none d-print-grid print-pastilles"></div>

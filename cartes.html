@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Glossaire des cartes de diesel</title>
+  <link rel="stylesheet" href="header.html">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 1rem;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.5rem;
+      padding: 1rem;
+    }
+
+    .carte {
+      width: 300px;
+      height: 180px;
+      border-radius: 15px;
+      background: linear-gradient(135deg, #3a3a3a, #1a1a1a);
+      color: #fff;
+      padding: 1.2rem;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+      position: relative;
+      font-size: 0.95rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .carte .logo {
+      text-align: right;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+
+    .carte .numero {
+      letter-spacing: 2px;
+      font-size: 1.1rem;
+      margin: 0.5rem 0;
+    }
+
+    .carte .nip {
+      font-weight: bold;
+    }
+
+    .carte .unite {
+      font-size: 0.9rem;
+      color: #bbb;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div id="header-container"></div>
+
+  <h1>Glossaire des cartes de diesel</h1>
+
+  <div class="container" id="cartes-container">
+    <!-- Exemple de carte -->
+    <div class="carte">
+      <div class="logo">ELZ</div>
+      <div class="numero">1234 5678 9012 3456</div>
+      <div class="nip">NIP : 9876</div>
+      <div class="unite">Camion 1203</div>
+    </div>
+    <!-- Ajoutez ici d'autres cartes dynamiquement -->
+  </div>
+
+  <script>
+    // Import dynamique du header.html
+    fetch('header.html')
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById('header-container').innerHTML = html;
+      });
+
+    // Exemple de données (à remplacer par vos vraies données si nécessaire)
+    const cartes = [
+      { numero: "1234 5678 9012 3456", nip: "9876", unite: "Camion 1203" },
+      { numero: "2345 6789 0123 4567", nip: "4321", unite: "Remorque 2506" },
+      { numero: "3456 7890 1234 5678", nip: "1111", unite: "Camion 1404" }
+    ];
+
+    const container = document.getElementById('cartes-container');
+
+    cartes.forEach(carte => {
+      const div = document.createElement('div');
+      div.className = 'carte';
+      div.innerHTML = `
+        <div class="logo">ELZ</div>
+        <div class="numero">${carte.numero}</div>
+        <div class="nip">NIP : ${carte.nip}</div>
+        <div class="unite">${carte.unite}</div>
+      `;
+      container.appendChild(div);
+    });
+  </script>
+</body>
+</html>

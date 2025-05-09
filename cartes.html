@@ -4,12 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Glossaire des cartes de diesel</title>
+
   <style>
-    body {
+    html, body {
+      margin: 0;
+      padding-top: calc(60px + env(safe-area-inset-top));
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: #f4f4f4;
-      margin: 0;
-      padding: 1rem;
+    }
+
+    h1 {
+      text-align: center;
+      margin: 2rem 0 1rem;
     }
 
     .container {
@@ -28,7 +34,6 @@
       color: #fff;
       padding: 1.2rem;
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-      position: relative;
       font-size: 0.95rem;
       display: flex;
       flex-direction: column;
@@ -55,57 +60,28 @@
       font-size: 0.9rem;
       color: #bbb;
     }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
   </style>
-</head>
-<body>
-<div id="customHeader"></div>
-<script>
-  fetch("assets/header.html")
-    .then(res => res.text())
-    .then(html => {
-      document.getElementById("customHeader").innerHTML = html;
 
-      // 🧠 Corrige dynamiquement le décalage une fois que le header est injecté
-      setTimeout(() => {
-        const header = document.querySelector("header");
-        if (header) {
-          const height = header.offsetHeight;
-          document.body.style.paddingTop = `${height + 10}px`;
-        }
-      }, 100);
+  <!-- En-tête dynamique -->
+  <script>
+    window.addEventListener("DOMContentLoaded", function () {
+      fetch("assets/header.html")
+        .then(res => res.text())
+        .then(html => {
+          document.getElementById("customHeader").innerHTML = html;
+        });
     });
-</script>
+  </script>
+</head>
 
-  <!-- Header -->
-  <div id="header-container"></div>
+<body>
+  <div id="customHeader"></div>
 
   <h1>Glossaire des cartes de diesel</h1>
 
-  <div class="container" id="cartes-container">
-    <!-- Exemple de carte -->
-    <div class="carte">
-      <div class="logo">ELZ</div>
-      <div class="numero">1234 5678 9012 3456</div>
-      <div class="nip">NIP : 9876</div>
-      <div class="unite">Camion 1203</div>
-    </div>
-    <!-- Ajoutez ici d'autres cartes dynamiquement -->
-  </div>
+  <div class="container" id="cartes-container"></div>
 
   <script>
-    // Import dynamique du header.html
-    fetch('header.html')
-      .then(res => res.text())
-      .then(html => {
-        document.getElementById('header-container').innerHTML = html;
-      });
-
-    // Exemple de données (à remplacer par vos vraies données si nécessaire)
     const cartes = [
       { numero: "1234 5678 9012 3456", nip: "9876", unite: "Camion 1203" },
       { numero: "2345 6789 0123 4567", nip: "4321", unite: "Remorque 2506" },

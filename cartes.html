@@ -4,13 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Glossaire des cartes de diesel</title>
-<script>
-  fetch("header.html")
-    .then(response => response.text())
-    .then(data => {
-      document.getElementById("header-container").innerHTML = data;
-    });
-</script>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -70,6 +63,13 @@
   </style>
 </head>
 <body>
+  <script>
+  fetch("header.html")
+    .then(response => response.text())
+    .then(data => {
+      document.getElementById("header-container").innerHTML = data;
+    });
+</script>
   <!-- Header -->
   <div id="header-container"></div>
 

@@ -63,13 +63,24 @@
   </style>
 </head>
 <body>
-  <script>
-  fetch("header.html")
-    .then(response => response.text())
-    .then(data => {
-      document.getElementById("header-container").innerHTML = data;
+<div id="customHeader"></div>
+<script>
+  fetch("assets/header.html")
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById("customHeader").innerHTML = html;
+
+      // 🧠 Corrige dynamiquement le décalage une fois que le header est injecté
+      setTimeout(() => {
+        const header = document.querySelector("header");
+        if (header) {
+          const height = header.offsetHeight;
+          document.body.style.paddingTop = `${height + 10}px`;
+        }
+      }, 100);
     });
 </script>
+
   <!-- Header -->
   <div id="header-container"></div>
 

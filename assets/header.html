@@ -13,6 +13,7 @@
 
     header {
       position: fixed;
+      transition: transform 0.3s ease;
       top: 0;
       left: 0;
       width: 100%;
@@ -143,6 +144,25 @@
         <a href="mathieu.html">Paye</a>
         <a href="permis.html">Permis</a>
       </div>
-    </nav>
+      </nav>
+      <script>
+  let lastScroll = 0;
+  const header = document.querySelector("header");
+
+  window.addEventListener("scroll", () => {
+    const currentScroll = window.pageYOffset;
+
+    if (currentScroll > lastScroll && currentScroll > 60) {
+      // Scroll vers le bas → cache le header
+      header.style.transform = "translateY(-100%)";
+    } else {
+      // Scroll vers le haut → montre le header
+      header.style.transform = "translateY(0)";
+    }
+
+    lastScroll = currentScroll;
+  });
+</script>
+    
   </header>
   

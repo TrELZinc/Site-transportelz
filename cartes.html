@@ -89,41 +89,43 @@
     }
 
 .carte.petro {
-  background: linear-gradient(145deg, #2a2a2a, #000000);
+  background: linear-gradient(145deg, #1a1a1a, #000);
   color: #fff;
   font-family: 'Courier New', monospace;
   position: relative;
-  border: none;
   overflow: hidden;
-  padding-top: 2rem;
+  border: none;
+  padding-top: 1.5rem;
 }
 
+/* effet route rouge stylisée */
 .carte.petro::before {
   content: "";
   position: absolute;
-  width: 200%;
-  height: 300%;
-  top: -50%;
-  left: -50%;
-  background: radial-gradient(circle at 60% 70%, #d32f2f 0%, #000 40%);
+  width: 180%;
+  height: 60%;
+  top: 60%;
+  left: -40%;
+  background: linear-gradient(to right, transparent 10%, #d32f2f 20%, #d32f2f 80%, transparent 90%);
   transform: rotate(-20deg);
-  opacity: 0.3;
+  opacity: 0.6;
   z-index: 0;
 }
 
 .carte.petro .badge-fournisseur {
-  background-color: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   color: white;
   font-weight: bold;
   font-size: 0.75rem;
+  z-index: 2;
 }
 
 .carte.petro .logo {
   position: absolute;
   top: 10px;
   right: 10px;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: bold;
   color: #fff;
   z-index: 2;
@@ -134,6 +136,15 @@
 .carte.petro .unite {
   z-index: 2;
   position: relative;
+}
+
+.logo-petro {
+  height: 24px;
+  vertical-align: middle;
+  border-radius: 2px;
+  background-color: white;
+  padding: 1px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
 }
 
     .carte.irving {
@@ -242,7 +253,9 @@ function renderCartes() {
       const fournisseurClasse = getFournisseurClass(carte.fournisseur);
       div.className = `carte ${fournisseurClasse}`;
       div.innerHTML = `
-        <div class="badge-fournisseur">${carte.fournisseur}</div>
+<div class="badge-fournisseur">
+  ${carte.fournisseur.includes("Petro") ? '<img src="https://upload.wikimedia.org/wikipedia/en/thumb/f/fc/Petro-Canada_logo.svg/150px-Petro-Canada_logo.svg.png" alt="Petro-Canada" class="logo-petro">' : carte.fournisseur}
+</div>
         <div class="logo">ELZ</div>
         <div class="numero">${carte.numero}</div>
         <div class="nip">NIP : ${carte.nip}</div>

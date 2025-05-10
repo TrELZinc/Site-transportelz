@@ -262,32 +262,33 @@ function renderCartes() {
   const rechercheTexte = search.value.toLowerCase();
   const rechercheNormalisee = rechercheTexte.replace(/\s+/g, '');
 
+  let matchCount = 0;
+
   cartes.forEach(carte => {
     const uniteMatch = !filtreUnite || carte.unite.toLowerCase() === filtreUnite;
     const numeroNormalise = carte.numero.replace(/\s+/g, '').toLowerCase();
     const numeroMatch = rechercheNormalisee === '' || numeroNormalise.includes(rechercheNormalisee);
 
     if (uniteMatch && numeroMatch) {
+      matchCount++;
       const div = document.createElement('div');
       const fournisseurClasse = getFournisseurClass(carte.fournisseur);
       div.className = `carte ${fournisseurClasse}`;
       div.innerHTML = `
-<div class="badge-fournisseur">
-  ${carte.fournisseur.includes("Petro") 
-    ? '<img src="https://upload.wikimedia.org/wikipedia/en/5/52/Petro-Canada_logo.png" alt="Petro-Canada" class="logo-petro">' 
-    : carte.fournisseur}
-</div>
+        <div class="badge-fournisseur">${carte.fournisseur}</div>
         <div class="logo">ELZ</div>
         <div class="numero">${carte.numero}</div>
         <div class="nip">NIP : ${carte.nip}</div>
         <div class="unite">${carte.unite}</div>
       `;
-if (container.children.length === 0) {
-  container.innerHTML = '<div class="text-center text-muted">Aucune carte trouvée.</div>';
-}
       container.appendChild(div);
     }
   });
+
+  // Affiche le message seulement si on filtre et qu’il n’y a aucun résultat
+  if (matchCount === 0 && (filtreUnite || rechercheNormalisee)) {
+    container.innerHTML = '<div class="text-center text-muted">Aucune carte trouvée.</div>';
+  }
 }
 
     select.addEventListener("change", renderCartes);

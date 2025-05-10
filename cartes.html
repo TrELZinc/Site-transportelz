@@ -44,7 +44,6 @@
       width: 300px;
       height: 200px;
       border-radius: 15px;
-      background: linear-gradient(135deg, #3a3a3a, #1a1a1a);
       color: #fff;
       padding: 1.2rem;
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
@@ -53,27 +52,67 @@
       flex-direction: column;
       justify-content: space-between;
       position: relative;
+      overflow: hidden;
     }
 
     .carte .logo {
       text-align: right;
       font-weight: bold;
       font-size: 1.2rem;
+      z-index: 1;
     }
 
     .carte .numero {
       letter-spacing: 2px;
       font-size: 1.1rem;
       margin: 0.5rem 0;
+      z-index: 1;
     }
 
     .carte .nip {
       font-weight: bold;
+      z-index: 1;
     }
 
     .carte .unite {
       font-size: 0.9rem;
       color: #bbb;
+      z-index: 1;
+    }
+
+    /* === Fournisseur Styles === */
+
+    .carte.esso {
+      background: linear-gradient(145deg, #1a1a1a, #000000);
+      color: white;
+      font-family: 'Courier New', monospace;
+    }
+
+    .carte.petro {
+      background: linear-gradient(to bottom right, #2a2a2a, #444);
+      background-blend-mode: multiply;
+      color: #eee;
+      font-family: 'Segoe UI', sans-serif;
+      border-left: 6px solid #d32f2f;
+    }
+
+    .carte.irving {
+      background-color: white;
+      color: #111;
+      border: 2px solid #c62828;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .carte.irving::before {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      background: linear-gradient(to top right, transparent 40%, #c62828 40%, #c62828 60%, transparent 60%);
+      opacity: 0.1;
+      z-index: 0;
     }
 
     .badge-fournisseur {
@@ -85,18 +124,10 @@
       padding: 4px 10px;
       border-radius: 5px;
       text-transform: uppercase;
-    }
-
-    .esso {
-      background-color: #007bff;
-    }
-
-    .petro {
-      background-color: #d32f2f;
-    }
-
-    .irving {
-      background-color: #2e7d32;
+      z-index: 1;
+      background-color: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(2px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
     }
   </style>
 
@@ -148,9 +179,10 @@
     });
 
     function getFournisseurClass(name) {
-      if (name.toLowerCase().includes("esso")) return "esso";
-      if (name.toLowerCase().includes("petro")) return "petro";
-      if (name.toLowerCase().includes("irving")) return "irving";
+      const n = name.toLowerCase();
+      if (n.includes("esso")) return "esso";
+      if (n.includes("petro")) return "petro";
+      if (n.includes("irving")) return "irving";
       return "";
     }
 
@@ -166,12 +198,11 @@
 
         if (matchUnite && matchNumero) {
           const div = document.createElement('div');
-          div.className = 'carte';
-
           const fournisseurClasse = getFournisseurClass(carte.fournisseur);
+          div.className = `carte ${fournisseurClasse}`;
 
           div.innerHTML = `
-            <div class="badge-fournisseur ${fournisseurClasse}">${carte.fournisseur}</div>
+            <div class="badge-fournisseur">${carte.fournisseur}</div>
             <div class="logo">ELZ</div>
             <div class="numero">${carte.numero}</div>
             <div class="nip">NIP : ${carte.nip}</div>

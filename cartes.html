@@ -160,6 +160,16 @@
     .text-center.mt-3 {
       margin-bottom: 1rem;
     }
+
+    .logo-irving {
+      height: 22px;
+      vertical-align: middle;
+      background: white;
+      border-radius: 3px;
+      padding: 1px 3px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+    }
+
   </style>
 
   <script>
@@ -288,7 +298,11 @@
         const fournisseurClasse = getFournisseurClass(carte.fournisseur);
         div.className = `carte ${fournisseurClasse}`;
         div.innerHTML = `
-          <div class="badge-fournisseur">${carte.fournisseur}</div>
+          <div class="badge-fournisseur">
+            ${carte.fournisseur === "Irving"
+              ? '<img src="assets/icones/irving.png" alt="Irving" class="logo-irving">'
+              : carte.fournisseur}
+          </div>
           <div class="logo">ELZ</div>
           <div class="numero">${carte.numero}</div>
           <div class="nip">NIP : ${carte.nip}</div>

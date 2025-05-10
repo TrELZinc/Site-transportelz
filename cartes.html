@@ -195,7 +195,7 @@ function renderCartes() {
   cartes.forEach(carte => {
     const uniteMatch = !filtreUnite || carte.unite.toLowerCase() === filtreUnite;
     const numeroNormalise = carte.numero.replace(/\s+/g, '').toLowerCase();
-    const numeroMatch = !rechercheNormalisee || numeroNormalise.includes(rechercheNormalisee);
+    const numeroMatch = rechercheNormalisee === '' || numeroNormalise.includes(rechercheNormalisee);
 
     if (uniteMatch && numeroMatch) {
       const div = document.createElement('div');

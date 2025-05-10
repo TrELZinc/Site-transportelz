@@ -187,31 +187,32 @@
     }
 
     function renderCartes() {
-      container.innerHTML = '';
-      const filtreUnite = select.value.toLowerCase();
-      const rechercheTexte = search.value.toLowerCase().replace(/\s+/g, '');
+  container.innerHTML = '';
+  const filtreUnite = select.value.toLowerCase();
+  const rechercheTexte = search.value.toLowerCase();
+  const rechercheNormalisee = rechercheTexte.replace(/\s+/g, '');
 
-      cartes.forEach(carte => {
-        const matchUnite = !filtreUnite || carte.unite.toLowerCase() === filtreUnite;
-        const numeroNormalise = carte.numero.replace(/\s+/g, '').toLowerCase();
-        const matchNumero = !rechercheTexte || numeroNormalise.includes(rechercheTexte);
+  cartes.forEach(carte => {
+    const matchUnite = !filtreUnite || carte.unite.toLowerCase() === filtreUnite;
+    const numeroNormalise = carte.numero.replace(/\s+/g, '').toLowerCase();
+    const matchNumero = !rechercheNormalisee || numeroNormalise.includes(rechercheNormalisee);
 
-        if (matchUnite && matchNumero) {
-          const div = document.createElement('div');
-          const fournisseurClasse = getFournisseurClass(carte.fournisseur);
-          div.className = `carte ${fournisseurClasse}`;
+    if (matchUnite && matchNumero) {
+      const div = document.createElement('div');
+      const fournisseurClasse = getFournisseurClass(carte.fournisseur);
+      div.className = `carte ${fournisseurClasse}`;
 
-          div.innerHTML = `
-            <div class="badge-fournisseur">${carte.fournisseur}</div>
-            <div class="logo">ELZ</div>
-            <div class="numero">${carte.numero}</div>
-            <div class="nip">NIP : ${carte.nip}</div>
-            <div class="unite">${carte.unite}</div>
-          `;
-          container.appendChild(div);
-        }
-      });
+      div.innerHTML = `
+        <div class="badge-fournisseur">${carte.fournisseur}</div>
+        <div class="logo">ELZ</div>
+        <div class="numero">${carte.numero}</div>
+        <div class="nip">NIP : ${carte.nip}</div>
+        <div class="unite">${carte.unite}</div>
+      `;
+      container.appendChild(div);
     }
+  });
+}
 
     select.addEventListener("change", renderCartes);
     search.addEventListener("input", renderCartes);

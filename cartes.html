@@ -186,15 +186,16 @@
       return "";
     }
 
-    function renderCartes() {
+function renderCartes() {
   container.innerHTML = '';
   const filtreUnite = select.value.toLowerCase();
-  const rechercheTexte = search.value.toLowerCase().replace(/\s+/g, '');
+  const rechercheTexte = search.value.toLowerCase();
+  const rechercheNormalisee = rechercheTexte.replace(/\s+/g, '');
 
   cartes.forEach(carte => {
     const uniteMatch = !filtreUnite || carte.unite.toLowerCase() === filtreUnite;
     const numeroNormalise = carte.numero.replace(/\s+/g, '').toLowerCase();
-    const numeroMatch = !rechercheTexte || numeroNormalise.includes(rechercheTexte);
+    const numeroMatch = !rechercheNormalisee || numeroNormalise.includes(rechercheNormalisee);
 
     if (uniteMatch && numeroMatch) {
       const div = document.createElement('div');

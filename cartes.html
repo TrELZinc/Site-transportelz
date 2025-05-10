@@ -191,13 +191,19 @@
 
   <div class="container" id="cartes-container"></div>
 
+  <div class="text-center mt-3">
+    <button id="loadMoreBtn" class="btn btn-outline-primary d-none">Afficher plus</button>
+  </div>
+
   <script>
     const cartes = [
       { numero: "1234 5678 9012 7777", nip: "9876", unite: "Camion 1203", fournisseur: "ESSO" },
       { numero: "2345 6789 0123 4567", nip: "4321", unite: "Remorque 2506", fournisseur: "Petro-Pass" },
       { numero: "3456 7890 1234 5678", nip: "1111", unite: "Camion 1404", fournisseur: "Irving" },
       { numero: "4567 8901 2345 6789", nip: "2222", unite: "Camion 1203", fournisseur: "Petro-Pass" },
-      { numero: "5678 9012 3456 7890", nip: "3333", unite: "Remorque 2506", fournisseur: "ESSO" }
+      { numero: "5678 9012 3456 7890", nip: "3333", unite: "Remorque 2506", fournisseur: "ESSO" },
+      { numero: "6789 0123 4567 8901", nip: "4444", unite: "Camion 1404", fournisseur: "Irving" },
+      { numero: "7890 1234 5678 9012", nip: "5555", unite: "Camion 1203", fournisseur: "Petro-Pass" }
     ];
 
     const container = document.getElementById('cartes-container');
@@ -205,6 +211,11 @@
     const fournisseurSelect = document.getElementById('filterFournisseur');
     const search = document.getElementById('searchCarte');
     const clearButton = document.getElementById("clearSearch");
+    const loadMoreBtn = document.getElementById("loadMoreBtn");
+
+    let filteredCartes = [];
+    let cartesAffichees = 0;
+    const BATCH_SIZE = 6;
 
     search.addEventListener("input", () => {
       clearButton.classList.toggle("d-none", search.value.trim() === "");
@@ -216,6 +227,10 @@
       clearButton.classList.add("d-none");
       renderCartes();
     });
+
+    select.addEventListener("change", renderCartes);
+    fournisseurSelect.addEventListener("change", renderCartes);
+    loadMoreBtn.addEventListener("click", afficherProchainesCartes);
 
     const unites = [...new Set(cartes.map(c => c.unite))];
     unites.forEach(unite => {
@@ -248,37 +263,49 @@
       const rechercheTexte = search.value.toLowerCase();
       const rechercheNormalisee = rechercheTexte.replace(/\s+/g, '');
 
-      let matchCount = 0;
-
-      cartes.forEach(carte => {
+      filteredCartes = cartes.filter(carte => {
         const uniteMatch = !filtreUnite || carte.unite.toLowerCase() === filtreUnite;
         const fournisseurMatch = !filtreFournisseur || carte.fournisseur.toLowerCase() === filtreFournisseur;
         const numeroNormalise = carte.numero.replace(/\s+/g, '').toLowerCase();
         const numeroMatch = rechercheNormalisee === '' || numeroNormalise.includes(rechercheNormalisee);
-
-        if (uniteMatch && numeroMatch && fournisseurMatch) {
-          matchCount++;
-          const div = document.createElement('div');
-          const fournisseurClasse = getFournisseurClass(carte.fournisseur);
-          div.className = `carte ${fournisseurClasse}`;
-          div.innerHTML = `
-            <div class="badge-fournisseur">${carte.fournisseur}</div>
-            <div class="logo">ELZ</div>
-            <div class="numero">${carte.numero}</div>
-            <div class="nip">NIP : ${carte.nip}</div>
-            <div class="unite">${carte.unite}</div>
-          `;
-          container.appendChild(div);
-        }
+        return uniteMatch && numeroMatch && fournisseurMatch;
       });
 
-      if (matchCount === 0 && (filtreUnite || filtreFournisseur || rechercheNormalisee)) {
+      cartesAffichees = 0;
+      afficherProchainesCartes();
+    }
+
+    function afficherProchainesCartes() {
+      const cartesRestantes = filteredCartes.slice(cartesAffichees, cartesAffichees + BATCH_SIZE);
+
+      cartesRestantes.forEach(carte => {
+        const div = document.createElement('div');
+        const fournisseurClasse = getFournisseurClass(carte.fournisseur);
+        div.className = `carte ${fournisseurClasse}`;
+        div.innerHTML = `
+          <div class="badge-fournisseur">${carte.fournisseur}</div>
+          <div class="logo">ELZ</div>
+          <div class="numero">${carte.numero}</div>
+          <div class="nip">NIP : ${carte.nip}</div>
+          <div class="unite">${carte.unite}</div>
+        `;
+        container.appendChild(div);
+      });
+
+      cartesAffichees += cartesRestantes.length;
+
+      if (cartesAffichees >= filteredCartes.length) {
+        loadMoreBtn.classList.add("d-none");
+      } else {
+        loadMoreBtn.classList.remove("d-none");
+      }
+
+      if (filteredCartes.length === 0) {
         container.innerHTML = '<div class="text-center text-muted">Aucune carte trouvée.</div>';
+        loadMoreBtn.classList.add("d-none");
       }
     }
 
-    select.addEventListener("change", renderCartes);
-    fournisseurSelect.addEventListener("change", renderCartes);
     renderCartes();
   </script>
 </body>

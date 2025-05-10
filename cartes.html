@@ -180,6 +180,10 @@
       backdrop-filter: blur(2px);
       border: 1px solid rgba(255, 255, 255, 0.3);
     }
+#searchCarte:focus {
+  border-color: #d32f2f;
+  box-shadow: 0 0 0 0.2rem rgba(211, 47, 47, 0.25);
+}
   </style>
 
   <script>
@@ -278,7 +282,9 @@ function renderCartes() {
         <div class="nip">NIP : ${carte.nip}</div>
         <div class="unite">${carte.unite}</div>
       `;
-
+if (container.children.length === 0) {
+  container.innerHTML = '<div class="text-center text-muted">Aucune carte trouvée.</div>';
+}
       container.appendChild(div);
     }
   });

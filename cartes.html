@@ -230,6 +230,12 @@ search.addEventListener("input", () => {
   renderCartes();
 });
 
+clearButton.addEventListener("click", () => {
+  search.value = "";
+  clearButton.classList.add("d-none");
+  renderCartes();
+});
+
     const unites = [...new Set(cartes.map(c => c.unite))];
     unites.forEach(unite => {
       const opt = document.createElement("option");

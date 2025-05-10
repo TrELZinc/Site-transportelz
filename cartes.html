@@ -254,7 +254,9 @@ function renderCartes() {
       div.className = `carte ${fournisseurClasse}`;
       div.innerHTML = `
 <div class="badge-fournisseur">
-  ${carte.fournisseur.includes("Petro") ? '<img src="https://upload.wikimedia.org/wikipedia/en/thumb/f/fc/Petro-Canada_logo.svg/150px-Petro-Canada_logo.svg.png" alt="Petro-Canada" class="logo-petro">' : carte.fournisseur}
+  ${carte.fournisseur.includes("Petro") 
+    ? '<img src="https://upload.wikimedia.org/wikipedia/en/5/52/Petro-Canada_logo.png" alt="Petro-Canada" class="logo-petro">' 
+    : carte.fournisseur}
 </div>
         <div class="logo">ELZ</div>
         <div class="numero">${carte.numero}</div>

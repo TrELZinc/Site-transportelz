@@ -205,7 +205,7 @@
     <label for="searchCarte">Recherche par numéro de carte :</label>
 <div class="input-group">
   <input type="text" id="searchCarte" class="form-control" placeholder="Ex : 5678">
-  <button id="clearSearch" class="btn btn-outline-secondary" type="button">Effacer</button>
+<button id="clearSearch" class="btn btn-outline-secondary d-none" type="button">Effacer</button>
 </div>
   </div>
 
@@ -223,9 +223,10 @@
     const container = document.getElementById('cartes-container');
     const select = document.getElementById('filterCamion');
     const search = document.getElementById('searchCarte');
+    const clearButton = document.getElementById("clearSearch");
 
-document.getElementById("clearSearch").addEventListener("click", () => {
-  search.value = "";
+search.addEventListener("input", () => {
+  clearButton.classList.toggle("d-none", search.value.trim() === "");
   renderCartes();
 });
 

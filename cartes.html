@@ -233,10 +233,10 @@
   <script>
     const cartes = [
       { numero: "1234 5678 9012 7777", nip: "9876", unite: "Camion 1203", fournisseur: "ESSO" },
-      { numero: "2345 6789 0123 4567", nip: "4321", unite: "Remorque 2506", fournisseur: "Petro-Pass" },
+      { numero: "2345 6789 0123 4567", nip: "4321", unite: "Camion 1303", fournisseur: "Petro-Pass" },
       { numero: "3456 7890 1234 5678", nip: "1111", unite: "Camion 1404", fournisseur: "Irving" },
       { numero: "4567 8901 2345 6789", nip: "2222", unite: "Camion 1203", fournisseur: "Petro-Pass" },
-      { numero: "5678 9012 3456 7890", nip: "3333", unite: "Remorque 2506", fournisseur: "ESSO" },
+      { numero: "5678 9012 3456 7890", nip: "3333", unite: "Camion 1503", fournisseur: "ESSO" },
       { numero: "6789 0123 4567 8901", nip: "4444", unite: "Camion 1404", fournisseur: "Irving" },
       { numero: "7890 1234 5678 9012", nip: "5555", unite: "Camion 1203", fournisseur: "Petro-Pass" }
     ];
@@ -320,7 +320,7 @@
         div.innerHTML = `
           <div class="badge-fournisseur">
             ${carte.fournisseur === "Irving"
-              ? '<img src="assets/icones/irving.png" alt="Irving" class="logo-irving">'
+              ? '<img src="assets/icones/irvingoil.png" alt="Irving" class="logo-irving">'
               : carte.fournisseur === "Petro-Pass"
               ? '<img src="assets/icones/pcanada.png" alt="Petro-Pass" class="logo-petro">'
               : carte.fournisseur === "ESSO"

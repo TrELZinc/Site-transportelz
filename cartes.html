@@ -203,7 +203,10 @@
     </select>
 
     <label for="searchCarte">Recherche par numéro de carte :</label>
-    <input type="text" id="searchCarte" class="form-control" placeholder="Ex : 5678">
+<div class="input-group">
+  <input type="text" id="searchCarte" class="form-control" placeholder="Ex : 5678">
+  <button id="clearSearch" class="btn btn-outline-secondary" type="button">Effacer</button>
+</div>
   </div>
 
   <div class="container" id="cartes-container"></div>
@@ -220,6 +223,11 @@
     const container = document.getElementById('cartes-container');
     const select = document.getElementById('filterCamion');
     const search = document.getElementById('searchCarte');
+
+document.getElementById("clearSearch").addEventListener("click", () => {
+  search.value = "";
+  renderCartes();
+});
 
     const unites = [...new Set(cartes.map(c => c.unite))];
     unites.forEach(unite => {
@@ -263,6 +271,7 @@ function renderCartes() {
         <div class="nip">NIP : ${carte.nip}</div>
         <div class="unite">${carte.unite}</div>
       `;
+
       container.appendChild(div);
     }
   });

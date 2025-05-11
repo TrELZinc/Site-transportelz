@@ -248,9 +248,7 @@
 
   <h1>⛽️ Cartes de diesel ⛽️</h1>
   
-<div class="text-center my-3">
-  <button id="unlockAllBtn" class="btn btn-danger">Afficher les données</button>
-</div>
+
   <div class="filters">
     <label for="filterCamion">Filtrer par unité :</label>
     <select id="filterCamion" class="form-select mb-2">
@@ -268,6 +266,9 @@
       <button id="clearSearch" class="btn btn-outline-secondary d-none" type="button">Effacer</button>
     </div>
   </div>
+  <div class="text-center my-3">
+  <button id="unlockAllBtn" class="btn btn-danger">Afficher les données</button>
+</div>
 
   <div class="container" id="cartes-container"></div>
 
@@ -454,7 +455,7 @@ function revealCardData(button) {
     }
 
     renderCartes();
-    const unlockAllBtn = document.getElementById('unlockAllBtn');
+const unlockAllBtn = document.getElementById('unlockAllBtn');
 const globalModal = document.getElementById('globalPinModal');
 const globalPinInput = document.getElementById('globalPinInput');
 const clearGlobalPin = document.getElementById('clearGlobalPin');
@@ -521,6 +522,25 @@ function revealAllCards() {
     <div id="globalPinInput" style="font-size: 1.5rem; letter-spacing: 8px;">____</div>
     <div class="digits mt-3">
       ${[1,2,3,4,5,6,7,8,9,0].map(n => `<button class="digit">${n}</button>`).join('')}
+      <button class="clear" id="clearGlobalPin">Effacer</button>
+    </div>
+  </div>
+</div>
+<div id="globalPinModal" class="modal-overlay d-none">
+  <div class="num-pad">
+    <h4>Entrez le code PIN</h4>
+    <div id="globalPinInput" style="font-size: 1.5rem; letter-spacing: 8px;">____</div>
+    <div class="digits mt-3">
+      <button class="digit">1</button>
+      <button class="digit">2</button>
+      <button class="digit">3</button>
+      <button class="digit">4</button>
+      <button class="digit">5</button>
+      <button class="digit">6</button>
+      <button class="digit">7</button>
+      <button class="digit">8</button>
+      <button class="digit">9</button>
+      <button class="digit">0</button>
       <button class="clear" id="clearGlobalPin">Effacer</button>
     </div>
   </div>

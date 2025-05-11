@@ -232,6 +232,21 @@
   color: white;
 }
 
+@keyframes shake {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(6px); }
+  100% { transform: translateX(0); }
+}
+
+.input-error {
+  animation: shake 0.4s ease;
+  border: 2px solid #ff4d4d !important;
+  background-color: #ffe6e6;
+}
+
   </style>
 
   <script>
@@ -287,9 +302,7 @@
            class="form-control text-center fs-4 mb-3"
            placeholder="____"
            style="letter-spacing: 10px;" />
-    
-    <button class="btn btn-danger w-100" id="submitPinBtn">Valider</button>
-    <button class="btn btn-secondary mt-2 w-100" id="clearGlobalPin">Effacer</button>
+    <button class="btn btn-secondary w-100" id="clearGlobalPin">Effacer</button>
   </div>
 </div>
 
@@ -322,17 +335,19 @@
       const unlockAllBtn = document.getElementById('unlockAllBtn');
       const globalModal = document.getElementById('globalPinModal');
       const globalPinInput = document.getElementById('globalPinInput');
-      globalPinInput.addEventListener('input', () => {
+globalPinInput.addEventListener('input', () => {
   const code = globalPinInput.value.trim();
   if (code.length === 4) {
     if (code === '1359') {
       revealAllCards();
       closeGlobalModal();
     } else {
+      globalPinInput.classList.add('input-error');
       globalPinInput.value = '';
       globalPinInput.placeholder = 'Erreur';
       setTimeout(() => {
         globalPinInput.placeholder = '____';
+        globalPinInput.classList.remove('input-error');
       }, 1000);
     }
   }

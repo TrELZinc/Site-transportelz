@@ -327,20 +327,17 @@
       let filteredCartes = cartes.slice();
       let cartesAffichees = 0;
       const BATCH_SIZE = 8;
-      let globalPin = '';
       
-      const globalPinInputField = document.getElementById('globalPinInput');
-const submitPinBtn = document.getElementById('submitPinBtn');
-const clearGlobalPin = document.getElementById('clearGlobalPin');
+      const submitPinBtn = document.getElementById('submitPinBtn');
 
 submitPinBtn.addEventListener('click', () => {
-  const code = globalPinInputField.value.trim();
+  const code = globalPinInput.value.trim();       // ✅
   if (code === '1359') {
     revealAllCards();
     closeGlobalModal();
   } else {
-    globalPinInputField.value = '';
-    globalPinInputField.placeholder = 'Erreur';
+globalPinInput.value = '';
+globalPinInput.placeholder = 'Erreur';
     setTimeout(() => globalPinInputField.placeholder = '____', 1000);
   }
 });
@@ -437,23 +434,16 @@ clearGlobalPin.addEventListener('click', () => {
       // PIN Global
       unlockAllBtn.addEventListener('click', () => {
         globalModal.classList.remove('d-none');
-        globalPin = '';
-        updateGlobalPinDisplay();
       });
 
 
-      clearGlobalPin.addEventListener('click', () => {
-        globalPin = '';
-        updateGlobalPinDisplay();
-      });
-
-      function updateGlobalPinDisplay() {
-        globalPinInput.textContent = globalPin.padEnd(4, '_');
-      }
+clearGlobalPin.addEventListener('click', () => {
+  globalPinInput.value = '';
+  globalPinInput.placeholder = '____';
+});
 
       function closeGlobalModal() {
         globalModal.classList.add('d-none');
-        globalPin = '';
       }
 
       function revealAllCards() {

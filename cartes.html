@@ -247,6 +247,15 @@
   background-color: #ffe6e6;
 }
 
+@keyframes flash-success {
+  0% { background-color: #d4edda; }
+  100% { background-color: white; }
+}
+
+.flash-success {
+  animation: flash-success 0.6s ease-out;
+}
+
   </style>
 
   <script>
@@ -338,9 +347,15 @@
 globalPinInput.addEventListener('input', () => {
   const code = globalPinInput.value.trim();
   if (code.length === 4) {
-    if (code === '1359') {
-      revealAllCards();
-      closeGlobalModal();
+if (code === '1359') {
+  globalPinInput.classList.add('flash-success');
+
+  setTimeout(() => {
+    revealAllCards();
+    closeGlobalModal();
+    globalPinInput.classList.remove('flash-success');
+  }, 500); // attend que l'animation se voie bien
+}
     } else {
       globalPinInput.classList.add('input-error');
       globalPinInput.value = '';

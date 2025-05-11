@@ -266,9 +266,9 @@
       <button id="clearSearch" class="btn btn-outline-secondary d-none" type="button">Effacer</button>
     </div>
   </div>
-  <div class="text-center my-3">
-  <button id="unlockAllBtn" class="btn btn-danger">Afficher les données</button>
-</div>
+<div class="text-center my-3">
+    <button id="unlockAllBtn" class="btn btn-danger">Afficher les données</button>
+  </div>
 
   <div class="container" id="cartes-container"></div>
 
@@ -276,274 +276,206 @@
     <button id="loadMoreBtn" class="btn btn-outline-primary d-none">Afficher plus</button>
   </div>
 
-  <script>
-  
-  const modal = document.getElementById('pinModal');
-const pinInput = document.getElementById('pinInput');
-let currentPin = '';
-let activeButton = null;
-
-document.querySelectorAll('.btn-unlock').forEach(btn => {
-  btn.addEventListener('click', () => {
-    modal.classList.remove('d-none');
-    currentPin = '';
-    updatePinDisplay();
-    activeButton = btn;
-  });
-});
-
-document.querySelectorAll('.digit').forEach(btn => {
-  btn.addEventListener('click', () => {
-    if (currentPin.length < 4) {
-      currentPin += btn.textContent;
-      updatePinDisplay();
-    }
-
-    if (currentPin.length === 4) {
-      if (currentPin === '1359') {
-        revealCardData(activeButton);
-        closePinPad();
-      } else {
-        pinInput.textContent = 'Erreur';
-        setTimeout(() => {
-          currentPin = '';
-          updatePinDisplay();
-        }, 800);
-      }
-    }
-  });
-});
-
-function updatePinDisplay() {
-  pinInput.textContent = currentPin.padEnd(4, '_'.repeat(4 - currentPin.length));
-}
-
-document.getElementById('clearPin').addEventListener('click', () => {
-  currentPin = '';
-  updatePinDisplay();
-});
-
-function closePinPad() {
-  modal.classList.add('d-none');
-  currentPin = '';
-  activeButton = null;
-}
-
-function revealCardData(button) {
-  const carte = button.closest('.carte');
-  carte.querySelector('.numero').textContent = button.dataset.numero;
-  carte.querySelector('.nip').textContent = 'NIP : ' + button.dataset.nip;
-  button.remove();
-}
-
-    const cartes = [
-      { numero: "1234 5678 9012 7777", nip: "9876", unite: "Camion 1203", fournisseur: "ESSO" },
-      { numero: "2345 6789 0123 4567", nip: "4321", unite: "Camion 1303", fournisseur: "Petro-Pass" },
-      { numero: "3456 7890 1234 5678", nip: "1111", unite: "Camion 1404", fournisseur: "Irving" },
-      { numero: "4567 8901 2345 6789", nip: "2222", unite: "Camion 1203", fournisseur: "Petro-Pass" },
-      { numero: "5678 9012 3456 7890", nip: "3333", unite: "Camion 1503", fournisseur: "ESSO" },
-      { numero: "6789 0123 4567 8901", nip: "4444", unite: "Camion 1404", fournisseur: "Irving" },
-      { numero: "7890 1234 5678 9012", nip: "5555", unite: "Camion 1203", fournisseur: "Petro-Pass" }
-    ];
-
-    const container = document.getElementById('cartes-container');
-    const select = document.getElementById('filterCamion');
-    const fournisseurSelect = document.getElementById('filterFournisseur');
-    const search = document.getElementById('searchCarte');
-    const clearButton = document.getElementById("clearSearch");
-    const loadMoreBtn = document.getElementById("loadMoreBtn");
-
-    let filteredCartes = [];
-    let cartesAffichees = 0;
-    const BATCH_SIZE = 8;
-
-    search.addEventListener("input", () => {
-      clearButton.classList.toggle("d-none", search.value.trim() === "");
-      renderCartes();
-    });
-
-    clearButton.addEventListener("click", () => {
-      search.value = "";
-      clearButton.classList.add("d-none");
-      renderCartes();
-    });
-
-    select.addEventListener("change", renderCartes);
-    fournisseurSelect.addEventListener("change", renderCartes);
-    loadMoreBtn.addEventListener("click", afficherProchainesCartes);
-
-    const unites = [...new Set(cartes.map(c => c.unite))];
-    unites.forEach(unite => {
-      const opt = document.createElement("option");
-      opt.value = unite;
-      opt.textContent = unite;
-      select.appendChild(opt);
-    });
-
-    const fournisseurs = [...new Set(cartes.map(c => c.fournisseur))];
-    fournisseurs.forEach(f => {
-      const opt = document.createElement("option");
-      opt.value = f;
-      opt.textContent = f;
-      fournisseurSelect.appendChild(opt);
-    });
-
-    function getFournisseurClass(name) {
-      const n = name.toLowerCase();
-      if (n.includes("esso")) return "esso";
-      if (n.includes("petro")) return "petro";
-      if (n.includes("irving")) return "irving";
-      return "";
-    }
-
-    function renderCartes() {
-      container.innerHTML = '';
-      const filtreUnite = select.value.toLowerCase();
-      const filtreFournisseur = fournisseurSelect.value.toLowerCase();
-      const rechercheTexte = search.value.toLowerCase();
-      const rechercheNormalisee = rechercheTexte.replace(/\s+/g, '');
-
-      filteredCartes = cartes.filter(carte => {
-        const uniteMatch = !filtreUnite || carte.unite.toLowerCase() === filtreUnite;
-        const fournisseurMatch = !filtreFournisseur || carte.fournisseur.toLowerCase() === filtreFournisseur;
-        const numeroNormalise = carte.numero.replace(/\s+/g, '').toLowerCase();
-        const numeroMatch = rechercheNormalisee === '' || numeroNormalise.includes(rechercheNormalisee);
-        return uniteMatch && numeroMatch && fournisseurMatch;
-      });
-
-      cartesAffichees = 0;
-      afficherProchainesCartes();
-    }
-
-    function afficherProchainesCartes() {
-      const cartesRestantes = filteredCartes.slice(cartesAffichees, cartesAffichees + BATCH_SIZE);
-
-      cartesRestantes.forEach(carte => {
-        const div = document.createElement('div');
-        const fournisseurClasse = getFournisseurClass(carte.fournisseur);
-        div.className = `carte ${fournisseurClasse}`;
-        div.innerHTML = `
-          <div class="badge-fournisseur">
-            ${carte.fournisseur === "Irving"
-              ? '<img src="assets/icones/irvingoil.png" alt="Irving" class="logo-irving">'
-              : carte.fournisseur === "Petro-Pass"
-              ? '<img src="assets/icones/pcanada.png" alt="Petro-Pass" class="logo-petro">'
-              : carte.fournisseur === "ESSO"
-              ? '<img src="assets/icones/esso.png" alt="ESSO" class="logo-esso">'
-              : carte.fournisseur}
-          </div>
-          <div class="logo">ELZ</div>
-          <div class="numero">**** **** **** ${carte.numero.slice(-4)}</div>
-          <div class="nip">NIP : ****</div>
-          <div class="unite">${carte.unite}</div>
-        `;
-        container.appendChild(div);
-      });
-
-      cartesAffichees += cartesRestantes.length;
-
-      if (cartesAffichees >= filteredCartes.length) {
-        loadMoreBtn.classList.add("d-none");
-      } else {
-        loadMoreBtn.classList.remove("d-none");
-      }
-
-      if (filteredCartes.length === 0) {
-        container.innerHTML = '<div class="text-center text-muted">Aucune carte trouvée.</div>';
-        loadMoreBtn.classList.add("d-none");
-      }
-    }
-
-    renderCartes();
-const unlockAllBtn = document.getElementById('unlockAllBtn');
-const globalModal = document.getElementById('globalPinModal');
-const globalPinInput = document.getElementById('globalPinInput');
-const clearGlobalPin = document.getElementById('clearGlobalPin');
-let globalPin = '';
-
-unlockAllBtn.addEventListener('click', () => {
-  globalModal.classList.remove('d-none');
-  globalPin = '';
-  updateGlobalPinDisplay();
-});
-
-document.querySelectorAll('.digit').forEach(btn => {
-  btn.addEventListener('click', () => {
-    if (globalPin.length < 4) {
-      globalPin += btn.textContent;
-      updateGlobalPinDisplay();
-    }
-
-    if (globalPin.length === 4) {
-      if (globalPin === '1359') {
-        revealAllCards();
-        closeGlobalModal();
-      } else {
-        globalPinInput.textContent = 'Erreur';
-        setTimeout(() => {
-          globalPin = '';
-          updateGlobalPinDisplay();
-        }, 800);
-      }
-    }
-  });
-});
-
-clearGlobalPin.addEventListener('click', () => {
-  globalPin = '';
-  updateGlobalPinDisplay();
-});
-
-function updateGlobalPinDisplay() {
-  globalPinInput.textContent = globalPin.padEnd(4, '_');
-}
-
-function closeGlobalModal() {
-  globalModal.classList.add('d-none');
-  globalPin = '';
-}
-
-function revealAllCards() {
-  document.querySelectorAll('.carte').forEach(card => {
-    const numeroEl = card.querySelector('.numero');
-    const nipEl = card.querySelector('.nip');
-    const last4 = numeroEl.textContent.slice(-4);
-    const carteObj = cartes.find(c => c.numero.endsWith(last4));
-    if (carteObj) {
-      numeroEl.textContent = carteObj.numero;
-      nipEl.textContent = "NIP : " + carteObj.nip;
-    }
-  });
-}
-  </script>
   <div id="globalPinModal" class="modal-overlay d-none">
-  <div class="num-pad">
-    <h4>Entrez le code PIN</h4>
-    <div id="globalPinInput" style="font-size: 1.5rem; letter-spacing: 8px;">____</div>
-    <div class="digits mt-3">
-      ${[1,2,3,4,5,6,7,8,9,0].map(n => `<button class="digit">${n}</button>`).join('')}
-      <button class="clear" id="clearGlobalPin">Effacer</button>
+    <div class="num-pad">
+      <h4>Entrez le code PIN</h4>
+      <div id="globalPinInput" style="font-size: 1.5rem; letter-spacing: 8px;">____</div>
+      <div class="digits mt-3">
+        <button class="digit">1</button>
+        <button class="digit">2</button>
+        <button class="digit">3</button>
+        <button class="digit">4</button>
+        <button class="digit">5</button>
+        <button class="digit">6</button>
+        <button class="digit">7</button>
+        <button class="digit">8</button>
+        <button class="digit">9</button>
+        <button class="digit">0</button>
+        <button class="clear" id="clearGlobalPin">Effacer</button>
+      </div>
     </div>
   </div>
-</div>
-<div id="globalPinModal" class="modal-overlay d-none">
-  <div class="num-pad">
-    <h4>Entrez le code PIN</h4>
-    <div id="globalPinInput" style="font-size: 1.5rem; letter-spacing: 8px;">____</div>
-    <div class="digits mt-3">
-      <button class="digit">1</button>
-      <button class="digit">2</button>
-      <button class="digit">3</button>
-      <button class="digit">4</button>
-      <button class="digit">5</button>
-      <button class="digit">6</button>
-      <button class="digit">7</button>
-      <button class="digit">8</button>
-      <button class="digit">9</button>
-      <button class="digit">0</button>
-      <button class="clear" id="clearGlobalPin">Effacer</button>
-    </div>
-  </div>
-</div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      fetch("assets/header.html")
+        .then(res => res.text())
+        .then(html => {
+          document.getElementById("customHeader").innerHTML = html;
+        })
+        .catch(err => console.warn("Header non chargé :", err));
+
+      // === Données ===
+      const cartes = [
+        { numero: "1234 5678 9012 7777", nip: "9876", unite: "Camion 1203", fournisseur: "ESSO" },
+        { numero: "2345 6789 0123 4567", nip: "4321", unite: "Camion 1303", fournisseur: "Petro-Pass" },
+        { numero: "3456 7890 1234 5678", nip: "1111", unite: "Camion 1404", fournisseur: "Irving" },
+        { numero: "4567 8901 2345 6789", nip: "2222", unite: "Camion 1203", fournisseur: "Petro-Pass" },
+        { numero: "5678 9012 3456 7890", nip: "3333", unite: "Camion 1503", fournisseur: "ESSO" },
+        { numero: "6789 0123 4567 8901", nip: "4444", unite: "Camion 1404", fournisseur: "Irving" },
+        { numero: "7890 1234 5678 9012", nip: "5555", unite: "Camion 1203", fournisseur: "Petro-Pass" }
+      ];
+
+      const container = document.getElementById('cartes-container');
+      const select = document.getElementById('filterCamion');
+      const fournisseurSelect = document.getElementById('filterFournisseur');
+      const search = document.getElementById('searchCarte');
+      const clearButton = document.getElementById("clearSearch");
+      const loadMoreBtn = document.getElementById("loadMoreBtn");
+      const unlockAllBtn = document.getElementById('unlockAllBtn');
+      const globalModal = document.getElementById('globalPinModal');
+      const globalPinInput = document.getElementById('globalPinInput');
+      const clearGlobalPin = document.getElementById('clearGlobalPin');
+
+      let filteredCartes = cartes.slice();
+      let cartesAffichees = 0;
+      const BATCH_SIZE = 8;
+      let globalPin = '';
+
+      // Init des filtres
+      [...new Set(cartes.map(c => c.unite))].forEach(unite => {
+        const opt = document.createElement("option");
+        opt.value = unite;
+        opt.textContent = unite;
+        select.appendChild(opt);
+      });
+
+      [...new Set(cartes.map(c => c.fournisseur))].forEach(f => {
+        const opt = document.createElement("option");
+        opt.value = f;
+        opt.textContent = f;
+        fournisseurSelect.appendChild(opt);
+      });
+
+      function getFournisseurClass(name) {
+        const n = name.toLowerCase();
+        if (n.includes("esso")) return "esso";
+        if (n.includes("petro")) return "petro";
+        if (n.includes("irving")) return "irving";
+        return "";
+      }
+
+      function renderCartes() {
+        container.innerHTML = '';
+        const filtreUnite = select.value.toLowerCase();
+        const filtreFournisseur = fournisseurSelect.value.toLowerCase();
+        const rechercheTexte = search.value.toLowerCase().replace(/\s+/g, '');
+
+        filteredCartes = cartes.filter(carte => {
+          const uniteMatch = !filtreUnite || carte.unite.toLowerCase() === filtreUnite;
+          const fournisseurMatch = !filtreFournisseur || carte.fournisseur.toLowerCase() === filtreFournisseur;
+          const numeroMatch = rechercheTexte === '' || carte.numero.replace(/\s+/g, '').toLowerCase().includes(rechercheTexte);
+          return uniteMatch && fournisseurMatch && numeroMatch;
+        });
+
+        cartesAffichees = 0;
+        afficherProchainesCartes();
+      }
+
+      function afficherProchainesCartes() {
+        const cartesRestantes = filteredCartes.slice(cartesAffichees, cartesAffichees + BATCH_SIZE);
+
+        cartesRestantes.forEach(carte => {
+          const div = document.createElement('div');
+          const fournisseurClasse = getFournisseurClass(carte.fournisseur);
+          div.className = `carte ${fournisseurClasse}`;
+          div.innerHTML = `
+            <div class="badge-fournisseur">
+              ${carte.fournisseur === "Irving"
+                ? '<img src="assets/icones/irvingoil.png" alt="Irving" class="logo-irving">'
+                : carte.fournisseur === "Petro-Pass"
+                ? '<img src="assets/icones/pcanada.png" alt="Petro-Pass" class="logo-petro">'
+                : carte.fournisseur === "ESSO"
+                ? '<img src="assets/icones/esso.png" alt="ESSO" class="logo-esso">'
+                : carte.fournisseur}
+            </div>
+            <div class="logo">ELZ</div>
+            <div class="numero">**** **** **** ${carte.numero.slice(-4)}</div>
+            <div class="nip">NIP : ****</div>
+            <div class="unite">${carte.unite}</div>
+          `;
+          container.appendChild(div);
+        });
+
+        cartesAffichees += cartesRestantes.length;
+        loadMoreBtn.classList.toggle("d-none", cartesAffichees >= filteredCartes.length);
+        if (filteredCartes.length === 0) container.innerHTML = '<div class="text-center text-muted">Aucune carte trouvée.</div>';
+      }
+
+      search.addEventListener("input", () => {
+        clearButton.classList.toggle("d-none", search.value.trim() === "");
+        renderCartes();
+      });
+
+      clearButton.addEventListener("click", () => {
+        search.value = "";
+        clearButton.classList.add("d-none");
+        renderCartes();
+      });
+
+      select.addEventListener("change", renderCartes);
+      fournisseurSelect.addEventListener("change", renderCartes);
+      loadMoreBtn.addEventListener("click", afficherProchainesCartes);
+
+      // PIN Global
+      unlockAllBtn.addEventListener('click', () => {
+        globalModal.classList.remove('d-none');
+        globalPin = '';
+        updateGlobalPinDisplay();
+      });
+
+      document.querySelector('.digits').addEventListener('click', (e) => {
+        if (e.target.classList.contains('digit')) {
+          if (globalPin.length < 4) {
+            globalPin += e.target.textContent;
+            updateGlobalPinDisplay();
+          }
+
+          if (globalPin.length === 4) {
+            if (globalPin === '1359') {
+              revealAllCards();
+              closeGlobalModal();
+            } else {
+              globalPinInput.textContent = 'Erreur';
+              setTimeout(() => {
+                globalPin = '';
+                updateGlobalPinDisplay();
+              }, 800);
+            }
+          }
+        }
+      });
+
+      clearGlobalPin.addEventListener('click', () => {
+        globalPin = '';
+        updateGlobalPinDisplay();
+      });
+
+      function updateGlobalPinDisplay() {
+        globalPinInput.textContent = globalPin.padEnd(4, '_');
+      }
+
+      function closeGlobalModal() {
+        globalModal.classList.add('d-none');
+        globalPin = '';
+      }
+
+      function revealAllCards() {
+        document.querySelectorAll('.carte').forEach(card => {
+          const numeroEl = card.querySelector('.numero');
+          const nipEl = card.querySelector('.nip');
+          const last4 = numeroEl.textContent.slice(-4);
+          const carteObj = cartes.find(c => c.numero.endsWith(last4));
+          if (carteObj) {
+            numeroEl.textContent = carteObj.numero;
+            nipEl.textContent = "NIP : " + carteObj.nip;
+          }
+        });
+      }
+
+      // Lancer l'affichage au chargement
+      renderCartes();
+    });
+  </script>
 </body>
 </html>

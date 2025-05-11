@@ -358,22 +358,8 @@ globalPinInput.addEventListener('input', () => {
       let cartesAffichees = 0;
       const BATCH_SIZE = 8;
       
-      const submitPinBtn = document.getElementById('submitPinBtn');
-
-submitPinBtn.addEventListener('click', () => {
-  const code = globalPinInput.value.trim();       // ✅
-  if (code === '1359') {
-    revealAllCards();
-    closeGlobalModal();
-  } else {
-globalPinInput.value = '';
-globalPinInput.placeholder = 'Erreur';
-    setTimeout(() => globalPinInputField.placeholder = '____', 1000);
-  }
-});
-
 clearGlobalPin.addEventListener('click', () => {
-  globalPinInputField.value = '';
+globalPinInput.value = '';
 });
 
       // Init des filtres

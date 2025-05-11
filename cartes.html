@@ -276,25 +276,22 @@
     <button id="loadMoreBtn" class="btn btn-outline-primary d-none">Afficher plus</button>
   </div>
 
-  <div id="globalPinModal" class="modal-overlay d-none">
-    <div class="num-pad">
-      <h4>Entrez le code PIN</h4>
-      <div id="globalPinInput" style="font-size: 1.5rem; letter-spacing: 8px;">____</div>
-      <div class="digits mt-3">
-        <button class="digit">1</button>
-        <button class="digit">2</button>
-        <button class="digit">3</button>
-        <button class="digit">4</button>
-        <button class="digit">5</button>
-        <button class="digit">6</button>
-        <button class="digit">7</button>
-        <button class="digit">8</button>
-        <button class="digit">9</button>
-        <button class="digit">0</button>
-        <button class="clear" id="clearGlobalPin">Effacer</button>
-      </div>
-    </div>
+<div id="globalPinModal" class="modal-overlay d-none">
+  <div class="num-pad">
+    <h4>Entrez le code PIN</h4>
+    <input type="tel"
+           id="globalPinInput"
+           maxlength="4"
+           pattern="\d{4}"
+           inputmode="numeric"
+           class="form-control text-center fs-4 mb-3"
+           placeholder="____"
+           style="letter-spacing: 10px;" />
+    
+    <button class="btn btn-danger w-100" id="submitPinBtn">Valider</button>
+    <button class="btn btn-secondary mt-2 w-100" id="clearGlobalPin">Effacer</button>
   </div>
+</div>
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
@@ -331,6 +328,26 @@
       let cartesAffichees = 0;
       const BATCH_SIZE = 8;
       let globalPin = '';
+      
+      const globalPinInputField = document.getElementById('globalPinInput');
+const submitPinBtn = document.getElementById('submitPinBtn');
+const clearGlobalPin = document.getElementById('clearGlobalPin');
+
+submitPinBtn.addEventListener('click', () => {
+  const code = globalPinInputField.value.trim();
+  if (code === '1359') {
+    revealAllCards();
+    closeGlobalModal();
+  } else {
+    globalPinInputField.value = '';
+    globalPinInputField.placeholder = 'Erreur';
+    setTimeout(() => globalPinInputField.placeholder = '____', 1000);
+  }
+});
+
+clearGlobalPin.addEventListener('click', () => {
+  globalPinInputField.value = '';
+});
 
       // Init des filtres
       [...new Set(cartes.map(c => c.unite))].forEach(unite => {
@@ -424,27 +441,6 @@
         updateGlobalPinDisplay();
       });
 
-      document.querySelector('.digits').addEventListener('click', (e) => {
-        if (e.target.classList.contains('digit')) {
-          if (globalPin.length < 4) {
-            globalPin += e.target.textContent;
-            updateGlobalPinDisplay();
-          }
-
-          if (globalPin.length === 4) {
-            if (globalPin === '1359') {
-              revealAllCards();
-              closeGlobalModal();
-            } else {
-              globalPinInput.textContent = 'Erreur';
-              setTimeout(() => {
-                globalPin = '';
-                updateGlobalPinDisplay();
-              }, 800);
-            }
-          }
-        }
-      });
 
       clearGlobalPin.addEventListener('click', () => {
         globalPin = '';

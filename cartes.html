@@ -322,6 +322,21 @@
       const unlockAllBtn = document.getElementById('unlockAllBtn');
       const globalModal = document.getElementById('globalPinModal');
       const globalPinInput = document.getElementById('globalPinInput');
+      globalPinInput.addEventListener('input', () => {
+  const code = globalPinInput.value.trim();
+  if (code.length === 4) {
+    if (code === '1359') {
+      revealAllCards();
+      closeGlobalModal();
+    } else {
+      globalPinInput.value = '';
+      globalPinInput.placeholder = 'Erreur';
+      setTimeout(() => {
+        globalPinInput.placeholder = '____';
+      }, 1000);
+    }
+  }
+});
       const clearGlobalPin = document.getElementById('clearGlobalPin');
 
       let filteredCartes = cartes.slice();

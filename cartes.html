@@ -324,16 +324,20 @@
         })
         .catch(err => console.warn("Header non chargé :", err));
 
-      // === Données ===
-      const cartes = [
-        { numero: "1234 5678 9012 7777", nip: "9876", unite: "Camion 1203", fournisseur: "ESSO" },
-        { numero: "2345 6789 0123 4567", nip: "4321", unite: "Camion 1303", fournisseur: "Petro-Pass" },
-        { numero: "3456 7890 1234 5678", nip: "1111", unite: "Camion 1404", fournisseur: "Irving" },
-        { numero: "4567 8901 2345 6789", nip: "2222", unite: "Camion 1203", fournisseur: "Petro-Pass" },
-        { numero: "5678 9012 3456 7890", nip: "3333", unite: "Camion 1503", fournisseur: "ESSO" },
-        { numero: "6789 0123 4567 8901", nip: "4444", unite: "Camion 1404", fournisseur: "Irving" },
-        { numero: "7890 1234 5678 9012", nip: "5555", unite: "Camion 1203", fournisseur: "Petro-Pass" }
-      ];
+        let cartes = [];
+
+        fetch("https://script.google.com/macros/s/AKfycbwrCcHiQBcTnmLmg1U2XpVToUarycO5_Rlsg-lZzKLnTbFHep4PRep7zn9J6-VUEg/exec")
+        .then(res => res.json())
+        .then(data => {
+            console.log("Cartes chargées :", data); // <-- ici
+            cartes = data;
+            renderCartes();
+        })
+        .catch(err => {
+            console.error("Erreur chargement Google Sheet :", err);
+        });
+
+
 
       const container = document.getElementById('cartes-container');
       const select = document.getElementById('filterCamion');
@@ -344,8 +348,8 @@
       const unlockAllBtn = document.getElementById('unlockAllBtn');
       const globalModal = document.getElementById('globalPinModal');
       const globalPinInput = document.getElementById('globalPinInput');
-globalPinInput.addEventListener('input', () => {
-  const code = globalPinInput.value.trim();
+        globalPinInput.addEventListener('input', () => {
+        const code = globalPinInput.value.trim();
 
   if (code.length === 4) {
     if (code === '1359') {
@@ -373,9 +377,9 @@ globalPinInput.addEventListener('input', () => {
       let cartesAffichees = 0;
       const BATCH_SIZE = 8;
       
-clearGlobalPin.addEventListener('click', () => {
-globalPinInput.value = '';
-});
+        clearGlobalPin.addEventListener('click', () => {
+        globalPinInput.value = '';
+        });
 
       // Init des filtres
       [...new Set(cartes.map(c => c.unite))].forEach(unite => {
@@ -393,12 +397,14 @@ globalPinInput.value = '';
       });
 
       function getFournisseurClass(name) {
+        if (!name) return "";
         const n = name.toLowerCase();
         if (n.includes("esso")) return "esso";
         if (n.includes("petro")) return "petro";
         if (n.includes("irving")) return "irving";
         return "";
-      }
+        }
+
 
       function renderCartes() {
         container.innerHTML = '';
@@ -407,11 +413,11 @@ globalPinInput.value = '';
         const rechercheTexte = search.value.toLowerCase().replace(/\s+/g, '');
 
         filteredCartes = cartes.filter(carte => {
-          const uniteMatch = !filtreUnite || carte.unite.toLowerCase() === filtreUnite;
-          const fournisseurMatch = !filtreFournisseur || carte.fournisseur.toLowerCase() === filtreFournisseur;
-          const numeroMatch = rechercheTexte === '' || carte.numero.replace(/\s+/g, '').toLowerCase().includes(rechercheTexte);
-          return uniteMatch && fournisseurMatch && numeroMatch;
-        });
+            const uniteMatch = !filtreUnite || carte["Unité"].toLowerCase() === filtreUnite;
+            const fournisseurMatch = !filtreFournisseur || carte["Fournisseur"].toLowerCase() === filtreFournisseur;
+            const numeroMatch = rechercheTexte === '' || carte["Numéro"].replace(/\s+/g, '').toLowerCase().includes(rechercheTexte);
+            return uniteMatch && fournisseurMatch && numeroMatch;
+            });
 
         cartesAffichees = 0;
         afficherProchainesCartes();
@@ -422,22 +428,22 @@ globalPinInput.value = '';
 
         cartesRestantes.forEach(carte => {
           const div = document.createElement('div');
-          const fournisseurClasse = getFournisseurClass(carte.fournisseur);
+          const fournisseurClasse = getFournisseurClass(carte["Fournisseur"]);
           div.className = `carte ${fournisseurClasse}`;
           div.innerHTML = `
             <div class="badge-fournisseur">
-              ${carte.fournisseur === "Irving"
+                ${carte["Fournisseur"] === "Irving"
                 ? '<img src="assets/icones/irvingoil.png" alt="Irving" class="logo-irving">'
-                : carte.fournisseur === "Petro-Pass"
+                : carte["Fournisseur"] === "Petro-Pass"
                 ? '<img src="assets/icones/pcanada.png" alt="Petro-Pass" class="logo-petro">'
-                : carte.fournisseur === "ESSO"
+                : carte["Fournisseur"] === "ESSO"
                 ? '<img src="assets/icones/esso.png" alt="ESSO" class="logo-esso">'
-                : carte.fournisseur}
+                : carte["Fournisseur"]}
             </div>
             <div class="logo">ELZ</div>
-            <div class="numero">**** **** **** ${carte.numero.slice(-4)}</div>
+            <div class="numero">**** **** **** ${String(carte["Numéro"]).slice(-4)}</div>
             <div class="nip">NIP : ****</div>
-            <div class="unite">${carte.unite}</div>
+            <div class="unite">${carte["Unité"]}</div>
           `;
           container.appendChild(div);
         });
@@ -468,10 +474,10 @@ globalPinInput.value = '';
       });
 
 
-clearGlobalPin.addEventListener('click', () => {
-  globalPinInput.value = '';
-  globalPinInput.placeholder = '____';
-});
+        clearGlobalPin.addEventListener('click', () => {
+        globalPinInput.value = '';
+        globalPinInput.placeholder = '____';
+        });
 
       function closeGlobalModal() {
         globalModal.classList.add('d-none');
@@ -479,16 +485,17 @@ clearGlobalPin.addEventListener('click', () => {
 
       function revealAllCards() {
         document.querySelectorAll('.carte').forEach(card => {
-          const numeroEl = card.querySelector('.numero');
-          const nipEl = card.querySelector('.nip');
-          const last4 = numeroEl.textContent.slice(-4);
-          const carteObj = cartes.find(c => c.numero.endsWith(last4));
-          if (carteObj) {
-            numeroEl.textContent = carteObj.numero;
-            nipEl.textContent = "NIP : " + carteObj.nip;
-          }
+            const numeroEl = card.querySelector('.numero');
+            const nipEl = card.querySelector('.nip');
+            const last4 = numeroEl.textContent.slice(-4);
+            carteObj = cartes.find(c => String(c["Numéro"]).endsWith(last4));
+
+            if (carteObj) {
+            numeroEl.textContent = carteObj["Numéro"];
+            nipEl.textContent = "NIP : " + carteObj["Nip"];
+            }
         });
-      }
+        }
 
       // Lancer l'affichage au chargement
       renderCartes();

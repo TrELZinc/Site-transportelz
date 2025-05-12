@@ -811,10 +811,10 @@ formError.classList.add("d-none");
         douane: isDouane
       });
     } else {
-      const dH = parseInt(data.get(`heure_debut_h_${i}`) || "0", 10);
-      const dM = parseInt(data.get(`heure_debut_m_${i}`) || "0", 10);
-      const fH = parseInt(data.get(`heure_fin_h_${i}`) || "0", 10);
-      const fM = parseInt(data.get(`heure_fin_m_${i}`) || "0", 10);
+      const dH = parseInt(data[`heure_debut_h_${i}`] || "0", 10);
+      const dM = parseInt(data[`heure_debut_m_${i}`] || "0", 10);
+      const fH = parseInt(data[`heure_fin_h_${i}`] || "0", 10);
+      const fM = parseInt(data[`heure_fin_m_${i}`] || "0", 10);
       const duration = (fH * 60 + fM) - (dH * 60 + dM);
       if (duration > 0) totalMinutes += duration;
       voyages.push({

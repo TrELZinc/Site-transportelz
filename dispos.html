@@ -160,7 +160,7 @@
       }
     }
 
-    #dateSelect {
+    #dp_custom_981 {
         background-image: url('https://img.icons8.com/ios-filled/20/000000/calendar.png');
         background-repeat: no-repeat;
         background-position: 12px center;
@@ -178,7 +178,7 @@
 
 
 
-    #dateSelect:focus {
+    #dp_custom_981:focus {
       border-color: #d32f2f;
       box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.15);
       outline: none;
@@ -220,7 +220,7 @@
   <div class="container">
 <div class="top-bar">
   <input 
-    id="dateSelect" 
+    id="dp_custom_981" 
     type="text" 
     placeholder="Sélectionnez une date" 
     autocomplete="off"
@@ -356,7 +356,7 @@
         }
       });
 
-      const selectedDate = document.querySelector("#dateSelect")?.value || "";
+      const selectedDate = document.querySelector("#dp_custom_981")?.value || "";
       if (!selectedDate) {
         alert("Veuillez sélectionner une date.");
         return;
@@ -380,7 +380,7 @@
 
     function resetForm() {
       document.getElementById("note").value = "";
-      document.getElementById("dateSelect").value = "";
+      document.getElementById("dp_custom_981").value = "";
       localStorage.clear();
 
       const rows = document.querySelectorAll("#dispoTable tbody tr");
@@ -419,7 +419,7 @@
         const table = document.getElementById("dispoTable");
         if (!table) throw new Error("Table introuvable");
 
-        const date = document.getElementById("dateSelect").value;
+        const date = document.getElementById("dp_custom_981").value;
         const note = document.getElementById("note").value;
 
         const rows = Array.from(document.querySelectorAll("#dispoTable tbody tr")).map(tr => {
@@ -483,7 +483,7 @@
   const filledDates = [];
 
   if (note) document.getElementById("note").value = note;
-  if (date) document.getElementById("dateSelect").value = date;
+  if (date) document.getElementById("dp_custom_981").value = date;
 
   if (table) {
     document.getElementById("dispoTable").outerHTML = table;
@@ -509,11 +509,11 @@
         }
       });
 
-      fpInstance = flatpickr("#dateSelect", {
+      fpInstance = flatpickr("#dp_custom_981", {
       dateFormat: "Y-m-d",
       disableMobile: true,
       onChange: function (selectedDates, dateStr) {
-        document.getElementById("dateSelect").value = dateStr;
+        document.getElementById("dp_custom_981").value = dateStr;
 
           db.collection("disponibilites_dispos")
             .where("date", "==", dateStr)
@@ -554,7 +554,7 @@
       if (!snapshot.empty) {
         const data = snapshot.docs[0].data();
         document.getElementById("note").value = data.note || "";
-        document.getElementById("dateSelect").value = data.date || "";
+        document.getElementById("dp_custom_981").value = data.date || "";
         document.getElementById("dispoTable").outerHTML = data.table;
 
         setTimeout(() => {

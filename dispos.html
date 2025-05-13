@@ -219,13 +219,8 @@
 
   <div class="container">
 <div class="top-bar">
-    <input 
-      id="dateSelect" 
-      type="text" 
-      name="dispo_date_picker" 
-      placeholder="Sélectionnez une date" 
-      autocomplete="off" 
-    />
+<input type="text" id="dateSelect_fake" placeholder="Sélectionnez une date" readonly />
+<input type="hidden" id="dateSelect" name="dispo_date_picker" />
   </div>
     <label for="note">Note:</label>
     <textarea id="note" rows="2"></textarea>
@@ -506,11 +501,11 @@
       });
 
       fpInstance = flatpickr("#dateSelect", {
-        dateFormat: "Y-m-d",
-        defaultDate: date || null,
-        disableMobile: true, // ←←← CRUCIAL sur iOS Safari
-        onChange(selectedDates, dateStr) {
-          document.getElementById("dateSelect").value = dateStr;
+      dateFormat: "Y-m-d",
+      disableMobile: true,
+      onChange: function (selectedDates, dateStr) {
+        document.getElementById("dateSelect_fake").value = dateStr;
+        document.getElementById("dateSelect").value = dateStr;
 
           db.collection("disponibilites_dispos")
             .where("date", "==", dateStr)
@@ -532,11 +527,11 @@
               }
             });
         },
-        onDayCreate(dObj, dStr, fp, dayElem) {
-          const date = dayElem.dateObj.toISOString().split("T")[0];
-          const today = new Date().toISOString().split("T")[0];
-          if (filledDates.includes(date) && date > today) {
-            dayElem.classList.add("has-event-future");
+          onDayCreate: function (dObj, dStr, fp, dayElem) {
+            const date = dayElem.dateObj.toISOString().split("T")[0];
+            const today = new Date().toISOString().split("T")[0];
+            if (filledDates.includes(date) && date > today) {
+              dayElem.classList.add("has-event-future");
           }
         }
       });

@@ -383,6 +383,20 @@
       return `${yyyy}-${mm}-${dd}`;
     }
 
+    function resetMinimal() {
+      document.getElementById("note").value = "";
+
+      const rows = document.querySelectorAll("#dispoTable tbody tr");
+      rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        if (cells[4]) cells[4].textContent = ""; // colonne "départ"
+        if (cells[5]) cells[5].textContent = ""; // colonne "note"
+      });
+
+      console.log("🧹 Colonnes 'départ', 'note' et la note globale ont été réinitialisées.");
+    }
+
+
     function saveData() {
       try {
         const table = document.getElementById("dispoTable");
@@ -480,7 +494,6 @@
 
       // Initialiser Flatpickr APRÈS avoir récupéré les dates
       flatpickr("#dateSelect", {
-        disableMobile: true,
         dateFormat: "Y-m-d",
         defaultDate: date || null,
         onChange: function (selectedDates, dateStr) {
@@ -505,10 +518,11 @@
                 }, 0);
 
                 console.log("✅ Données chargées automatiquement !");
-              } else {
-                console.log("📭 Aucun enregistrement pour cette date.");
-                generateDefaultRows(9);
-              }
+                } else {
+                  console.log("📭 Aucun enregistrement pour cette date. Nettoyage partiel.");
+                  resetMinimal(); // 👈 Appelle ta fonction ciblée
+                }
+
             })
             .catch(error => {
               console.error("❌ Erreur de chargement :", error);

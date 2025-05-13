@@ -2,7 +2,9 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <title>Disponibilités</title>
   <style>
     html, body {
@@ -151,6 +153,31 @@
         font-size: 14px !important;
       }
     }
+
+    #dateSelect {
+        background-image: url('https://img.icons8.com/ios-filled/20/000000/calendar.png');
+        background-repeat: no-repeat;
+        background-position: 12px center;
+        padding-left: 38px;
+        padding: 12px 16px;
+        font-size: 16px;
+        border: 2px solid #ccc;
+        border-radius: 8px;
+        background-color: #ffffff;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        transition: border-color 0.2s, box-shadow 0.2s;
+        width: 200px;
+        text-align: center;
+    }
+
+
+
+    #dateSelect:focus {
+      border-color: #d32f2f;
+      box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.15);
+      outline: none;
+    }
+
   </style>
   <!-- Firebase SDK en mode compat -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -182,7 +209,7 @@
 
   <div class="container">
     <div class="top-bar">
-      <input type="date" id="dateSelect" />
+      <input type="text" id="dateSelect" />
     </div>
     <label for="note">Note:</label>
     <textarea id="note" rows="2"></textarea>
@@ -197,7 +224,6 @@
       </table>
     </div>
     <div class="buttons">
-      <button class="load-btn" id="loadBtn">Load</button>
       <button class="reset-btn" onclick="resetForm()">Reset</button>
       <button class="save-btn" onclick="saveData()">Save</button>
       <button class="send-btn" onclick="sendForm()">Send</button>
@@ -413,101 +439,110 @@
       }
     });
 
-    // Initialize on load
-    window.onload = function() {
-      const note = localStorage.getItem("dispo_note");
-      const date = localStorage.getItem("dispo_date");
-      const table = localStorage.getItem("dispo_table");
+    window.onload = function () {
+  const note = localStorage.getItem("dispo_note");
+  const date = localStorage.getItem("dispo_date");
+  const table = localStorage.getItem("dispo_table");
+  const filledDates = [];
 
-      if (note) document.getElementById("note").value = note;
-      if (date) document.getElementById("dateSelect").value = date;
+  if (note) document.getElementById("note").value = note;
+  if (date) document.getElementById("dateSelect").value = date;
 
-      if (table) {
-        document.getElementById("dispoTable").outerHTML = table;
+  if (table) {
+    document.getElementById("dispoTable").outerHTML = table;
+    setTimeout(() => {
+      const newTable = document.getElementById("dispoTable");
+      const usCells = newTable.querySelectorAll(".us-cell");
+      usCells.forEach(cell => {
+        cell.onclick = () => toggleUS(cell);
+      });
+    }, 0);
+  } else {
+    generateDefaultRows(9);
+  }
+
+  // Charger toutes les dates existantes
+  db.collection("disponibilites_dispos")
+    .get()
+    .then(snapshot => {
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.date) {
+          filledDates.push(data.date);
+        }
+      });
+
+      // Initialiser Flatpickr APRÈS avoir récupéré les dates
+      flatpickr("#dateSelect", {
+        dateFormat: "Y-m-d",
+        defaultDate: date || null,
+        onChange: function (selectedDates, dateStr) {
+          document.getElementById("dateSelect").value = dateStr;
+
+          db.collection("disponibilites_dispos")
+            .where("date", "==", dateStr)
+            .orderBy("timestamp", "desc")
+            .limit(1)
+            .get()
+            .then(snapshot => {
+              if (!snapshot.empty) {
+                const data = snapshot.docs[0].data();
+                document.getElementById("note").value = data.note || "";
+                document.getElementById("dispoTable").outerHTML = data.table;
+
+                setTimeout(() => {
+                  const usCells = document.querySelectorAll(".us-cell");
+                  usCells.forEach(cell => {
+                    cell.onclick = () => toggleUS(cell);
+                  });
+                }, 0);
+
+                console.log("✅ Données chargées automatiquement !");
+              } else {
+                console.log("📭 Aucun enregistrement pour cette date.");
+                generateDefaultRows(9);
+              }
+            })
+            .catch(error => {
+              console.error("❌ Erreur de chargement :", error);
+            });
+        },
+        onDayCreate: function (dObj, dStr, fp, dayElem) {
+          const date = dayElem.dateObj.toISOString().split("T")[0];
+          const today = new Date().toISOString().split("T")[0];
+          if (filledDates.includes(date) && date > today) {
+            dayElem.style.background = "#f1c40f";
+            dayElem.style.color = "black";
+            dayElem.style.borderRadius = "6px";
+          }
+        }
+      });
+    });
+
+  // Charger la dernière sauvegarde Firebase
+  db.collection("disponibilites_dispos")
+    .orderBy("timestamp", "desc")
+    .limit(1)
+    .get()
+    .then(snapshot => {
+      if (!snapshot.empty) {
+        const data = snapshot.docs[0].data();
+        document.getElementById("note").value = data.note || "";
+        document.getElementById("dateSelect").value = data.date || "";
+        document.getElementById("dispoTable").outerHTML = data.table;
+
         setTimeout(() => {
-          const newTable = document.getElementById("dispoTable");
-          const usCells = newTable.querySelectorAll(".us-cell");
+          const usCells = document.querySelectorAll(".us-cell");
           usCells.forEach(cell => {
             cell.onclick = () => toggleUS(cell);
           });
         }, 0);
-      } else {
-        generateDefaultRows(9);
+
+        console.log("✅ Dernière donnée Firebase chargée");
       }
+    });
+};
 
-      // 🔁 Toujours tenter de charger la dernière saisie depuis Firestore
-      db.collection("disponibilites_dispos")
-        .orderBy("timestamp", "desc")
-        .limit(1)
-        .get()
-        .then(snapshot => {
-          if (!snapshot.empty) {
-            const data = snapshot.docs[0].data();
-            document.getElementById("note").value = data.note || "";
-            document.getElementById("dateSelect").value = data.date || "";
-            document.getElementById("dispoTable").outerHTML = data.table;
-
-            setTimeout(() => {
-              const usCells = document.querySelectorAll(".us-cell");
-              usCells.forEach(cell => {
-                cell.onclick = () => toggleUS(cell);
-              });
-            }, 0);
-
-            console.log("✅ Données chargées depuis Firestore !");
-          } else {
-            console.log("📭 Aucune donnée trouvée dans Firestore.");
-          }
-        });
-
-        document.getElementById("loadBtn").addEventListener("click", () => {
-        const selectedDate = document.getElementById("dateSelect").value;
-        if (!selectedDate) {
-          alert("Veuillez sélectionner une date.");
-          return;
-        }
-
-        const btn = document.getElementById("loadBtn");
-        const originalText = btn.textContent;
-        btn.textContent = "⏳ Loading...";
-        btn.disabled = true;
-
-        db.collection("disponibilites_dispos")
-          .where("date", "==", selectedDate)
-          .orderBy("timestamp", "desc")
-          .limit(1)
-          .get()
-          .then(snapshot => {
-            if (!snapshot.empty) {
-              const data = snapshot.docs[0].data();
-              document.getElementById("note").value = data.note || "";
-              document.getElementById("dateSelect").value = data.date || "";
-              document.getElementById("dispoTable").outerHTML = data.table;
-
-              setTimeout(() => {
-                const usCells = document.querySelectorAll(".us-cell");
-                usCells.forEach(cell => {
-                  cell.onclick = () => toggleUS(cell);
-                });
-              }, 0);
-
-              console.log("✅ Données chargées !");
-            } else {
-              alert("📭 Aucune donnée trouvée pour cette date.");
-              generateDefaultRows(9);
-            }
-          })
-          .catch(error => {
-            console.error("❌ Erreur Firestore :", error);
-            alert("Erreur de chargement : " + error.message);
-          })
-          .finally(() => {
-            btn.textContent = originalText;
-            btn.disabled = false;
-          });
-      });
-
-    };
   </script>
 </body>
 </html>

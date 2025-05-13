@@ -29,6 +29,10 @@
       z-index: 9999;
     }
 
+    .load-btn {
+      background-color: #f1c40f;
+      color: black;
+    }
 
     header img {
       height: 40px;
@@ -193,6 +197,7 @@
       </table>
     </div>
     <div class="buttons">
+      <button class="load-btn" id="loadBtn">Load</button>
       <button class="reset-btn" onclick="resetForm()">Reset</button>
       <button class="save-btn" onclick="saveData()">Save</button>
       <button class="send-btn" onclick="sendForm()">Send</button>
@@ -202,16 +207,41 @@
   <script>
     
     function saveToFirebase(data, callback) {
-      db.collection("disponibilites_dispos").add(data) // Collection différente
+      const collection = db.collection("disponibilites_dispos");
+
+      const TWO_YEARS_AGO = new Date();
+      TWO_YEARS_AGO.setFullYear(TWO_YEARS_AGO.getFullYear() - 2);
+
+      // Étape 1 : suppression des documents de +2 ans
+      collection
+        .where("timestamp", "<", TWO_YEARS_AGO.toISOString())
+        .get()
+        .then(snapshot => {
+          const deletions = snapshot.docs.map(doc => doc.ref.delete());
+          return Promise.all(deletions);
+        })
         .then(() => {
-          console.log("✅ Données enregistrées dans Firestore (dispos) !");
+          // Étape 2 : on cherche s’il existe déjà une entrée pour cette date
+          return collection.where("date", "==", data.date).get();
+        })
+        .then(snapshot => {
+          if (!snapshot.empty) {
+            const existingDocId = snapshot.docs[0].id;
+            return collection.doc(existingDocId).set(data, { merge: false });
+          } else {
+            return collection.add(data);
+          }
+        })
+        .then(() => {
+          console.log("✅ Données enregistrées ou mises à jour.");
           if (typeof callback === "function") callback();
         })
-        .catch((error) => {
+        .catch(error => {
           console.error("❌ Erreur Firestore :", error);
           alert("Erreur Firestore : " + error.message);
         });
     }
+
 
     function createRow() {
       const row = document.createElement("tr");
@@ -429,6 +459,54 @@
             console.log("📭 Aucune donnée trouvée dans Firestore.");
           }
         });
+
+        document.getElementById("loadBtn").addEventListener("click", () => {
+        const selectedDate = document.getElementById("dateSelect").value;
+        if (!selectedDate) {
+          alert("Veuillez sélectionner une date.");
+          return;
+        }
+
+        const btn = document.getElementById("loadBtn");
+        const originalText = btn.textContent;
+        btn.textContent = "⏳ Loading...";
+        btn.disabled = true;
+
+        db.collection("disponibilites_dispos")
+          .where("date", "==", selectedDate)
+          .orderBy("timestamp", "desc")
+          .limit(1)
+          .get()
+          .then(snapshot => {
+            if (!snapshot.empty) {
+              const data = snapshot.docs[0].data();
+              document.getElementById("note").value = data.note || "";
+              document.getElementById("dateSelect").value = data.date || "";
+              document.getElementById("dispoTable").outerHTML = data.table;
+
+              setTimeout(() => {
+                const usCells = document.querySelectorAll(".us-cell");
+                usCells.forEach(cell => {
+                  cell.onclick = () => toggleUS(cell);
+                });
+              }, 0);
+
+              console.log("✅ Données chargées !");
+            } else {
+              alert("📭 Aucune donnée trouvée pour cette date.");
+              generateDefaultRows(9);
+            }
+          })
+          .catch(error => {
+            console.error("❌ Erreur Firestore :", error);
+            alert("Erreur de chargement : " + error.message);
+          })
+          .finally(() => {
+            btn.textContent = originalText;
+            btn.disabled = false;
+          });
+      });
+
     };
   </script>
 </body>

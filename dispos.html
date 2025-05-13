@@ -55,12 +55,12 @@
       justify-content: center;
       margin-bottom: 10px;
     }
-    .top-bar input[type="date"] {
-      padding: 8px 12px;
+
+    .top-bar input {
+      width: 200px;
       font-size: 16px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
     }
+
     label {
       font-weight: bold;
       display: block;
@@ -215,7 +215,7 @@
 
   <div class="container">
     <div class="top-bar">
-      <input id="dateSelect" class="flatpickr-input" type="text" readonly placeholder="Sélectionnez une date" />
+      <input id="dateSelect" type="text" placeholder="Sélectionnez une date" autocomplete="off" />
     </div>
     <label for="note">Note:</label>
     <textarea id="note" rows="2"></textarea>
@@ -237,6 +237,9 @@
   </div>
   
   <script>
+
+    let fpInstance = null;
+
     
     function saveToFirebase(data, callback) {
       const collection = db.collection("disponibilites_dispos");
@@ -492,11 +495,11 @@
         }
       });
 
-      // Initialiser Flatpickr APRÈS avoir récupéré les dates
-      flatpickr("#dateSelect", {
+      fpInstance = flatpickr("#dateSelect", {
         dateFormat: "Y-m-d",
         defaultDate: date || null,
-        onChange: function (selectedDates, dateStr) {
+        disableMobile: true, // ←←← CRUCIAL sur iOS Safari
+        onChange(selectedDates, dateStr) {
           document.getElementById("dateSelect").value = dateStr;
 
           db.collection("disponibilites_dispos")
@@ -509,26 +512,17 @@
                 const data = snapshot.docs[0].data();
                 document.getElementById("note").value = data.note || "";
                 document.getElementById("dispoTable").outerHTML = data.table;
-
                 setTimeout(() => {
-                  const usCells = document.querySelectorAll(".us-cell");
-                  usCells.forEach(cell => {
+                  document.querySelectorAll(".us-cell").forEach(cell => {
                     cell.onclick = () => toggleUS(cell);
                   });
                 }, 0);
-
-                console.log("✅ Données chargées automatiquement !");
-                } else {
-                  console.log("📭 Aucun enregistrement pour cette date. Nettoyage partiel.");
-                  resetMinimal(); // 👈 Appelle ta fonction ciblée
-                }
-
-            })
-            .catch(error => {
-              console.error("❌ Erreur de chargement :", error);
+              } else {
+                resetMinimal();
+              }
             });
         },
-        onDayCreate: function (dObj, dStr, fp, dayElem) {
+        onDayCreate(dObj, dStr, fp, dayElem) {
           const date = dayElem.dateObj.toISOString().split("T")[0];
           const today = new Date().toISOString().split("T")[0];
           if (filledDates.includes(date) && date > today) {

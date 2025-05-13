@@ -270,9 +270,22 @@ td[contenteditable], textarea, input {
 
           console.log("✅ Données chargées depuis Firebase !");
         } else {
-          generateDefaultRows(9);
+          console.log("📭 Aucune donnée trouvée dans Firebase. Nettoyage du tableau existant.");
+
+          elements.noteField.value = "";
+
+          // Nettoie les colonnes sauf RANG (0) et le bouton (8), sauf dernière ligne
+          const rows = document.querySelectorAll("#tableBody tr");
+          rows.forEach((row, index) => {
+            if (index === rows.length - 1) return; // Garde la dernière ligne intacte
+            const cells = row.querySelectorAll("td");
+            for (let i = 1; i < cells.length - 1; i++) {
+              cells[i].textContent = "";
+            }
+          });
+
           generateGarageRows(3);
-          console.log("📭 Aucune donnée trouvée dans Firebase.");
+
         }
       })
       .catch(error => {
@@ -383,7 +396,6 @@ td[contenteditable], textarea, input {
 </div>
 
 <div class="buttons" style="margin-top: 16px;">
-  <button class="load-btn" id="loadBtn">Load</button>
   <button class="reset-btn" id="resetBtn">Reset</button>
   <button class="save-btn" id="saveBtn">Save</button>
   <button class="send-btn" id="sendBtn">Send</button>
@@ -745,15 +757,12 @@ const data = {
   elements.resetBtn.addEventListener("click", resetForm);
   elements.saveBtn.addEventListener("click", saveData);
   elements.sendBtn.addEventListener("click", sendForm);
-  elements.loadBtn = document.getElementById("loadBtn");
-  elements.loadBtn.addEventListener("click", () => {
+  elements.dateSelect.addEventListener("change", () => {
   const selectedDate = elements.dateSelect.value;
-  if (!selectedDate) {
-    alert("Veuillez sélectionner une date.");
-    return;
-  }
+  if (!selectedDate) return;
   window.loadFromFirebase(selectedDate);
 });
+
 
   elements.tableBody.innerHTML = "";
 
@@ -806,11 +815,24 @@ const data = {
         localStorage.setItem(STORAGE_KEYS.rows, JSON.stringify(data.rows || []));
 
         console.log("🟢 Données chargées depuis Firebase.");
-      } else {
-        generateDefaultRows(9);
-        generateGarageRows(3);
-        console.log("📭 Aucune donnée trouvée.");
-      }
+        } else {
+          console.log("📭 Aucune donnée trouvée dans Firebase. Réinitialisation ciblée.");
+          
+          elements.noteField.value = "";
+          const rows = document.querySelectorAll("#tableBody tr");
+
+          rows.forEach((row, index) => {
+            const cells = row.querySelectorAll("td");
+            if (index === rows.length - 1) return; // Garde la dernière ligne intacte
+
+            for (let i = 1; i < cells.length - 1; i++) {
+              cells[i].textContent = "";
+            }
+          });
+
+          generateGarageRows(3);
+        }
+
     });
     setupArrowNavigation();
 }

@@ -31,6 +31,12 @@
       z-index: 9999;
     }
 
+    .flatpickr-day.has-event-future {
+      background-color: #f1c40f !important;
+      color: black !important;
+      border-radius: 6px !important;
+    }
+
     .load-btn {
       background-color: #f1c40f;
       color: black;
@@ -511,9 +517,7 @@
           const date = dayElem.dateObj.toISOString().split("T")[0];
           const today = new Date().toISOString().split("T")[0];
           if (filledDates.includes(date) && date > today) {
-            dayElem.style.background = "#f1c40f";
-            dayElem.style.color = "black";
-            dayElem.style.borderRadius = "6px";
+            dayElem.classList.add("has-event-future");
           }
         }
       });

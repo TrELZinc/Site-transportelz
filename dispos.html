@@ -480,6 +480,7 @@
 
       // Initialiser Flatpickr APRÈS avoir récupéré les dates
       flatpickr("#dateSelect", {
+        disableMobile: true,
         dateFormat: "Y-m-d",
         defaultDate: date || null,
         onChange: function (selectedDates, dateStr) {

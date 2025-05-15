@@ -79,15 +79,6 @@
     </div>
   </div>
 </div>
-<div id="requestedBanner" class="d-none w-100">
-  <div class="renewal-box mx-auto mt-2 mb-4 px-3 py-2 rounded shadow-sm text-success bg-success-subtle bg-opacity-25 text-center">
-    <div class="fw-bold">✅ Renouvellements déjà demandés ✅</div>
-    <div class="mt-1 text-success-emphasis marquee-container">
-      <span class="marquee-content d-inline-block"></span>
-    </div>
-  </div>
-</div>
-
 
 <div class="container">
   <h1 class="mb-4 text-center">📄 Visualisation des Permis</h1>
@@ -117,9 +108,8 @@
       <div class="mt-3 d-flex flex-row flex-wrap justify-content-center gap-2 btn-group-wrap">
         <a id="openPdf" href="#" target="_blank" class="btn btn-primary">🧾 Voir le PDF</a>
         <a id="downloadPdf" href="#" class="btn btn-success" download>⬇️ Télécharger</a>
-        <button id="markAsRequestedBtn" class="btn btn-outline-secondary btn-sm d-none">✅ Marquer comme demandé</button>
-        <small id="confirmMark" class="text-success d-block mt-1"></small>
       </div>
+
       <div class="mt-3 text-center">
         <label for="emailInput" class="form-label">✉️ Envoyer le PDF avec pièce jointe à :</label>
         <div class="input-group mb-2">
@@ -133,7 +123,7 @@
 </div>
 
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbx02g4vhGEdcbsERJ7hkpVH-1HzpUQ7MuRq8Zl_XUtGY84Mw5DYT1CEvB3YJYRHddvs/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbya6pXCawlVp-uoqJWPPZmAtEzSjpRgIQyVrHCaAtVSxz-CtayB8TSTsKtBz6Hbm8jU/exec";
   let docs = [];
   let selectedDoc = null;
 
@@ -181,74 +171,49 @@ function showUpcomingRenewals() {
   const threeMonthsLater = new Date();
   threeMonthsLater.setMonth(now.getMonth() + 3);
 
-  const renouveler = [];
-  const demandes = [];
-
-  docs.forEach(doc => {
+  const upcoming = docs.filter(doc => {
     const exp = new Date(doc.expiration);
-    if (exp >= now && exp <= threeMonthsLater) {
-      if (doc.demandeRenouvelee === "oui" && doc.demandeDate) {
-        demandes.push(`✅ ${doc.unit} – ${doc.permit} (demandé le ${doc.demandeDate.split(" ")[0]})`);
-      } else {
-        renouveler.push(`⚠️ ${doc.unit} – ${doc.permit} (expire le ${doc.expiration})`);
-      }
-    }
-  });
+    return exp >= now && exp <= threeMonthsLater;
+  }).sort((a, b) => new Date(a.expiration) - new Date(b.expiration)).slice(0, 2);
 
-  // Bannières séparées
-  if (renouveler.length > 0) {
+  if (upcoming.length > 0) {
+    const messages = upcoming.map(doc =>
+      `${doc.unit} – ${doc.permit} (expire le ${doc.expiration})`
+    );
+    document.querySelector(".marquee-content").textContent = messages.join("   •   ");
     document.getElementById("renewalBanner").classList.remove("d-none");
-    document.querySelector("#renewalBanner .marquee-content").textContent = renouveler.join("   •   ");
-  }
-
-  if (demandes.length > 0) {
-    document.getElementById("requestedBanner").classList.remove("d-none");
-    document.querySelector("#requestedBanner .marquee-content").textContent = demandes.join("   •   ");
   }
 }
 
+  function updateDisplay() {
+    const unit = document.getElementById("unitSelect").value;
+    const permit = document.getElementById("permitSelect").value;
+    const doc = docs.find(d => d.unit === unit && d.permit === permit);
+    selectedDoc = doc;
 
+    if (doc) {
+      const driveLink = `https://drive.google.com/file/d/${doc.fileId}/preview`;
+      const downloadLink = `https://drive.google.com/uc?export=download&id=${doc.fileId}`;
 
-function updateDisplay() {
-  const unit = document.getElementById("unitSelect").value;
-  const permit = document.getElementById("permitSelect").value;
-  const doc = docs.find(d => d.unit === unit && d.permit === permit);
-  selectedDoc = doc;
+      document.getElementById("unitLabel").textContent = doc.unit;
+      document.getElementById("permitLabel").textContent = doc.permit;
+      document.getElementById("expirationLabel").textContent = doc.expiration;
 
-  const msg = document.getElementById("confirmMark");
+      document.getElementById("openPdf").href = driveLink;
+      document.getElementById("downloadPdf").href = downloadLink;
 
-  if (doc) {
-    const driveLink = `https://drive.google.com/file/d/${doc.fileId}/preview`;
-    const downloadLink = `https://drive.google.com/uc?export=download&id=${doc.fileId}`;
-
-    document.getElementById("unitLabel").textContent = doc.unit;
-    document.getElementById("permitLabel").textContent = doc.permit;
-    document.getElementById("expirationLabel").textContent = doc.expiration;
-    document.getElementById("markAsRequestedBtn").classList.remove("d-none");
-
-    // ✅ Affiche la date de demande si elle existe
-    if (doc.demandeRenouvelee === "oui" && doc.demandeDate) {
-      msg.textContent = `✅ Renouvellement demandé le ${doc.demandeDate}`;
+      document.getElementById("infoBlock").classList.remove("d-none");
     } else {
-      msg.textContent = "";
+      document.getElementById("infoBlock").classList.add("d-none");
     }
-
-    document.getElementById("openPdf").href = driveLink;
-    document.getElementById("downloadPdf").href = downloadLink;
-
-    document.getElementById("infoBlock").classList.remove("d-none");
-  } else {
-    document.getElementById("infoBlock").classList.add("d-none");
   }
-}
-
 
   document.getElementById("unitSelect").addEventListener("change", () => {
     const unit = document.getElementById("unitSelect").value;
-    const permitsForUnit = [...new Set(docs.filter(d => d.unit === unit).map(d => d.permit))].sort((a, b) => {
-    const getChunks = str => str.match(/\D+|\d+/g).map(s => isNaN(s) ? s : parseInt(s));
-    const aChunks = getChunks(a);
-    const bChunks = getChunks(b);
+  const permitsForUnit = [...new Set(docs.filter(d => d.unit === unit).map(d => d.permit))].sort((a, b) => {
+  const getChunks = str => str.match(/\D+|\d+/g).map(s => isNaN(s) ? s : parseInt(s));
+  const aChunks = getChunks(a);
+  const bChunks = getChunks(b);
   
   for (let i = 0; i < Math.max(aChunks.length, bChunks.length); i++) {
     if (aChunks[i] === undefined) return -1;
@@ -318,11 +283,12 @@ function updateDisplay() {
   })();
 </script>
   <script>
-    async function afficherAlertesPermis() {
+  async function afficherAlertesPermis() {
+    const API_URL = "https://script.google.com/macros/s/AKfycbya6pXCawlVp-uoqJWPPZmAtEzSjpRgIQyVrHCaAtVSxz-CtayB8TSTsKtBz6Hbm8jU/exec";
     try {
-        const res = await fetch(API_URL); // <--- utilise la version globale
-        const data = await res.json();
-        const docs = data.docs || data;
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      const docs = data.docs || data;
 
       const now = new Date();
       const dans3mois = new Date();
@@ -346,40 +312,6 @@ function updateDisplay() {
   }
 
   document.addEventListener("DOMContentLoaded", afficherAlertesPermis);
-
-  document.getElementById("markAsRequestedBtn").addEventListener("click", async () => {
-  if (!selectedDoc) return;
-
-  const btn = document.getElementById("markAsRequestedBtn");
-  const msg = document.getElementById("confirmMark");
-
-  btn.disabled = true;
-  msg.textContent = "⏳ Enregistrement...";
-
-  const params = new URLSearchParams({
-    unit: selectedDoc.unit,
-    permit: selectedDoc.permit
-  });
-
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: params
-    });
-
-    const txt = await res.text();
-    if (txt === "OK") {
-      msg.textContent = "✅ Marqué comme demandé.";
-    } else {
-      msg.textContent = "❌ Erreur : " + txt;
-    }
-  } catch (e) {
-    msg.textContent = "❌ Erreur réseau : " + e.message;
-  }
-
-  btn.disabled = false;
-});
-
 </script>
 
 <div class="container text-center mt-5">

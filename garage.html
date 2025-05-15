@@ -287,10 +287,14 @@ input[type=range].range-ticks::-moz-range-thumb {
     </li>
   </ul>
 
-  <!-- Zone de filtre -->
-  <div id="filterZone" class="mb-3">
-    <input type="text" class="form-control" id="searchInput" placeholder="🔎 Filtrer par unité..." oninput="renderCurrentTab()">
-  </div>
+    <div id="filterZone" class="mb-3">
+    <div class="input-group">
+        <input type="text" class="form-control" id="searchInput" placeholder="🔎 Filtrer par unité..." oninput="handleSearchInput()">
+        <button class="btn btn-outline-secondary d-none" id="clearButton" type="button" onclick="resetSearch()">❌ Effacer</button>
+    </div>
+    </div>
+
+
 
   <!-- Contenus -->
   <div id="faireList" class="list-group"></div>
@@ -802,6 +806,29 @@ function showToast(message = "Réparation enregistrée ✅") {
   setTimeout(() => {
     toast.style.display = 'none';
   }, 3000);
+}
+
+function handleSearchInput() {
+  const input = document.getElementById("searchInput");
+  const clearBtn = document.getElementById("clearButton");
+
+  if (input.value.trim() !== "") {
+    clearBtn.classList.remove("d-none");
+  } else {
+    clearBtn.classList.add("d-none");
+  }
+
+  renderCurrentTab(); // met à jour l'affichage filtré
+}
+
+function resetSearch() {
+  const input = document.getElementById("searchInput");
+  const clearBtn = document.getElementById("clearButton");
+
+  input.value = "";
+  clearBtn.classList.add("d-none");
+  renderCurrentTab();
+  input.focus(); // optionnel : remet le curseur dans le champ
 }
 
 

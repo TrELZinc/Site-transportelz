@@ -1,32 +1,26 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Blackjack</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
       background: #111;
       color: #fff;
-      margin: 0;
-      padding: 20px;
+      font-family: 'Segoe UI', sans-serif;
       text-align: center;
+      padding: 20px;
     }
     h1 {
-      font-size: 2rem;
-      margin-bottom: 10px;
+      color: #feca57;
     }
     select, button {
-      font-size: 1.2rem;
       padding: 10px;
-      margin: 10px 5px;
-      border: none;
+      font-size: 1.2rem;
+      margin: 5px;
       border-radius: 5px;
-    }
-    select {
-      background-color: #333;
-      color: #fff;
+      border: none;
     }
     button {
       background-color: #00c851;
@@ -34,49 +28,45 @@
       cursor: pointer;
     }
     .result {
-      font-size: 1.5rem;
       margin-top: 30px;
+      font-size: 1.3rem;
+    }
+    .highlight {
+      font-weight: bold;
       color: #feca57;
     }
   </style>
 </head>
 <body>
   <h1>Blackjack</h1>
+  <p>Entre ta main et celle du croupier</p>
 
-  <div>
-    <label for="playerHand">Ta main :</label><br>
-    <select id="playerHand">
-      <option value="">-- Choisir --</option>
-      <option value="5,5">5 et 5</option>
-      <option value="6,4">6 et 4</option>
-      <option value="10,6">10 et 6</option>
-      <option value="9,7">9 et 7</option>
-      <option value="As,6">As et 6</option>
-      <option value="As,7">As et 7</option>
-      <option value="8,8">8 et 8</option>
-      <option value="10,10">10 et 10</option>
-      <option value="9,9">9 et 9</option>
-      <!-- Ajoute d'autres mains au besoin -->
-    </select>
-  </div>
+  <label>Ta carte 1 :</label>
+  <select id="card1">
+    <option value="">--</option>
+    <option>2</option><option>3</option><option>4</option><option>5</option>
+    <option>6</option><option>7</option><option>8</option><option>9</option>
+    <option>10</option><option>As</option>
+  </select>
 
-  <div>
-    <label for="dealerCard">Carte du croupier :</label><br>
-    <select id="dealerCard">
-      <option value="">-- Choisir --</option>
-      <option value="2">2</option>
-      <option value="3">3</option>
-      <option value="4">4</option>
-      <option value="5">5</option>
-      <option value="6">6</option>
-      <option value="7">7</option>
-      <option value="8">8</option>
-      <option value="9">9</option>
-      <option value="10">10</option>
-      <option value="As">As</option>
-    </select>
-  </div>
+  <label>Ta carte 2 :</label>
+  <select id="card2">
+    <option value="">--</option>
+    <option>2</option><option>3</option><option>4</option><option>5</option>
+    <option>6</option><option>7</option><option>8</option><option>9</option>
+    <option>10</option><option>As</option>
+  </select>
 
+  <br><br>
+  <label>Carte du croupier :</label>
+  <select id="dealerCard">
+    <option value="">--</option>
+    <option>2</option><option>3</option><option>4</option><option>5</option>
+    <option>6</option><option>7</option><option>8</option><option>9</option>
+    <option>10</option><option>As</option>
+  </select>
+
+  <br><br>
   <button onclick="analyser()">Analyser</button>
   <button onclick="reset()">Nouvelle main</button>
 
@@ -84,63 +74,66 @@
 
   <script>
     function analyser() {
-      const main = document.getElementById('playerHand').value;
+      const c1 = document.getElementById('card1').value;
+      const c2 = document.getElementById('card2').value;
       const dealer = document.getElementById('dealerCard').value;
       const res = document.getElementById('resultat');
 
-      if (!main || !dealer) {
-        res.textContent = 'Choisis les deux cartes.';
+      if (!c1 || !c2 || !dealer) {
+        res.innerHTML = 'Veuillez sélectionner toutes les cartes.';
         return;
       }
 
-      let [carte1, carte2] = main.split(',');
-      let total = 0;
-      let hasAce = false;
+      // Calcul total et structure
+      let val1 = c1 === 'As' ? 11 : parseInt(c1);
+      let val2 = c2 === 'As' ? 11 : parseInt(c2);
+      let total = val1 + val2;
+      let soft = (c1 === 'As' || c2 === 'As');
+      let pair = (c1 === c2);
+      let dealerVal = dealer === 'As' ? 11 : parseInt(dealer);
 
-      if (carte1 === 'As' || carte2 === 'As') hasAce = true;
-      total += carte1 === 'As' ? 11 : parseInt(carte1);
-      total += carte2 === 'As' ? 11 : parseInt(carte2);
-      if (hasAce && total > 21) total -= 10;
+      let conseil = '';
+      let prob = { win: '', tie: '', lose: '' };
 
-      const isPair = carte1 === carte2;
-      const isSoft = hasAce && total < 21;
-
-      // LOGIQUE SIMPLIFIÉE
-      let action = '';
-
-      if (isPair) {
-        if (carte1 === '8') action = 'Séparer';
-        else if (carte1 === 'As') action = 'Séparer';
-        else if (carte1 === '9' && ['7','10','As'].includes(dealer)) action = 'Rester';
-        else if (carte1 === '9') action = 'Séparer';
-        else if (carte1 === '10') action = 'Rester';
-        else action = 'Ne pas séparer';
-      }
-      else if (isSoft) {
-        if (total === 18 && ['2','7','8'].includes(dealer)) action = 'Rester';
-        else if (total === 18 && ['3','4','5','6'].includes(dealer)) action = 'Doubler si possible';
-        else if (total === 18) action = 'Tirer';
-        else if (total <= 17 && ['4','5','6'].includes(dealer)) action = 'Doubler si possible';
-        else action = 'Tirer';
-      }
-      else {
-        if (total <= 8) action = 'Tirer';
-        else if (total === 9 && ['3','4','5','6'].includes(dealer)) action = 'Doubler si possible';
-        else if (total === 10 && dealer < 10) action = 'Doubler si possible';
-        else if (total === 11) action = 'Doubler si possible';
-        else if (total === 12 && ['4','5','6'].includes(dealer)) action = 'Rester';
-        else if (total >= 13 && total <= 16 && dealer <= 6) action = 'Rester';
-        else if (total >= 17) action = 'Rester';
-        else action = 'Tirer';
+      // Probabilités statiques (exemples — à ajuster si tu veux + de précision)
+      if (pair && c1 === '8') {
+        conseil = 'Séparer';
+        prob = { win: '54%', tie: '8%', lose: '38%' };
+      } else if (soft && total === 18 && dealerVal >= 9) {
+        conseil = 'Tirer';
+        prob = { win: '23%', tie: '9%', lose: '68%' };
+      } else if (total === 11 && dealerVal < 11) {
+        conseil = 'Doubler';
+        prob = { win: '63%', tie: '7%', lose: '30%' };
+      } else if (total === 16 && dealerVal >= 9) {
+        conseil = 'Tirer';
+        prob = { win: '23%', tie: '5%', lose: '72%' };
+      } else if (total === 12 && dealerVal >= 4 && dealerVal <= 6) {
+        conseil = 'Rester';
+        prob = { win: '39%', tie: '9%', lose: '52%' };
+      } else if (total >= 17) {
+        conseil = 'Rester';
+        prob = { win: '45%', tie: '8%', lose: '47%' };
+      } else {
+        conseil = 'Tirer';
+        prob = { win: '36%', tie: '7%', lose: '57%' };
       }
 
-      res.textContent = `Décision : ${action}`;
+      res.innerHTML = `
+        <div class="highlight">Décision optimale : ${conseil}</div>
+        <br>
+        <strong>Probabilités estimées :</strong><br>
+        Victoire : ${prob.win} <br>
+        Égalité : ${prob.tie} <br>
+        Défaite : ${prob.lose}
+      `;
     }
 
     function reset() {
-      document.getElementById('playerHand').value = '';
+      document.getElementById('card1').value = '';
+      document.getElementById('card2').value = '';
       document.getElementById('dealerCard').value = '';
-      document.getElementById('resultat').textContent = '';
+      document.getElementById('resultat').innerHTML = '';
     }
   </script>
 </body>

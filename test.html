@@ -1128,55 +1128,6 @@ document.getElementById("btn-confirm").addEventListener("click", async () => {
   return;
 }
 
-document.getElementById("btn-consulter-semaine").addEventListener("click", async () => {
-  const nom = document.getElementById("nom")?.value;
-  if (!nom) {
-    alert("Nom introuvable, impossible d’afficher le sommaire.");
-    return;
-  }
-
-  // 📅 Calcule le lundi de la semaine courante
-  const now = new Date();
-  const day = now.getDay(); // 0 = dimanche, 1 = lundi, etc.
-  const monday = new Date(now);
-  monday.setDate(now.getDate() - ((day + 6) % 7));
-  const lundiISO = monday.toISOString().split("T")[0]; // ex: "2024-05-20"
-
-  try {
-    const response = await fetch("https://script.google.com/macros/s/AKfycbzAuEV3rbgvNzQ-aiwN6K_IZrY1wqizz7BI5JnhbW93ubs9Uz1A1U85pbCxtWsE0aT0/exec?" + 
-                                 `chauffeur=${encodeURIComponent(nom)}&lundi=${encodeURIComponent(lundiISO)}`);
-    const data = await response.json();
-
-    if (!Array.isArray(data.resultats) || data.resultats.length === 0) {
-      alert("Aucune donnée trouvée pour cette semaine.");
-      return;
-    }
-
-    let html = "<h4 class='mb-3'>Sommaire de votre semaine</h4>";
-    data.resultats.forEach(entry => {
-      html += `
-        <div class="border rounded p-3 mb-3 bg-light">
-          <strong>${entry.date}</strong><br/>
-          KM: ${entry.km || 0}, Heures: ${Math.floor((entry.minutes || 0) / 60)}h${(entry.minutes || 0) % 60}, 
-          Forfaits: ${entry.prime_forfait || 0}$, Total: ${(entry.km * 0.5 + (entry.minutes / 60) * 20 + entry.prime || 0).toFixed(2)}$
-        </div>
-      `;
-    });
-
-    document.getElementById("confirmationContainer").innerHTML = `
-      <div class="section-box">
-        ${html}
-        <button class="btn btn-primary mt-3" onclick="window.location.reload()">Remplir un nouveau formulaire</button>
-      </div>
-    `;
-  } catch (err) {
-    console.error("Erreur de récupération :", err);
-    alert("Une erreur est survenue lors de la consultation.");
-  }
-});
-
-
-
   const chauffeur = document.getElementById("nom")?.value;
   const tauxChauffeur = tauxMap[chauffeur] || { taux_h: 0, taux_km: 0 };
 
@@ -1230,6 +1181,72 @@ document.getElementById("btn-consulter-semaine").addEventListener("click", async
 });
   
   let parametresMap = { prime_forfait: 60.85, prime_douane: 15 }; // Valeurs par défaut
+
+function getLundiFromDate(dateStr) {
+  const d = new Date(dateStr);
+  const day = d.getDay(); // 0 = dimanche, 1 = lundi...
+  const offset = (day === 0 ? -6 : 1 - day);
+  d.setDate(d.getDate() + offset);
+  return d.toISOString().slice(0, 10); // "YYYY-MM-DD"
+}
+
+document.getElementById("btn-consulter-semaine").addEventListener("click", async () => {
+  const nom = document.getElementById("nom")?.value;
+  const dateStr = document.getElementById("date")?.value;
+
+  if (!nom || !dateStr) {
+    alert("Merci de sélectionner un nom et une date.");
+    return;
+  }
+
+  const lundi = getLundiFromDate(dateStr);
+
+  try {
+    const response = await fetch(`https://script.google.com/macros/s/AKfycbzAuEV3rbgvNzQ-aiwN6K_IZrY1wqizz7BI5JnhbW93ubs9Uz1A1U85pbCxtWsE0aT0/exec?chauffeur=${encodeURIComponent(nom)}&lundi=${lundi}`);
+    const result = await response.json();
+
+    const resultats = result.resultats || [];
+
+    if (!Array.isArray(resultats) || resultats.length === 0) {
+      alert("Aucune donnée trouvée pour cette semaine.");
+      return;
+    }
+
+    let html = "<h4 class='mb-3'>Sommaire de votre semaine</h4>";
+
+    const jourMap = {};
+    resultats.forEach(entry => {
+      const jour = entry.date;
+      if (!jourMap[jour]) {
+        jourMap[jour] = { km: 0, heures: 0, forfait: 0, total: 0 };
+      }
+      jourMap[jour].km += entry.km || 0;
+      jourMap[jour].heures += (entry.minutes || 0) / 60;
+      jourMap[jour].forfait += entry.prime || 0;
+    });
+
+    Object.entries(jourMap).forEach(([jour, val]) => {
+      const total = (val.km * 0.55) + (val.heures * 26) + val.forfait;
+      html += `
+        <div class="border rounded p-3 mb-3 bg-light">
+          <strong>${jour}</strong><br/>
+          KM: ${val.km}, Heures: ${val.heures.toFixed(2)}, Forfaits: ${val.forfait.toFixed(2)}$, Total: ${total.toFixed(2)}$
+        </div>
+      `;
+    });
+
+    document.getElementById("confirmationContainer").innerHTML = `
+      <div class="section-box text-center">
+        ${html}
+        <button class="btn btn-primary mt-3" onclick="window.location.reload()">Remplir un nouveau formulaire</button>
+      </div>
+    `;
+  } catch (err) {
+    console.error("Erreur de récupération :", err);
+    alert("Une erreur est survenue lors de la consultation.");
+  }
+});
+
 
 </script>
 <script>

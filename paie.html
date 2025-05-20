@@ -624,6 +624,7 @@ radios.forEach((radio) => {
 <div class="mb-3 d-none visually-enhanced-block" id="litres_uree_block">
   <label class="form-label fw-bold">Inscrivez la quantité de litres (urée)</label>
   <input type="number" inputmode="numeric" class="form-control mt-2" name="litres_uree" />
+  <input type="radio" name="uree" id="uree_autre" value="autre" style="display: none;" />
 </div>
   `;
 
@@ -673,23 +674,63 @@ const ureeRadios = section.querySelectorAll('input[name="uree"]');
 const ureeLitres = section.querySelector("#litres_uree_block");
 const ureeAutreInput = section.querySelector("#uree_spec_direct");
 
+// Gestion des radios urée
 ureeRadios.forEach((radio) => {
   radio.addEventListener("change", () => {
+    // Enlève le style actif de tous les boutons
+    ureeRadios.forEach(r => r.closest(".fuel-toggle")?.classList.remove("active"));
+    ureeAutreInput.closest(".fuel-toggle")?.classList.remove("active");
+
+    // Ajoute le style actif au bouton sélectionné
+    if (radio.checked) {
+      radio.closest(".fuel-toggle")?.classList.add("active");
+    }
+
+    // Affiche ou cache le bloc litres
     if (radio.checked && radio.value !== "non") {
       ureeLitres.classList.remove("d-none");
-    } else if (radio.checked && radio.value === "non") {
+    } else {
       ureeLitres.classList.add("d-none");
     }
+
+    // Supprime l'attribut 'required' du champ litres
+    const inputLitres = ureeLitres.querySelector('input[name="litres_uree"]');
+    if (inputLitres) inputLitres.removeAttribute("required");
   });
 });
 
-ureeAutreInput.addEventListener("focus", () => {
+// Gestion du champ texte "Autre"
+ureeAutreInput.addEventListener("input", () => {
+  // Décocher les autres boutons et enlever leur style actif
   ureeRadios.forEach(r => {
     r.checked = false;
-    r.closest('.fuel-toggle').classList.remove("active");
+    r.closest(".fuel-toggle")?.classList.remove("active");
   });
+
+  // Ajoute un bouton fantôme s’il n’existe pas
+  let autreRadio = document.getElementById("uree_autre");
+  if (!autreRadio) {
+    autreRadio = document.createElement("input");
+    autreRadio.type = "radio";
+    autreRadio.name = "uree";
+    autreRadio.id = "uree_autre";
+    autreRadio.value = "autre";
+    autreRadio.style.display = "none";
+    ureeLitres.appendChild(autreRadio);
+  }
+
+  autreRadio.checked = true;
+
+  // Applique le style actif à "Autre"
+  ureeAutreInput.closest(".fuel-toggle")?.classList.add("active");
+
+  // Affiche le bloc litres et le rend requis
   ureeLitres.classList.remove("d-none");
+  const inputLitres = ureeLitres.querySelector('input[name="litres_uree"]');
+  if (inputLitres) inputLitres.setAttribute("required", "required");
 });
+
+
 }
   </script>
   <!-- Résumé -->
@@ -713,9 +754,12 @@ ureeAutreInput.addEventListener("focus", () => {
       <input type="number" step="1" min="0" class="form-control" id="ajust_km" placeholder="Ex: 12" />
     </div>
     <div class="mb-3">
-        <label for="ajust_forfait" class="form-label">Forfait supplémentaire ($)</label>
-        <input type="number" step="0.01" min="0" class="form-control" id="ajust_forfait" placeholder="Ex: 20.00" />
-      </div>      
+      <label for="ajust_forfait" class="form-label">Forfait supplémentaire ($)</label>
+      <input type="number" step="0.01" min="0" class="form-control" id="ajust_forfait" placeholder="Ex: 20.00" />
+      <div class="form-text text-muted fst-italic mt-1">
+        Forfait chargement: 21.75$ / Forfait déchargement: 39.10$
+      </div>
+    </div>    
     <div class="mb-3">
       <label for="ajust_raison" class="form-label">Justification</label>
       <textarea class="form-control" id="ajust_raison" rows="2" placeholder="Obligatoire si ajustement ajouté"></textarea>
@@ -762,6 +806,34 @@ btnPreview.addEventListener("click", () => {
   const formEl = document.getElementById("formulaire");
 
   const formError = document.getElementById("formError");
+  // 🛠️ Si champ texte urée est rempli, forcer sélection radio "autre"
+  const ureeSpec = document.getElementById("uree_spec_direct");
+  const ureeAutreRadio = document.querySelector('input[name="uree"][value="autre"]');
+  if (ureeSpec && ureeSpec.value.trim() !== "") {
+    if (ureeAutreRadio) {
+      ureeAutreRadio.checked = true;
+    }
+  }
+
+  // 🛠️ Si champ texte diesel est rempli, forcer sélection radio "autre"
+const dieselSpec = document.getElementById("diesel_spec_direct");
+const dieselAutreRadio = document.querySelector('input[name="diesel"][value="autre"]');
+if (dieselSpec && dieselSpec.value.trim() !== "") {
+  if (dieselAutreRadio) {
+    dieselAutreRadio.checked = true;
+  } else {
+    // Cas où le radio "autre" n’existe pas encore, on le crée
+    const fakeRadio = document.createElement('input');
+    fakeRadio.type = "radio";
+    fakeRadio.name = "diesel";
+    fakeRadio.value = "autre";
+    fakeRadio.checked = true;
+    fakeRadio.style.display = "none";
+    dieselSpec.parentNode.appendChild(fakeRadio);
+  }
+}
+
+
 
 if (!formEl.checkValidity()) {
   formEl.reportValidity();

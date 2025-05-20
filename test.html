@@ -1201,19 +1201,21 @@ document.getElementById("btn-consulter-semaine").addEventListener("click", async
 
   const lundi = getLundiFromDate(dateStr);
 
-  try {
-    const response = await fetch(`https://script.google.com/macros/s/AKfycbzAuEV3rbgvNzQ-aiwN6K_IZrY1wqizz7BI5JnhbW93ubs9Uz1A1U85pbCxtWsE0aT0/exec?chauffeur=${encodeURIComponent(nom)}&lundi=${lundi}`);
-    const result = await response.json();
+try {
+  const response = await fetch(`https://script.google.com/macros/s/AKfycb.../exec?chauffeur=${encodeURIComponent(nom)}&lundi=${lundi}`, {
+    method: "GET",
+    redirect: "follow"
+  });
 
-    const semaineData = await response.json();
-    const resultats = Array.isArray(semaineData) ? semaineData : semaineData.resultats || [];
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-    if (resultats.length === 0) {
+  const semaineData = await response.json();
+  const resultats = Array.isArray(semaineData) ? semaineData : semaineData.resultats || [];
+
+  if (resultats.length === 0) {
     alert("Aucune donnée trouvée pour cette semaine.");
     return;
-    }
-
-
+  }
 
     let html = "<h4 class='mb-3'>Sommaire de votre semaine</h4>";
 

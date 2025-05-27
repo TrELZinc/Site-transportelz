@@ -230,12 +230,14 @@ function afficherBoutonsAdmin() {
   lienRapport.className = "button";
   lienRapport.innerHTML = `<img src="assets/icones/permis.png" alt=""> Gestion des permis`;
   btnContainer.appendChild(lienRapport);
-
-    const lienEmploye = document.createElement("a");
-  lienRapport.href = "employes.html";
-  lienRapport.className = "button";
-  lienRapport.innerHTML = `<img src="assets/icones/permis.png" alt=""> Dossiers employés`;
+  
+  // Pastille 2 : Dossiers employés
+  const lienEmploye = document.createElement("a");
+  lienEmploye.href = "employes.html";
+  lienEmploye.className = "button";
+  lienEmploye.innerHTML = `<img src="assets/icones/permis.png" alt=""> Dossiers employés`;
   btnContainer.appendChild(lienEmploye);
+
 
     // Pastille 3 : Réparation mécanique
   const lienGarage = document.createElement("a");

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Punch Journalier</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0f172a;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      background-color: #1e293b;
+      padding: 25px;
+      border-radius: 15px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 0 15px rgba(0,0,0,0.4);
+    }
+
+    h1 {
+      color: #38bdf8;
+      margin-bottom: 10px;
+    }
+
+    #date {
+      margin-bottom: 20px;
+      font-size: 1.1em;
+    }
+
+    button {
+      padding: 12px 25px;
+      margin: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    #punchInBtn {
+      background-color: #22c55e;
+    }
+
+    #punchInBtn:hover {
+      background-color: #15803d;
+    }
+
+    #punchOutBtn {
+      background-color: #ef4444;
+    }
+
+    #punchOutBtn:hover {
+      background-color: #b91c1c;
+    }
+
+    .result p {
+      margin: 10px 0;
+      font-size: 1rem;
+      line-height: 1.5;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: nowrap;
+    }
+
+    .result p span.label {
+      min-width: 150px;
+      max-width: 150px;
+      color: #94a3b8;
+      font-weight: 500;
+      display: inline-block;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    .result p span.value {
+      color: #f8fafc;
+      font-weight: 600;
+      flex: 1;
+      text-align: right;
+    }
+
+    .result p#liveTimer {
+      color: #facc15;
+      font-weight: 700;
+      font-size: 1.1rem;
+      border-top: 1px dashed #334155;
+      padding-top: 10px;
+      margin-top: 15px;
+    }
+
+    #status {
+      margin-top: 15px;
+      font-size: 1.05rem;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Punch de Travail</h1>
+    <label for="employeeName" style="display:block; margin-bottom:10px; font-weight:600;">Employé :</label>
+      <select id="employeeName" style="
+        padding: 10px 15px;
+        border-radius: 8px;
+        border: 1px solid #334155;
+        background-color: #0f172a;
+        color: #f1f5f9;
+        width: 100%;
+        margin-bottom: 20px;
+        font-size: 1em;
+        font-weight: 600;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+        appearance: none;
+        background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22 viewBox=%220 0 20 20%22><polygon fill=%22%23f1f5f9%22 points=%225,7 10,12 15,7%22/></svg>');
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 12px;
+        text-align: center;           /* ← centrage horizontal du texte */
+        text-align-last: center;      /* ← compatibilité pour certains navigateurs */
+      ">
+        <option value="Sacha-Pierre Tournier" selected>Sacha-Pierre Tournier</option>
+      </select>
+    <div id="date">Date: --/--/----</div>
+    <div id="clock">Heure: --:--:--</div>
+    <button id="punchInBtn">🟢 Punch In</button>
+    <button id="punchOutBtn">🔴 Punch Out</button>
+
+    <div class="result">
+      <p id="inLine"><span class="label">🕓 Heure d'entrée:</span> <span class="value" id="inTime"></span></p>
+      <p id="outLine"><span class="label">🏁 Heure de sortie:</span> <span class="value" id="outTime"></span></p>
+      <p id="workLine"><span class="label">⏱ Temps travaillé:</span> <span class="value" id="workedTime"></span></p>
+      <p id="liveTimer">⏳ En cours: 00:00:00</p>
+    </div>
+  </div>
+
+  <script>
+const dateEl = document.getElementById('date');
+const inTimeEl = document.getElementById('inTime');
+const outTimeEl = document.getElementById('outTime');
+const workedTimeEl = document.getElementById('workedTime');
+const liveTimerEl = document.getElementById('liveTimer');
+
+
+
+let punchInTime = null;
+let punchOutTime = null;
+let geoData = {};
+let liveInterval = null;
+
+// Affiche date et heure
+const today = new Date();
+dateEl.textContent = `Date: ${today.toLocaleDateString('fr-FR')}`;
+const clockEl = document.getElementById('clock');
+function updateClock() {
+  const now = new Date();
+  clockEl.textContent = `Heure: ${now.toLocaleTimeString('fr-FR')}`;
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+function startLiveTimer() {
+  clearInterval(liveInterval);
+  liveInterval = setInterval(() => {
+    const now = new Date();
+    const diff = now - punchInTime;
+    const seconds = Math.floor(diff / 1000) % 60;
+    const minutes = Math.floor(diff / (1000 * 60)) % 60;
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    liveTimerEl.textContent = `⏳ En cours: ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  }, 1000);
+}
+
+function stopLiveTimer() {
+  clearInterval(liveInterval);
+}
+
+function savePunchIn() {
+  localStorage.setItem('punchInTime', punchInTime.toISOString());
+  localStorage.setItem('geoData', JSON.stringify(geoData));
+}
+
+function clearPunchData() {
+  localStorage.removeItem('punchInTime');
+  localStorage.removeItem('geoData');
+}
+
+function loadSavedPunchIn() {
+  const savedTime = localStorage.getItem('punchInTime');
+  if (savedTime) {
+    punchInTime = new Date(savedTime);
+    inTimeEl.textContent = punchInTime.toLocaleTimeString('fr-FR');
+    startLiveTimer();
+  }
+
+  const savedGeo = localStorage.getItem('geoData');
+  if (savedGeo) {
+    try {
+      geoData = JSON.parse(savedGeo);
+    } catch (e) {
+      geoData = {};
+    }
+  }
+}
+
+loadSavedPunchIn();
+
+// Géolocalisation
+if ('geolocation' in navigator) {
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      geoData.lat = pos.coords.latitude;
+      geoData.lng = pos.coords.longitude;
+
+      const inZone = checkIfInZone(geoData.lat, geoData.lng);
+      console.log("Position actuelle:", geoData.lat, geoData.lng, "-> Dans la zone ?", inZone);
+      
+      geoData.inZone = inZone; // ← Sauvegarde dans geoData
+      console.log("Position actuelle:", geoData.lat, geoData.lng, "-> Dans la zone ?", inZone);
+      // Le bouton reste actif, même si hors zone
+      document.getElementById('punchInBtn').disabled = false;
+    },
+    (err) => {
+      console.error("Erreur géolocalisation :", err.message);
+      geoData.error = err.message;
+      // Facultatif : activer quand même pour test
+      document.getElementById('punchInBtn').disabled = false;
+    }
+  );
+}
+
+
+// Punch IN
+document.getElementById('punchInBtn').addEventListener('click', () => {
+  const employee = document.getElementById('employeeName').value;
+  if (punchInTime) {
+    const existing = punchInTime.toLocaleTimeString('fr-FR');
+    const confirmOverwrite = confirm(`Un Punch In est déjà enregistré à ${existing}. Écraser ?`);
+    if (!confirmOverwrite) return;
+  }
+
+  punchInTime = new Date();
+  inTimeEl.textContent = punchInTime.toLocaleTimeString('fr-FR');
+  outTimeEl.textContent = "";
+  workedTimeEl.textContent = "";
+  punchOutTime = null;
+
+  savePunchIn();
+  startLiveTimer();
+
+const urlIn = `https://script.google.com/macros/s/AKfycbxyOhuMfTkCAl9ljWXxVUnm0fQOa-veQo58PAnvBcIJ-LGOnsUto7LQOln_3fc6CMvg6g/exec?status=in&lat=${geoData.lat}&lng=${geoData.lng}&name=${encodeURIComponent(employee)}`;
+  fetch(urlIn)
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        console.log("✅ Punch IN envoyé");
+      } else {
+        console.error("❌ Erreur Punch IN", data.error);
+      }
+    });
+});
+
+// Punch OUT
+document.getElementById('punchOutBtn').addEventListener('click', () => {
+  const employee = document.getElementById('employeeName').value;
+  if (!punchInTime || !localStorage.getItem('punchInTime')) {
+    alert("❌ Impossible : aucun Punch In trouvé. Tu dois Punch In d'abord !");
+    return;
+  }
+
+
+  punchOutTime = new Date();
+  outTimeEl.textContent = punchOutTime.toLocaleTimeString('fr-FR');
+  const msWorked = punchOutTime - punchInTime;
+  const totalMins = Math.floor(msWorked / 60000);
+  const hours = Math.floor(totalMins / 60);
+  const mins = totalMins % 60;
+  workedTimeEl.textContent = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+  liveTimerEl.textContent = "⏳ En cours: 00:00:00";
+
+  stopLiveTimer();
+  clearPunchData();
+  punchInTime = null;
+
+const urlOut = `https://script.google.com/macros/s/AKfycbxyOhuMfTkCAl9ljWXxVUnm0fQOa-veQo58PAnvBcIJ-LGOnsUto7LQOln_3fc6CMvg6g/exec?status=out&lat=${geoData.lat}&lng=${geoData.lng}&name=${encodeURIComponent(employee)}`;
+  fetch(urlOut)
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        console.log("✅ Punch OUT envoyé");
+      } else {
+        console.error("❌ Erreur Punch OUT", data.error);
+      }
+    });
+});
+
+// Zone géo
+const GEO_CENTER = { lat: 46.78572, lng: -71.81464 };
+const ALLOWED_RADIUS = 100;
+
+function getDistanceInMeters(lat1, lng1, lat2, lng2) {
+  const R = 6371000;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+function checkIfInZone(currentLat, currentLng) {
+  const distance = getDistanceInMeters(currentLat, currentLng, GEO_CENTER.lat, GEO_CENTER.lng);
+  return distance <= ALLOWED_RADIUS;
+}
+</script>
+
+
+</body>
+</html>

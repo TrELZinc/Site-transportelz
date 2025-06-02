@@ -133,7 +133,7 @@
       ">
         <option value="Sacha-Pierre Tournier" selected>Sacha-Pierre Tournier</option>
         <option value="Mathieu Denis">Mathieu Denis</option>
-                <option value="Ann Déry">Ann Déry</option>
+        <option value="Ann Déry">Ann Déry</option>
       </select>
     <div id="date">Date: --/--/----</div>
     <div id="clock">Heure: --:--:--</div>
@@ -147,22 +147,20 @@
       <p id="liveTimer">⏳ En cours: 00:00:00</p>
     </div>
   </div>
-
-  <script>
+<script>
 const dateEl = document.getElementById('date');
 const inTimeEl = document.getElementById('inTime');
 const outTimeEl = document.getElementById('outTime');
 const workedTimeEl = document.getElementById('workedTime');
 const liveTimerEl = document.getElementById('liveTimer');
-
-
+const employeeSelect = document.getElementById('employeeName');
 
 let punchInTime = null;
 let punchOutTime = null;
 let geoData = {};
 let liveInterval = null;
 
-// Affiche date et heure
+// Display date and time
 const today = new Date();
 dateEl.textContent = `Date: ${today.toLocaleDateString('fr-FR')}`;
 const clockEl = document.getElementById('clock');
@@ -173,6 +171,32 @@ function updateClock() {
 updateClock();
 setInterval(updateClock, 1000);
 
+// --- Storage Helpers ---
+function getAllPunchData() {
+  return JSON.parse(localStorage.getItem('punchMap') || '{}');
+}
+
+function savePunchData(employee, punchInTime, geoData) {
+  const allData = getAllPunchData();
+  allData[employee] = {
+    punchInTime: punchInTime.toISOString(),
+    geoData
+  };
+  localStorage.setItem('punchMap', JSON.stringify(allData));
+}
+
+function loadPunchData(employee) {
+  const allData = getAllPunchData();
+  return allData[employee] || null;
+}
+
+function clearPunchData(employee) {
+  const allData = getAllPunchData();
+  delete allData[employee];
+  localStorage.setItem('punchMap', JSON.stringify(allData));
+}
+
+// --- Live Timer ---
 function startLiveTimer() {
   clearInterval(liveInterval);
   liveInterval = setInterval(() => {
@@ -187,82 +211,74 @@ function startLiveTimer() {
 
 function stopLiveTimer() {
   clearInterval(liveInterval);
+  liveTimerEl.textContent = "⏳ En cours: 00:00:00";
 }
 
-function savePunchIn() {
-  localStorage.setItem('punchInTime', punchInTime.toISOString());
-  localStorage.setItem('geoData', JSON.stringify(geoData));
-}
-
-function clearPunchData() {
-  localStorage.removeItem('punchInTime');
-  localStorage.removeItem('geoData');
-}
-
-function loadSavedPunchIn() {
-  const savedTime = localStorage.getItem('punchInTime');
-  if (savedTime) {
-    punchInTime = new Date(savedTime);
+// --- Load Punch on Page Load or Change ---
+function updateUIForEmployee(employee) {
+  const data = loadPunchData(employee);
+  if (data && data.punchInTime) {
+    punchInTime = new Date(data.punchInTime);
+    geoData = data.geoData || {};
     inTimeEl.textContent = punchInTime.toLocaleTimeString('fr-FR');
+    outTimeEl.textContent = "";
+    workedTimeEl.textContent = "";
     startLiveTimer();
-  }
-
-  const savedGeo = localStorage.getItem('geoData');
-  if (savedGeo) {
-    try {
-      geoData = JSON.parse(savedGeo);
-    } catch (e) {
-      geoData = {};
-    }
+  } else {
+    punchInTime = null;
+    inTimeEl.textContent = "";
+    outTimeEl.textContent = "";
+    workedTimeEl.textContent = "";
+    stopLiveTimer();
   }
 }
 
-loadSavedPunchIn();
+// On load
+updateUIForEmployee(employeeSelect.value);
 
-// Géolocalisation
+// On employee switch
+employeeSelect.addEventListener('change', () => {
+  updateUIForEmployee(employeeSelect.value);
+});
+
+// --- Géoloc ---
 if ('geolocation' in navigator) {
   navigator.geolocation.getCurrentPosition(
     (pos) => {
       geoData.lat = pos.coords.latitude;
       geoData.lng = pos.coords.longitude;
-
-      const inZone = checkIfInZone(geoData.lat, geoData.lng);
-      console.log("Position actuelle:", geoData.lat, geoData.lng, "-> Dans la zone ?", inZone);
-      
-      geoData.inZone = inZone; // ← Sauvegarde dans geoData
-      console.log("Position actuelle:", geoData.lat, geoData.lng, "-> Dans la zone ?", inZone);
-      // Le bouton reste actif, même si hors zone
+      geoData.inZone = checkIfInZone(geoData.lat, geoData.lng);
+      console.log("Position:", geoData);
       document.getElementById('punchInBtn').disabled = false;
     },
     (err) => {
-      console.error("Erreur géolocalisation :", err.message);
+      console.error("Erreur géoloc:", err.message);
       geoData.error = err.message;
-      // Facultatif : activer quand même pour test
       document.getElementById('punchInBtn').disabled = false;
     }
   );
 }
 
-
-// Punch IN
+// --- Punch IN ---
 document.getElementById('punchInBtn').addEventListener('click', () => {
-  const employee = document.getElementById('employeeName').value;
-  if (punchInTime) {
-    const existing = punchInTime.toLocaleTimeString('fr-FR');
-    const confirmOverwrite = confirm(`Un Punch In est déjà enregistré à ${existing}. Écraser ?`);
+  const employee = employeeSelect.value;
+  const existing = loadPunchData(employee);
+
+  if (existing && existing.punchInTime) {
+    const confirmOverwrite = confirm(`Punch In déjà enregistré pour ${employee}. Écraser ?`);
     if (!confirmOverwrite) return;
   }
 
   punchInTime = new Date();
+  punchOutTime = null;
   inTimeEl.textContent = punchInTime.toLocaleTimeString('fr-FR');
   outTimeEl.textContent = "";
   workedTimeEl.textContent = "";
-  punchOutTime = null;
 
-  savePunchIn();
+  savePunchData(employee, punchInTime, geoData);
   startLiveTimer();
 
-const urlIn = `https://script.google.com/macros/s/AKfycbxyOhuMfTkCAl9ljWXxVUnm0fQOa-veQo58PAnvBcIJ-LGOnsUto7LQOln_3fc6CMvg6g/exec?status=in&lat=${geoData.lat}&lng=${geoData.lng}&name=${encodeURIComponent(employee)}`;
+  const urlIn = `https://script.google.com/macros/s/AKfycbxyOhuMfTkCAl9ljWXxVUnm0fQOa-veQo58PAnvBcIJ-LGOnsUto7LQOln_3fc6CMvg6g/exec?status=in&lat=${geoData.lat}&lng=${geoData.lng}&name=${encodeURIComponent(employee)}`;
   fetch(urlIn)
     .then(res => res.json())
     .then(data => {
@@ -274,29 +290,31 @@ const urlIn = `https://script.google.com/macros/s/AKfycbxyOhuMfTkCAl9ljWXxVUnm0f
     });
 });
 
-// Punch OUT
+// --- Punch OUT ---
 document.getElementById('punchOutBtn').addEventListener('click', () => {
-  const employee = document.getElementById('employeeName').value;
-  if (!punchInTime || !localStorage.getItem('punchInTime')) {
-    alert("❌ Impossible : aucun Punch In trouvé. Tu dois Punch In d'abord !");
+  const employee = employeeSelect.value;
+  const data = loadPunchData(employee);
+
+  if (!data || !data.punchInTime) {
+    alert("❌ Aucun Punch In trouvé. Tu dois Punch In d'abord !");
     return;
   }
 
-
   punchOutTime = new Date();
-  outTimeEl.textContent = punchOutTime.toLocaleTimeString('fr-FR');
-  const msWorked = punchOutTime - punchInTime;
+  const inTime = new Date(data.punchInTime);
+  const msWorked = punchOutTime - inTime;
   const totalMins = Math.floor(msWorked / 60000);
   const hours = Math.floor(totalMins / 60);
   const mins = totalMins % 60;
-  workedTimeEl.textContent = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
-  liveTimerEl.textContent = "⏳ En cours: 00:00:00";
 
+  inTimeEl.textContent = inTime.toLocaleTimeString('fr-FR');
+  outTimeEl.textContent = punchOutTime.toLocaleTimeString('fr-FR');
+  workedTimeEl.textContent = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
   stopLiveTimer();
-  clearPunchData();
+  clearPunchData(employee);
   punchInTime = null;
 
-const urlOut = `https://script.google.com/macros/s/AKfycbxyOhuMfTkCAl9ljWXxVUnm0fQOa-veQo58PAnvBcIJ-LGOnsUto7LQOln_3fc6CMvg6g/exec?status=out&lat=${geoData.lat}&lng=${geoData.lng}&name=${encodeURIComponent(employee)}`;
+  const urlOut = `https://script.google.com/macros/s/AKfycbxyOhuMfTkCAl9ljWXxVUnm0fQOa-veQo58PAnvBcIJ-LGOnsUto7LQOln_3fc6CMvg6g/exec?status=out&lat=${geoData.lat}&lng=${geoData.lng}&name=${encodeURIComponent(employee)}`;
   fetch(urlOut)
     .then(res => res.json())
     .then(data => {
@@ -308,7 +326,7 @@ const urlOut = `https://script.google.com/macros/s/AKfycbxyOhuMfTkCAl9ljWXxVUnm0
     });
 });
 
-// Zone géo
+// --- Zone Check ---
 const GEO_CENTER = { lat: 46.78572, lng: -71.81464 };
 const ALLOWED_RADIUS = 100;
 
@@ -326,7 +344,6 @@ function checkIfInZone(currentLat, currentLng) {
   return distance <= ALLOWED_RADIUS;
 }
 </script>
-
 
 </body>
 </html>

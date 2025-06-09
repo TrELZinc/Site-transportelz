@@ -409,6 +409,20 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+  async function manualPunch(employee, isoTimeStr, geoData = {}, deviceId = 'manual') {
+  const dateKey = isoTimeStr.slice(0, 10);
+  await db.collection("punches")
+          .doc(employee)
+          .collection("entries")
+          .doc(dateKey)
+          .set({
+            punchInTime: isoTimeStr,
+            geoData,
+            deviceId
+          });
+}
+
+
 function handleMissedPunchOut(employee, punchInISO) {
   const input = document.getElementById(`missedOutTime_${employee}`);
   const timeStr = input.value;

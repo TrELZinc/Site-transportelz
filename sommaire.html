@@ -840,8 +840,8 @@ const data = {
 
           rows.forEach((row, index) => {
             const cells = row.querySelectorAll("td");
-            if (index === rows.length - 1) return; // Garde la dernière ligne intacte
-
+            if (index >= rows.length - 2) return; // Protège les deux dernières lignes
+          
             for (let i = 1; i < cells.length - 1; i++) {
               cells[i].textContent = "";
             }

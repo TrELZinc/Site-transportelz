@@ -308,14 +308,16 @@ window.loadFromFirebase = function(date) {
 
         // Réinitialise le tableau (efface tout sauf la colonne rang et dernière ligne)
         elements.noteField.value = "";
-        const rows = document.querySelectorAll("#tableBody tr");
-        rows.forEach((row, index) => {
-          if (index === rows.length - 2) return;
-          const cells = row.querySelectorAll("td");
-          for (let i = 1; i < cells.length - 1; i++) {
-            cells[i].textContent = "";
-          }
-        });
+const rows = document.querySelectorAll("#tableBody tr");
+
+rows.forEach((row, index) => {
+  if (index >= rows.length - 2) return; // Protège les deux dernières lignes
+  const cells = row.querySelectorAll("td");
+  for (let i = 1; i < cells.length - 1; i++) {
+    cells[i].textContent = "";
+  }
+});
+
           db.collection("disponibilites")
             .orderBy("timestamp", "desc")
             .limit(1)

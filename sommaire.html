@@ -554,16 +554,16 @@ function generateGarageRows(n = 3) {
     
       const rows = document.querySelectorAll("#tableBody tr");
       rows.forEach((row, index) => {
-        // Si c’est la dernière ligne, on la saute
-        if (index === rows.length - 1) return;
+        // Ne pas effacer les deux dernières lignes
+        if (index >= rows.length - 2) return;
     
         const cells = row.querySelectorAll("td");
-        // Ne pas effacer la 1re cellule (rang)
         for (let i = 1; i < 8; i++) {
           if (cells[i]) cells[i].textContent = "";
         }
       });
     }
+
 
 
 function saveData() {

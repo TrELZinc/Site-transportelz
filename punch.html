@@ -107,6 +107,23 @@
     }
 
   </style>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD4U85mokKXsAP1AdwClWtcbt8udZrwlAw",
+      authDomain: "sommaireelz.firebaseapp.com",
+      projectId: "sommaireelz",
+      storageBucket: "sommaireelz.firebasestorage.app",
+      messagingSenderId: "171788284751",
+      appId: "1:171788284751:web:694f070d1cafe8b7c04b3a"
+    };
+  
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+  </script>
+
 </head>
 <body>
   <div class="container">
@@ -176,25 +193,44 @@ function getAllPunchData() {
   return JSON.parse(localStorage.getItem('punchMap') || '{}');
 }
 
-function savePunchData(employee, punchInTime, geoData) {
-  const allData = getAllPunchData();
-  allData[employee] = {
-    punchInTime: punchInTime.toISOString(),
-    geoData
-  };
-  localStorage.setItem('punchMap', JSON.stringify(allData));
+function getDateKey(date = new Date()) {
+  return date.toISOString().slice(0, 10); // ex: '2025-06-09'
 }
 
-function loadPunchData(employee) {
-  const allData = getAllPunchData();
-  return allData[employee] || null;
+async function savePunchData(employee, punchInTime, geoData) {
+  const dateKey = getDateKey(punchInTime);
+  const deviceId = getDeviceId();
+
+  await db.collection("punches")
+          .doc(employee)
+          .collection("entries")
+          .doc(dateKey)
+          .set({
+            punchInTime: punchInTime.toISOString(),
+            geoData,
+            deviceId
+          });
 }
 
-function clearPunchData(employee) {
-  const allData = getAllPunchData();
-  delete allData[employee];
-  localStorage.setItem('punchMap', JSON.stringify(allData));
+async function loadPunchData(employee) {
+  const dateKey = getDateKey();
+  const docSnap = await db.collection("punches")
+                          .doc(employee)
+                          .collection("entries")
+                          .doc(dateKey)
+                          .get();
+  return docSnap.exists ? docSnap.data() : null;
 }
+
+async function clearPunchData(employee) {
+  const dateKey = getDateKey();
+  await db.collection("punches")
+          .doc(employee)
+          .collection("entries")
+          .doc(dateKey)
+          .delete();
+}
+
 
 // --- Live Timer ---
 function startLiveTimer() {
@@ -214,9 +250,8 @@ function stopLiveTimer() {
   liveTimerEl.textContent = "⏳ En cours: 00:00:00";
 }
 
-// --- Load Punch on Page Load or Change ---
-function updateUIForEmployee(employee) {
-  const data = loadPunchData(employee);
+async function updateUIForEmployee(employee) {
+  const data = await loadPunchData(employee);
   if (data && data.punchInTime) {
     punchInTime = new Date(data.punchInTime);
     geoData = data.geoData || {};
@@ -233,14 +268,11 @@ function updateUIForEmployee(employee) {
   }
 }
 
-
-// On load
 updateUIForEmployee(employeeSelect.value);
-
-// On employee switch
 employeeSelect.addEventListener('change', () => {
   updateUIForEmployee(employeeSelect.value);
 });
+
 
 // --- Géoloc ---
 if ('geolocation' in navigator) {
@@ -261,9 +293,9 @@ if ('geolocation' in navigator) {
 }
 
 // --- Punch IN ---
-document.getElementById('punchInBtn').addEventListener('click', () => {
+document.getElementById('punchInBtn').addEventListener('click', async () => {
   const employee = employeeSelect.value;
-  const existing = loadPunchData(employee);
+  const existing = await loadPunchData(employee); // ✅ await ici
 
   if (existing && existing.punchInTime) {
     const confirmOverwrite = confirm(`Punch In déjà enregistré pour ${employee}. Écraser ?`);
@@ -276,7 +308,7 @@ document.getElementById('punchInBtn').addEventListener('click', () => {
   outTimeEl.textContent = "";
   workedTimeEl.textContent = "";
 
-  savePunchData(employee, punchInTime, geoData);
+  await savePunchData(employee, punchInTime, geoData); // ❗ Bonne pratique
   startLiveTimer();
 
   const urlIn = `https://script.google.com/macros/s/AKfycbxyOhuMfTkCAl9ljWXxVUnm0fQOa-veQo58PAnvBcIJ-LGOnsUto7LQOln_3fc6CMvg6g/exec?status=in&lat=${geoData.lat}&lng=${geoData.lng}&name=${encodeURIComponent(employee)}`;
@@ -290,6 +322,7 @@ document.getElementById('punchInBtn').addEventListener('click', () => {
       }
     });
 });
+
 
 // --- Punch OUT ---
 document.getElementById('punchOutBtn').addEventListener('click', () => {

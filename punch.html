@@ -325,9 +325,9 @@ document.getElementById('punchInBtn').addEventListener('click', async () => {
 
 
 // --- Punch OUT ---
-document.getElementById('punchOutBtn').addEventListener('click', () => {
+document.getElementById('punchOutBtn').addEventListener('click', async () => {
   const employee = employeeSelect.value;
-  const data = loadPunchData(employee);
+  const data = await loadPunchData(employee);  // ← ATTENTION : ajout du await
 
   if (!data || !data.punchInTime) {
     alert("❌ Aucun Punch In trouvé. Tu dois Punch In d'abord !");

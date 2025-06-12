@@ -174,7 +174,7 @@ function showUpcomingRenewals() {
   const upcoming = docs.filter(doc => {
     const exp = new Date(doc.expiration);
     return exp >= now && exp <= threeMonthsLater;
-  }).sort((a, b) => new Date(a.expiration) - new Date(b.expiration)).slice(0, 2);
+  }).sort((a, b) => new Date(a.expiration) - new Date(b.expiration))
 
   if (upcoming.length > 0) {
     const messages = upcoming.map(doc =>
@@ -297,7 +297,7 @@ function showUpcomingRenewals() {
       const prochains = docs.filter(doc => {
         const exp = new Date(doc.expiration);
         return exp >= now && exp <= dans3mois;
-      }).sort((a, b) => new Date(a.expiration) - new Date(b.expiration)).slice(0, 2);
+      }).sort((a, b) => new Date(a.expiration) - new Date(b.expiration))
 
       if (prochains.length > 0) {
         const messages = prochains.map(doc =>

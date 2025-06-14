@@ -3,20 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scan Multi-pages - Billets</title>
+  <title>Scanner PDF - Mobile</title>
   <style>
     body {
-      font-family: sans-serif;
       margin: 0;
-      padding: 0;
-      background: #f0f0f0;
+      font-family: sans-serif;
+      background: #000;
+      color: white;
       text-align: center;
     }
 
     #video {
-      width: 90vw;
-      margin: 10px auto;
-      border: 2px solid #333;
+      width: 100vw;
+      height: auto;
+      border-bottom: 2px solid #333;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      margin: 15px 0;
+    }
+
+    .shutter {
+      width: 70px;
+      height: 70px;
+      background: white;
+      border-radius: 50%;
+      border: 4px solid #ccc;
+      box-shadow: 0 0 10px #999;
     }
 
     #thumbnails {
@@ -24,47 +39,82 @@
       flex-wrap: wrap;
       justify-content: center;
       padding: 10px;
+      background: #111;
     }
 
     .thumb {
       width: 80px;
-      height: 110px;
+      height: 100px;
       object-fit: cover;
       margin: 5px;
-      border: 2px solid #888;
-    }
-
-    button {
-      padding: 12px 18px;
-      margin: 10px;
-      font-size: 16px;
-      display: inline-block;
+      border: 2px solid #666;
+      cursor: pointer;
     }
 
     #canvas {
       display: none;
     }
 
+    #send, #clear {
+      margin: 10px;
+      padding: 12px 18px;
+      font-size: 16px;
+    }
+
     #status {
+      margin: 10px 0;
+      color: lightgreen;
+    }
+
+    #previewModal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.95);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    #previewModal img {
+      max-width: 90%;
+      max-height: 80%;
+      border: 3px solid #fff;
+    }
+
+    #deletePage {
+      background: red;
+      color: white;
+      font-size: 18px;
       margin-top: 15px;
+      padding: 10px 20px;
     }
   </style>
 </head>
 <body>
 
-  <h2>Scanner vos documents</h2>
   <video id="video" autoplay playsinline></video>
   <canvas id="canvas"></canvas>
 
-  <div>
-    <button id="capture">Ajouter une page</button>
-    <button id="send" style="display:none;">Envoyer le PDF</button>
-    <button id="clear" style="display:none;">Réinitialiser</button>
+  <div class="controls">
+    <div id="capture" class="shutter"></div>
   </div>
 
   <div id="thumbnails"></div>
 
+  <div>
+    <button id="send" style="display:none;">Envoyer PDF</button>
+    <button id="clear" style="display:none;">Réinitialiser</button>
+  </div>
+
   <p id="status"></p>
+
+  <div id="previewModal">
+    <img id="previewImg" src="">
+    <button id="deletePage">Supprimer</button>
+  </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
@@ -74,10 +124,15 @@
     const captureBtn = document.getElementById('capture');
     const sendBtn = document.getElementById('send');
     const clearBtn = document.getElementById('clear');
-    const statusText = document.getElementById('status');
     const thumbnails = document.getElementById('thumbnails');
+    const statusText = document.getElementById('status');
+
+    const previewModal = document.getElementById('previewModal');
+    const previewImg = document.getElementById('previewImg');
+    const deletePageBtn = document.getElementById('deletePage');
 
     let pages = [];
+    let previewIndex = null;
 
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
       .then(stream => video.srcObject = stream)
@@ -88,16 +143,42 @@
       canvas.height = video.videoHeight;
       ctx.drawImage(video, 0, 0);
 
-      // Sauvegarde l'image dans pages[]
       canvas.toBlob(blob => {
         pages.push(blob);
         const img = document.createElement('img');
         img.className = 'thumb';
         img.src = URL.createObjectURL(blob);
+        img.dataset.index = pages.length - 1;
         thumbnails.appendChild(img);
         sendBtn.style.display = 'inline-block';
         clearBtn.style.display = 'inline-block';
       }, 'image/jpeg', 0.95);
+    };
+
+    thumbnails.onclick = (e) => {
+      if (e.target.tagName !== 'IMG') return;
+      previewIndex = parseInt(e.target.dataset.index);
+      previewImg.src = e.target.src;
+      previewModal.style.display = 'flex';
+    };
+
+    deletePageBtn.onclick = () => {
+      if (previewIndex === null) return;
+      pages.splice(previewIndex, 1);
+      thumbnails.removeChild(thumbnails.children[previewIndex]);
+      [...thumbnails.children].forEach((img, i) => img.dataset.index = i);
+      previewModal.style.display = 'none';
+      previewIndex = null;
+      if (pages.length === 0) {
+        sendBtn.style.display = 'none';
+        clearBtn.style.display = 'none';
+      }
+    };
+
+    previewModal.onclick = (e) => {
+      if (e.target === previewModal) {
+        previewModal.style.display = 'none';
+      }
     };
 
     clearBtn.onclick = () => {
@@ -109,7 +190,6 @@
     };
 
     sendBtn.onclick = async () => {
-      if (pages.length === 0) return;
       statusText.innerText = "Génération du PDF...";
 
       const { jsPDF } = window.jspdf;
@@ -139,16 +219,16 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          filename: 'multi-pages-scan.pdf',
+          filename: 'scan-multipage.pdf',
           imageData: base64
         })
       });
 
       if (response.ok) {
-        statusText.innerText = "Document envoyé avec succès ✅";
+        statusText.innerText = "✅ Document envoyé avec succès";
         clearBtn.click();
       } else {
-        statusText.innerText = "Erreur lors de l'envoi ❌";
+        statusText.innerText = "❌ Erreur lors de l'envoi";
       }
     };
 
@@ -163,9 +243,7 @@
     function blobToBase64(blob) {
       return new Promise(resolve => {
         const reader = new FileReader();
-        reader.onloadend = () => {
-          resolve(reader.result.split(',')[1]);
-        };
+        reader.onloadend = () => resolve(reader.result.split(',')[1]);
         reader.readAsDataURL(blob);
       });
     }

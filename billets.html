@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scanner Mobile - Billets</title>
+  <style>
+    body { font-family: sans-serif; margin: 0; padding: 0; text-align: center; background: #f0f0f0; }
+    video, canvas { width: 90vw; margin-top: 10px; border: 2px solid #333; }
+    button { margin: 10px; padding: 12px 20px; font-size: 16px; }
+  </style>
+</head>
+<body>
+
+  <h2>Scanner un Document</h2>
+  <video id="video" autoplay playsinline></video>
+  <canvas id="canvas" style="display:none;"></canvas>
+
+  <div>
+    <button id="capture">Capturer</button>
+    <button id="toggle-bw" style="display:none;">Noir & Blanc</button>
+    <button id="send" style="display:none;">Envoyer</button>
+  </div>
+
+  <p id="status"></p>
+
+  <script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const captureBtn = document.getElementById('capture');
+    const sendBtn = document.getElementById('send');
+    const toggleBWBtn = document.getElementById('toggle-bw');
+    const statusText = document.getElementById('status');
+
+    let bwMode = false;
+
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+      .then(stream => video.srcObject = stream)
+      .catch(err => alert('Caméra inaccessible : ' + err));
+
+    captureBtn.onclick = () => {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0);
+      canvas.style.display = 'block';
+      toggleBWBtn.style.display = 'inline-block';
+      sendBtn.style.display = 'inline-block';
+    };
+
+    toggleBWBtn.onclick = () => {
+      bwMode = !bwMode;
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < imageData.data.length; i += 4) {
+        let avg = (imageData.data[i] + imageData.data[i+1] + imageData.data[i+2]) / 3;
+        imageData.data[i] = imageData.data[i+1] = imageData.data[i+2] = bwMode ? avg : imageData.data[i];
+      }
+      ctx.putImageData(imageData, 0, 0);
+    };
+
+    sendBtn.onclick = async () => {
+      statusText.innerText = 'Envoi en cours...';
+      canvas.toBlob(async (blob) => {
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          const base64data = reader.result.split(',')[1];
+          const response = await fetch('https://SCRIPT_WEB_APP_URL', {
+            method: 'POST',
+            body: JSON.stringify({
+              filename: 'scan.pdf',
+              imageData: base64data
+            }),
+            headers: { 'Content-Type': 'application/json' }
+          });
+          if (response.ok) {
+            statusText.innerText = 'Document envoyé avec succès ✅';
+          } else {
+            statusText.innerText = 'Erreur lors de l\'envoi ❌';
+          }
+        };
+        reader.readAsDataURL(blob);
+      }, 'image/jpeg', 0.95);
+    };
+  </script>
+
+</body>
+</html>

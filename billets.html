@@ -1,18 +1,28 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scanner PDF - E.L.Z</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Scanner avec cadrage - E.L.Z</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
-      background-color: #f8f9fa;
+      background: #f8f9fa;
       font-family: 'Segoe UI', sans-serif;
     }
-    video {
+    #video-container {
+      position: relative;
+    }
+    video, canvas#overlay {
       width: 100%;
       border-radius: 0.5rem;
+    }
+    canvas#overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 10;
+      pointer-events: none;
     }
     .shutter-btn {
       width: 70px;
@@ -38,199 +48,254 @@
       cursor: pointer;
       border: 2px solid #dee2e6;
     }
-    #canvas {
-      display: none;
-    }
-    .btn-block {
-      width: 100%;
-      margin-top: 10px;
-    }
-    #thumbnail-scroll::-webkit-scrollbar {
-      display: none;
-    }
-    #previewImg {
-      max-width: 100%;
-      max-height: 70vh;
-      border-radius: 8px;
-    }
   </style>
 </head>
 <body>
 
-  <div class="container py-4">
-    <h3 class="text-center mb-4">Scanner un document PDF</h3>
+<div class="container py-4">
+  <h3 class="text-center mb-4">Scanner avec cadrage automatique</h3>
 
-    <video id="video" autoplay playsinline></video>
-    <canvas id="canvas"></canvas>
-
-    <div class="text-center">
-      <div id="capture" class="shutter-btn"></div>
-    </div>
-
-    <div id="thumbnail-scroll" class="mb-3"></div>
-
-    <div class="row">
-      <div class="col-6">
-        <button id="send" class="btn btn-success btn-block" style="display:none;">Envoyer PDF</button>
-      </div>
-      <div class="col-6">
-        <button id="clear" class="btn btn-outline-secondary btn-block" style="display:none;">Réinitialiser</button>
-      </div>
-    </div>
-
-    <p class="text-center text-muted mt-3" id="status"></p>
+  <div id="video-container">
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="overlay"></canvas>
   </div>
 
-  <!-- Modal Preview -->
-  <div class="modal fade" id="previewModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content bg-light text-center p-3">
-        <div class="modal-header border-0">
-          <h5 class="modal-title w-100">Prévisualisation</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-        </div>
-        <div class="modal-body">
-          <img id="previewImg" src="" alt="Preview">
-          <button id="deletePage" class="btn btn-danger mt-3">Supprimer cette page</button>
-        </div>
-      </div>
+  <canvas id="captureCanvas" style="display:none;"></canvas>
+
+  <div class="text-center">
+    <div id="capture" class="shutter-btn"></div>
+  </div>
+
+  <div id="thumbnail-scroll" class="mb-3"></div>
+
+  <div class="row">
+    <div class="col-6">
+      <button id="send" class="btn btn-success btn-block" style="display:none;">Envoyer PDF</button>
+    </div>
+    <div class="col-6">
+      <button id="clear" class="btn btn-outline-secondary btn-block" style="display:none;">Réinitialiser</button>
     </div>
   </div>
 
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script>
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    const captureBtn = document.getElementById('capture');
-    const sendBtn = document.getElementById('send');
-    const clearBtn = document.getElementById('clear');
-    const thumbnails = document.getElementById('thumbnail-scroll');
-    const statusText = document.getElementById('status');
-    const previewImg = document.getElementById('previewImg');
-    const previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
-    const deletePageBtn = document.getElementById('deletePage');
+  <p class="text-center text-muted mt-3" id="status"></p>
+</div>
 
-    let pages = [];
-    let totalSize = 0;
-    const MAX_SIZE = 25 * 1024 * 1024; // 25 Mo
-    let previewIndex = null;
+<!-- Modal Preview -->
+<div class="modal fade" id="previewModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-light text-center p-3">
+      <div class="modal-header border-0">
+        <h5 class="modal-title w-100">Prévisualisation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body">
+        <img id="previewImg" src="" alt="Preview" class="img-fluid" />
+        <button id="deletePage" class="btn btn-danger mt-3">Supprimer cette page</button>
+      </div>
+    </div>
+  </div>
+</div>
 
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script async src="https://docs.opencv.org/4.x/opencv.js" onload="onOpenCvReady();" type="text/javascript"></script>
+<script>
+  let video = document.getElementById('video');
+  let overlay = document.getElementById('overlay');
+  let captureCanvas = document.getElementById('captureCanvas');
+  let ctxOverlay = overlay.getContext('2d');
+
+  function onOpenCvReady() {
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-      .then(stream => video.srcObject = stream)
-      .catch(err => alert('Erreur caméra : ' + err));
+      .then(stream => {
+        video.srcObject = stream;
+        video.addEventListener('loadedmetadata', () => {
+          overlay.width = video.videoWidth;
+          overlay.height = video.videoHeight;
+          captureCanvas.width = video.videoWidth;
+          captureCanvas.height = video.videoHeight;
+          startDetection();
+        });
+      });
+  }
 
-    captureBtn.onclick = () => {
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      ctx.drawImage(video, 0, 0);
-      canvas.toBlob(blob => {
-        if (totalSize + blob.size > MAX_SIZE) {
-          alert("🚫 Taille maximale atteinte (25 Mo).");
-          return;
+  function startDetection() {
+    const src = new cv.Mat(video.videoHeight, video.videoWidth, cv.CV_8UC4);
+    const gray = new cv.Mat();
+    const blurred = new cv.Mat();
+    const edged = new cv.Mat();
+    const contours = new cv.MatVector();
+    const hierarchy = new cv.Mat();
+
+    const cap = new cv.VideoCapture(video);
+
+    function processFrame() {
+      cap.read(src);
+      cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+      cv.GaussianBlur(gray, blurred, new cv.Size(5, 5), 0);
+      cv.Canny(blurred, edged, 75, 200);
+      cv.findContours(edged, contours, hierarchy, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE);
+
+      ctxOverlay.clearRect(0, 0, overlay.width, overlay.height);
+
+      let biggest = null;
+      let maxArea = 0;
+      for (let i = 0; i < contours.size(); i++) {
+        const cnt = contours.get(i);
+        const peri = cv.arcLength(cnt, true);
+        const approx = new cv.Mat();
+        cv.approxPolyDP(cnt, approx, 0.02 * peri, true);
+        const area = cv.contourArea(approx);
+        if (approx.rows === 4 && area > maxArea) {
+          biggest = approx;
+          maxArea = area;
         }
-        pages.push(blob);
-        totalSize += blob.size;
-
-        const img = document.createElement('img');
-        img.className = 'thumb';
-        img.src = URL.createObjectURL(blob);
-        img.dataset.index = pages.length - 1;
-        thumbnails.appendChild(img);
-
-        sendBtn.style.display = 'block';
-        clearBtn.style.display = 'block';
-      }, 'image/jpeg', 0.95);
-    };
-
-    thumbnails.onclick = (e) => {
-      if (e.target.tagName !== 'IMG') return;
-      previewIndex = parseInt(e.target.dataset.index);
-      previewImg.src = e.target.src;
-      previewModal.show();
-    };
-
-    deletePageBtn.onclick = () => {
-      if (previewIndex === null) return;
-      totalSize -= pages[previewIndex].size;
-      pages.splice(previewIndex, 1);
-      thumbnails.removeChild(thumbnails.children[previewIndex]);
-      [...thumbnails.children].forEach((img, i) => img.dataset.index = i);
-      previewModal.hide();
-      previewIndex = null;
-      if (pages.length === 0) {
-        sendBtn.style.display = 'none';
-        clearBtn.style.display = 'none';
       }
-    };
 
-    clearBtn.onclick = () => {
-      pages = [];
-      totalSize = 0;
-      thumbnails.innerHTML = '';
+      if (biggest) {
+        ctxOverlay.strokeStyle = 'lime';
+        ctxOverlay.lineWidth = 3;
+        ctxOverlay.beginPath();
+        for (let i = 0; i < 4; i++) {
+          const pt1 = biggest.data32S[i * 2];
+          const pt2 = biggest.data32S[i * 2 + 1];
+          if (i === 0) ctxOverlay.moveTo(pt1, pt2);
+          else ctxOverlay.lineTo(pt1, pt2);
+        }
+        const pt0 = biggest.data32S[0];
+        const pt1 = biggest.data32S[1];
+        ctxOverlay.lineTo(pt0, pt1);
+        ctxOverlay.stroke();
+      }
+
+      requestAnimationFrame(processFrame);
+    }
+
+    processFrame();
+  }
+</script>
+<script>
+  const captureBtn = document.getElementById('capture');
+  const thumbnails = document.getElementById('thumbnail-scroll');
+  const sendBtn = document.getElementById('send');
+  const clearBtn = document.getElementById('clear');
+  const statusText = document.getElementById('status');
+  const previewImg = document.getElementById('previewImg');
+  const deletePageBtn = document.getElementById('deletePage');
+  const previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
+
+  let pages = [];
+  let previewIndex = null;
+  let totalSize = 0;
+  const MAX_SIZE = 25 * 1024 * 1024;
+
+  captureBtn.onclick = () => {
+    const ctx = captureCanvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, captureCanvas.width, captureCanvas.height);
+    captureCanvas.toBlob(blob => {
+      if (totalSize + blob.size > MAX_SIZE) {
+        alert("🚫 Taille maximale atteinte (25 Mo).");
+        return;
+      }
+      pages.push(blob);
+      totalSize += blob.size;
+
+      const img = document.createElement('img');
+      img.className = 'thumb';
+      img.src = URL.createObjectURL(blob);
+      img.dataset.index = pages.length - 1;
+      thumbnails.appendChild(img);
+
+      sendBtn.style.display = 'block';
+      clearBtn.style.display = 'block';
+    }, 'image/jpeg', 0.95);
+  };
+
+  thumbnails.onclick = (e) => {
+    if (e.target.tagName !== 'IMG') return;
+    previewIndex = parseInt(e.target.dataset.index);
+    previewImg.src = e.target.src;
+    previewModal.show();
+  };
+
+  deletePageBtn.onclick = () => {
+    if (previewIndex === null) return;
+    totalSize -= pages[previewIndex].size;
+    pages.splice(previewIndex, 1);
+    thumbnails.removeChild(thumbnails.children[previewIndex]);
+    [...thumbnails.children].forEach((img, i) => img.dataset.index = i);
+    previewModal.hide();
+    previewIndex = null;
+    if (pages.length === 0) {
       sendBtn.style.display = 'none';
       clearBtn.style.display = 'none';
-      statusText.innerText = '';
-    };
+    }
+  };
 
-    sendBtn.onclick = async () => {
-      statusText.innerText = "Génération du PDF...";
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF();
-      for (let i = 0; i < pages.length; i++) {
-        const imgData = await blobToDataURL(pages[i]);
-        const img = new Image();
-        await new Promise(resolve => {
-          img.onload = () => {
-            const w = pdf.internal.pageSize.getWidth();
-            const h = (img.height / img.width) * w;
-            if (i > 0) pdf.addPage();
-            pdf.addImage(img, 'JPEG', 0, 0, w, h);
-            resolve();
-          };
-          img.src = imgData;
-        });
-      }
+  clearBtn.onclick = () => {
+    pages = [];
+    totalSize = 0;
+    thumbnails.innerHTML = '';
+    sendBtn.style.display = 'none';
+    clearBtn.style.display = 'none';
+    statusText.innerText = '';
+  };
 
-      const pdfBlob = pdf.output('blob');
-      const base64 = await blobToBase64(pdfBlob);
+  sendBtn.onclick = async () => {
+    statusText.innerText = "📄 Génération du PDF...";
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF();
 
-      statusText.innerText = "Envoi en cours...";
-
-      const response = await fetch('https://SCRIPT_WEB_APP_URL', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          filename: 'document.pdf',
-          imageData: base64
-        })
-      });
-
-      if (response.ok) {
-        statusText.innerText = "✅ Document envoyé avec succès";
-        clearBtn.click();
-      } else {
-        statusText.innerText = "❌ Erreur lors de l'envoi";
-      }
-    };
-
-    function blobToDataURL(blob) {
-      return new Promise(resolve => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.readAsDataURL(blob);
+    for (let i = 0; i < pages.length; i++) {
+      const imgData = await blobToDataURL(pages[i]);
+      const img = new Image();
+      await new Promise(resolve => {
+        img.onload = () => {
+          const w = pdf.internal.pageSize.getWidth();
+          const h = (img.height / img.width) * w;
+          if (i > 0) pdf.addPage();
+          pdf.addImage(img, 'JPEG', 0, 0, w, h);
+          resolve();
+        };
+        img.src = imgData;
       });
     }
 
-    function blobToBase64(blob) {
-      return new Promise(resolve => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result.split(',')[1]);
-        reader.readAsDataURL(blob);
-      });
+    const pdfBlob = pdf.output('blob');
+    const base64 = await blobToBase64(pdfBlob);
+
+    statusText.innerText = "✉️ Envoi en cours...";
+
+    const response = await fetch('https://SCRIPT_WEB_APP_URL', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        filename: 'document.pdf',
+        imageData: base64
+      })
+    });
+
+    if (response.ok) {
+      statusText.innerText = "✅ Document envoyé avec succès";
+      clearBtn.click();
+    } else {
+      statusText.innerText = "❌ Erreur lors de l'envoi";
     }
-  </script>
-</body>
-</html>
+  };
+
+  function blobToDataURL(blob) {
+    return new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  function blobToBase64(blob) {
+    return new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result.split(',')[1]);
+      reader.readAsDataURL(blob);
+    });
+  }
+</script>

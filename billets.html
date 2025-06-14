@@ -10,12 +10,10 @@
       background-color: #f8f9fa;
       font-family: 'Segoe UI', sans-serif;
     }
-
     video {
       width: 100%;
       border-radius: 0.5rem;
     }
-
     .shutter-btn {
       width: 70px;
       height: 70px;
@@ -26,7 +24,6 @@
       display: block;
       box-shadow: 0 0 10px rgba(0,0,0,0.15);
     }
-
     #thumbnail-scroll {
       display: flex;
       overflow-x: auto;
@@ -34,7 +31,6 @@
       padding: 10px;
       background: #fff;
     }
-
     .thumb {
       height: 110px;
       object-fit: cover;
@@ -42,33 +38,20 @@
       cursor: pointer;
       border: 2px solid #dee2e6;
     }
-
     #canvas {
       display: none;
     }
-
     .btn-block {
       width: 100%;
       margin-top: 10px;
     }
-
-    /* Scrollbar invisible (optionnel) */
     #thumbnail-scroll::-webkit-scrollbar {
       display: none;
     }
-
-    #previewModal {
-      z-index: 9999;
-    }
-
     #previewImg {
       max-width: 100%;
       max-height: 70vh;
       border-radius: 8px;
-    }
-
-    .modal-header {
-      border-bottom: none;
     }
   </style>
 </head>
@@ -131,6 +114,8 @@
     const deletePageBtn = document.getElementById('deletePage');
 
     let pages = [];
+    let totalSize = 0;
+    const MAX_SIZE = 25 * 1024 * 1024; // 25 Mo
     let previewIndex = null;
 
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
@@ -142,12 +127,19 @@
       canvas.height = video.videoHeight;
       ctx.drawImage(video, 0, 0);
       canvas.toBlob(blob => {
+        if (totalSize + blob.size > MAX_SIZE) {
+          alert("🚫 Taille maximale atteinte (25 Mo).");
+          return;
+        }
         pages.push(blob);
+        totalSize += blob.size;
+
         const img = document.createElement('img');
         img.className = 'thumb';
         img.src = URL.createObjectURL(blob);
         img.dataset.index = pages.length - 1;
         thumbnails.appendChild(img);
+
         sendBtn.style.display = 'block';
         clearBtn.style.display = 'block';
       }, 'image/jpeg', 0.95);
@@ -162,6 +154,7 @@
 
     deletePageBtn.onclick = () => {
       if (previewIndex === null) return;
+      totalSize -= pages[previewIndex].size;
       pages.splice(previewIndex, 1);
       thumbnails.removeChild(thumbnails.children[previewIndex]);
       [...thumbnails.children].forEach((img, i) => img.dataset.index = i);
@@ -175,6 +168,7 @@
 
     clearBtn.onclick = () => {
       pages = [];
+      totalSize = 0;
       thumbnails.innerHTML = '';
       sendBtn.style.display = 'none';
       clearBtn.style.display = 'none';
@@ -183,10 +177,8 @@
 
     sendBtn.onclick = async () => {
       statusText.innerText = "Génération du PDF...";
-
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF();
-
       for (let i = 0; i < pages.length; i++) {
         const imgData = await blobToDataURL(pages[i]);
         const img = new Image();

@@ -100,26 +100,38 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script async src="https://docs.opencv.org/4.x/opencv.js" onload="onOpenCvReady();" type="text/javascript"></script>
 <script>
-  let video = document.getElementById('video');
-  let overlay = document.getElementById('overlay');
-  let captureCanvas = document.getElementById('captureCanvas');
-  let ctxOverlay = overlay.getContext('2d');
-  let lastDetectedCorners = [];
-
-
+let video = document.getElementById('video');
+let overlay = document.getElementById('overlay');
+let captureCanvas = document.getElementById('captureCanvas');
+let ctxOverlay = overlay.getContext('2d');
+let lastDetectedCorners = [];
 
 function onOpenCvReady() {
   navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
     .then(stream => {
       video.srcObject = stream;
       video.addEventListener('loadedmetadata', () => {
-        overlay.width = video.videoWidth;
-        overlay.height = video.videoHeight;
-        captureCanvas.width = video.videoWidth;
-        captureCanvas.height = video.videoHeight;
-        startDetectionFixed();
+        if (video.videoWidth && video.videoHeight) {
+          overlay.width = video.videoWidth;
+          overlay.height = video.videoHeight;
+          captureCanvas.width = video.videoWidth;
+          captureCanvas.height = video.videoHeight;
+          startDetectionFixed();
+        } else {
+          console.warn("⚠️ Vidéo pas encore prête.");
+        }
       });
+    })
+    .catch(err => {
+      console.error("Erreur accès caméra:", err);
     });
+}
+
+function sortCorners(pts) {
+  pts.sort((a, b) => a.y - b.y);
+  const top = pts.slice(0, 2).sort((a, b) => a.x - b.x);
+  const bottom = pts.slice(2, 4).sort((a, b) => a.x - b.x);
+  return [top[0], top[1], bottom[1], bottom[0]];
 }
 
 function startDetectionFixed() {
@@ -140,10 +152,15 @@ function startDetectionFixed() {
 
     cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
     cv.GaussianBlur(gray, blurred, new cv.Size(5, 5), 0);
-    cv.Canny(blurred, edged, 75, 200);
+    cv.Canny(blurred, edged, 50, 150); // ajusté : plus sensible
+
     cv.findContours(edged, contours, hierarchy, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE);
 
     ctxOverlay.clearRect(0, 0, overlay.width, overlay.height);
+
+    // --- debug overlay visible toujours ---
+    ctxOverlay.fillStyle = "rgba(255,0,0,0.2)";
+    ctxOverlay.fillRect(10, 10, 80, 30); // preuve que canvas est actif
 
     let biggest = null;
     let maxArea = 0;
@@ -159,24 +176,28 @@ function startDetectionFixed() {
       }
     }
 
-      if (biggest) {
-        lastDetectedCorners = []; // reset
-        ctxOverlay.strokeStyle = 'lime';
-        ctxOverlay.lineWidth = 3;
-        ctxOverlay.beginPath();
-      
-        for (let i = 0; i < 4; i++) {
-          const x = biggest.data32S[i * 2];
-          const y = biggest.data32S[i * 2 + 1];
-          lastDetectedCorners.push({ x, y });
-          if (i === 0) ctxOverlay.moveTo(x, y);
-          else ctxOverlay.lineTo(x, y);
-        }
-      
-        ctxOverlay.closePath();
-        ctxOverlay.stroke();
+    if (biggest) {
+      let corners = [];
+      for (let i = 0; i < 4; i++) {
+        corners.push({
+          x: biggest.data32S[i * 2],
+          y: biggest.data32S[i * 2 + 1]
+        });
       }
 
+      const ordered = sortCorners(corners);
+      lastDetectedCorners = ordered;
+
+      ctxOverlay.strokeStyle = 'lime';
+      ctxOverlay.lineWidth = 3;
+      ctxOverlay.beginPath();
+      ctxOverlay.moveTo(ordered[0].x, ordered[0].y);
+      for (let i = 1; i < 4; i++) {
+        ctxOverlay.lineTo(ordered[i].x, ordered[i].y);
+      }
+      ctxOverlay.closePath();
+      ctxOverlay.stroke();
+    }
 
     src.delete();
     requestAnimationFrame(processFrame);
@@ -185,6 +206,7 @@ function startDetectionFixed() {
   processFrame();
 }
 </script>
+
 <script>
   const captureBtn = document.getElementById('capture');
   const thumbnails = document.getElementById('thumbnail-scroll');

@@ -6,6 +6,8 @@
   <title>Disponibilité des Équipements</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.3.4/dist/css/datepicker.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.3.4/dist/js/datepicker-full.min.js"></script>
 
   <style>
 
@@ -208,6 +210,9 @@
   margin-left: auto;
 }
 
+#datepickerInput {
+  text-align: center;
+}
 
   </style>
   <!-- Firebase SDKs -->
@@ -293,11 +298,11 @@
   
 
   <div class="text-center mb-4">
-    <select id="datePicker" class="form-control mx-auto" style="max-width: 220px;">
-      <option disabled selected>Choisir une date</option>
-    </select>
+    <input type="text" id="datepickerInput" class="form-control mx-auto" style="max-width: 220px;" placeholder="Sélectionner une date">
   </div>
 
+
+  <div id="dateAffichee" style="text-align:center; font-weight:600; font-size: 1rem; margin-bottom: 1.5rem;"></div>
 
 
   <div class="section" id="equipementList">
@@ -522,7 +527,8 @@ function updateEquipementStatus(camionsSet, remorquesSet, garageMap) {
 }
 
 async function chargerDatesDisponibles() {
-  const datePicker = document.getElementById("datePicker");
+  const today = new Date().toISOString().split("T")[0];
+  let dateExist = false;
 
   try {
     const snapshot = await db.collection("disponibilites").orderBy("date", "desc").get();
@@ -536,67 +542,93 @@ async function chargerDatesDisponibles() {
         option.value = date;
         option.textContent = date;
         datePicker.appendChild(option);
+
+        if (date === today) dateExist = true;
       }
     });
+
+    // Sélectionne la date d'aujourd'hui si elle est disponible
+    if (dateExist) {
+      datePicker.value = today;
+      datePicker.dispatchEvent(new Event("change")); // ← simule le clic
+    }
+
   } catch (error) {
     console.error("Erreur chargement des dates :", error);
   }
 }
+
 </script>
 
 
 <script>
   
 window.addEventListener("DOMContentLoaded", async () => {
-  await chargerDatesDisponibles(); // ⬅️ ici
-
-  const info = await getLastRecordedEquipments();
-  const dateEl = document.getElementById("dateAffichee");
-
-  if (info) {
-    dateEl.textContent = `Pour la journée du : ${info.date}`;
-    updateEquipementStatus(info.camions, info.remorques, info.garage);
-  } else {
-    dateEl.textContent = "Aucune donnée disponible.";
-  }
-
-  await fetchGarageEquipments();
+  await fetchGarageEquipments();        // Charge les unités au garage
+  await initCalendrierAvecDates();      // Initialise le calendrier interactif
 });
 
-  document.getElementById("datePicker").addEventListener("change", async (e) => {
-  const selectedDate = e.target.value;
-  if (!selectedDate) return;
 
-  const snapshot = await db.collection("disponibilites")
-    .where("date", "==", selectedDate)
-    .limit(1)
-    .get();
+async function initCalendrierAvecDates() {
+  const input = document.getElementById("datepickerInput");
+  const picker = new Datepicker(input, {
+    format: 'yyyy-mm-dd',
+    autohide: true,
+    language: 'fr'
+  });
 
-  if (snapshot.empty) {
-    document.getElementById("dateAffichee").textContent = `Aucune donnée pour le ${selectedDate}`;
-    return;
+  const snapshot = await db.collection("disponibilites").get();
+  const datesDispo = new Set();
+
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    if (data.date) datesDispo.add(data.date);
+  });
+
+  input.addEventListener("changeDate", async (e) => {
+    const selectedDate = input.value;
+    if (!selectedDate) return;
+
+    const snapshot = await db.collection("disponibilites")
+      .where("date", "==", selectedDate)
+      .limit(1)
+      .get();
+
+    const dateAffichee = document.getElementById("dateAffichee");
+
+    if (snapshot.empty) {
+      dateAffichee.textContent = `Aucune donnée pour le ${selectedDate}`;
+      updateEquipementStatus(new Set(), new Set(), new Map()); // Tout vide
+      return;
+    }
+
+    const doc = snapshot.docs[0];
+    const data = doc.data();
+
+    const camions = new Set();
+    const remorques = new Set();
+    const garage = new Map();
+
+    (data.rows || []).forEach(row => {
+      if (row.camion) camions.add(row.camion.trim());
+      if (row.remorque) remorques.add(row.remorque.trim());
+    });
+
+    (data.garage || []).forEach(item => {
+      if (item.unite) garage.set(item.unite.trim(), item.raison || "Garage");
+    });
+
+    dateAffichee.textContent = `Pour la journée du : ${selectedDate}`;
+    updateEquipementStatus(camions, remorques, garage);
+  });
+
+  // Sélectionne aujourd’hui automatiquement si disponible
+  const today = new Date().toISOString().split("T")[0];
+  if (datesDispo.has(today)) {
+    input.value = today;
+    input.dispatchEvent(new Event("changeDate"));
   }
-
-  const doc = snapshot.docs[0];
-  const data = doc.data();
-
-  const camionsSet = new Set();
-  const remorquesSet = new Set();
-  const garageMap = new Map();
-
-  (data.rows || []).forEach(row => {
-    if (row.camion) camionsSet.add(row.camion.trim());
-    if (row.remorque) remorquesSet.add(row.remorque.trim());
-  });
-
-  (data.garage || []).forEach(item => {
-    if (item.unite) garageMap.set(item.unite.trim(), item.raison || "Garage");
-  });
-
-  document.getElementById("dateAffichee").textContent = `Pour la journée du : ${selectedDate}`;
-  updateEquipementStatus(camionsSet, remorquesSet, garageMap);
-});
-
+}
 
 
 </script>

@@ -481,6 +481,46 @@ function updateEquipementStatus(camionsSet, remorquesSet, garageMap) {
   });
 }
 
+  function updateGarageStatus(garageMap) {
+  const rows = document.querySelectorAll("#equipementList .row");
+
+  rows.forEach(row => {
+    const unit = row.querySelector("span")?.textContent?.trim();
+    const badge = row.querySelector(".status");
+
+    if (!unit || !badge) return;
+
+    if (garageMap.has(unit)) {
+      badge.textContent = "GARAGE";
+      badge.className = "status garage";
+
+      const note = document.createElement("span");
+      note.className = "garage-note";
+      note.textContent = "(Cliquez pour voir la raison)";
+
+      const reason = document.createElement("div");
+      reason.className = "garage-reason";
+      reason.textContent = `🛠 ${garageMap.get(unit)}`;
+
+      const unitSpan = row.querySelector("span:first-child").cloneNode(true);
+      const badgeClone = badge.cloneNode(true);
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "row-content";
+      wrapper.appendChild(unitSpan);
+      wrapper.appendChild(note);
+      wrapper.appendChild(badgeClone);
+
+      row.innerHTML = "";
+      row.appendChild(wrapper);
+      row.appendChild(reason);
+
+      row.classList.add("expandable");
+      row.onclick = () => row.classList.toggle("expanded");
+    }
+  });
+}
+
 async function chargerDatesDisponibles() {
   const datePicker = document.getElementById("datePicker");
 

@@ -293,6 +293,11 @@
   
   <div id="dateAffichee" style="text-align:center; font-weight:600; font-size: 1rem; margin-bottom: 1.5rem;"></div>
 
+  <div class="text-center mb-4">
+  <input type="date" id="datePicker" class="form-control mx-auto" style="max-width: 220px;">
+  </div>
+
+
   <div class="section" id="equipementList">
   <div class="section-title">CAMIONS</div>
   <div class="row"><span>1103</span><span class="status disponible">DISPONIBLE</span></div>
@@ -492,6 +497,40 @@ window.addEventListener("DOMContentLoaded", async () => {
   }
 
   await fetchGarageEquipments();
+});
+
+  document.getElementById("datePicker").addEventListener("change", async (e) => {
+  const selectedDate = e.target.value;
+  if (!selectedDate) return;
+
+  const snapshot = await db.collection("disponibilites")
+    .where("date", "==", selectedDate)
+    .limit(1)
+    .get();
+
+  if (snapshot.empty) {
+    document.getElementById("dateAffichee").textContent = `Aucune donnée pour le ${selectedDate}`;
+    return;
+  }
+
+  const doc = snapshot.docs[0];
+  const data = doc.data();
+
+  const camionsSet = new Set();
+  const remorquesSet = new Set();
+  const garageMap = new Map();
+
+  (data.rows || []).forEach(row => {
+    if (row.camion) camionsSet.add(row.camion.trim());
+    if (row.remorque) remorquesSet.add(row.remorque.trim());
+  });
+
+  (data.garage || []).forEach(item => {
+    if (item.unite) garageMap.set(item.unite.trim(), item.raison || "Garage");
+  });
+
+  document.getElementById("dateAffichee").textContent = `Pour la journée du : ${selectedDate}`;
+  updateEquipementStatus(camionsSet, remorquesSet, garageMap);
 });
 
 

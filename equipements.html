@@ -291,11 +291,13 @@
   Disponibilité des équipements
   </h1>
   
-  <div id="dateAffichee" style="text-align:center; font-weight:600; font-size: 1rem; margin-bottom: 1.5rem;"></div>
 
   <div class="text-center mb-4">
-  <input type="date" id="datePicker" class="form-control mx-auto" style="max-width: 220px;">
+    <select id="datePicker" class="form-control mx-auto" style="max-width: 220px;">
+      <option disabled selected>Choisir une date</option>
+    </select>
   </div>
+
 
 
   <div class="section" id="equipementList">
@@ -479,13 +481,35 @@ function updateEquipementStatus(camionsSet, remorquesSet, garageMap) {
   });
 }
 
+async function chargerDatesDisponibles() {
+  const datePicker = document.getElementById("datePicker");
 
+  try {
+    const snapshot = await db.collection("disponibilites").orderBy("date", "desc").get();
+
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const date = data.date;
+
+      if (date) {
+        const option = document.createElement("option");
+        option.value = date;
+        option.textContent = date;
+        datePicker.appendChild(option);
+      }
+    });
+  } catch (error) {
+    console.error("Erreur chargement des dates :", error);
+  }
+}
 </script>
 
 
 <script>
   
 window.addEventListener("DOMContentLoaded", async () => {
+  await chargerDatesDisponibles(); // ⬅️ ici
+
   const info = await getLastRecordedEquipments();
   const dateEl = document.getElementById("dateAffichee");
 

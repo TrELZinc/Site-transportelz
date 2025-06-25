@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Journées de Maladie</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding-top: 80px;
+      overflow-y: auto;
+      background: #f8f9fa;
+    }
+    .employee-details {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-top: 20px;
+    }
+    .history-list {
+      list-style-type: none;
+      padding-left: 0;
+    }
+    .history-list li {
+      border-bottom: 1px solid #e9ecef;
+      padding: 6px 0;
+    }
+    .history-plus {
+      color: #28a745;
+      font-weight: 500;
+    }
+    .history-minus {
+      color: #dc3545;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+
+<div id="header-placeholder"></div>
+<script>
+  fetch('/assets/header.html')
+    .then(response => response.text())
+    .then(html => {
+      document.getElementById('header-placeholder').innerHTML = html;
+    })
+    .catch(err => console.error('Erreur lors du chargement du header:', err));
+</script>
+
+<div class="container pb-5">
+  <h1 class="text-center my-4">Gestion des Journées de Maladie</h1>
+
+<div class="card shadow-sm">
+  <div class="card-header bg-dark text-white text-center fw-bold">
+    Liste des Employés
+  </div>
+  <ul class="list-group list-group-flush" id="employeeTable"></ul>
+</div>
+
+
+  <div class="employee-details" id="employeeDetails" style="display: none;">
+    <h3 id="empName"></h3>
+    <p>Solde actuel : <strong><span id="empBalance"></span></strong> jour(s)</p>
+
+    <div class="mb-3">
+      <label for="dateUsed" class="form-label">Date d'utilisation :</label>
+      <input type="date" id="dateUsed" class="form-control" />
+    </div>
+    <button class="btn btn-primary" onclick="subtractDay()">Soustraire cette journée</button>
+    <button class="btn btn-secondary" onclick="closeDetails()">Fermer</button>
+
+    <h5 class="mt-4">Historique</h5>
+    <ul id="empHistory" class="history-list"></ul>
+  </div>
+</div>
+
+<script>
+  const scriptURL = "https://script.google.com/macros/s/AKfycbxeiFOSPOdh6wSGEYKUQellGHJ9t9x_NZebIw2MgEHk7tYieCfrsNL5HiTAfzbjk_oY/exec";
+  let employees = [];
+  let currentEmployee = null;
+
+  function formatDateCA(dateStr) {
+    const [year, month, day] = dateStr.split("-");
+    return `${day}-${month}-${year}`;
+  }
+
+function renderTable() {
+  const tbody = document.getElementById("employeeTable");
+  tbody.innerHTML = "";
+
+  employees.forEach((emp, index) => {
+    const row = document.createElement("li");
+    row.className = "list-group-item d-flex justify-content-between align-items-center";
+
+    // Détermine la couleur du badge selon le solde
+    let badgeColor = "bg-danger"; // rouge par défaut
+    if (emp.balance >= 9) {
+      badgeColor = "bg-success"; // vert
+    } else if (emp.balance >= 4) {
+      badgeColor = "bg-warning text-dark"; // jaune
+    }
+
+    row.innerHTML = `
+      <span class="fw-medium">${emp.nom}</span>
+      <span class="badge ${badgeColor} rounded-pill">${emp.balance} jour(s)</span>
+    `;
+
+    row.onclick = () => toggleDetails(index);
+    tbody.appendChild(row);
+  });
+}
+
+
+  function toggleDetails(index) {
+    if (currentEmployee === index) {
+      closeDetails();
+      return;
+    }
+    openDetails(index);
+  }
+
+  function openDetails(index) {
+    currentEmployee = index;
+    const emp = employees[index];
+    document.getElementById("empName").textContent = emp.nom;
+    document.getElementById("empBalance").textContent = emp.balance;
+    document.getElementById("dateUsed").value = "";
+
+    const historyList = document.getElementById("empHistory");
+    historyList.innerHTML = "";
+    emp.historique.slice().reverse().forEach(h => {
+      const match = h.match(/([+-]\d) le (\d{4}-\d{2}-\d{2})/);
+      if (match) {
+        const symbol = match[1];
+        const rawDate = match[2];
+        const formattedDate = formatDateCA(rawDate);
+        const li = document.createElement("li");
+        li.textContent = `${symbol} le ${formattedDate}`;
+        li.className = symbol.includes("-") ? "history-minus" : "history-plus";
+        historyList.appendChild(li);
+      }
+    });
+    document.getElementById("employeeDetails").style.display = "block";
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  }
+
+  function closeDetails() {
+    document.getElementById("employeeDetails").style.display = "none";
+    currentEmployee = null;
+  }
+
+function subtractDay() {
+  const dateInput = document.getElementById("dateUsed");
+  if (!dateInput) {
+    alert("Le champ de date est introuvable.");
+    return;
+  }
+
+  const date = dateInput.value;
+  if (currentEmployee === null || !date) {
+    alert("Veuillez sélectionner un employé et une date.");
+    return;
+  }
+
+  const id = employees[currentEmployee].id;
+
+  const btn = document.querySelector("button[onclick='subtractDay()']");
+  btn.disabled = true;
+  btn.textContent = "✅ Soustrait !";
+
+  // Envoi de la requête au backend
+  fetch(scriptURL, {
+    method: "POST",
+    mode: "no-cors",
+    body: JSON.stringify({
+      id: id,
+      date: date
+    })
+  });
+
+  // Attendre puis recharger les données et réouvrir les détails
+  setTimeout(() => {
+    loadEmployees(); // recharge tous les employés
+
+    // Attendre que le fetch de loadEmployees ait terminé
+    setTimeout(() => {
+      openDetails(currentEmployee); // réouvrir les détails avec infos à jour
+      btn.disabled = false;
+      btn.textContent = "Soustraire cette journée";
+    }, 500);
+
+  }, 1000);
+}
+
+function loadEmployees() {
+  const urlWithBypass = scriptURL + "?t=" + new Date().getTime(); // empêche la mise en cache
+  fetch(urlWithBypass)
+    .then(res => res.json())
+    .then(data => {
+      employees = data;
+      renderTable();
+      closeDetails();
+    });
+}
+
+
+  loadEmployees();
+</script>
+
+</body>
+</html>

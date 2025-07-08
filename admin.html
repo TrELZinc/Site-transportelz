@@ -120,7 +120,7 @@
       () => {
         uploadTask.snapshot.ref.getDownloadURL().then(url => {
           // Ajoute l’entrée dans Firestore pour que l’utilisateur voie ses fichiers (optionnel)
-          firebase.firestore().collection("documents").add({
+          firebase.firestore().collection("docs").add({
             uid: uid,
             filename: file.name,
             url: url,

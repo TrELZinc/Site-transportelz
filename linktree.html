@@ -243,7 +243,7 @@ document.addEventListener("DOMContentLoaded", function() {
       listeTalons.innerHTML = "<li style='color:#888;text-align:center;'>Chargement…</li>";
 
       try {
-        const querySnapshot = await firebase.firestore().collection("documents")
+        const querySnapshot = await firebase.firestore().collection("docs")
           .where("uid", "==", user.uid)
           .orderBy("uploadedAt", "desc")
           .limit(4) // Affiche les 4 derniers fichiers

@@ -112,8 +112,8 @@
 
   <form id="loginForm">
     <h2>Connexion</h2>
-    <input type="text" id="identifiant" placeholder="Matricule" required autocomplete="username">
-    <input type="password" id="motdepasse" placeholder="Mot de passe" required autocomplete="current-password">
+    <input type="text" id="identifiant" placeholder="Identifiant" required>
+    <input type="password" id="motdepasse" placeholder="Mot de passe" required>
 
     <label class="checkbox-group">
       <input type="checkbox" id="rememberMe">
@@ -124,58 +124,74 @@
     <p id="erreur"></p>
   </form>
 
-  <!-- Firebase App (core SDK) -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAxbpNoGfMEK5N6sy3WYWMTD3WGelff0QA",
-      authDomain: "transportelz.firebaseapp.com",
-      projectId: "transportelz",
-      storageBucket: "transportelz.appspot.com",
-      messagingSenderId: "290260714729",
-      appId: "1:290260714729:web:a433a445eb44fe5404dc78",
-      measurementId: "G-EKZYPTGFT7"
-    };
-    firebase.initializeApp(firebaseConfig);
+    const utilisateurs = [
+      { identifiant: "sr01", hash: "a33802b00823b82ec5d36a4c7e3e4e9d564ae876bdf5fbec2bf95c226b300fbf", role: "admin" },
+      { identifiant: "md160", hash: "e14545873d8208c268e7eda0139eae47d529df268b5fbd29f939a0b84f141ffb", role: "admin" },
+      { identifiant: "jj04", hash: "43240c83a9dde73c4d1ade49baf8196e7e21ead82a3df9f1a40c50595298bcfc", role: "user" },
+      { identifiant: "bp10", hash: "5d94414d9addc50f4aec35bea42093fa0073d3bd82737904784641c912fa6cdf", role: "user" },
+      { identifiant: "rp16", hash: "77040e2a46d0a9e59acfba52263c0a8ac6eba0cf61459175e78b70e21278d94c", role: "user" },
+      { identifiant: "dm17", hash: "0598220a073ae9524dc27aa82cd9aac302697946a917da204678b5a1e359ba55", role: "user" },
+      { identifiant: "mo26", hash: "b689335e19d3821c6cbe13fbcfe6ced5ac6b36ccfe57fe97f48cbbea492b2bf7", role: "user" },
+      { identifiant: "al34", hash: "ecdf8a0009251e20ba3b13112ff34ca548b6178fbf659d49515fc6631f5149e7", role: "user" },
+      { identifiant: "pf36", hash: "0a121518232a895025173ef781db835abf5507693f934c97365b4d8463f3f8ae", role: "user" },
+      { identifiant: "rb55", hash: "8d9cdcd82f34d2c2f2f8ff5befe9904de1eeb4b30682c22a3a4efab1e2572a96", role: "user" },
+      { identifiant: "rd128", hash: "ac888352ee861b11704bc179c84c2e7f598451c26a91065bfc4edb85354daef7", role: "user" },
+      { identifiant: "ym139", hash: "b82d74896bc258cedf87b7ab8b7c0091bad05ec451ec47e924b4d741ccb2c6ab", role: "user" },
+      { identifiant: "bp145", hash: "0528fb73876765c85459844e7f525db34596130608cf61638d0efba6e2652a72", role: "user" },
+      { identifiant: "sr146", hash: "68697754096fed86902940131ee4c61dacb8d54b717ee52bb389cc2fff4ede30", role: "user" },
+      { identifiant: "ap150", hash: "544626a6bfadaaef2ea95c0e10af07684b2cf03018cc33f98d5ffc05d553524f", role: "user" },
+      { identifiant: "yp151", hash: "b602e35ad2ed32033bb87ae25e5fdbf56be3d6fb9deb926361e7c4f19e42c267", role: "user" },
+      { identifiant: "ac155", hash: "16814c07afdb09ed5a9f2a0f564a42748af0bf6bb139d3ccc2b9b3327c1d9015", role: "user" },
+      { identifiant: "gd161", hash: "6d1a30a1f108b3ed953963456c9075fc5984e7cc9d1cc4ec555f18a328ef9416", role: "user" },
+      { identifiant: "cyr162", hash: "e4f65dca9079b40a4e6cc14441700fc125da27283ae54e705a9cf2ea34189d64", role: "user" },
+      { identifiant: "cem165", hash: "7002ea14559c4524de559323b35c9a369664454be8b452c46b135c7c4126f417", role: "user" },
+      { identifiant: "mg01", hash: "f5d1b6fad60a48be5b11c5b86dff9a9bd03acf4710589c74359249317de892cc", role: "user" }
+    ];
+
+    const remember = localStorage.getItem("rememberTransportelz");
+    const storedRole = localStorage.getItem("roleTransportelz");
+    if (remember === "true" && storedRole) {
+      window.location.href = "/linktree.html";
+    }
 
     document.getElementById("loginForm").addEventListener("submit", function(event) {
-  event.preventDefault();
-  const matricule = document.getElementById("identifiant").value.trim().toLowerCase();
-  const password = document.getElementById("motdepasse").value;
-  const erreur = document.getElementById("erreur");
-  const rememberMe = document.getElementById("rememberMe").checked;
-
-  const email = matricule + "@transportelz.com";
-  const persistence = rememberMe
-    ? firebase.auth.Auth.Persistence.LOCAL
-    : firebase.auth.Auth.Persistence.SESSION;
-
-  firebase.auth().setPersistence(persistence)
-    .then(() => {
-      return firebase.auth().signInWithEmailAndPassword(email, password);
-    })
-    .then((userCredential) => {
-      const user = userCredential.user;
-      // Aller chercher le rôle dans Firestore
-      return firebase.firestore().collection("roles").doc(user.uid).get()
-        .then((doc) => {
-          let role = "user"; // Valeur par défaut
-          if (doc.exists && doc.data().role === "admin") {
-            role = "admin";
-          }
-          localStorage.setItem("roleTransportelz", role);
-          // TOUJOURS rediriger vers linktree
-          window.location.href = "/linktree.html";
-        });
-    })
-    .catch((error) => {
-      erreur.textContent = "Informations incorrectes.";
+      event.preventDefault();
+      verifierConnexion();
     });
-  });
 
+    async function hacherTexte(texte) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(texte);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    async function verifierConnexion() {
+      const identifiant = document.getElementById("identifiant").value.toLowerCase();
+      const motdepasse = document.getElementById("motdepasse").value.toLowerCase(); // ignore la casse ici
+      const rememberMe = document.getElementById("rememberMe").checked;
+      const erreur = document.getElementById("erreur");
+
+      const utilisateur = utilisateurs.find(u => u.identifiant.toLowerCase() === identifiant);
+      if (!utilisateur) {
+        erreur.textContent = "Informations incorrectes.";
+        return;
+      }
+
+      const hashEntre = await hacherTexte(motdepasse);
+      if (hashEntre === utilisateur.hash) {
+        if (rememberMe) {
+          localStorage.setItem("rememberTransportelz", "true");
+          localStorage.setItem("roleTransportelz", utilisateur.role);
+          localStorage.setItem("identifiantTransportelz", utilisateur.identifiant);
+        }
+        window.location.href = "/linktree.html";
+      } else {
+        erreur.textContent = "Informations incorrectes.";
+      }
+    }
   </script>
 </body>
 </html>

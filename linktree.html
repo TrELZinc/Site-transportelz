@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Transport ELZ – Portail Employés</title>
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
-  <style>
+<style>
     body {
       margin: 0;
       font-family: 'Comfortaa', sans-serif;
@@ -137,136 +137,155 @@
       color: #888;
       text-align: center;
     }
+
+    .button.admin {
+      background-color: #009688 !important; /* Teal ou autre couleur distinctive */
+      color: #fff;
+    }
+    .button.admin:hover {
+      background-color: #006e5e !important;
+    }
+
   </style>
 </head>
 <body>
-
-  <div class="header">
+  <div class="header" id="header">
     <img src="assets/logo.jpeg" alt="Logo Transport ELZ" class="logo" />
   </div>
 
   <div class="container">
     <h1>Portail des employés</h1>
-
     <div class="btn-container" id="liens">
-      <a href="paie.html" class="button vacation-button">
-        <img src="assets/icones/feuille.png" alt=""> Envoyer une feuille de route
+      <a href="https://forms.gle/HECpkfwsGGcsdMVFA" class="button">
+        <img src="assets/icones/feuille.png" alt=""> Envoyer une feuille de temps
       </a>
       <a href="reparation.html" class="button">
         <img src="assets/icones/outil.png" alt=""> Envoyer une demande de réparation
       </a>
-      <a href="equipements.html" class="button">
+      <a href="https://citernes.netlify.app/" class="button">
         <img src="assets/icones/camion.png" alt=""> Disponibilité des équipements
       </a>
       <a href="fuel.html" class="button">
         <img src="assets/icones/fuel.png" alt=""> Afficher le prix du diesel
       </a>
-      <a href="cartes.html" class="button">
-        <img src="assets/icones/fuel.png" alt=""> Cartes à fuel
-      </a>
       <a href="poids.html" class="button">
         <img src="assets/icones/liste.png" alt=""> Consulter la liste des charges
       </a>
-      <button onclick="ouvrirPopup()" style="background-color: #444; color: white; padding: 12px 20px; border: none; border-radius: 10px; font-size: 16px; font-family: 'Comfortaa', sans-serif; margin-top: 20px; cursor: pointer; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);">
-        🔐 Accès administrateur
-      </button>
+      <!-- Le bouton admin va s'ajouter ici dynamiquement si l'employé est admin -->
     </div>
+
+    <div id="section-talons" style="max-width:400px;width:100%;margin:40px auto 0;display:none;">
+      <h2 style="text-align:center;font-size:1.18em;margin-bottom:20px;">📂 Mes talons de paie</h2>
+      <ul id="liste-talons" style="padding:0;list-style:none;"></ul>
+    </div>
+
 
     <div style="margin-top: 30px;">
       <button onclick="deconnexion()" style="background-color: #000; color: #fff; padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); font-family: 'Comfortaa', sans-serif;">
         Se déconnecter
       </button>
     </div>
-
     <footer>
       Transport ELZ inc. – Tous droits réservés
     </footer>
   </div>
 
-  <!-- Popup NIP -->
-  <div id="popupNIP" class="admin-popup" style="display:none;">
-    <div class="admin-box">
-      <p>Entrez le NIP pour accéder à cette section :</p>
-      <input id="nipInput" type="tel" inputmode="numeric" maxlength="6" />
-      <br />
-      <button onclick="validerNIP()">Valider</button>
-    </div>
-  </div>
+  <!-- ... le reste de ton HTML ... -->
 
-  <script>
-    function ouvrirPopup() {
-      document.getElementById("popupNIP").style.display = "flex";
-      document.getElementById("nipInput").focus();
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAxbpNoGfMEK5N6sy3WYWMTD3WGelff0QA",
+  authDomain: "transportelz.firebaseapp.com",
+  projectId: "transportelz",
+  storageBucket: "transportelz.appspot.com",
+  messagingSenderId: "290260714729",
+  appId: "1:290260714729:web:a433a445eb44fe5404dc78",
+  measurementId: "G-EKZYPTGFT7"
+};
+firebase.initializeApp(firebaseConfig);
+
+document.addEventListener("DOMContentLoaded", function() {
+  // Affiche la section des fichiers après les boutons (tu dois avoir <div id="section-talons"> dans le HTML)
+  const sectionTalons = document.getElementById("section-talons");
+  const listeTalons = document.getElementById("liste-talons");
+
+  firebase.auth().onAuthStateChanged(async (user) => {
+    if (!user) {
+      window.location.href = "index.html";
+      return;
+    }
+    let role = "user";
+    let matricule = user.email.split("@")[0].toUpperCase();
+    try {
+      const doc = await firebase.firestore().collection("roles").doc(user.uid).get();
+      if (doc.exists && doc.data().role === "admin") {
+        role = "admin";
+      }
+    } catch (e) {}
+
+    if (role === "admin") {
+      const btnContainer = document.getElementById("liens");
+      const lienAdmin = document.createElement("a");
+      lienAdmin.href = "admin.html";
+      lienAdmin.className = "button admin";
+      lienAdmin.innerHTML = `<img src="assets/icones/admin.png" alt=""> Administration`;
+      btnContainer.insertBefore(lienAdmin, btnContainer.firstChild);
     }
 
-function validerNIP() {
-  const nip = document.getElementById("nipInput").value;
-  if (nip === "1359") {
-    localStorage.setItem("adminValid", "true");
-    afficherBoutonsAdmin();
-    document.getElementById("popupNIP").style.display = "none";
-  } else {
-    alert("NIP incorrect.");
+    // ===== Affichage des fichiers "Mes talons de paie" =====
+    if (sectionTalons && listeTalons) {
+      sectionTalons.style.display = "block";
+      listeTalons.innerHTML = "<li style='color:#888;text-align:center;'>Chargement…</li>";
+
+      try {
+        const querySnapshot = await firebase.firestore().collection("documents")
+          .where("uid", "==", user.uid)
+          .orderBy("uploadedAt", "desc")
+          .limit(4) // Affiche les 4 derniers fichiers
+          .get();
+
+        if (querySnapshot.empty) {
+          listeTalons.innerHTML = "<li style='color:#888;text-align:center;'>Aucun talon de paie pour le moment.</li>";
+        } else {
+          listeTalons.innerHTML = "";
+          querySnapshot.forEach(doc => {
+            const data = doc.data();
+            const li = document.createElement("li");
+            li.style = "margin:0 0 12px 0;padding:14px 18px;background:#fff;border-radius:7px;box-shadow:0 2px 7px #0001;display:flex;align-items:center;justify-content:space-between;";
+            li.innerHTML = `
+              <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:220px;display:inline-block;">${data.filename}</span>
+              <a href="${data.url}" download target="_blank" style="background:#009688;color:#fff;padding:6px 14px;border-radius:5px;text-decoration:none;font-size:15px;font-family:'Comfortaa',sans-serif;">Télécharger</a>
+            `;
+            listeTalons.appendChild(li);
+          });
+        }
+      } catch (e) {
+        listeTalons.innerHTML = "<li style='color:#e00;'>Erreur lors du chargement des fichiers.</li>";
+      }
+    }
+    // ============================================
+  });
+
+  // Bouton de déconnexion
+  const btnDeconnexion = document.querySelector("button[onclick='deconnexion()']");
+  if (btnDeconnexion) {
+    btnDeconnexion.addEventListener("click", function(e) {
+      e.preventDefault();
+      firebase.auth().signOut().then(function() {
+        localStorage.clear();
+        window.location.href = "index.html";
+      }).catch(function(error) {
+        alert("Erreur lors de la déconnexion.");
+      });
+    });
   }
-}
-
-
-function afficherBoutonsAdmin() {
-  const btnContainer = document.getElementById("liens");
-
-  if (document.getElementById("admin-btn-dispatch")) return;
-
-  // Dispatch interne
-  const lienDispatch = document.createElement("a");
-  lienDispatch.id = "admin-btn-dispatch";
-  lienDispatch.href = "dispos.html";
-  lienDispatch.className = "button";
-  lienDispatch.innerHTML = `<img src="assets/icones/dispatch.png" alt=""> Dispatch interne`;
-  btnContainer.appendChild(lienDispatch);
-
-  // Pastille 1 : Gestion des permis
-  const lienRapport = document.createElement("a");
-  lienRapport.href = "permis.html";
-  lienRapport.className = "button";
-  lienRapport.innerHTML = `<img src="assets/icones/permis.png" alt=""> Gestion des permis`;
-  btnContainer.appendChild(lienRapport);
-  
-  // Pastille 2 : Dossiers employés
-  const lienEmploye = document.createElement("a");
-  lienEmploye.href = "employes.html";
-  lienEmploye.className = "button";
-  lienEmploye.innerHTML = `<img src="assets/icones/permis.png" alt=""> Dossiers employés`;
-  btnContainer.appendChild(lienEmploye);
-
-
-    // Pastille 3 : Réparation mécanique
-  const lienGarage = document.createElement("a");
-  lienGarage.href = "garage.html";
-  lienGarage.className = "button";
-  lienGarage.innerHTML = `<img src="assets/icones/outil.png" alt=""> Réparation mécanique`;
-  btnContainer.appendChild(lienGarage);
-
-  // Pastille 2 : Paie
-  const lienJournal = document.createElement("a");
-  lienJournal.href = "mathieu.html";
-  lienJournal.className = "button";
-  lienJournal.innerHTML = `<img src="assets/icones/feuille.png" alt=""> Paie`;
-  btnContainer.appendChild(lienJournal);
-}
-
-function deconnexion() {
-  localStorage.removeItem("rememberTransportelz");
-  localStorage.removeItem("roleTransportelz");
-  localStorage.removeItem("adminValid"); // réinitialise l'accès admin
-  window.location.href = "index.html";
-}
-
-window.onload = function() {
-  if (localStorage.getItem("adminValid") === "true") {
-    afficherBoutonsAdmin();
-  }
-};
-  </script>
+});
+</script>
 
 </body>
 </html>

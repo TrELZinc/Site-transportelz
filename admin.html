@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Tableau de bord Admin – Transport E.L.Z</title>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Comfortaa', sans-serif; background: #f6f6f6; margin: 0; padding: 0; }
+    h1 { background: #111; color: #fff; margin: 0; padding: 24px; text-align: center; }
+    #users {
+      max-width: 500px; margin: 40px auto;
+      background: #fff; border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.10);
+      padding: 40px 30px 20px 30px;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .user {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 28px 0 18px 0; margin-bottom: 16px;
+      border-bottom: 1px solid #eee;
+      width: 100%;
+    }
+    .user:last-child { border-bottom: none; }
+    .user-name {
+      font-size: 1.18em; font-weight: bold; color: #111; margin-bottom: 6px;
+      letter-spacing: 0.5px;
+    }
+    .user-email {
+      color: #888; font-size: 0.98em; margin-bottom: 16px;
+    }
+    .upload-label {
+      background: #eee; padding: 10px 24px;
+      border-radius: 8px; cursor: pointer; border: 1px solid #ddd;
+      font-size: 15px; transition: background 0.2s;
+      margin-bottom: 6px;
+    }
+    .upload-label:hover { background: #cce8ff; }
+    input[type="file"] { display: none; }
+    .progress { font-size: 13px; color: #007a7a; margin-top: 5px; }
+    button {
+      margin: 26px auto 0 auto; padding: 12px 28px; border-radius: 8px;
+      font-size: 17px; border: none; background: #111; color: #fff; cursor: pointer;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <h1>Tableau de bord Admin</h1>
+  <div id="users">Chargement…</div>
+  <button onclick="logout()">Déconnexion</button>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+  <script>
+    // Ta config
+    const firebaseConfig = {
+      apiKey: "AIzaSyAxbpNoGfMEK5N6sy3WYWMTD3WGelff0QA",
+      authDomain: "transportelz.firebaseapp.com",
+      projectId: "transportelz",
+      storageBucket: "transportelz.appspot.com",
+      messagingSenderId: "290260714729",
+      appId: "1:290260714729:web:a433a445eb44fe5404dc78",
+      measurementId: "G-EKZYPTGFT7"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    // Sécurité : redirige si pas admin
+    firebase.auth().onAuthStateChanged(user => {
+      if (!user) window.location.href = "/index.html";
+      firebase.firestore().collection("roles").doc(user.uid).get().then(doc => {
+        if (!doc.exists || doc.data().role !== "admin") {
+          window.location.href = "/linktree.html";
+        }
+      });
+    });
+
+    firebase.firestore().collection("roles").get().then(snapshot => {
+    const usersDiv = document.getElementById("users");
+    usersDiv.innerHTML = "";
+    snapshot.forEach(doc => {
+        const uid = doc.id;
+        // Affiche le champ "matricule" du document, sinon (Inconnu)
+        const matricule = doc.data().matricule || "(Inconnu)";
+        usersDiv.innerHTML += `
+        <div class="user" id="user-${uid}">
+            <div class="user-name">${matricule}</div>
+            <label class="upload-label">
+            📎 Joindre un fichier
+            <input type="file" onchange="uploadDoc(event, '${uid}')">
+            </label>
+            <span class="progress" id="progress-${uid}"></span>
+        </div>
+        `;
+    });
+    });
+
+
+  function uploadDoc(e, uid) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const progressElem = document.getElementById(`progress-${uid}`);
+    progressElem.textContent = "Téléversement en cours…";
+
+    const matricule = document.querySelector(`#user-${uid} .user-name`).textContent.trim();
+
+    // Chemin dans Storage : docs/UID/nomfichier.pdf
+    const storageRef = firebase.storage().ref().child(`docs/${uid}/${Date.now()}_${file.name}`);
+    const uploadTask = storageRef.put(file);
+
+    uploadTask.on('state_changed', 
+      (snapshot) => {
+        let pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+        progressElem.textContent = `Envoi : ${pct}%`;
+      }, 
+      (error) => {
+        progressElem.textContent = "Erreur lors de l’envoi.";
+      }, 
+      () => {
+        uploadTask.snapshot.ref.getDownloadURL().then(url => {
+          // Ajoute l’entrée dans Firestore pour que l’utilisateur voie ses fichiers (optionnel)
+          firebase.firestore().collection("documents").add({
+            uid: uid,
+            filename: file.name,
+            url: url,
+            uploadedAt: new Date()
+          }).then(() => {
+            progressElem.textContent = "Fichier déposé ! (Firebase)";
+            setTimeout(() => { progressElem.textContent = ""; }, 3000);
+          });
+        });
+      }
+    );
+  }
+
+
+    function logout() {
+      firebase.auth().signOut().then(() => window.location.href = "/index.html");
+    }
+  </script>
+</body>
+</html>

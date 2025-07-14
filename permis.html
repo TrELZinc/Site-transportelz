@@ -83,6 +83,22 @@
 <div class="container">
   <h1 class="mb-4 text-center">📄 Visualisation des Permis</h1>
 
+<div class="row mb-3">
+  <div class="col-12 col-md-6 mx-auto">
+    <label for="filterPermitType" class="form-label">Filtrer par type de permis</label>
+    <div class="input-group">
+      <select id="filterPermitType" class="form-select">
+        <option value="">-- Tous les types --</option>
+      </select>
+      <button id="clearPermitTypeBtn" class="btn btn-outline-secondary d-none" type="button">Effacer</button>
+    </div>
+  </div>
+</div>
+
+
+  <div id="permitTypeTableBlock" class="mt-4"></div>
+
+
   <div class="row g-3 mb-3">
     <div class="col-md-6">
       <label class="form-label">Unité</label>
@@ -276,11 +292,94 @@ function showUpcomingRenewals() {
     btn.disabled = false;
   });
 
-  // Exécution correcte séquentielle
-  (async () => {
-    await fetchDocs();
-    showUpcomingRenewals();
-  })();
+
+  function populatePermitTypeSelect() {
+  const permitTypeSelect = document.getElementById('filterPermitType');
+  permitTypeSelect.innerHTML = '<option value="">-- Tous les types --</option>'; // reset d'abord!
+  const allTypes = [...new Set(docs.map(d => d.permit))].sort();
+  allTypes.forEach(type => {
+    permitTypeSelect.innerHTML += `<option value="${type}">${type}</option>`;
+  });
+}
+
+function renderPermitTypeTable(type) {
+  let filtered = docs;
+  if (type) {
+    filtered = docs.filter(d => d.permit === type);
+    // Tri par date d'expiration croissante
+    filtered.sort((a, b) => new Date(a.expiration) - new Date(b.expiration));
+    if (!filtered.length) {
+      document.getElementById("permitTypeTableBlock").innerHTML = ""; // ne rien afficher
+      return;
+    }
+  } else {
+    // Si aucun type choisi, efface le tableau
+    document.getElementById("permitTypeTableBlock").innerHTML = "";
+    return;
+  }
+  let rows = filtered.map(doc => `
+    <tr>
+      <td>${doc.unit}</td>
+      <td>${doc.permit}</td>
+      <td>${doc.expiration}</td>
+      <td>
+        <a href="https://drive.google.com/file/d/${doc.fileId}/preview" target="_blank" class="btn btn-sm btn-primary">Voir</a>
+      </td>
+    </tr>
+  `).join('');
+  document.getElementById("permitTypeTableBlock").innerHTML = `
+    <div class="table-responsive">
+      <table class="table table-sm table-bordered align-middle mt-2">
+        <thead>
+          <tr>
+            <th>Unité</th>
+            <th>Type de permis</th>
+            <th>Expiration</th>
+            <th>PDF</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+
+document.getElementById('filterPermitType').addEventListener('change', function() {
+  renderPermitTypeTable(this.value);
+});
+
+const filterPermitType = document.getElementById('filterPermitType');
+const clearPermitTypeBtn = document.getElementById('clearPermitTypeBtn');
+
+filterPermitType.addEventListener('change', function() {
+  renderPermitTypeTable(this.value);
+
+  // Affiche ou cache le bouton "Effacer"
+  if (this.value) {
+    clearPermitTypeBtn.classList.remove('d-none');
+  } else {
+    clearPermitTypeBtn.classList.add('d-none');
+  }
+});
+
+clearPermitTypeBtn.addEventListener('click', function() {
+  filterPermitType.value = "";
+  clearPermitTypeBtn.classList.add('d-none');
+  renderPermitTypeTable(""); // Vide le tableau
+});
+
+
+// Après avoir fetché les docs :
+(async () => {
+  await fetchDocs();
+  showUpcomingRenewals();
+  populatePermitTypeSelect();
+  renderPermitTypeTable(""); // affiche tout par défaut
+})();
+
 </script>
   <script>
   async function afficherAlertesPermis() {

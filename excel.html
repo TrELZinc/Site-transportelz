@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Export Lieux Chauffeur</title>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  >
+  <style>
+    body { background: #f8f9fa; }
+    .card { border: none; border-radius: .75rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .form-control-sm { border-radius: .375rem; }
+    table { margin-top: 1rem; }
+    table td, table th { padding: .5rem .75rem; }
+  </style>
+</head>
+<body>
+  <div class="container py-5">
+    <div class="card p-4">
+      <h2 class="h5 mb-3">Extraction Lieux</h2>
+      <div class="row gx-2 gy-3 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label small text-uppercase">Date début</label>
+          <input type="date" id="dateStart" class="form-control form-control-sm">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small text-uppercase">Date fin</label>
+          <input type="date" id="dateEnd" class="form-control form-control-sm">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small text-uppercase">Code Chauffeur</label>
+          <input type="text" id="driverCode" class="form-control form-control-sm" placeholder="Ex : JFJ">
+        </div>
+        <div class="col-md-3 text-end">
+          <button id="loadBtn" class="btn btn-sm btn-primary">Charger</button>
+          <button id="copyBtn" class="btn btn-sm btn-outline-secondary">Copier Lieux</button>
+        </div>
+      </div>
+
+      <table class="table table-bordered table-sm mt-4">
+        <thead class="table-light">
+          <tr><th>Date</th><th>Lieu</th></tr>
+        </thead>
+        <tbody id="tableBody">
+          <!-- lignes dynamiques -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Firebase SDK (inchangé) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+    apiKey: "AIzaSyD4U85mokKXsAP1AdwClWtcbt8udZrwlAw",
+    authDomain: "sommaireelz.firebaseapp.com",
+    projectId: "sommaireelz",
+    storageBucket: "sommaireelz.firebasestorage.app",
+    messagingSenderId: "171788284751",
+    appId: "1:171788284751:web:694f070d1cafe8b7c04b3a"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    const db = firebase.firestore();
+
+    // Charger et afficher seulement Date+Lieu
+    async function loadFromFirebase() {
+      const rawStart = document.getElementById("dateStart").value;
+      const rawEnd   = document.getElementById("dateEnd").value;
+      const code     = document.getElementById("driverCode").value.trim().toUpperCase();
+      if (!rawStart || !rawEnd || !code) {
+        return alert("Date début, date fin et code chauffeur requis.");
+      }
+      // parser localement
+      const [yS,mS,dS] = rawStart.split("-");
+      const [yE,mE,dE] = rawEnd.split("-");
+      const start = new Date(+yS, +mS-1, +dS);
+      const end   = new Date(+yE, +mE-1, +dE);
+
+      const fmt = d => {
+        const mm = String(d.getMonth()+1).padStart(2,"0");
+        const dd = String(d.getDate()).padStart(2,"0");
+        return `${d.getFullYear()}-${mm}-${dd}`;
+      };
+      const startKey = fmt(start), endKey = fmt(end);
+
+      const body = document.getElementById("tableBody");
+      body.innerHTML = "";
+
+      const snap = await db.collection("disponibilites")
+        .where("date", ">=", startKey)
+        .where("date", "<=", endKey)
+        .orderBy("date","asc")
+        .get();
+
+      // lookup date→lieu
+      const lookup = {};
+      snap.docs.forEach(doc => {
+        const data = doc.data();
+        (data.rows||[])
+          .filter(r => (r.chauffeur||"").toUpperCase()===code)
+          .forEach(r => {
+            if (!lookup[data.date]) lookup[data.date] = r.client||"";
+          });
+      });
+
+      // boucle
+      let cur = new Date(start);
+      while (cur<=end) {
+        const key = fmt(cur);
+        const label = cur.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"});
+        const lieu = lookup[key]||"";
+        const tr  = document.createElement("tr");
+        tr.innerHTML = `<td>${label}</td><td>${lieu}</td>`;
+        body.appendChild(tr);
+        cur.setDate(cur.getDate()+1);
+      }
+    }
+
+    // copie en Excel‑ready (tab + newline)
+    function copyLieux() {
+      const lines = Array.from(
+        document.querySelectorAll("#tableBody tr td:nth-child(2)")
+      ).map(td => td.textContent.trim());
+      const txt = lines.join("\t\n");
+      navigator.clipboard.writeText(txt)
+        .then(()=> alert("✅ Lieux copiés."))
+        .catch(()=> alert("❌ Échec du copier."));
+    }
+
+    // Lorsque l’on choisit Date de début (dimanche), on calcule le samedi suivant
+    document.getElementById("dateStart").addEventListener("change", function() {
+    const raw = this.value;           // ex. "2025-07-06"
+    if (!raw) return;
+
+    // parser en locale
+    const [y,m,d] = raw.split("-");
+    const dt = new Date(+y, +m-1, +d);
+
+    // ajouter 6 jours pour tomber le samedi suivant
+    dt.setDate(dt.getDate() + 6);
+
+    // formater YYYY-MM-DD
+    const mm = String(dt.getMonth()+1).padStart(2,"0");
+    const dd = String(dt.getDate()).padStart(2,"0");
+    const formatted = `${dt.getFullYear()}-${mm}-${dd}`;
+
+    // remplir la date de fin
+    document.getElementById("dateEnd").value = formatted;
+    });
+
+
+    document.getElementById("loadBtn").addEventListener("click", loadFromFirebase);
+    document.getElementById("copyBtn").addEventListener("click", copyLieux);
+  </script>
+</body>
+</html>

@@ -1,333 +1,439 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Documents Permis - Autochargés</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    @media (max-width: 576px) {
-      .btn-group-wrap > a,
-      .btn-group-wrap > button {
-        flex: 1 1 0;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Documents Permis</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      @media (max-width: 576px) {
+        .btn-group-wrap > a,
+        .btn-group-wrap > button {
+          flex: 1 1 0;
+          white-space: nowrap;
+        }
+      }
+      .renewal-box {
+        max-width: 95%;
+        font-size: 0.95rem;
+        font-family: system-ui, sans-serif;
+        border-left: 4px solid #dc3545;
+        backdrop-filter: blur(3px);
+        background-color: rgba(255, 0, 0, 0.075) !important;
+        margin-top: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .marquee-container {
+        overflow: hidden;
+        position: relative;
+        height: 1.6em;
+      }
+
+      .marquee-content {
         white-space: nowrap;
+        animation: scroll-left 40s linear infinite;
+        display: inline-block;
+        transform: translateX(100%);
       }
-    }
-.renewal-box {
-  max-width: 95%;
-  font-size: 0.95rem;
-  font-family: system-ui, sans-serif;
-  border-left: 4px solid #dc3545;
-  backdrop-filter: blur(3px);
-  background-color: rgba(255, 0, 0, 0.075) !important;
-  margin-top: 1rem;
-  margin-bottom: 2rem;
-}
+      body {
+        padding-bottom: 3rem;
+      }
 
-.marquee-container {
-  overflow: hidden;
-  position: relative;
-  height: 1.6em;
-}
+      @keyframes scroll-left {
+        0% {
+          transform: translateX(0%);
+        }
+        100% {
+          transform: translateX(-100%);
+        }
+      }
+      html,
+      body {
+        background-color: #f8f9fa !important;
+        min-height: 100vh;
+      }
+    </style>
+  </head>
+  <body class="bg-light py-4">
+    <!-- 🔼 Header HTML inclus dynamiquement -->
+    <div id="customHeader"></div>
+    <script>
+      fetch("assets/header.html")
+        .then((res) => res.text())
+        .then((html) => {
+          document.getElementById("customHeader").innerHTML = html;
+          setTimeout(() => {
+            const header = document.querySelector("header");
+            if (header) {
+              const height = header.offsetHeight;
+              document.body.style.paddingTop = `${height + 10}px`;
 
-.marquee-content {
-  white-space: nowrap;
-  animation: scroll-left 25s linear infinite;
-  display: inline-block;
-  transform: translateX(100%);
-}
+              // ✅ Décale la bannière rouge vers le bas
+              const banner = document.getElementById("renewalBanner");
+              if (banner) banner.style.marginTop = `${height + 10}px`;
+            }
+          }, 100);
+        });
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-@keyframes scroll-left {
-  0%   { transform: translateX(0%); }
-  100% { transform: translateX(-100%); }
-}
-    html, body {
-  background-color: #f8f9fa !important;
-  min-height: 100vh;
-  }  
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyD4U85mokKXsAP1AdwClWtcbt8udZrwlAw",
+        authDomain: "sommaireelz.firebaseapp.com",
+        projectId: "sommaireelz",
+        storageBucket: "sommaireelz.firebasestorage.app",
+        messagingSenderId: "171788284751",
+        appId: "1:171788284751:web:694f070d1cafe8b7c04b3a",
+      };
 
-</style>
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+    </script>
 
-</head>
-<body class="bg-light py-4">
-  <!-- 🔼 Header HTML inclus dynamiquement -->
-  <div id="customHeader"></div>
-  <script>
-    fetch("assets/header.html")
-      .then(res => res.text())
-      .then(html => {
-        document.getElementById("customHeader").innerHTML = html;
-        setTimeout(() => {
-          const header = document.querySelector("header");
-          if (header) {
-            const height = header.offsetHeight;
-            document.body.style.paddingTop = `${height + 10}px`;
-  
-            // ✅ Décale la bannière rouge vers le bas
-            const banner = document.getElementById("renewalBanner");
-            if (banner) banner.style.marginTop = `${height + 10}px`;
-          }
-        }, 100);
-      });
-  </script>
-
-<div id="renewalBanner" class="d-none w-100">
-  <div class="renewal-box mx-auto mt-2 mb-4 px-3 py-2 rounded shadow-sm text-danger bg-danger-subtle bg-opacity-25 text-center">
-    <div class="fw-bold">⚠️ Permis à renouveler ⚠️</div>
-    <div id="renewalMarquee" class="mt-1 text-danger-emphasis marquee-container">
-      <span class="marquee-content d-inline-block"></span>
-    </div>
-  </div>
-</div>
-
-<div class="container">
-  <h1 class="mb-4 text-center">📄 Visualisation des Permis</h1>
-
-<div class="row mb-3">
-  <div class="col-12 col-md-6 mx-auto">
-    <label for="filterPermitType" class="form-label">Filtrer par type de permis</label>
-    <div class="input-group">
-      <select id="filterPermitType" class="form-select">
-        <option value="">-- Tous les types --</option>
-      </select>
-      <button id="clearPermitTypeBtn" class="btn btn-outline-secondary d-none" type="button">Effacer</button>
-    </div>
-  </div>
-</div>
-
-
-  <div id="permitTypeTableBlock" class="mt-4"></div>
-
-
-  <div class="row g-3 mb-3">
-    <div class="col-md-6">
-      <label class="form-label">Unité</label>
-      <select id="unitSelect" class="form-select">
-        <option disabled selected>Choisir une unité</option>
-      </select>
-    </div>
-    <div class="col-md-6">
-      <label class="form-label">Type de permis</label>
-      <select id="permitSelect" class="form-select">
-        <option disabled selected>Choisir un permis</option>
-      </select>
-    </div>
-  </div>
-
-  <div class="mt-4">
-    <div id="infoBlock" class="d-none">
-      <ul class="list-group">
-        <li class="list-group-item"><strong>Unité :</strong> <span id="unitLabel"></span></li>
-        <li class="list-group-item"><strong>Permis :</strong> <span id="permitLabel"></span></li>
-        <li class="list-group-item"><strong>Expiration :</strong> <span id="expirationLabel"></span></li>
-      </ul>
-      <div class="mt-3 d-flex flex-row flex-wrap justify-content-center gap-2 btn-group-wrap">
-        <a id="openPdf" href="#" target="_blank" class="btn btn-primary">🧾 Voir le PDF</a>
-        <a id="downloadPdf" href="#" class="btn btn-success" download>⬇️ Télécharger</a>
-      </div>
-
-      <div class="mt-3 text-center">
-        <label for="emailInput" class="form-label">✉️ Envoyer le PDF avec pièce jointe à :</label>
-        <div class="input-group mb-2">
-          <input type="email" id="emailInput" class="form-control" placeholder="adresse@email.com">
-          <button id="sendViaScriptBtn" class="btn btn-warning" type="button">📎 Envoyer </button>
+    <div id="renewalBanner" class="d-none w-100">
+      <div
+        class="renewal-box mx-auto mt-2 mb-4 px-3 py-2 rounded shadow-sm text-danger bg-danger-subtle bg-opacity-25 text-center"
+      >
+        <div class="fw-bold">⚠️ Permis à renouveler ⚠️</div>
+        <div
+          id="renewalMarquee"
+          class="mt-1 text-danger-emphasis marquee-container"
+        >
+          <span class="marquee-content d-inline-block"></span>
         </div>
-        <small class="form-text text-muted d-block" id="pjStatus"></small>
       </div>
     </div>
-  </div>
-</div>
 
-<script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbya6pXCawlVp-uoqJWPPZmAtEzSjpRgIQyVrHCaAtVSxz-CtayB8TSTsKtBz6Hbm8jU/exec";
-  let docs = [];
-  let selectedDoc = null;
+    <div class="container">
+      <h1 class="mb-4 text-center">📄 Visualisation des Permis</h1>
 
-async function fetchDocs() {
-  try {
-    const res = await fetch(API_URL);
-    const data = await res.json();
-    docs = data.docs || data;
+      <div class="row mb-3">
+        <div class="col-12 col-md-6 mx-auto">
+          <label for="filterPermitType" class="form-label"
+            >Filtrer par type de permis</label
+          >
+          <div class="input-group">
+            <select id="filterPermitType" class="form-select">
+              <option value="">-- Tous les types --</option>
+            </select>
+            <button
+              id="clearPermitTypeBtn"
+              class="btn btn-outline-secondary d-none"
+              type="button"
+            >
+              Effacer
+            </button>
+          </div>
+        </div>
+      </div>
 
-    const unitSelect = document.getElementById('unitSelect');
-    unitSelect.innerHTML = '<option disabled selected>Choisir une unité</option>';
+      <div id="permitTypeTableBlock" class="mt-4"></div>
 
-    const unitMap = new Map(); // éviter les doublons réels
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Unité</label>
+          <select id="unitSelect" class="form-select">
+            <option disabled selected>Choisir une unité</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Type de permis</label>
+          <select id="permitSelect" class="form-select">
+            <option disabled selected>Choisir un permis</option>
+          </select>
+        </div>
+      </div>
 
-    docs.forEach(doc => {
-      if (doc.unit && !unitMap.has(doc.unit)) {
-        unitMap.set(doc.unit, true);
+      <div class="mt-4">
+        <div id="infoBlock" class="d-none">
+          <ul class="list-group">
+            <li class="list-group-item">
+              <strong>Unité :</strong> <span id="unitLabel"></span>
+            </li>
+            <li class="list-group-item">
+              <strong>Permis :</strong> <span id="permitLabel"></span>
+            </li>
+            <li class="list-group-item">
+              <strong>Expiration :</strong> <span id="expirationLabel"></span>
+            </li>
+          </ul>
+          <div
+            class="mt-3 d-flex flex-row flex-wrap justify-content-center gap-2 btn-group-wrap"
+          >
+            <a id="openPdf" href="#" target="_blank" class="btn btn-primary"
+              >🧾 Voir le PDF</a
+            >
+            <a id="downloadPdf" href="#" class="btn btn-success" download
+              >⬇️ Télécharger</a
+            >
+          </div>
+
+          <div class="mt-3 text-center">
+            <label for="emailInput" class="form-label"
+              >✉️ Envoyer le PDF avec pièce jointe à :</label
+            >
+            <div class="input-group mb-2">
+              <input
+                type="email"
+                id="emailInput"
+                class="form-control"
+                placeholder="adresse@email.com"
+              />
+              <button
+                id="sendViaScriptBtn"
+                class="btn btn-warning"
+                type="button"
+              >
+                📎 Envoyer
+              </button>
+            </div>
+            <small class="form-text text-muted d-block" id="pjStatus"></small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API_URL =
+        "https://script.google.com/macros/s/AKfycbya6pXCawlVp-uoqJWPPZmAtEzSjpRgIQyVrHCaAtVSxz-CtayB8TSTsKtBz6Hbm8jU/exec";
+      let docs = [];
+      let selectedDoc = null;
+
+      async function fetchDocs() {
+        try {
+          const res = await fetch(API_URL);
+          const data = await res.json();
+          docs = data.docs || data;
+
+          const unitSelect = document.getElementById("unitSelect");
+          unitSelect.innerHTML =
+            "<option disabled selected>Choisir une unité</option>";
+
+          const unitMap = new Map(); // éviter les doublons réels
+
+          docs.forEach((doc) => {
+            if (doc.unit && !unitMap.has(doc.unit)) {
+              unitMap.set(doc.unit, true);
+            }
+          });
+
+          const sortedUnits = Array.from(unitMap.keys()).sort((a, b) => {
+            const getChunks = (str) =>
+              str.match(/\D+|\d+/g).map((s) => (isNaN(s) ? s : parseInt(s)));
+            const ac = getChunks(a);
+            const bc = getChunks(b);
+            for (let i = 0; i < Math.max(ac.length, bc.length); i++) {
+              if (ac[i] === undefined) return -1;
+              if (bc[i] === undefined) return 1;
+              if (ac[i] < bc[i]) return -1;
+              if (ac[i] > bc[i]) return 1;
+            }
+            return 0;
+          });
+
+          sortedUnits.forEach((unit) => {
+            unitSelect.innerHTML += `<option value="${unit}">${unit}</option>`;
+          });
+        } catch (e) {
+          alert("Erreur de chargement des données : " + e.message);
+        }
       }
-    });
 
-    const sortedUnits = Array.from(unitMap.keys()).sort((a, b) => {
-      const getChunks = str => str.match(/\D+|\d+/g).map(s => isNaN(s) ? s : parseInt(s));
-      const ac = getChunks(a);
-      const bc = getChunks(b);
-      for (let i = 0; i < Math.max(ac.length, bc.length); i++) {
-        if (ac[i] === undefined) return -1;
-        if (bc[i] === undefined) return 1;
-        if (ac[i] < bc[i]) return -1;
-        if (ac[i] > bc[i]) return 1;
+      async function showUpcomingRenewals() {
+        const now = new Date();
+        const threeMonthsLater = new Date();
+        threeMonthsLater.setMonth(now.getMonth() + 3);
+
+        // 🟡 Charger les demandes actives depuis Firestore
+        const demandesSnapshot = await db
+          .collection("permisDemandes")
+          .where("demandeActive", "==", true)
+          .get();
+
+        // 🗂️ Créer une liste des combinaisons unit+permit déjà demandées
+        const demandesActives = new Set();
+        demandesSnapshot.forEach((doc) => {
+          const data = doc.data();
+          if (data.unit && data.permit) {
+            demandesActives.add(`${data.unit}__${data.permit}`);
+          }
+        });
+
+        // 🔴 Filtrer les permis à renouveler qui n'ont pas encore été demandés
+        const upcoming = docs
+          .filter((doc) => {
+            const exp = new Date(doc.expiration);
+            const key = `${doc.unit}__${doc.permit}`;
+            return (
+              exp >= now && exp <= threeMonthsLater && !demandesActives.has(key)
+            );
+          })
+          .sort((a, b) => new Date(a.expiration) - new Date(b.expiration));
+
+        if (upcoming.length > 0) {
+          const messages = upcoming.map(
+            (doc) => `${doc.unit} – ${doc.permit} (expire le ${doc.expiration})`
+          );
+          document.querySelector(".marquee-content").textContent =
+            messages.join("   •   ");
+          document.getElementById("renewalBanner").classList.remove("d-none");
+        }
       }
-      return 0;
-    });
 
-    sortedUnits.forEach(unit => {
-      unitSelect.innerHTML += `<option value="${unit}">${unit}</option>`;
-    });
-  } catch (e) {
-    alert("Erreur de chargement des données : " + e.message);
-  }
-}
+      function updateDisplay() {
+        const unit = document.getElementById("unitSelect").value;
+        const permit = document.getElementById("permitSelect").value;
+        const doc = docs.find((d) => d.unit === unit && d.permit === permit);
+        selectedDoc = doc;
 
+        if (doc) {
+          const driveLink = `https://drive.google.com/file/d/${doc.fileId}/preview`;
+          const downloadLink = `https://drive.google.com/uc?export=download&id=${doc.fileId}`;
 
-function showUpcomingRenewals() {
-  const now = new Date();
-  const threeMonthsLater = new Date();
-  threeMonthsLater.setMonth(now.getMonth() + 3);
+          document.getElementById("unitLabel").textContent = doc.unit;
+          document.getElementById("permitLabel").textContent = doc.permit;
+          document.getElementById("expirationLabel").textContent =
+            doc.expiration;
 
-  const upcoming = docs.filter(doc => {
-    const exp = new Date(doc.expiration);
-    return exp >= now && exp <= threeMonthsLater;
-  }).sort((a, b) => new Date(a.expiration) - new Date(b.expiration))
+          document.getElementById("openPdf").href = driveLink;
+          document.getElementById("downloadPdf").href = downloadLink;
 
-  if (upcoming.length > 0) {
-    const messages = upcoming.map(doc =>
-      `${doc.unit} – ${doc.permit} (expire le ${doc.expiration})`
-    );
-    document.querySelector(".marquee-content").textContent = messages.join("   •   ");
-    document.getElementById("renewalBanner").classList.remove("d-none");
-  }
-}
+          document.getElementById("infoBlock").classList.remove("d-none");
+        } else {
+          document.getElementById("infoBlock").classList.add("d-none");
+        }
+      }
 
-  function updateDisplay() {
-    const unit = document.getElementById("unitSelect").value;
-    const permit = document.getElementById("permitSelect").value;
-    const doc = docs.find(d => d.unit === unit && d.permit === permit);
-    selectedDoc = doc;
+      document.getElementById("unitSelect").addEventListener("change", () => {
+        const unit = document.getElementById("unitSelect").value;
+        const permitsForUnit = [
+          ...new Set(docs.filter((d) => d.unit === unit).map((d) => d.permit)),
+        ].sort((a, b) => {
+          const getChunks = (str) =>
+            str.match(/\D+|\d+/g).map((s) => (isNaN(s) ? s : parseInt(s)));
+          const aChunks = getChunks(a);
+          const bChunks = getChunks(b);
 
-    if (doc) {
-      const driveLink = `https://drive.google.com/file/d/${doc.fileId}/preview`;
-      const downloadLink = `https://drive.google.com/uc?export=download&id=${doc.fileId}`;
+          for (let i = 0; i < Math.max(aChunks.length, bChunks.length); i++) {
+            if (aChunks[i] === undefined) return -1;
+            if (bChunks[i] === undefined) return 1;
+            if (aChunks[i] < bChunks[i]) return -1;
+            if (aChunks[i] > bChunks[i]) return 1;
+          }
+          return 0;
+        });
 
-      document.getElementById("unitLabel").textContent = doc.unit;
-      document.getElementById("permitLabel").textContent = doc.permit;
-      document.getElementById("expirationLabel").textContent = doc.expiration;
+        const permitSelect = document.getElementById("permitSelect");
+        permitSelect.innerHTML = `<option disabled selected>Choisir un permis</option>`;
+        permitsForUnit.forEach((p) => {
+          permitSelect.innerHTML += `<option value="${p}">${p}</option>`;
+        });
 
-      document.getElementById("openPdf").href = driveLink;
-      document.getElementById("downloadPdf").href = downloadLink;
-
-      document.getElementById("infoBlock").classList.remove("d-none");
-    } else {
-      document.getElementById("infoBlock").classList.add("d-none");
-    }
-  }
-
-  document.getElementById("unitSelect").addEventListener("change", () => {
-    const unit = document.getElementById("unitSelect").value;
-  const permitsForUnit = [...new Set(docs.filter(d => d.unit === unit).map(d => d.permit))].sort((a, b) => {
-  const getChunks = str => str.match(/\D+|\d+/g).map(s => isNaN(s) ? s : parseInt(s));
-  const aChunks = getChunks(a);
-  const bChunks = getChunks(b);
-  
-  for (let i = 0; i < Math.max(aChunks.length, bChunks.length); i++) {
-    if (aChunks[i] === undefined) return -1;
-    if (bChunks[i] === undefined) return 1;
-    if (aChunks[i] < bChunks[i]) return -1;
-    if (aChunks[i] > bChunks[i]) return 1;
-  }
-  return 0;
-});
-
-    const permitSelect = document.getElementById("permitSelect");
-    permitSelect.innerHTML = `<option disabled selected>Choisir un permis</option>`;
-    permitsForUnit.forEach(p => {
-      permitSelect.innerHTML += `<option value="${p}">${p}</option>`;
-    });
-
-    document.getElementById("infoBlock").classList.add("d-none");
-  });
-
-  document.getElementById("permitSelect").addEventListener("change", updateDisplay);
-
-  document.getElementById("sendViaScriptBtn").addEventListener("click", async () => {
-    const emailInput = document.getElementById("emailInput");
-    const statusMsg = document.getElementById("pjStatus");
-    const btn = document.getElementById("sendViaScriptBtn");
-
-    const email = emailInput.value;
-    if (!email || !selectedDoc) {
-      alert("Veuillez choisir un document et entrer une adresse email.");
-      return;
-    }
-
-    btn.disabled = true;
-    statusMsg.textContent = "⏳ Envoi en cours...";
-
-    const params = new URLSearchParams({
-      email: email,
-      fileId: selectedDoc.fileId,
-      unit: selectedDoc.unit,
-      permit: selectedDoc.permit
-    });
-
-    try {
-      const res = await fetch(API_URL, {
-        method: "POST",
-        body: params
+        document.getElementById("infoBlock").classList.add("d-none");
       });
-      const text = await res.text();
 
-      if (text === "OK") {
-        statusMsg.textContent = "📧 Envoyé avec pièce jointe !";
-        emailInput.value = "";
-      } else {
-        statusMsg.textContent = "Erreur : " + text;
+      document
+        .getElementById("permitSelect")
+        .addEventListener("change", updateDisplay);
+
+      document
+        .getElementById("sendViaScriptBtn")
+        .addEventListener("click", async () => {
+          const emailInput = document.getElementById("emailInput");
+          const statusMsg = document.getElementById("pjStatus");
+          const btn = document.getElementById("sendViaScriptBtn");
+
+          const email = emailInput.value;
+          if (!email || !selectedDoc) {
+            alert("Veuillez choisir un document et entrer une adresse email.");
+            return;
+          }
+
+          btn.disabled = true;
+          statusMsg.textContent = "⏳ Envoi en cours...";
+
+          const params = new URLSearchParams({
+            email: email,
+            fileId: selectedDoc.fileId,
+            unit: selectedDoc.unit,
+            permit: selectedDoc.permit,
+          });
+
+          try {
+            const res = await fetch(API_URL, {
+              method: "POST",
+              body: params,
+            });
+            const text = await res.text();
+
+            if (text === "OK") {
+              statusMsg.textContent = "📧 Envoyé avec pièce jointe !";
+              emailInput.value = "";
+            } else {
+              statusMsg.textContent = "Erreur : " + text;
+            }
+          } catch (e) {
+            statusMsg.textContent = "❌ Erreur réseau : " + e.message;
+          }
+
+          btn.disabled = false;
+        });
+
+      function populatePermitTypeSelect() {
+        const permitTypeSelect = document.getElementById("filterPermitType");
+        permitTypeSelect.innerHTML =
+          '<option value="">-- Tous les types --</option>'; // reset d'abord!
+        const allTypes = [...new Set(docs.map((d) => d.permit))].sort();
+        allTypes.forEach((type) => {
+          permitTypeSelect.innerHTML += `<option value="${type}">${type}</option>`;
+        });
       }
-    } catch (e) {
-      statusMsg.textContent = "❌ Erreur réseau : " + e.message;
-    }
 
-    btn.disabled = false;
-  });
+      function renderPermitTypeTable(type) {
+        let filtered = docs;
+        if (type) {
+          filtered = docs.filter((d) => d.permit === type);
+          filtered.sort(
+            (a, b) => new Date(a.expiration) - new Date(b.expiration)
+          );
+          if (!filtered.length) {
+            document.getElementById("permitTypeTableBlock").innerHTML = "";
+            return;
+          }
+        } else {
+          document.getElementById("permitTypeTableBlock").innerHTML = "";
+          return;
+        }
 
+        let rows = filtered
+          .map((doc) => {
+            const rowId = `${doc.unit}_${doc.permit}`.replace(/\s+/g, "_");
+            return `
+      <tr>
+        <td>${doc.unit}</td>
+        <td>${doc.permit}</td>
+        <td>${doc.expiration}</td>
+        <td>
+          <a href="https://drive.google.com/file/d/${doc.fileId}/preview" target="_blank" class="btn btn-sm btn-primary">Voir</a>
+        </td>
+        <td class="text-center">
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input demande-checkbox" data-unit="${doc.unit}" data-permit="${doc.permit}" id="chk_${rowId}">
+            <div class="small text-muted demande-date mt-1" id="date_${rowId}"></div>
+          </div>
+        </td>
+      </tr>
+    `;
+          })
+          .join("");
 
-  function populatePermitTypeSelect() {
-  const permitTypeSelect = document.getElementById('filterPermitType');
-  permitTypeSelect.innerHTML = '<option value="">-- Tous les types --</option>'; // reset d'abord!
-  const allTypes = [...new Set(docs.map(d => d.permit))].sort();
-  allTypes.forEach(type => {
-    permitTypeSelect.innerHTML += `<option value="${type}">${type}</option>`;
-  });
-}
-
-function renderPermitTypeTable(type) {
-  let filtered = docs;
-  if (type) {
-    filtered = docs.filter(d => d.permit === type);
-    // Tri par date d'expiration croissante
-    filtered.sort((a, b) => new Date(a.expiration) - new Date(b.expiration));
-    if (!filtered.length) {
-      document.getElementById("permitTypeTableBlock").innerHTML = ""; // ne rien afficher
-      return;
-    }
-  } else {
-    // Si aucun type choisi, efface le tableau
-    document.getElementById("permitTypeTableBlock").innerHTML = "";
-    return;
-  }
-  let rows = filtered.map(doc => `
-    <tr>
-      <td>${doc.unit}</td>
-      <td>${doc.permit}</td>
-      <td>${doc.expiration}</td>
-      <td>
-        <a href="https://drive.google.com/file/d/${doc.fileId}/preview" target="_blank" class="btn btn-sm btn-primary">Voir</a>
-      </td>
-    </tr>
-  `).join('');
-  document.getElementById("permitTypeTableBlock").innerHTML = `
+        document.getElementById("permitTypeTableBlock").innerHTML = `
     <div class="table-responsive">
       <table class="table table-sm table-bordered align-middle mt-2">
         <thead>
@@ -336,6 +442,7 @@ function renderPermitTypeTable(type) {
             <th>Type de permis</th>
             <th>Expiration</th>
             <th>PDF</th>
+            <th>Demandé</th>
           </tr>
         </thead>
         <tbody>
@@ -344,77 +451,112 @@ function renderPermitTypeTable(type) {
       </table>
     </div>
   `;
-}
 
+        // 🔄 Synchronise les cases cochées avec Firestore
+        const checkboxes = document.querySelectorAll(".demande-checkbox");
 
-document.getElementById('filterPermitType').addEventListener('change', function() {
-  renderPermitTypeTable(this.value);
-});
+        checkboxes.forEach(async (checkbox) => {
+          const unit = checkbox.dataset.unit;
+          const permit = checkbox.dataset.permit;
+          const rowId = `${unit}_${permit}`.replace(/\s+/g, "_");
+          const dateDisplay = document.getElementById(`date_${rowId}`);
 
-const filterPermitType = document.getElementById('filterPermitType');
-const clearPermitTypeBtn = document.getElementById('clearPermitTypeBtn');
+          const snapshot = await db
+            .collection("permisDemandes")
+            .where("unit", "==", unit)
+            .where("permit", "==", permit)
+            .where("demandeActive", "==", true)
+            .orderBy("timestamp", "desc")
+            .limit(1)
+            .get();
 
-filterPermitType.addEventListener('change', function() {
-  renderPermitTypeTable(this.value);
+          // ✅ ⬇️ ICI tu colles le bloc :
+          if (!snapshot.empty) {
+            const data = snapshot.docs[0].data();
 
-  // Affiche ou cache le bouton "Effacer"
-  if (this.value) {
-    clearPermitTypeBtn.classList.remove('d-none');
-  } else {
-    clearPermitTypeBtn.classList.add('d-none');
-  }
-});
+            checkbox.checked = true;
 
-clearPermitTypeBtn.addEventListener('click', function() {
-  filterPermitType.value = "";
-  clearPermitTypeBtn.classList.add('d-none');
-  renderPermitTypeTable(""); // Vide le tableau
-});
+            if (data.timestamp?.toDate) {
+              const date = data.timestamp.toDate();
+              const formattedDate = date.toISOString().split("T")[0];
+              dateDisplay.textContent = `Demandé le ${formattedDate}`;
+            }
+          }
 
+          checkbox.addEventListener("change", async function () {
+            const currentDoc = docs.find(
+              (d) => d.unit === unit && d.permit === permit
+            );
 
-// Après avoir fetché les docs :
-(async () => {
-  await fetchDocs();
-  showUpcomingRenewals();
-  populatePermitTypeSelect();
-  renderPermitTypeTable(""); // affiche tout par défaut
-})();
+            if (this.checked) {
+              if (!currentDoc) return alert("Erreur : document non trouvé.");
 
-</script>
-  <script>
-  async function afficherAlertesPermis() {
-    const API_URL = "https://script.google.com/macros/s/AKfycbya6pXCawlVp-uoqJWPPZmAtEzSjpRgIQyVrHCaAtVSxz-CtayB8TSTsKtBz6Hbm8jU/exec";
-    try {
-      const res = await fetch(API_URL);
-      const data = await res.json();
-      const docs = data.docs || data;
+              const docRef = await db.collection("permisDemandes").add({
+                unit,
+                permit,
+                fileId: currentDoc.fileId, // ✅ fileId bien défini ici
+                demandeActive: true,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+              });
 
-      const now = new Date();
-      const dans3mois = new Date();
-      dans3mois.setMonth(now.getMonth() + 3);
+              // Optionnel : afficher la date dès maintenant
+              const now = new Date();
+              const formattedDate = now.toISOString().split("T")[0];
+              dateDisplay.textContent = `Demandé le ${formattedDate}`;
+            } else {
+              const docsToUpdate = await db
+                .collection("permisDemandes")
+                .where("unit", "==", unit)
+                .where("permit", "==", permit)
+                .where("demandeActive", "==", true)
+                .get();
 
-      const prochains = docs.filter(doc => {
-        const exp = new Date(doc.expiration);
-        return exp >= now && exp <= dans3mois;
-      }).sort((a, b) => new Date(a.expiration) - new Date(b.expiration))
+              docsToUpdate.forEach((docSnap) => {
+                docSnap.ref.update({ demandeActive: false });
+              });
 
-      if (prochains.length > 0) {
-        const messages = prochains.map(doc =>
-          `${doc.unit} – ${doc.permit} (expire le ${doc.expiration})`
-        );
-        document.querySelector(".marquee-content").textContent = messages.join("   •   ");
-        document.getElementById("renewalBanner").classList.remove("d-none");
+              // Efface la date visuellement
+              dateDisplay.textContent = "";
+            }
+          });
+        });
       }
-    } catch (e) {
-      console.warn("Impossible d’afficher les alertes de renouvellement :", e);
-    }
-  }
 
-  document.addEventListener("DOMContentLoaded", afficherAlertesPermis);
-</script>
+      const filterPermitType = document.getElementById("filterPermitType");
+      const clearPermitTypeBtn = document.getElementById("clearPermitTypeBtn");
 
-<div class="container text-center mt-5">
-  <a href="linktree.html" class="btn btn-dark px-4 py-2">⏮️ Retour au menu principal</a>
-</div>
-</body>
+      filterPermitType.addEventListener("change", function () {
+        renderPermitTypeTable(this.value);
+
+        // Affiche ou cache le bouton "Effacer"
+        if (this.value) {
+          clearPermitTypeBtn.classList.remove("d-none");
+        } else {
+          clearPermitTypeBtn.classList.add("d-none");
+        }
+      });
+
+      clearPermitTypeBtn.addEventListener("click", function () {
+        filterPermitType.value = "";
+        clearPermitTypeBtn.classList.add("d-none");
+        renderPermitTypeTable(""); // Vide le tableau
+      });
+
+      // Chargement initial
+      (async () => {
+        await fetchDocs();
+        showUpcomingRenewals();
+        populatePermitTypeSelect();
+
+        // Affiche les permis du type déjà sélectionné (si applicable)
+        const selectedType = document.getElementById("filterPermitType").value;
+        renderPermitTypeTable(selectedType);
+      })();
+    </script>
+    <div class="container text-center mt-5">
+      <a href="linktree.html" class="btn btn-dark px-4 py-2"
+        >⏮️ Retour au menu principal</a
+      >
+    </div>
+  </body>
 </html>

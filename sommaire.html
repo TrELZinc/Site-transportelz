@@ -674,33 +674,6 @@ const data = {
 }
 
       
-      // Événements
-      elements.dispoTable.addEventListener("focusin", (e) => {
-        if (e.target.tagName === "TD" && e.target.hasAttribute("contenteditable")) {
-          currentCell = e.target;
-          updateArrowPosition();
-          
-          // Assurer que la cellule est visible
-          currentCell.scrollIntoView({
-            behavior: "smooth",
-            block: "nearest",
-            inline: "center"
-          });
-        }
-      });
-      
-      document.addEventListener("scroll", updateArrowPosition);
-      
-      arrowBtn.addEventListener("click", moveToNextCell);
-      
-      document.addEventListener("click", (e) => {
-        if (!e.target.closest("td") && e.target !== arrowBtn) {
-          arrowBtn.style.display = "none";
-          currentCell = null;
-        }
-      });
-    }
-    
 let saveTimeout = null;
 const SAVE_DELAY = 1000; // 1 seconde après la dernière modification
 
@@ -732,17 +705,14 @@ document.addEventListener("input", (e) => {
   }
 });
 
-  
-    
-  function init() {
+function init() {
   elements.resetBtn.addEventListener("click", resetForm);
   elements.sendBtn.addEventListener("click", sendForm);
   elements.dateSelect.addEventListener("change", () => {
-  const selectedDate = elements.dateSelect.value;
-  if (!selectedDate) return;
-  window.loadFromFirebase(selectedDate);
-});
-
+    const selectedDate = elements.dateSelect.value;
+    if (!selectedDate) return;
+    window.loadFromFirebase(selectedDate);
+  });
 
   elements.tableBody.innerHTML = "";
 
@@ -795,29 +765,27 @@ document.addEventListener("input", (e) => {
         localStorage.setItem(STORAGE_KEYS.rows, JSON.stringify(data.rows || []));
 
         console.log("🟢 Données chargées depuis Firebase.");
-        } else {
-          console.log("📭 Aucune donnée trouvée dans Firebase. Réinitialisation ciblée.");
+      } else {
+        console.log("📭 Aucune donnée trouvée dans Firebase. Réinitialisation ciblée.");
           
-          elements.noteField.value = "";
-          const rows = document.querySelectorAll("#tableBody tr");
+        elements.noteField.value = "";
+        const rows = document.querySelectorAll("#tableBody tr");
 
-          rows.forEach((row, index) => {
-            const cells = row.querySelectorAll("td");
-            if (index >= rows.length - 2) return; // Protège les deux dernières lignes
-          
-            for (let i = 1; i < cells.length - 1; i++) {
-              cells[i].textContent = "";
-            }
-          });
+        rows.forEach((row, index) => {
+          const cells = row.querySelectorAll("td");
+          if (index >= rows.length - 2) return; // Protège les deux dernières lignes
+        
+          for (let i = 1; i < cells.length - 1; i++) {
+            cells[i].textContent = "";
+          }
+        });
 
-          generateGarageRows(3);
-        }
-
+        generateGarageRows(3);
+      }
     });
-    setupArrowNavigation();
 }
-    
-  // Démarrer l'application quand la page est chargée
+
+// Démarrer l'application quand la page est chargée
 document.addEventListener("DOMContentLoaded", init);
 
   </script>

@@ -569,6 +569,38 @@
     });
 };
 
+    let saveTimeout = null;
+const SAVE_DELAY = 1000; // 1 seconde après la dernière modification
+
+document.addEventListener("input", (e) => {
+  if (e.target.matches("td[contenteditable], #note")) {
+
+    // Majuscules pour les td
+    if (e.target.tagName === "TD") {
+      const selection = window.getSelection();
+      const range = selection.getRangeAt(0);
+      const cursorPos = range.startOffset;
+
+      const upper = e.target.textContent.toUpperCase();
+      e.target.textContent = upper;
+
+      if (e.target.firstChild) {
+        range.setStart(e.target.firstChild, Math.min(cursorPos, e.target.textContent.length));
+        range.setEnd(e.target.firstChild, Math.min(cursorPos, e.target.textContent.length));
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+    }
+
+    // Debounce pour sauvegarde automatique
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+      saveData(); // utilise ta fonction existante saveData()
+    }, SAVE_DELAY);
+  }
+});
+
+
   </script>
 </body>
 </html>

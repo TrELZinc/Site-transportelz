@@ -416,7 +416,6 @@ rows.forEach((row, index) => {
 
 <div class="buttons" style="margin-top: 16px;">
   <button class="reset-btn" id="resetBtn">Reset</button>
-  <button class="save-btn" id="saveBtn">Save</button>
   <button class="send-btn" id="sendBtn">Send</button>
 </div>
 
@@ -437,6 +436,7 @@ rows.forEach((row, index) => {
       "RED": { nom: "Rejean", tel: "4183254436" },
       "SIR": { nom: "Simon", tel: "4185760436" },
       "CEM": { nom: "Charles-Etienne", tel: "5819892459" },
+      "AC": { nom: "Alain", tel: "4182843106" },
     };
     const STORAGE_KEYS = {
       note: "dispo_note",
@@ -567,12 +567,11 @@ function generateGarageRows(n = 3) {
       });
     }
 
-
-
-function saveData() {
+function saveData(showAlert = true) {
   try {
     const note = elements.noteField.value;
     const date = elements.dateSelect.value;
+    if (!date) return; // On n'enregistre pas si pas de date
 
     const rows = Array.from(document.querySelectorAll("#dispoTable tbody tr")).map(tr => {
       const cells = Array.from(tr.querySelectorAll("td")).slice(0, 8);
@@ -611,14 +610,17 @@ function saveData() {
 
     if (window.saveToFirebase) {
       window.saveToFirebase(data, () => {
-        alert("✅ Données sauvegardées localement ET dans Firebase !");
+        if (showAlert) alert("✅ Données sauvegardées localement ET dans Firebase !");
       });
     }
-
   } catch (err) {
-    alert("Erreur lors de la sauvegarde : " + err.message);
+    if (showAlert) alert("Erreur lors de la sauvegarde : " + err.message);
+    console.error(err);
   }
 }
+
+
+
 
 
 function sendForm() {
@@ -752,30 +754,41 @@ const data = {
       });
     }
     
-    // Événement pour convertir le texte en majuscules pendant la saisie
-    document.addEventListener("input", (e) => {
-      if (e.target.matches("td[contenteditable]")) {
-        const selection = window.getSelection();
-        const range = selection.getRangeAt(0);
-        const cursorPos = range.startOffset;
-        
-        const upper = e.target.textContent.toUpperCase();
-        e.target.textContent = upper;
-        
-        // Remet le curseur à la bonne place
-        if (e.target.firstChild) {
-          range.setStart(e.target.firstChild, Math.min(cursorPos, e.target.textContent.length));
-          range.setEnd(e.target.firstChild, Math.min(cursorPos, e.target.textContent.length));
-          selection.removeAllRanges();
-          selection.addRange(range);
-        }
+let saveTimeout = null;
+const SAVE_DELAY = 1000; // 1 seconde après la dernière modification
+
+// Événement pour majuscules + sauvegarde automatique
+document.addEventListener("input", (e) => {
+  if (e.target.matches("td[contenteditable], #note")) {
+    // Mise en majuscules si td
+    if (e.target.tagName === "TD") {
+      const selection = window.getSelection();
+      const range = selection.getRangeAt(0);
+      const cursorPos = range.startOffset;
+      
+      const upper = e.target.textContent.toUpperCase();
+      e.target.textContent = upper;
+      
+      if (e.target.firstChild) {
+        range.setStart(e.target.firstChild, Math.min(cursorPos, e.target.textContent.length));
+        range.setEnd(e.target.firstChild, Math.min(cursorPos, e.target.textContent.length));
+        selection.removeAllRanges();
+        selection.addRange(range);
       }
-    });
+    }
+
+    // Debounce pour éviter de spammer Firebase
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+      saveData(false); // sauvegarde automatique après 1s
+    }, SAVE_DELAY);
+  }
+});
+
   
     
   function init() {
   elements.resetBtn.addEventListener("click", resetForm);
-  elements.saveBtn.addEventListener("click", saveData);
   elements.sendBtn.addEventListener("click", sendForm);
   elements.dateSelect.addEventListener("change", () => {
   const selectedDate = elements.dateSelect.value;

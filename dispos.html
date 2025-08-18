@@ -414,48 +414,53 @@
     }
 
 
-    function saveData() {
-      try {
-        const table = document.getElementById("dispoTable");
-        if (!table) throw new Error("Table introuvable");
+function saveData(isAuto = false) {
+  try {
+    const table = document.getElementById("dispoTable");
+    if (!table) throw new Error("Table introuvable");
 
-        const date = document.getElementById("dp_custom_981").value;
-        const note = document.getElementById("note").value;
+    const date = document.getElementById("dp_custom_981").value;
+    const note = document.getElementById("note").value;
 
-        const rows = Array.from(document.querySelectorAll("#dispoTable tbody tr")).map(tr => {
-          const cells = Array.from(tr.querySelectorAll("td")).slice(0, 6).map(td => td.textContent.trim());
-          return {
-            chauffeur: cells[0] || "",
-            us: cells[1] || "",
-            camion: cells[2] || "",
-            remorque: cells[3] || "",
-            depart: cells[4] || "",
-            note: cells[5] || ""
-          };
-        });
+    const rows = Array.from(document.querySelectorAll("#dispoTable tbody tr")).map(tr => {
+      const cells = Array.from(tr.querySelectorAll("td")).slice(0, 6).map(td => td.textContent.trim());
+      return {
+        chauffeur: cells[0] || "",
+        us: cells[1] || "",
+        camion: cells[2] || "",
+        remorque: cells[3] || "",
+        depart: cells[4] || "",
+        note: cells[5] || ""
+      };
+    });
 
-        const data = {
-          date,
-          note,
-          table: table.outerHTML,
-          rows,
-          timestamp: new Date().toISOString()
-        };
+    const data = {
+      date,
+      note,
+      table: table.outerHTML,
+      rows,
+      timestamp: new Date().toISOString()
+    };
 
-        // 🧠 Enregistrement local
-        localStorage.setItem("dispo_note", note);
-        localStorage.setItem("dispo_date", date);
-        localStorage.setItem("dispo_table", table.outerHTML);
+    // Enregistrement local
+    localStorage.setItem("dispo_note", note);
+    localStorage.setItem("dispo_date", date);
+    localStorage.setItem("dispo_table", table.outerHTML);
 
-        // ☁️ Enregistrement dans Firestore
-        saveToFirebase(data, () => {
-          alert("✅ Données sauvegardées localement et dans Firebase !");
-        });
-
-      } catch (err) {
-        alert("Erreur lors de la sauvegarde : " + err.message);
+    // Enregistrement Firebase
+    saveToFirebase(data, () => {
+      if (!isAuto) {
+        alert("✅ Données sauvegardées !");
       }
+    });
+
+  } catch (err) {
+    if (!isAuto) {
+      alert("Erreur lors de la sauvegarde : " + err.message);
     }
+  }
+}
+
 
     // Cell focus behavior
     document.addEventListener("focusin", function(e) {
@@ -595,7 +600,7 @@ document.addEventListener("input", (e) => {
     // Debounce pour sauvegarde automatique
     clearTimeout(saveTimeout);
     saveTimeout = setTimeout(() => {
-      saveData(); // utilise ta fonction existante saveData()
+      saveData(true); // utilise ta fonction existante saveData()
     }, SAVE_DELAY);
   }
 });

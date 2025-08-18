@@ -673,59 +673,6 @@ const data = {
   alert("Sommaire envoyé !");
 }
 
-
-    // Gestion de la navigation avec flèche
-    function setupArrowNavigation() {
-      const arrowBtn = document.createElement("button");
-      arrowBtn.textContent = "➡️";
-      arrowBtn.className = "arrow-next";
-      document.body.appendChild(arrowBtn);
-      
-      let currentCell = null;
-      
-      // Fonction pour mettre à jour la position du bouton flèche
-      function updateArrowPosition() {
-        if (!currentCell) return;
-        const rect = currentCell.getBoundingClientRect();
-        arrowBtn.style.top = `${window.scrollY + rect.top + 5}px`;
-        arrowBtn.style.left = `${window.scrollX + rect.right + 5}px`;
-        arrowBtn.style.display = "inline-block";
-      }
-      
-      // Déplacement vers la cellule suivante
-      function moveToNextCell() {
-        if (!currentCell) return;
-        const row = currentCell.closest("tr");
-        const cells = Array.from(row.querySelectorAll("td[contenteditable]"));
-        const idx = cells.indexOf(currentCell);
-        
-        let next = null;
-        
-        if (idx < cells.length - 1) {
-          next = cells[idx + 1];
-        } else {
-          const nextRow = row.nextElementSibling;
-          if (nextRow) {
-            const nextCells = Array.from(nextRow.querySelectorAll("td[contenteditable]"));
-            if (nextCells.length) next = nextCells[0];
-          }
-        }
-        
-        if (next) {
-          next.focus();
-          currentCell = next;
-          
-          // Attendre le rendu avant scroll
-          setTimeout(() => {
-            next.scrollIntoView({
-              behavior: "smooth",
-              block: "nearest",
-              inline: "center"
-            });
-            updateArrowPosition();
-          }, 50);
-        }
-      }
       
       // Événements
       elements.dispoTable.addEventListener("focusin", (e) => {

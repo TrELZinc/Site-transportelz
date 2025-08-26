@@ -183,9 +183,9 @@
       const hashEntre = await hacherTexte(motdepasse);
       if (hashEntre === utilisateur.hash) {
         if (rememberMe) {
-          localStorage.setItem("rememberTransportelz", "true");
-          localStorage.setItem("roleTransportelz", utilisateur.role);
-          localStorage.setItem("identifiantTransportelz", utilisateur.identifiant);
+            localStorage.setItem("rememberTransportelz", rememberMe ? "true" : "false");
+            localStorage.setItem("roleTransportelz", utilisateur.role);
+            localStorage.setItem("identifiantTransportelz", utilisateur.identifiant);
         }
         window.location.href = "/linktree.html";
       } else {

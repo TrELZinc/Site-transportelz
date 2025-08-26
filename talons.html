@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mes Talons de paie – Transport E.L.Z inc.</title>
+    <link rel="icon" type="image/png" href="assets/favicon.png" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Comfortaa", sans-serif;
+        background: #f6f6f6;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      header {
+        background-color: #111;
+        width: 100%;
+        padding: 20px 0;
+        text-align: center;
+      }
+      header img {
+        height: 50px;
+      }
+      main {
+        background: #fff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        max-width: 500px;
+        width: 90%;
+        margin: 40px auto;
+      }
+      select {
+        padding: 12px;
+        margin: 20px 0;
+        width: 100%;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+      }
+      button {
+        background-color: #000;
+        color: #fff;
+        padding: 12px;
+        width: 100%;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #333;
+      }
+      #message {
+        margin-top: 10px;
+        font-size: 14px;
+        min-height: 18px;
+      }
+      .footer-btn {
+        margin: 20px auto 0;
+        max-width: 500px;
+        width: 90%;
+      }
+      @media (max-width: 480px) {
+        main {
+          padding: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <img src="assets/logo.jpeg" alt="Logo Transportelz" />
+    </header>
+
+    <main>
+      <h2>Mes Talons de paie</h2>
+      <p>Sélectionnez la semaine du talon de paie :</p>
+
+      <select id="weekSelect" aria-label="Sélection de la semaine"></select>
+      <button id="voir">Voir</button>
+      <p id="message"></p>
+    </main>
+
+    <!-- Bouton retour -->
+    <div class="footer-btn">
+      <button id="retourMenu" style="background-color: #555">
+        Retour au menu principal
+      </button>
+    </div>
+
+    <!-- Firebase (compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
+    <script>
+      // --- Session (identifiant chauffeur) ---
+      const identifiant = localStorage.getItem("identifiantTransportelz");
+      if (!identifiant) {
+        alert("Vous devez vous connecter.");
+        window.location.href = "/index.html";
+      }
+
+      // --- Config Firebase ---
+      const firebaseConfig = {
+        apiKey: "AIzaSyAxbpNoGfMEK5N6sy3WYWMTD3WGelff0QA",
+        authDomain: "transportelz.firebaseapp.com",
+        projectId: "transportelz",
+        storageBucket: "transportelz.firebasestorage.app",
+        messagingSenderId: "290260714729",
+        appId: "1:290260714729:web:a433a445eb44fe5404dc78",
+      };
+      firebase.initializeApp(firebaseConfig);
+      const storage = firebase.storage();
+
+      const weekSelect = document.getElementById("weekSelect");
+      const messageEl = document.getElementById("message");
+
+      // --- Construire la liste des semaines & présélectionner la semaine courante
+      (function buildWeeks() {
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const onejan = new Date(currentYear, 0, 1);
+        const numberOfDays = Math.floor((now - onejan) / (24 * 60 * 60 * 1000));
+        const currentWeek = Math.ceil((now.getDay() + 1 + numberOfDays) / 7);
+
+        for (let i = 1; i <= 52; i++) {
+          const option = document.createElement("option");
+          option.value = `${currentYear}-W${String(i).padStart(2, "0")}`;
+          option.textContent = `Semaine ${i}, ${currentYear}`;
+          if (i === currentWeek) {
+            option.style.backgroundColor = "lightgreen";
+            option.style.fontWeight = "bold";
+          }
+          weekSelect.appendChild(option);
+        }
+        weekSelect.value = `${currentYear}-W${String(currentWeek).padStart(
+          2,
+          "0"
+        )}`;
+      })();
+
+      // --- Helpers
+      const BUCKET_GS = "gs://transportelz.firebasestorage.app";
+      function gsPathFor(week) {
+        return `${BUCKET_GS}/talons/${identifiant}/${week}.pdf`;
+      }
+      async function getUrl(week) {
+        const ref = storage.refFromURL(gsPathFor(week));
+        return ref.getDownloadURL();
+      }
+      function showError(msg) {
+        messageEl.style.color = "crimson";
+        messageEl.textContent = msg || "Erreur.";
+      }
+      function showInfo(msg) {
+        messageEl.style.color = "#0a7d00";
+        messageEl.textContent = msg || "";
+      }
+
+      // --- Bouton Voir
+      document.getElementById("voir").addEventListener("click", async () => {
+        const week = weekSelect.value;
+        if (!week) {
+          showError("Veuillez choisir une semaine.");
+          return;
+        }
+        messageEl.textContent = "Chargement…";
+        try {
+          const url = await getUrl(week);
+          window.open(url, "_blank"); // ouvre le PDF dans un nouvel onglet
+          showInfo("");
+        } catch (e) {
+          console.error(e);
+          showError("Talon introuvable pour cette semaine.");
+        }
+      });
+
+      // --- Bouton Retour
+      document.getElementById("retourMenu").addEventListener("click", () => {
+        window.location.href = "linktree.html";
+      });
+    </script>
+  </body>
+</html>

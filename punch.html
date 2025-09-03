@@ -369,50 +369,65 @@
 
       /* ------------------- Sommaire depuis Google Sheet ------------------- */
       // ⚠️ Mets ici l’URL de TON web app Apps Script (celui qui écrit dans le Sheet) :
-      const SUMMARY_URL =
-        "https://script.google.com/macros/s/AKfycbwAHBFhiWNt8kvJnoPDE9cnOAK0QwxnojkkYP6qch9GBcfFmWmsIm3qJTEsRq7Y0B0Mzw/exec";
+// ✅ Mets TON URL déployée
+const SUMMARY_URL = "https://script.google.com/macros/s/AKfycbwAHBFhiWNt8kvJnoPDE9cnOAK0QwxnojkkYP6qch9GBcfFmWmsIm3qJTEsRq7Y0B0Mzw/exec";
 
-      // Appel: SUMMARY_URL?mode=summary&name=Nom%20Employe&days=7
-      // Callback JSONP appelé par Apps Script
-      function handleSummary(json) {
-        const sumTableBody = document.querySelector("#sumTable tbody");
-        const sumTotalEl = document.getElementById("sumTotal");
-        const rangeLabel = document.getElementById("rangeLabel");
+// Rend le tableau
+function renderSummary(json) {
+  sumTableBody.innerHTML = "";
+  let total = 0;
 
-        rangeLabel.textContent = "(7 derniers jours)";
-        sumTableBody.innerHTML = "";
-        let total = 0;
+  (json.rows || []).forEach((r) => {
+    const dateStr = r.dateKey.split("-").reverse().join("/"); // DD/MM/YYYY
+    const inStr = r.in || "—";
+    const outStr = r.out || "—";
+    const dur = (r.workedMinutes != null) ? minsToHHMM(r.workedMinutes) : "—";
+    total += r.workedMinutes || 0;
 
-        (json.rows || []).forEach((r) => {
-          const dateStr = r.dateKey.split("-").reverse().join("/");
-          const inStr = r.in || "—";
-          const outStr = r.out || "—";
-          const dur =
-            r.workedHHMM ||
-            (r.workedMinutes != null ? minsToHHMM(r.workedMinutes) : "—");
-          total += r.workedMinutes || 0;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${dateStr}</td><td>${inStr}</td><td>${outStr}</td><td>${dur}</td>`;
+    sumTableBody.appendChild(tr);
+  });
 
-          const tr = document.createElement("tr");
-          tr.innerHTML = `<td>${dateStr}</td><td>${inStr}</td><td>${outStr}</td><td>${dur}</td>`;
-          sumTableBody.appendChild(tr);
-        });
+  sumTotalEl.textContent = minsToHHMM(total);
+}
 
-        sumTotalEl.textContent = minsToHHMM(total);
-      }
+// JSONP fallback (pour Safari iOS)
+function jsonp(url) {
+  return new Promise((resolve, reject) => {
+    const cb = "cb_" + Math.random().toString(36).slice(2);
+    window[cb] = (data) => {
+      try { renderSummary(data); resolve(); }
+      finally { delete window[cb]; script.remove(); }
+    };
+    const script = document.createElement("script");
+    script.src = url + (url.includes("?") ? "&" : "?") + "callback=" + cb;
+    script.onerror = () => { delete window[cb]; script.remove(); reject(new Error("JSONP failed")); };
+    document.body.appendChild(script);
+  });
+}
 
-      // Charge le sommaire via JSONP (évite CORS)
-      function refreshSummaryFromSheet(employee) {
-        // supprime un éventuel script JSONP précédent
-        const old = document.getElementById("jsonpSummary");
-        if (old) old.remove();
+// Charge le sommaire (7 jours) avec fetch -> fallback JSONP
+async function refreshSummaryFromSheet(employee) {
+  rangeLabel.textContent = "(7 derniers jours)";
+  const base = `${SUMMARY_URL}?mode=summary&name=${encodeURIComponent(employee)}&days=7`;
+  try {
+    const res = await fetch(base, { cache: "no-store", mode: "cors", credentials: "omit" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const json = await res.json();
+    renderSummary(json);
+  } catch (err) {
+    console.warn("fetch échoué, passage en JSONP:", err);
+    try {
+      await jsonp(base);
+    } catch (e) {
+      console.error("JSONP échoué:", e);
+      sumTableBody.innerHTML = `<tr><td colspan="4">Impossible de charger le sommaire.</td></tr>`;
+      sumTotalEl.textContent = "00:00";
+    }
+  }
+}
 
-        const s = document.createElement("script");
-        s.id = "jsonpSummary";
-        s.src = `${SUMMARY_URL}?mode=summary&name=${encodeURIComponent(
-          employee
-        )}&days=7&callback=handleSummary`;
-        document.body.appendChild(s);
-      }
 
       /* ------------------- UI état du jour ------------------- */
       let punchInTime = null,

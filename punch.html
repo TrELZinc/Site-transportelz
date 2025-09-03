@@ -1,483 +1,580 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Punch Journalier</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #0f172a;
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      padding: 20px;
-    }
-
-    .container {
-      background-color: #1e293b;
-      padding: 25px;
-      border-radius: 15px;
-      max-width: 400px;
-      width: 100%;
-      text-align: center;
-      box-shadow: 0 0 15px rgba(0,0,0,0.4);
-    }
-
-    h1 {
-      color: #38bdf8;
-      margin-bottom: 10px;
-    }
-
-    #date {
-      margin-bottom: 20px;
-      font-size: 1.1em;
-    }
-
-    button {
-      padding: 12px 25px;
-      margin: 10px;
-      border: none;
-      border-radius: 8px;
-      font-size: 1em;
-      color: #fff;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-
-    #punchInBtn {
-      background-color: #22c55e;
-    }
-
-    #punchInBtn:hover {
-      background-color: #15803d;
-    }
-
-    #punchOutBtn {
-      background-color: #ef4444;
-    }
-
-    #punchOutBtn:hover {
-      background-color: #b91c1c;
-    }
-
-    .result p {
-      margin: 10px 0;
-      font-size: 1rem;
-      line-height: 1.5;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: nowrap;
-    }
-
-    .result p span.label {
-      min-width: 150px;
-      max-width: 150px;
-      color: #94a3b8;
-      font-weight: 500;
-      display: inline-block;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      overflow: hidden;
-    }
-
-    .result p span.value {
-      color: #f8fafc;
-      font-weight: 600;
-      flex: 1;
-      text-align: right;
-    }
-
-    .result p#liveTimer {
-      color: #facc15;
-      font-weight: 700;
-      font-size: 1.1rem;
-      border-top: 1px dashed #334155;
-      padding-top: 10px;
-      margin-top: 15px;
-    }
-
-    #status {
-      margin-top: 15px;
-      font-size: 1.05rem;
-    }
-
-  </style>
-
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyD4U85mokKXsAP1AdwClWtcbt8udZrwlAw",
-      authDomain: "sommaireelz.firebaseapp.com",
-      projectId: "sommaireelz",
-      storageBucket: "sommaireelz.firebasestorage.app",
-      messagingSenderId: "171788284751",
-      appId: "1:171788284751:web:694f070d1cafe8b7c04b3a"
-    };
-  
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-  </script>
-
-</head>
-<body>
-  <div class="container">
-    <h1>Punch de Travail</h1>
-    <label for="employeeName" style="display:block; margin-bottom:10px; font-weight:600;">Employé :</label>
-      <select id="employeeName" style="
-        padding: 10px 15px;
-        border-radius: 8px;
-        border: 1px solid #334155;
-        background-color: #0f172a;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Punch Journalier + Sommaire</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: "Segoe UI", sans-serif;
+        background: #0f172a;
+        color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
+      .container {
+        background: #1e293b;
+        padding: 24px;
+        border-radius: 16px;
+        max-width: 780px;
+        width: 100%;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+      }
+      h1 {
+        color: #38bdf8;
+        margin: 0 0 8px;
+      }
+      #date {
+        margin-bottom: 8px;
+        font-size: 1.05rem;
+        color: #cbd5e1;
+      }
+      #clock {
+        margin-bottom: 16px;
+        color: #94a3b8;
+      }
+      select,
+      button {
+        border: none;
+        border-radius: 10px;
+      }
+      select {
+        padding: 12px 40px 12px 12px;
+        background: #0f172a;
         color: #f1f5f9;
         width: 100%;
-        margin-bottom: 20px;
-        font-size: 1em;
         font-weight: 600;
-        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+        border: 1px solid #334155;
         appearance: none;
-        background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22 viewBox=%220 0 20 20%22><polygon fill=%22%23f1f5f9%22 points=%225,7 10,12 15,7%22/></svg>');
+        background-image: url("data:image/svg+xml;charset=US-ASCII,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22 viewBox=%220 0 20 20%22><polygon fill=%22%23f1f5f9%22 points=%225,7 10,12 15,7%22/></svg>");
         background-repeat: no-repeat;
         background-position: right 10px center;
         background-size: 12px;
-        text-align: center;           /* ← centrage horizontal du texte */
-        text-align-last: center;      /* ← compatibilité pour certains navigateurs */
-      ">
-        <option value="Sacha-Pierre Tournier" selected>Sacha-Pierre Tournier</option>
+        text-align: center;
+        text-align-last: center;
+      }
+      .actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin: 16px 0;
+      }
+      .btn {
+        padding: 12px 18px;
+        font-weight: 700;
+        color: #fff;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .btn-in {
+        background: #22c55e;
+      }
+      .btn-in:hover {
+        background: #15803d;
+      }
+      .btn-out {
+        background: #ef4444;
+      }
+      .btn-out:hover {
+        background: #b91c1c;
+      }
+      .result {
+        background: #0b1220;
+        border: 1px solid #334155;
+        border-radius: 12px;
+        padding: 14px;
+      }
+      .rowline {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+        margin: 6px 0;
+      }
+      .label {
+        min-width: 180px;
+        color: #94a3b8;
+        font-weight: 500;
+      }
+      .value {
+        font-weight: 700;
+      }
+      #liveTimer {
+        color: #facc15;
+        font-weight: 800;
+        margin-top: 10px;
+        border-top: 1px dashed #334155;
+        padding-top: 10px;
+      }
+      .summary {
+        margin-top: 20px;
+        background: #0b1220;
+        border: 1px solid #334155;
+        border-radius: 12px;
+      }
+      .summary-head {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 14px;
+        border-bottom: 1px solid #334155;
+      }
+      .sum-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .sum-table thead th {
+        color: #cbd5e1;
+        font-weight: 700;
+        text-align: left;
+        font-size: 0.92rem;
+        padding: 12px;
+        border-bottom: 1px solid #334155;
+      }
+      .sum-table tbody td {
+        padding: 10px 12px;
+        border-bottom: 1px solid #1f2937;
+        font-size: 0.95rem;
+      }
+      .sum-table tbody tr:hover {
+        background: #0f1a2f;
+      }
+      .totalbar {
+        display: flex;
+        justify-content: flex-end;
+        gap: 14px;
+        padding: 12px 14px;
+      }
+      .totalbar .tot {
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        padding: 8px 12px;
+      }
+      .muted {
+        color: #94a3b8;
+      }
+      @media (max-width: 640px) {
+        .label {
+          min-width: 140px;
+        }
+      }
+      /* Centrer le titre et le sélecteur Employé */
+      .container h1 {
+        text-align: center;
+      }
+
+      label[for="employeeName"] {
+        display: block;
+        text-align: center;
+      }
+      /* Centrer la date et l'heure */
+      #date,
+      #clock {
+        text-align: center;
+      }
+
+      /* Grossir un peu la zone Employé */
+      label[for="employeeName"] {
+        font-size: 1.08rem; /* + léger */
+        font-weight: 700;
+      }
+
+      #employeeName {
+        font-size: 1.05rem; /* texte du select un peu plus gros */
+        padding: 14px 40px; /* garde le look aéré */
+        display: block;
+        max-width: 600px;
+        margin: 0 auto 16px; /* reste centré */
+      }
+    </style>
+
+    <!-- Firebase (punch temps réel inchangé) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyD4U85mokKXsAP1AdwClWtcbt8udZrwlAw",
+        authDomain: "sommaireelz.firebaseapp.com",
+        projectId: "sommaireelz",
+        storageBucket: "sommaireelz.firebasestorage.app",
+        messagingSenderId: "171788284751",
+        appId: "1:171788284751:web:694f070d1cafe8b7c04b3a",
+      };
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Punch de Travail</h1>
+
+      <label
+        for="employeeName"
+        style="display: block; margin: 10px 0 8px; font-weight: 700"
+        >Employé :</label
+      >
+      <select id="employeeName">
+        <option value="Sacha-Pierre Tournier" selected>
+          Sacha-Pierre Tournier
+        </option>
         <option value="Mathieu Denis">Mathieu Denis</option>
         <option value="Ann Déry">Ann Déry</option>
       </select>
-    <div id="date">Date: --/--/----</div>
-    <div id="clock">Heure: --:--:--</div>
-    <button id="punchInBtn">🟢 Punch In</button>
-    <button id="punchOutBtn">🔴 Punch Out</button>
 
-    <div class="result">
-      <p id="inLine"><span class="label">🕓 Heure d'entrée:</span> <span class="value" id="inTime"></span></p>
-      <p id="outLine"><span class="label">🏁 Heure de sortie:</span> <span class="value" id="outTime"></span></p>
-      <p id="workLine"><span class="label">⏱ Temps travaillé:</span> <span class="value" id="workedTime"></span></p>
-      <p id="liveTimer">⏳ En cours: 00:00:00</p>
+      <div id="date">Date: --/--/----</div>
+      <div id="clock">Heure: --:--:--</div>
+
+      <div class="actions">
+        <button id="punchInBtn" class="btn btn-in">🟢 Punch In</button>
+        <button id="punchOutBtn" class="btn btn-out">🔴 Punch Out</button>
+      </div>
+
+      <div class="result">
+        <div class="rowline">
+          <span class="label">🕓 Heure d'entrée</span
+          ><span class="value" id="inTime"></span>
+        </div>
+        <div class="rowline">
+          <span class="label">🏁 Heure de sortie</span
+          ><span class="value" id="outTime"></span>
+        </div>
+        <div class="rowline">
+          <span class="label">⏱ Temps travaillé</span
+          ><span class="value" id="workedTime"></span>
+        </div>
+        <div id="liveTimer">⏳ En cours: 00:00:00</div>
+      </div>
+
+      <!-- SOMMAIRE (7 jours fixes, basé sur Google Sheet) -->
+      <div class="summary" id="summary">
+        <div class="summary-head">
+          <div>
+            <strong>📊 Sommaire des heures</strong>
+            <span class="muted" id="rangeLabel">(7 derniers jours)</span>
+          </div>
+        </div>
+        <div style="overflow: auto">
+          <table class="sum-table" id="sumTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Entrée</th>
+                <th>Sortie</th>
+                <th>Durée</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="totalbar">
+          <div class="tot">Total: <strong id="sumTotal">00:00</strong></div>
+        </div>
+      </div>
     </div>
-  </div>
-<script>
-const dateEl = document.getElementById('date');
-const inTimeEl = document.getElementById('inTime');
-const outTimeEl = document.getElementById('outTime');
-const workedTimeEl = document.getElementById('workedTime');
-const liveTimerEl = document.getElementById('liveTimer');
-const employeeSelect = document.getElementById('employeeName');
 
-let punchInTime = null;
-let punchOutTime = null;
-let geoData = {};
-let liveInterval = null;
+    <script>
+      /* ------------------- DOM refs ------------------- */
+      const dateEl = document.getElementById("date");
+      const inTimeEl = document.getElementById("inTime");
+      const outTimeEl = document.getElementById("outTime");
+      const workedTimeEl = document.getElementById("workedTime");
+      const liveTimerEl = document.getElementById("liveTimer");
+      const employeeSelect = document.getElementById("employeeName");
+      const sumTableBody = document.querySelector("#sumTable tbody");
+      const sumTotalEl = document.getElementById("sumTotal");
+      const rangeLabel = document.getElementById("rangeLabel");
 
-// Display date and time
-const today = new Date();
-dateEl.textContent = `Date: ${today.toLocaleDateString('fr-FR')}`;
-const clockEl = document.getElementById('clock');
-function updateClock() {
-  const now = new Date();
-  clockEl.textContent = `Heure: ${now.toLocaleTimeString('fr-FR')}`;
-}
-updateClock();
-setInterval(updateClock, 1000);
-
-// --- Storage Helpers ---
-function getAllPunchData() {
-  return JSON.parse(localStorage.getItem('punchMap') || '{}');
-}
-
-function getDateKey(date = new Date()) {
-  return date.toISOString().slice(0, 10); // ex: '2025-06-09'
-}
-
-async function savePunchData(employee, punchInTime, geoData) {
-  const dateKey = getDateKey(punchInTime);
-  const deviceId = getDeviceId();
-
-  await db.collection("punches")
-          .doc(employee)
-          .collection("entries")
-          .doc(dateKey)
-          .set({
-            punchInTime: punchInTime.toISOString(),
-            geoData,
-            deviceId
-          });
-}
-
-async function loadPunchData(employee) {
-  const dateKey = getDateKey();
-  const docSnap = await db.collection("punches")
-                          .doc(employee)
-                          .collection("entries")
-                          .doc(dateKey)
-                          .get();
-  return docSnap.exists ? docSnap.data() : null;
-}
-
-async function clearPunchData(employee) {
-  const dateKey = getDateKey();
-  await db.collection("punches")
-          .doc(employee)
-          .collection("entries")
-          .doc(dateKey)
-          .delete();
-}
-
-
-// --- Live Timer ---
-function startLiveTimer() {
-  clearInterval(liveInterval);
-  liveInterval = setInterval(() => {
-    const now = new Date();
-    const diff = now - punchInTime;
-    const seconds = Math.floor(diff / 1000) % 60;
-    const minutes = Math.floor(diff / (1000 * 60)) % 60;
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    liveTimerEl.textContent = `⏳ En cours: ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-  }, 1000);
-}
-
-function stopLiveTimer() {
-  clearInterval(liveInterval);
-  liveTimerEl.textContent = "⏳ En cours: 00:00:00";
-}
-
-async function updateUIForEmployee(employee) {
-  const data = await loadPunchData(employee);
-  if (data && data.punchInTime) {
-    punchInTime = new Date(data.punchInTime);
-    geoData = data.geoData || {};
-    inTimeEl.textContent = punchInTime.toLocaleTimeString('fr-FR');
-    outTimeEl.textContent = "";
-    workedTimeEl.textContent = "";
-    startLiveTimer();
-  } else {
-    punchInTime = null;
-    inTimeEl.textContent = "";
-    outTimeEl.textContent = "";
-    workedTimeEl.textContent = "";
-    stopLiveTimer();
-  }
-}
-
-updateUIForEmployee(employeeSelect.value);
-employeeSelect.addEventListener('change', () => {
-  updateUIForEmployee(employeeSelect.value);
-});
-
-
-// --- Géoloc ---
-if ('geolocation' in navigator) {
-  navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      geoData.lat = pos.coords.latitude;
-      geoData.lng = pos.coords.longitude;
-      geoData.inZone = checkIfInZone(geoData.lat, geoData.lng);
-      console.log("Position:", geoData);
-      document.getElementById('punchInBtn').disabled = false;
-    },
-    (err) => {
-      console.error("Erreur géoloc:", err.message);
-      geoData.error = err.message;
-      document.getElementById('punchInBtn').disabled = false;
-    }
-  );
-}
-
-// --- Punch IN ---
-document.getElementById('punchInBtn').addEventListener('click', async () => {
-  const employee = employeeSelect.value;
-  const existing = await loadPunchData(employee); // ✅ await ici
-
-  if (existing && existing.punchInTime) {
-    const confirmOverwrite = confirm(`Punch In déjà enregistré pour ${employee}. Écraser ?`);
-    if (!confirmOverwrite) return;
-  }
-
-  punchInTime = new Date();
-  punchOutTime = null;
-  inTimeEl.textContent = punchInTime.toLocaleTimeString('fr-FR');
-  outTimeEl.textContent = "";
-  workedTimeEl.textContent = "";
-
-  await savePunchData(employee, punchInTime, geoData); // ❗ Bonne pratique
-  startLiveTimer();
-
-  const urlIn = `https://script.google.com/macros/s/AKfycbxyOhuMfTkCAl9ljWXxVUnm0fQOa-veQo58PAnvBcIJ-LGOnsUto7LQOln_3fc6CMvg6g/exec?status=in&lat=${geoData.lat}&lng=${geoData.lng}&name=${encodeURIComponent(employee)}`;
-  fetch(urlIn)
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        console.log("✅ Punch IN envoyé");
-      } else {
-        console.error("❌ Erreur Punch IN", data.error);
+      /* ------------------- Horloge ------------------- */
+      dateEl.textContent = `Date: ${new Date().toLocaleDateString("fr-FR")}`;
+      const clockEl = document.getElementById("clock");
+      function updateClock() {
+        clockEl.textContent = `Heure: ${new Date().toLocaleTimeString(
+          "fr-FR"
+        )}`;
       }
-    });
-});
+      updateClock();
+      setInterval(updateClock, 1000);
 
-
-// --- Punch OUT ---
-document.getElementById('punchOutBtn').addEventListener('click', async () => {
-  const employee = employeeSelect.value;
-  const data = await loadPunchData(employee);  // ← ATTENTION : ajout du await
-
-  if (!data || !data.punchInTime) {
-    alert("❌ Aucun Punch In trouvé. Tu dois Punch In d'abord !");
-    return;
-  }
-
-  punchOutTime = new Date();
-  const inTime = new Date(data.punchInTime);
-  const msWorked = punchOutTime - inTime;
-  const totalMins = Math.floor(msWorked / 60000);
-  const hours = Math.floor(totalMins / 60);
-  const mins = totalMins % 60;
-
-  inTimeEl.textContent = inTime.toLocaleTimeString('fr-FR');
-  outTimeEl.textContent = punchOutTime.toLocaleTimeString('fr-FR');
-  workedTimeEl.textContent = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
-  stopLiveTimer();
-  clearPunchData(employee);
-  punchInTime = null;
-
-  const urlOut = `https://script.google.com/macros/s/AKfycbxyOhuMfTkCAl9ljWXxVUnm0fQOa-veQo58PAnvBcIJ-LGOnsUto7LQOln_3fc6CMvg6g/exec?status=out&lat=${geoData.lat}&lng=${geoData.lng}&name=${encodeURIComponent(employee)}`;
-  fetch(urlOut)
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        console.log("✅ Punch OUT envoyé");
-      } else {
-        console.error("❌ Erreur Punch OUT", data.error);
+      /* ------------------- Helpers ------------------- */
+      function getDateKey(d = new Date()) {
+        return d.toISOString().slice(0, 10);
       }
-    });
-});
+      function pad2(n) {
+        return String(n).padStart(2, "0");
+      }
+      function minsToHHMM(mins) {
+        const h = Math.floor(mins / 60),
+          m = mins % 60;
+        return `${pad2(h)}:${pad2(m)}`;
+      }
 
-// --- Zone Check ---
-const GEO_CENTER = { lat: 46.78572, lng: -71.81464 };
-const ALLOWED_RADIUS = 100;
-
-function getDistanceInMeters(lat1, lng1, lat2, lng2) {
-  const R = 6371000;
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLng = (lng2 - lng1) * Math.PI / 180;
-  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-}
-
-function checkIfInZone(currentLat, currentLng) {
-  const distance = getDistanceInMeters(currentLat, currentLng, GEO_CENTER.lat, GEO_CENTER.lng);
-  return distance <= ALLOWED_RADIUS;
-}
-
-// --- Alerte Punch Out oublié (hier) ---
-window.addEventListener('DOMContentLoaded', () => {
-  const allPunches = getAllPunchData();
-  const today = new Date();
-  const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);
-
-  for (const [employee, data] of Object.entries(allPunches)) {
-    const punchDate = new Date(data.punchInTime);
-    const isYesterday =
-      punchDate.getDate() === yesterday.getDate() &&
-      punchDate.getMonth() === yesterday.getMonth() &&
-      punchDate.getFullYear() === yesterday.getFullYear();
-
-    if (isYesterday) {
-      const div = document.createElement('div');
-      div.style.background = '#334155';
-      div.style.padding = '20px';
-      div.style.marginTop = '20px';
-      div.style.borderRadius = '10px';
-      div.innerHTML = `
-        <h3 style="color: #facc15">⚠️ Punch oubli\u00e9 pour ${employee} (hier)</h3>
-        <label for="missedOutTime_${employee}">Saisir l'heure de sortie (format HH:mm) :</label><br>
-        <input type="time" id="missedOutTime_${employee}" style="padding:10px; border-radius:8px; margin:10px 0; font-size:1rem"/><br>
-        <button onclick="handleMissedPunchOut('${employee}', '${data.punchInTime}')" style="background:#facc15; color:#000; padding:10px 15px; border:none; border-radius:6px; cursor:pointer; font-weight:bold">✅ Enregistrer l'heure de sortie</button>
-      `;
-      document.querySelector('.container').appendChild(div);
-    }
-  }
-});
-
-  async function manualPunch(employee, isoTimeStr, geoData = {}, deviceId = 'manual') {
-  const dateKey = isoTimeStr.slice(0, 10);
-  await db.collection("punches")
+      /* ------------------- Firestore (punch temps réel) ------------------- */
+      async function savePunchIn(employee, atDate = new Date()) {
+        const dateKey = getDateKey(atDate),
+          deviceId = getDeviceId();
+        await db
+          .collection("punches")
           .doc(employee)
           .collection("entries")
           .doc(dateKey)
-          .set({
-            punchInTime: isoTimeStr,
-            geoData,
-            deviceId
-          });
-}
+          .set(
+            {
+              status: "in",
+              punchInTime: atDate.toISOString(),
+              geoDataIn: geoData || {},
+              deviceId,
+            },
+            { merge: true }
+          );
+      }
+      async function savePunchOut(employee, inISO, outDate = new Date()) {
+        const dateKey = getDateKey(new Date(inISO));
+        const inDate = new Date(inISO);
+        const workedMinutes = Math.max(
+          0,
+          Math.floor((outDate - inDate) / 60000)
+        );
+        await db
+          .collection("punches")
+          .doc(employee)
+          .collection("entries")
+          .doc(dateKey)
+          .set(
+            {
+              status: "done",
+              punchOutTime: outDate.toISOString(),
+              workedMinutes,
+              workedHHMM: minsToHHMM(workedMinutes),
+              geoDataOut: geoData || {},
+            },
+            { merge: true }
+          );
+      }
+      async function loadTodayEntry(employee) {
+        const doc = await db
+          .collection("punches")
+          .doc(employee)
+          .collection("entries")
+          .doc(getDateKey())
+          .get();
+        return doc.exists ? doc.data() : null;
+      }
 
+      /* ------------------- Sommaire depuis Google Sheet ------------------- */
+      // ⚠️ Mets ici l’URL de TON web app Apps Script (celui qui écrit dans le Sheet) :
+      const SUMMARY_URL =
+        "https://script.google.com/macros/s/AKfycbwAHBFhiWNt8kvJnoPDE9cnOAK0QwxnojkkYP6qch9GBcfFmWmsIm3qJTEsRq7Y0B0Mzw/exec";
 
-function handleMissedPunchOut(employee, punchInISO) {
-  const input = document.getElementById(`missedOutTime_${employee}`);
-  const timeStr = input.value;
-  if (!timeStr) return alert("⛔ Tu dois entrer une heure !");
+      // Appel: SUMMARY_URL?mode=summary&name=Nom%20Employe&days=7
+      // Callback JSONP appelé par Apps Script
+      function handleSummary(json) {
+        const sumTableBody = document.querySelector("#sumTable tbody");
+        const sumTotalEl = document.getElementById("sumTotal");
+        const rangeLabel = document.getElementById("rangeLabel");
 
-  const [hh, mm] = timeStr.split(":").map(Number);
-  const inDate = new Date(punchInISO);
-  const outDate = new Date(inDate);
-  outDate.setHours(hh);
-  outDate.setMinutes(mm);
+        rangeLabel.textContent = "(7 derniers jours)";
+        sumTableBody.innerHTML = "";
+        let total = 0;
 
-  const diffMs = outDate - inDate;
-  if (diffMs <= 0) return alert("❌ L'heure de sortie doit être après l'entrée !");
+        (json.rows || []).forEach((r) => {
+          const dateStr = r.dateKey.split("-").reverse().join("/");
+          const inStr = r.in || "—";
+          const outStr = r.out || "—";
+          const dur =
+            r.workedHHMM ||
+            (r.workedMinutes != null ? minsToHHMM(r.workedMinutes) : "—");
+          total += r.workedMinutes || 0;
 
-  const mins = Math.floor(diffMs / 60000);
-  const hours = Math.floor(mins / 60);
-  const minutes = mins % 60;
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${dateStr}</td><td>${inStr}</td><td>${outStr}</td><td>${dur}</td>`;
+          sumTableBody.appendChild(tr);
+        });
 
-  alert(`✅ Punch Out enregistré pour ${employee} : ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`);
-  const allData = getAllPunchData();
-  delete allData[employee];
-  localStorage.setItem('punchMap', JSON.stringify(allData));
-  location.reload();
-}
+        sumTotalEl.textContent = minsToHHMM(total);
+      }
 
-// 🔑 Génère ou récupère ID unique pour l'appareil
-function getDeviceId() {
-  let id = localStorage.getItem('deviceId');
-  if (!id) {
-    id = 'dev-' + crypto.randomUUID();
-    localStorage.setItem('deviceId', id);
-  }
-  return id;
-}
+      // Charge le sommaire via JSONP (évite CORS)
+      function refreshSummaryFromSheet(employee) {
+        // supprime un éventuel script JSONP précédent
+        const old = document.getElementById("jsonpSummary");
+        if (old) old.remove();
 
-// 📡 À chaque ouverture, enregistre position actuelle
-window.addEventListener('DOMContentLoaded', () => {
-  if ('geolocation' in navigator) {
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-        const timestamp = new Date().toISOString();
-        const name = employeeSelect.value;
-        const device = getDeviceId();
+        const s = document.createElement("script");
+        s.id = "jsonpSummary";
+        s.src = `${SUMMARY_URL}?mode=summary&name=${encodeURIComponent(
+          employee
+        )}&days=7&callback=handleSummary`;
+        document.body.appendChild(s);
+      }
 
-        const url = `https://script.google.com/macros/s/AKfycbzzA9oc5n-c7QGQzZJQ-20t-IJb2mbYT6Hfg4dtJteURN-DceAWaCJSyn99WPjJDzI6BA/exec?mode=track&name=${encodeURIComponent(name)}&time=${encodeURIComponent(timestamp)}&lat=${lat}&lng=${lng}&device=${device}`;
-        fetch(url).then(r => console.log("📍 Position track envoyée"));
-      },
-      (err) => console.error("Erreur géoloc tracking:", err)
-    );
-  }
-});
+      /* ------------------- UI état du jour ------------------- */
+      let punchInTime = null,
+        liveInterval = null,
+        geoData = {};
+      function startLiveTimer() {
+        clearInterval(liveInterval);
+        liveInterval = setInterval(() => {
+          const now = new Date(),
+            diff = now - punchInTime;
+          const s = Math.floor(diff / 1000) % 60,
+            m = Math.floor(diff / 60000) % 60,
+            h = Math.floor(diff / 3600000);
+          liveTimerEl.textContent = `⏳ En cours: ${pad2(h)}:${pad2(m)}:${pad2(
+            s
+          )}`;
+        }, 1000);
+      }
+      function stopLiveTimer() {
+        clearInterval(liveInterval);
+        liveTimerEl.textContent = "⏳ En cours: 00:00:00";
+      }
 
-</script>
+      async function refreshTodayUI(employee) {
+        const data = await loadTodayEntry(employee);
+        if (data && data.punchInTime && data.status !== "done") {
+          punchInTime = new Date(data.punchInTime);
+          inTimeEl.textContent = punchInTime.toLocaleTimeString("fr-FR");
+          outTimeEl.textContent = "";
+          workedTimeEl.textContent = "";
+          startLiveTimer();
+        } else if (data && data.status === "done") {
+          inTimeEl.textContent = new Date(data.punchInTime).toLocaleTimeString(
+            "fr-FR"
+          );
+          outTimeEl.textContent = new Date(
+            data.punchOutTime
+          ).toLocaleTimeString("fr-FR");
+          workedTimeEl.textContent =
+            data.workedHHMM || minsToHHMM(data.workedMinutes || 0);
+          stopLiveTimer();
+          punchInTime = null;
+        } else {
+          inTimeEl.textContent = "";
+          outTimeEl.textContent = "";
+          workedTimeEl.textContent = "";
+          stopLiveTimer();
+          punchInTime = null;
+        }
+      }
 
-</body>
+      /* ------------------- Géoloc, actions & init ------------------- */
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            geoData.lat = pos.coords.latitude;
+            geoData.lng = pos.coords.longitude;
+            try {
+              geoData.inZone = checkIfInZone(geoData.lat, geoData.lng);
+            } catch (_) {}
+            document.getElementById("punchInBtn").disabled = false;
+          },
+          (err) => {
+            console.warn("Géoloc indisponible:", err.message);
+            geoData.error = err.message;
+            // on autorise quand même le punch
+            document.getElementById("punchInBtn").disabled = false;
+          },
+          { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 }
+        );
+      } else {
+        // pas de géoloc dispo
+        document.getElementById("punchInBtn").disabled = false;
+      }
+
+      // --- PUNCH IN ---
+      document
+        .getElementById("punchInBtn")
+        .addEventListener("click", async () => {
+          const employee = employeeSelect.value;
+          const existing = await loadTodayEntry(employee);
+          if (existing && existing.punchInTime && existing.status !== "done") {
+            const ok = confirm(
+              `Un Punch In est déjà enregistré pour ${employee}. Écraser ?`
+            );
+            if (!ok) return;
+          }
+
+          punchInTime = new Date();
+          inTimeEl.textContent = punchInTime.toLocaleTimeString("fr-FR");
+          outTimeEl.textContent = "";
+          workedTimeEl.textContent = "";
+          await savePunchIn(employee, punchInTime);
+          startLiveTimer();
+
+          // Écriture Sheet via Apps Script (beacon sans CORS)
+          const urlIn = `${SUMMARY_URL}?status=in&lat=${
+            geoData.lat ?? ""
+          }&lng=${geoData.lng ?? ""}&inZone=${
+            geoData.inZone ?? ""
+          }&name=${encodeURIComponent(employee)}`;
+          new Image().src = urlIn;
+
+          refreshSummaryFromSheet(employee); // met à jour le tableau 7j
+        });
+
+      // --- PUNCH OUT ---
+      document
+        .getElementById("punchOutBtn")
+        .addEventListener("click", async () => {
+          const employee = employeeSelect.value;
+          const data = await loadTodayEntry(employee);
+          if (!data || !data.punchInTime || data.status === "done") {
+            alert("❌ Aucun Punch In actif pour aujourd’hui.");
+            return;
+          }
+
+          const out = new Date();
+          const inDt = new Date(data.punchInTime);
+          const minutes = Math.max(0, Math.floor((out - inDt) / 60000));
+
+          inTimeEl.textContent = inDt.toLocaleTimeString("fr-FR");
+          outTimeEl.textContent = out.toLocaleTimeString("fr-FR");
+          workedTimeEl.textContent = minsToHHMM(minutes);
+
+          await savePunchOut(employee, data.punchInTime, out);
+          stopLiveTimer();
+          punchInTime = null;
+
+          // Écriture Sheet via Apps Script (beacon sans CORS)
+          const urlOut = `${SUMMARY_URL}?status=out&lat=${
+            geoData.lat ?? ""
+          }&lng=${geoData.lng ?? ""}&inZone=${
+            geoData.inZone ?? ""
+          }&name=${encodeURIComponent(employee)}`;
+          new Image().src = urlOut;
+
+          refreshSummaryFromSheet(employee); // met à jour le tableau 7j
+        });
+
+      employeeSelect.addEventListener("change", async () => {
+        await refreshTodayUI(employeeSelect.value);
+        refreshSummaryFromSheet(employeeSelect.value);
+      });
+
+      function getDeviceId() {
+        let id = localStorage.getItem("deviceId");
+        if (!id) {
+          id =
+            "dev-" +
+            (crypto.randomUUID
+              ? crypto.randomUUID()
+              : Math.random().toString(36).slice(2));
+          localStorage.setItem("deviceId", id);
+        }
+        return id;
+      }
+
+      (async function init() {
+        await refreshTodayUI(employeeSelect.value);
+        await refreshSummaryFromSheet(employeeSelect.value); // 7 jours fixes
+      })();
+    </script>
+  </body>
 </html>

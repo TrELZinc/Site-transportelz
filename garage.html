@@ -1,896 +1,856 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Réparations Mécanique</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <link rel="stylesheet" href="https://unpkg.com/photoswipe@5/dist/photoswipe.css">
-  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    .list-group {
-  overflow: visible !important;
-}
-.container {
-  overflow: visible !important;
-}
-    body {
-        font-family: 'Comfortaa', cursive, sans-serif;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Réparations Mécanique</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- PhotoSwipe -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/photoswipe@5/dist/photoswipe.css"
+    />
+
+    <style>
+      :root {
+        --bg: #f3f4f6;
+        --card: #fff;
+        --ink: #111;
+        --muted: #6b7280;
+        --brand: #0d6efd;
+        --shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        --shadow-lg: 0 6px 16px rgba(0, 0, 0, 0.08);
+        --radius: 16px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        font-family: "Comfortaa", cursive, sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        margin: 0;
       }
 
-    .bg-light-custom {
-        background-color: #f8f9fa !important;
+      /* Header (injecté) */
+      #customHeader {
+        position: sticky;
+        top: 0;
+        z-index: 1030;
       }
 
-    .opened {
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      /* Loader plein écran */
+      #loadingOverlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.9);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
       }
 
-      .description-box {
-        background: #fff;
-        border-left: 5px solid #0d6efd; /* une bordure bleue */
-        padding: 20px;
+      .container {
+        overflow: visible !important;
       }
 
-    
-    .badge {
-      font-size: 0.9rem;
-      padding: 6px 12px;
-      font-weight: 600;
-      box-shadow: 0px 2px 6px rgba(0,0,0,0.15); /* léger relief */
-    }
-.list-group .list-group-item {
-  margin-bottom: 24px; /* espace entre chaque carte */
-}
-
-body {
-  background-color: #f3f4f6; /* ✅ Un gris très doux */
-}
-
-.list-group {
-  display: block;
-}
-
-.list-group-item {
-  border: 1px solid #dce6f9;
-  border-radius: 16px;
-  background-color: #ffffff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-  overflow: hidden;
-  padding: 20px 24px;
-  position: relative;
-  z-index: 0;
-}
-
-.list-group-item::before {
-  content: "";
-  display: block;
-  width: 100%;
-  height: 3px;
-  background: linear-gradient(to right, #0d6efd, #84b6f4);
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 1;
-}
-
-.list-group-item:hover {
-  transform: translateY(-4px);
-  background-color: #f7faff;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-  border-color: #b3d4fc;
-}
-
-.list-group-item.opened {
-  background-color: #f0f7ff;
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
-  z-index: 2;
-}
-
-.details {
-  background: #f0f7ff; /* même fond que la carte ouverte */
-  border-top: 1px solid #dde7f1;
-  margin-top: 12px;
-  padding: 15px;
-  border-radius: 0 0 16px 16px;
-}
-
-.badge {
-  font-size: 0.85rem;
-  padding: 6px 12px;
-  background-color: #ffe08a;
-  color: #4d3f00;
-  font-weight: 600;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-
-input[type=range]::-webkit-slider-thumb {
-  height: 30px;
-  width: 30px;
-  background: #0d6efd;
-  border: 2px solid white;
-  border-radius: 50%;
-  cursor: pointer;
-  margin-top: -10px;
-}
-#timeDisplay {
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin-bottom: 10px;
-  color: #0d6efd;
-  text-align: center;
-}
-.btn-completer {
-  width: 100%;
-  padding: 15px;
-  font-size: 1.2rem;
-  font-weight: bold;
-}
-.description-tronquee {
-  min-height: 40px;
-}
-.img-thumbnail-mini {
-  height: 80px;
-  width: 80px;
-  object-fit: cover;
-  border-radius: 8px;
-  border: 3px solid #0d6efd; /* bleu vif Bootstrap */
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* un effet de profondeur */
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.img-thumbnail-mini:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.3);
-}
-@media (max-width: 768px) {
-  .img-thumbnail-mini {
-    height: 70px;
-    width: 70px;
-  }
-}
-    
-.bg-white {
-  background-color: #ffffff !important;
-}
-
-.pswp__bg {
-  backdrop-filter: blur(8px);
-  background: rgba(0, 0, 0, 0.5); /* Un peu de foncé aussi */
-}
-input[type=range].range-ticks {
-  background: #0d6efd; /* couleur de fond principale */
-  height: 8px;
-  border-radius: 5px;
-  appearance: none;
-}
-
-/* Track (la ligne du slider) */
-input[type=range].range-ticks::-webkit-slider-runnable-track {
-  background: repeating-linear-gradient(
-    to right,
-    #0d6efd,
-    #0d6efd 2px,
-    transparent 2px,
-    transparent 13px
-  );
-  height: 8px;
-  border-radius: 5px;
-}
-
-input[type=range].range-ticks::-moz-range-track {
-  background: repeating-linear-gradient(
-    to right,
-    #0d6efd,
-    #0d6efd 2px,
-    transparent 2px,
-    transparent 13px
-  );
-  height: 8px;
-  border-radius: 5px;
-}
-
-/* Thumb (la boule que tu glisses) */
-input[type=range].range-ticks::-webkit-slider-thumb {
-  background-color: white;
-  border: 3px solid #0d6efd;
-  height: 30px;
-  width: 30px;
-  border-radius: 50%;
-  cursor: pointer;
-  margin-top: -11px;
-  appearance: none;
-}
-
-input[type=range].range-ticks::-moz-range-thumb {
-  background-color: white;
-  border: 3px solid #0d6efd;
-  height: 30px;
-  width: 30px;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-#toastConfirm {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 3000;
-  background-color: #28a745;
-  color: white;
-  padding: 14px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  display: none;
-  align-items: center;
-  gap: 12px;
-  animation: slideDownFade 0.5s ease forwards;
-}
-
-#toastConfirm svg {
-  width: 24px;
-  height: 24px;
-}
-
-@keyframes slideDownFade {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -20px);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-}
-
-</style>
-</head>
-<body>
-  
-<!-- Loader d'attente -->
-<div id="loadingOverlay" style="
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(255,255,255,0.9);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-">
-  <div class="spinner-border text-primary" style="width: 4rem; height: 4rem;" role="status">
-    <span class="visually-hidden">Chargement...</span>
-  </div>
-</div>
-<!-- Header dynamique avec menu hamburger -->
-<div id="customHeader"></div>
-<script>
-  fetch("assets/header.html")
-    .then(res => res.text())
-    .then(html => document.getElementById("customHeader").innerHTML = html);
-</script>
-
-<div class="container py-4">
-  <h2 class="text-center mb-4">🔧 Réparations Mécanique 🔧</h2>
-
-  <!-- Onglets -->
-  <ul class="nav nav-pills nav-justified mb-3">
-    <li class="nav-item">
-      <button class="nav-link active" id="a-faire-tab" onclick="showTab('faire')">À faire</button>
-    </li>
-    <li class="nav-item">
-      <button class="nav-link" id="fait-tab" onclick="showTab('fait')">Réparé</button>
-    </li>
-  </ul>
-
-    <div id="filterZone" class="mb-3">
-    <div class="input-group">
-        <input type="text" class="form-control" id="searchInput" placeholder="🔎 Filtrer par unité..." oninput="handleSearchInput()">
-        <button class="btn btn-outline-secondary d-none" id="clearButton" type="button" onclick="resetSearch()">❌ Effacer</button>
-    </div>
-    </div>
-
-
-
-  <!-- Contenus -->
-  <div id="faireList" class="list-group"></div>
-  <div id="faitList" class="list-group d-none"></div>
-  <div class="text-center my-3">
-  <button id="toggleFaitView" class="btn btn-secondary btn-sm" onclick="toggleFaitView()">Afficher tout</button>
-  </div>
-</div>
-
-
-
-<script>
-// Données simulées
-let aFaire = [];
-let fait = [];
-let showAllFait = false;
-
-
-async function chargerReparations(noReset = false) {
-  try {
-    // ✅ Affiche le loader
-    document.getElementById('loadingOverlay').style.display = 'flex';
-
-    const response = await fetch("https://script.google.com/macros/s/AKfycbzuR03sbcehVxg8t3aiIGAiaUYHUMahYPjY1zjo3truIFaypot1Toohowk4GJz8TsN0/exec?read=1&ts=" + Date.now());
-    const data = await response.json();
-    console.log("🧪 Données reçues :", data[0]);
-
-    // ✅ Nettoyage et filtrage fiable
-    aFaire = data.filter(r => !String(r.notes || "").trim().length);
-    fait = data.filter(r => String(r.notes || "").trim().length > 0);
-
-    // ✅ Tri décroissant par date
-    aFaire = aFaire.sort((a, b) => new Date(b.date) - new Date(a.date));
-    fait = fait.sort((a, b) => new Date(b.dateFin || b.date) - new Date(a.dateFin || a.date));
-
-    // ✅ Rendu initial ou refresh
-    if (!noReset) {
-      showTab('faire');
-    } else {
-      renderCurrentTab();
-      updateCounters();
-    }
-
-  } catch (error) {
-    console.error("Erreur de chargement :", error);
-    alert("Erreur lors du chargement des réparations. Veuillez réessayer.");
-  } finally {
-    document.getElementById('loadingOverlay').style.display = 'none';
-  }
-}
-
-
-chargerReparations();
-
-
-let currentTab = 'faire';
-
-function showTab(tab) {
-  currentTab = tab;
-  document.getElementById('a-faire-tab').classList.remove('active');
-  document.getElementById('fait-tab').classList.remove('active');
-  document.getElementById('faireList').classList.add('d-none');
-  document.getElementById('faitList').classList.add('d-none');
-  document.getElementById('filterZone').classList.remove('d-none');
-
-  if (tab === 'faire') {
-    document.getElementById('a-faire-tab').classList.add('active');
-    document.getElementById('faireList').classList.remove('d-none');
-    renderAFaire(); // ✅ ici aussi
-  } else {
-    document.getElementById('fait-tab').classList.add('active');
-    document.getElementById('faitList').classList.remove('d-none');
-    renderFait();
-  }
-  updateCounters();
-
-  document.getElementById('toggleFaitView').style.display = (tab === 'fait') ? 'inline-block' : 'none';
-}
-
-
-function renderCurrentTab() {
-  if (currentTab === 'faire') renderAFaire(); 
-  else renderFait();
-}
-
-
-function renderAFaire() {
-  const content = document.getElementById('faireList');
-  const search = document.getElementById('searchInput').value.toLowerCase();
-  content.innerHTML = '';
-
-  let filtered = aFaire.filter(item => {
-    const notes = (item.notes || "").trim();
-    return item.unite.toLowerCase().includes(search) && notes === "";
-  });
-
-  filtered.sort((a, b) => getUrgenceLevel(b.date) - getUrgenceLevel(a.date));
-
-  if (filtered.length === 0) {
-    content.innerHTML = '<div class="text-center text-muted">Aucune réparation trouvée.</div>';
-    updateCounters();
-    return;
-  }
-
-  filtered.forEach(item => {
-    const diffDays = getDaysSince(item.date);
-    const badge = getDaysBadge(diffDays);
-    const hasFiles = item.fichiers && item.fichiers.length > 0;
-
-    const div = document.createElement('div');
-    div.className = 'list-group-item p-3 position-relative';
-    div.dataset.id = item.id;
-    div.style.minHeight = "140px";
-
-    div.innerHTML = `
-<div class="d-flex justify-content-between align-items-start">
-  <div class="w-100 pe-4">
-    <h6 class="mb-1">${item.unite} - ${item.nom}</h6>
-
-    <!-- Affiche "📸 Fichiers attachés" s’il y a des fichiers -->
-    ${hasFiles ? '<div class="text-warning small mb-1">📸 Fichiers attachés</div>' : ''}
-
-    <!-- Badge et date -->
-    <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
-      ${badge}
-      <small class="text-muted">${formatDate(item.date)}</small>
-    </div>
-
-    <!-- Description tronquée -->
-    <div class="mb-2">
-      <div class="description-tronquee">${escapeHtml(truncateText(item.description || '', 60))}</div>
-    </div>
-  </div>
-
-  <!-- Bouton Voir -->
-  <div class="position-absolute top-0 end-0 p-2">
-    <small class="text-primary">🔽 Voir</small>
-  </div>
-</div>
-
-<!-- Section détails masquée -->
-<div class="details mt-2" style="display: none;">
-  <hr>
-  <p class="mb-2">
-    <strong>📄 Description complète :</strong><br>
-    <div class="p-2 bg-white border rounded shadow-sm">
-      <span class="text-dark">${escapeHtml(item.description)}</span>
-    </div>
-  </p>
-
-
-        ${hasFiles ? `
-          <div class="mb-3 d-flex flex-wrap gap-2 gallery" id="gallery-${item.id}">
-            ${item.fichiers.map(f => {
-              const ext = f.toLowerCase();
-              const isVideo = ext.includes(".mp4") || ext.includes(".mov") || ext.includes(".webm");
-              const type = isVideo ? "video" : "image";
-
-              const thumbSrc = transformDriveUrl(f, type, false);
-              const fullSrc = transformDriveUrl(f, type, true);
-
-              if (type === "image") {
-                return `<img src="${thumbSrc}" class="img-thumbnail-mini" onclick="openPopupMedia('${fullSrc}', 'image')">`;
-              } else {
-                return `
-                  <div style="position: relative; display: inline-block;">
-                    <img src="${thumbSrc}" class="img-thumbnail-mini" onclick="openPopupMedia('${fullSrc}', 'video')">
-                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-                      <svg width="32" height="32" viewBox="0 0 24 24" fill="white" stroke="black" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="background: rgba(0,0,0,0.5); border-radius: 50%; padding:5px;">
-                        <polygon points="6,4 20,12 6,20 6,4"></polygon>
-                      </svg>
-                    </div>
-                  </div>
-                `;
-              }
-            }).join('')}
-          </div>
-        ` : ''}
-
-        <label class="form-label mt-2"><strong>🛠️ Réparations effectuées</strong></label>
-        <textarea class="form-control mb-3" rows="2" placeholder="Décrire la réparation..." oninput="checkFields(this)"></textarea>
-
-        <label class="form-label mt-2 fw-bold">⏱️ Temps de réparation</label>
-        <div class="mb-2 text-center" id="timeDisplay">Sélectionnez le temps</div>
-        <input type="range" class="form-range mb-3 range-ticks" min="0" max="240" step="15" value="0" oninput="updateTimeDisplay(this)">
-        <button class="btn btn-success btn-completer mt-2" onclick="completer(this)" disabled>✅ Compléter</button>
-      </div>
-    `;
-
-    div.classList.remove('opened');
-
-    div.addEventListener('click', function(e) {
-      if (!e.target.closest('a') && !e.target.closest('textarea') && !e.target.closest('input') && !e.target.closest('button') && !e.target.closest('img')) {
-        this.classList.toggle('opened');
-        const details = this.querySelector('.details');
-        if (this.classList.contains('opened')) {
-          details.style.display = 'block';
-          this.querySelector('.description-tronquee').style.display = 'none';
-        } else {
-          details.style.display = 'none';
-          this.querySelector('.description-tronquee').style.display = 'block';
+      /* Onglets a11y */
+      .nav[role="tablist"] .nav-link {
+        border-radius: 999px;
+      }
+      .nav[role="tablist"] .nav-link:focus-visible {
+        outline: 3px solid #84b6f4;
+        outline-offset: 2px;
+      }
+
+      /* Listes */
+      .list-group {
+        display: block;
+        overflow: visible !important;
+      }
+      details.list-card {
+        border: 1px solid #dce6f9;
+        border-radius: var(--radius);
+        background: var(--card);
+        box-shadow: var(--shadow);
+        transition: transform 0.2s ease, box-shadow 0.2s ease,
+          background 0.2s ease;
+        margin-bottom: 24px;
+        position: relative;
+      }
+      details.list-card::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 3px;
+        width: 100%;
+        background: linear-gradient(90deg, var(--brand), #84b6f4);
+        border-radius: var(--radius) var(--radius) 0 0;
+      }
+      details.list-card[open] {
+        background: #f0f7ff;
+        box-shadow: var(--shadow-lg);
+      }
+      summary.card-head {
+        list-style: none;
+        cursor: pointer;
+        padding: 20px 24px;
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+      }
+      summary.card-head::-webkit-details-marker {
+        display: none;
+      }
+      .card-title {
+        font-weight: 700;
+        margin: 0;
+      }
+      .card-sub {
+        font-size: 0.86rem;
+        color: var(--muted);
+      }
+      .chip {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 0.78rem;
+      }
+      .chip-warn {
+        background: #ffe08a;
+        color: #4d3f00;
+      }
+      .chip-ok {
+        background: #d1fae5;
+        color: #065f46;
+      }
+      .chip-bad {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+      .desc-preview {
+        color: #111;
+        opacity: 0.9;
+      }
+
+      .details-body {
+        border-top: 1px solid #dde7f1;
+        padding: 16px 20px 20px;
+      }
+      .img-thumbnail-mini {
+        height: 80px;
+        width: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 3px solid var(--brand);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+      .img-thumbnail-mini:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.28);
+      }
+      @media (max-width: 768px) {
+        .img-thumbnail-mini {
+          height: 70px;
+          width: 70px;
         }
       }
-    });
 
-    content.appendChild(div);
-  });
-
-  initGalleries();
-  updateCounters();
-}
-
-
-function initGalleries() {
-  // Détruire d'abord d'éventuelles anciennes instances
-  document.querySelectorAll('.pswp').forEach(el => el.remove());
-
-  document.querySelectorAll('.gallery').forEach(gallery => {
-    const lightbox = new PhotoSwipeLightbox({
-      gallery: '#' + gallery.id,
-      children: 'a.gallery-link',
-      pswpModule: () => import('https://unpkg.com/photoswipe@5/dist/photoswipe.esm.min.js')
-    });
-    lightbox.init();
-  });
-}
-
-function transformDriveUrl(url, type = "image", full = false) {
-  let match = url.match(/\/d\/([^\/]+)/) || url.match(/id=([^&]+)/);
-
-  if (match && match[1]) {
-    const id = match[1];
-    if (type === "video") {
-      // 🎯 Pour les vidéos : lien direct download qui marche avec <video>
-      return `https://drive.google.com/uc?export=download&id=${id}`;
-    }
-    if (full) {
-      // 🎯 Pour les images grandes tailles
-      return `https://drive.google.com/thumbnail?id=${id}&sz=w1600-h1200`;
-    } else {
-      // 🎯 Pour les miniatures rapides
-      return `https://drive.google.com/thumbnail?id=${id}&sz=w400-h400`;
-    }
-  }
-
-  return url; // fallback
-}
-
-function renderFait() {
-  const content = document.getElementById('faitList');
-  const search = document.getElementById('searchInput').value.toLowerCase();
-  content.innerHTML = '';
-
-  let filtered = fait.filter(item => item.unite.toLowerCase().includes(search));
-
-  if (!showAllFait) {
-    filtered = filtered.filter(item => {
-      const days = getDaysSince(item.dateFin || item.date);
-      return days <= 30;
-    });
-  }
-
-  if (filtered.length === 0) {
-    content.innerHTML = '<div class="text-center text-muted">Aucune réparation complétée trouvée.</div>';
-    return;
-  }
-
-  filtered.forEach(item => {
-    const div = document.createElement('div');
-    div.className = 'list-group-item p-3 position-relative';
-    div.dataset.id = item.id;
-    div.style.minHeight = "140px";
-
-    div.innerHTML = `
-      <div class="position-relative">
-        <div class="d-flex justify-content-between align-items-start">
-          <div class="w-100 pe-4">
-            <div class="d-flex align-items-center mb-1 gap-2 flex-wrap">
-              <h6 class="mb-0">${item.unite} - ${item.nom}</h6>
-              <span class="badge bg-success rounded-pill">
-                📅 Réparé le ${formatDate(item.dateFin)}
-              </span>
-            </div>
-            <small class="text-muted">${formatDate(item.date)}</small>
-            <div class="mb-2 description-tronquee">${escapeHtml(truncateText(item.description, 60))}</div>
-          </div>
-          <div class="position-absolute top-0 end-0 p-2">
-            <small class="text-primary">🔽 Voir</small>
-          </div>
-        </div>
-
-        <div class="details mt-2 p-2 bg-light rounded" style="display: none;">
-          <hr>
-          <p class="mb-2">
-            <strong>📄 Description complète :</strong><br>
-            <span class="text-muted">${escapeHtml(item.description)}</span>
-          </p>
-          <p class="mb-2">
-            <strong>🛠️ Réparations effectuées :</strong><br>
-            <span class="text-muted">${escapeHtml(item.notes)}</span>
-          </p>
-          <p class="mb-0">
-            <strong>⏱️ Temps :</strong> 
-            <span class="text-muted">${item.temps}</span>
-          </p>
-        </div>
-      </div>
-    `;
-
-    div.addEventListener('click', function(e) {
-      this.classList.toggle('opened');
-      const details = this.querySelector('.details');
-      if (this.classList.contains('opened')) {
-        details.style.display = 'block';
-        this.querySelector('.description-tronquee').style.display = 'none';
-      } else {
-        details.style.display = 'none';
-        this.querySelector('.description-tronquee').style.display = 'block';
+      /* Slider temps */
+      input[type="range"].range-ticks {
+        background: var(--brand);
+        height: 8px;
+        border-radius: 5px;
+        appearance: none;
       }
-    });
+      input[type="range"].range-ticks::-webkit-slider-runnable-track {
+        background: repeating-linear-gradient(
+          to right,
+          var(--brand),
+          var(--brand) 2px,
+          transparent 2px,
+          transparent 13px
+        );
+        height: 8px;
+        border-radius: 5px;
+      }
+      input[type="range"].range-ticks::-webkit-slider-thumb {
+        appearance: none;
+        background: #fff;
+        border: 3px solid var(--brand);
+        height: 30px;
+        width: 30px;
+        border-radius: 50%;
+        margin-top: -11px;
+        cursor: pointer;
+      }
+      input[type="range"].range-ticks::-moz-range-track {
+        background: repeating-linear-gradient(
+          to right,
+          var(--brand),
+          var(--brand) 2px,
+          transparent 2px,
+          transparent 13px
+        );
+        height: 8px;
+        border-radius: 5px;
+      }
+      input[type="range"].range-ticks::-moz-range-thumb {
+        background: #fff;
+        border: 3px solid var(--brand);
+        height: 30px;
+        width: 30px;
+        border-radius: 50%;
+      }
+      #timeDisplay {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--brand);
+        text-align: center;
+      }
 
-    content.appendChild(div);
-  });
+      /* Toast confirmé (custom) */
+      #toastConfirm {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 3000;
+        background: #28a745;
+        color: #fff;
+        padding: 14px 24px;
+        border-radius: 8px;
+        font-weight: 700;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        display: none;
+        align-items: center;
+        gap: 12px;
+      }
+      #toastConfirm svg {
+        width: 24px;
+        height: 24px;
+      }
 
-  updateCounters();
-}
+      /* Focus clavier */
+      :focus-visible {
+        outline: 3px solid #84b6f4;
+        outline-offset: 2px;
+      }
 
-
-function toggleFaitView() {
-  showAllFait = !showAllFait;
-  document.getElementById('toggleFaitView').innerText = showAllFait ? "Afficher seulement 30 jours" : "Afficher tout";
-  renderFait();
-}
-
-function truncateText(text, maxLength) {
-  if (typeof text !== "string") return "";
-  if (text.length <= maxLength) return text;
-  return text.substring(0, maxLength) + "...";
-}
-
-  function formatDate(dateStr) {
-  const date = new Date(dateStr);
-  const options = { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' };
-  return date.toLocaleDateString('fr-CA', options).replace(',', ' à');
-}
-
-  
-  function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.innerText = text;
-  return div.innerHTML;
-}
-
-function getDaysSince(dateStr) {
-  const today = new Date();
-  const repairDate = new Date(dateStr);
-  const diffTime = today - repairDate;
-  return Math.floor(diffTime / (1000 * 60 * 60 * 24));
-}
-  
-function getUrgenceLevel(dateStr) {
-  return getDaysSince(dateStr);
-}
-
-function getDaysBadge(diffDays) {
-  let color = "bg-success";
-  if (diffDays >= 3 && diffDays <= 5) color = "bg-warning text-dark";
-  if (diffDays > 5) color = "bg-danger";
-
-  return `<span class="badge ${color} rounded-pill">Demandée il y a ${diffDays} jours</span>`;
-}
-
-function updateTimeDisplay(slider) {
-  const display = slider.parentElement.querySelector("#timeDisplay");
-  const minutes = parseInt(slider.value);
-
-  if (minutes === 0) {
-    display.innerText = "Sélectionnez le temps";
-  } else {
-    const h = Math.floor(minutes / 60);
-    const m = minutes % 60;
-    display.innerText = `${h > 0 ? h + "h" : ""}${m > 0 ? " " + m + "min" : ""}`;
-  }
-  checkFields(slider);
-}
-
-function checkFields(input) {
-  const container = input.closest('.details');
-  const textarea = container.querySelector('textarea');
-  const slider = container.querySelector('input[type=range]');
-  const button = container.querySelector('button');
-
-  if (textarea.value.trim() !== "" && parseInt(slider.value) > 0) {
-    button.disabled = false;
-  } else {
-    button.disabled = true;
-  }
-}
-
-function openPopupMedia(url, type) {
-  const overlay = document.getElementById('popupOverlay');
-  const content = document.getElementById('popupInner');
-  content.innerHTML = '';
-
-  if (type.startsWith('image')) {
-    content.innerHTML = `
-      <img src="${url}" style="max-width:90vw; max-height:90vh; width:auto; height:auto; object-fit:contain; display:block; margin:auto; border-radius:10px;">
-    `;
-  } else if (type.startsWith('video')) {
-    content.innerHTML = `
-      <video controls autoplay style="max-width:90vw; max-height:90vh; width:auto; height:auto; border-radius:10px; display:block; margin:auto;">
-        <source src="${url}" type="video/mp4">
-        Votre navigateur ne supporte pas la lecture vidéo.
-      </video>
-    `;
-  }
-
-  overlay.style.display = 'flex';
-}
-
-function closePopup() {
-  const overlay = document.getElementById('popupOverlay');
-  overlay.style.display = 'none';
-}
-
-function completer(button) {
-  const itemEl = button.closest('.list-group-item');
-  const textarea = itemEl.querySelector('textarea').value.trim();
-  const slider = itemEl.querySelector('input[type=range]');
-  const descriptionEl = itemEl.querySelector('.details span.text-dark');
-  const description = descriptionEl ? descriptionEl.innerText : "";
-  const id = itemEl.dataset.id;
-
-  const minutes = parseInt(slider.value);
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  const temps = `${h > 0 ? h + "h" : ""}${m > 0 ? " " + m + "min" : ""}`;
-  const now = new Date();
-  const dateFin = now.toISOString();
-
-  // ✅ TROUVER L’ÉLÉMENT
-  const index = aFaire.findIndex(r => r.id === id);
-  if (index === -1) {
-    alert("Erreur : impossible de trouver cette réparation.");
-    return;
-  }
-
-  // ✅ MISE À JOUR LOCALE
-  aFaire[index].notes = textarea;
-  aFaire[index].temps = temps;
-  aFaire[index].description = description;
-  aFaire[index].dateFin = dateFin;
-
-  // ✅ DÉPLACEMENT VERS `fait`
-  const item = aFaire.splice(index, 1)[0];
-  fait.push(item);
-
-  // ✅ UI immédiate
-  itemEl.remove();
-  renderCurrentTab();
-  updateCounters();
-  showToast("Réparation enregistrée ✅");
-
-  // ✅ Envoi serveur
-  fetch("https://script.google.com/macros/s/AKfycbzuR03sbcehVxg8t3aiIGAiaUYHUMahYPjY1zjo3truIFaypot1Toohowk4GJz8TsN0/exec", {
-    method: "POST",
-    mode: "no-cors",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      update: true,
-      id: item.id,
-      notes: textarea,
-      temps: temps,
-      description: description,
-      dateFin: dateFin
-    })
-  }).catch(err => {
-    console.error("Erreur d’envoi :", err);
-    alert("Erreur d’enregistrement côté serveur");
-  });
-
-  // ✅ Optionnel : relancer le rechargement pour synchroniser
-  setTimeout(() => {
-    chargerReparations(true);
-  }, 1500);
-}
-
-
-function updateCounters() {
-  const aFaireCount = aFaire.filter(item => !item.notes || item.notes.trim() === "").length;
-const faitCount = fait.length;
-
-  document.getElementById('a-faire-tab').innerHTML = `À faire (${aFaireCount})`;
-  document.getElementById('fait-tab').innerHTML = `Réparé (${faitCount})`;
-}
-
-function showToast(message = "Réparation enregistrée ✅") {
-  const toast = document.getElementById('toastConfirm');
-  toast.innerHTML = `
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="white">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-    </svg>
-    ${message}
-  `;
-  toast.style.display = 'flex';
-
-  setTimeout(() => {
-    toast.style.display = 'none';
-  }, 3000);
-}
-
-function handleSearchInput() {
-  const input = document.getElementById("searchInput");
-  const clearBtn = document.getElementById("clearButton");
-
-  if (input.value.trim() !== "") {
-    clearBtn.classList.remove("d-none");
-  } else {
-    clearBtn.classList.add("d-none");
-  }
-
-  renderCurrentTab(); // met à jour l'affichage filtré
-}
-
-function resetSearch() {
-  const input = document.getElementById("searchInput");
-  const clearBtn = document.getElementById("clearButton");
-
-  input.value = "";
-  clearBtn.classList.add("d-none");
-  renderCurrentTab();
-  input.focus(); // optionnel : remet le curseur dans le champ
-}
-
-
-</script>
-
-
-  <!-- Petit Popup Media -->
-<div id="popupOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); z-index:1050; justify-content:center; align-items:center;">
-<div id="popupContent" style="position:relative; padding:20px; background:transparent;">
-<button onclick="closePopup()" style="
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: red;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  font-weight: bold;
-  font-size: 1.8rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  z-index: 9999;
-">
-  &times;
-</button>
-  <div id="popupInner" style="display:flex; align-items:center; justify-content:center;"></div>
-</div>
-</div>
-  
-<!-- Toast Notification -->
-<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100;">
-  <div id="liveToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="d-flex">
-      <div class="toast-body">
-        Réparation enregistrée ✅
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Loader -->
+    <div id="loadingOverlay">
+      <div
+        class="spinner-border text-primary"
+        style="width: 4rem; height: 4rem"
+        role="status"
+      >
+        <span class="visually-hidden">Chargement…</span>
       </div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
     </div>
-  </div>
-</div>
 
-  
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Header dynamique -->
+    <div id="customHeader"></div>
+    <script>
+      fetch("assets/header.html")
+        .then((r) => r.text())
+        .then((html) => {
+          document.getElementById("customHeader").innerHTML = html;
+        });
+    </script>
 
-  <script type="module">
-  import PhotoSwipeLightbox from 'https://unpkg.com/photoswipe@5/dist/photoswipe-lightbox.esm.min.js';
-  window.PhotoSwipeLightbox = PhotoSwipeLightbox;
-</script>
+    <div class="container py-4">
+      <h2 class="text-center mb-4">🔧 Réparations Mécanique</h2>
 
-</div>
+      <!-- Onglets -->
+      <ul
+        class="nav nav-pills nav-justified mb-3"
+        role="tablist"
+        aria-label="Filtres d'état"
+      >
+        <li class="nav-item">
+          <button
+            class="nav-link active"
+            id="a-faire-tab"
+            role="tab"
+            aria-selected="true"
+            onclick="showTab('faire')"
+          >
+            À faire
+          </button>
+        </li>
+        <li class="nav-item">
+          <button
+            class="nav-link"
+            id="fait-tab"
+            role="tab"
+            aria-selected="false"
+            onclick="showTab('fait')"
+          >
+            Réparé
+          </button>
+        </li>
+      </ul>
 
-<div id="toastConfirm">
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="white">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-  </svg>
-  Réparation enregistrée
-</div>
+      <!-- Filtre -->
+      <div id="filterZone" class="mb-3">
+        <div class="input-group">
+          <input
+            type="text"
+            class="form-control"
+            id="searchInput"
+            placeholder="🔎 Filtrer par unité…"
+          />
+          <button
+            class="btn btn-outline-secondary d-none"
+            id="clearButton"
+            type="button"
+            onclick="resetSearch()"
+          >
+            ❌ Effacer
+          </button>
+        </div>
+      </div>
 
-</body>
+      <!-- Listes -->
+      <div
+        id="faireList"
+        class="list-group"
+        role="region"
+        aria-label="Réparations à faire"
+      ></div>
 
+      <div id="faitWrap">
+        <div
+          id="faitList"
+          class="list-group d-none"
+          role="region"
+          aria-label="Réparations complétées"
+        ></div>
+        <div class="text-center my-3">
+          <button
+            id="loadMoreFait"
+            class="btn btn-secondary btn-sm d-none"
+            onclick="loadMoreFait()"
+          >
+            Charger plus
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast custom -->
+    <div id="toastConfirm">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="white"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M5 13l4 4L19 7"
+        />
+      </svg>
+      Réparation enregistrée
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    ></script>
+
+    <!-- PhotoSwipe (module) -->
+    <script type="module">
+      import PhotoSwipeLightbox from "https://unpkg.com/photoswipe@5/dist/photoswipe-lightbox.esm.min.js";
+      window.PhotoSwipeLightbox = PhotoSwipeLightbox; // exposé pour init dynamique
+    </script>
+
+    <script>
+      // --- State ---
+      let aFaire = [];
+      let fait = [];
+      let currentTab = "faire";
+      let faitPage = 1;
+      const PAGE_SIZE = 20;
+
+      // --- Utils ---
+      const debounced = (fn, d = 180) => {
+        let t;
+        return (...a) => {
+          clearTimeout(t);
+          t = setTimeout(() => fn(...a), d);
+        };
+      };
+
+      function escapeHtml(text = "") {
+        const div = document.createElement("div");
+        div.innerText = text;
+        return div.innerHTML;
+      }
+
+      function safeDriveId(u) {
+        try {
+          const url = new URL(u);
+          if (!/^(https?:)?\/\/(drive\.google\.com)/.test(url.href))
+            return null;
+          const m =
+            url.pathname.match(/\/d\/([^\/]+)/) ||
+            url.search.match(/id=([^&]+)/);
+          return m ? m[1] : null;
+        } catch {
+          return null;
+        }
+      }
+
+      function driveThumb(id, big = false) {
+        return `https://drive.google.com/thumbnail?id=${id}&sz=${
+          big ? "w1600-h1200" : "w400-h400"
+        }`;
+      }
+      function driveVideo(id) {
+        return `https://drive.google.com/uc?export=download&id=${id}`;
+      }
+
+      function formatDate(dateStr) {
+        const d = new Date(dateStr);
+        const opt = {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        };
+        return d.toLocaleDateString("fr-CA", opt).replace(",", " à");
+      }
+      function getDaysSince(dateStr) {
+        return Math.floor((Date.now() - new Date(dateStr)) / 86400000);
+      }
+      function urgencyChip(days) {
+        const unit = days > 1 ? "jours" : "jour";
+        if (days <= 2)
+          return `<span class="chip chip-ok">Nouvelle (${days} ${unit})</span>`;
+        if (days <= 5)
+          return `<span class="chip chip-warn">À traiter (${days} ${unit})</span>`;
+        return `<span class="chip chip-bad">Urgent (${days} ${unit})</span>`;
+      }
+
+      // --- Fetch ---
+      async function chargerReparations(noReset = false) {
+        try {
+          document.getElementById("loadingOverlay").style.display = "flex";
+          const res = await fetch(
+            "https://script.google.com/macros/s/AKfycbzuR03sbcehVxg8t3aiIGAiaUYHUMahYPjY1zjo3truIFaypot1Toohowk4GJz8TsN0/exec?read=1&ts=" +
+              Date.now()
+          );
+          const data = await res.json();
+
+          aFaire = data
+            .filter((r) => !String(r.notes || "").trim())
+            .sort((a, b) => new Date(b.date) - new Date(a.date));
+          fait = data
+            .filter((r) => String(r.notes || "").trim())
+            .sort(
+              (a, b) =>
+                new Date(b.dateFin || b.date) - new Date(a.dateFin || a.date)
+            );
+
+          if (!noReset) {
+            showTab("faire");
+          } else {
+            renderCurrentTab();
+            updateCounters();
+          }
+        } catch (e) {
+          console.error(e);
+          alert("Erreur de chargement des réparations.");
+        } finally {
+          document.getElementById("loadingOverlay").style.display = "none";
+        }
+      }
+      chargerReparations();
+
+      // --- Tabs ---
+      function showTab(tab) {
+        currentTab = tab;
+        document
+          .getElementById("a-faire-tab")
+          .classList.toggle("active", tab === "faire");
+        document
+          .getElementById("fait-tab")
+          .classList.toggle("active", tab === "fait");
+        document
+          .getElementById("a-faire-tab")
+          .setAttribute("aria-selected", tab === "faire");
+        document
+          .getElementById("fait-tab")
+          .setAttribute("aria-selected", tab === "fait");
+
+        document
+          .getElementById("faireList")
+          .classList.toggle("d-none", tab !== "faire");
+        document
+          .getElementById("faitList")
+          .classList.toggle("d-none", tab !== "fait");
+        document.getElementById("filterZone").classList.remove("d-none");
+
+        if (tab === "faire") {
+          renderAFaire();
+        } else {
+          faitPage = 1;
+          renderFait();
+        }
+
+        updateCounters();
+      }
+      function renderCurrentTab() {
+        currentTab === "faire" ? renderAFaire() : renderFait();
+      }
+
+      // --- Renderers ---
+      function renderAFaire() {
+        const wrap = document.getElementById("faireList");
+        const q = (
+          document.getElementById("searchInput").value || ""
+        ).toLowerCase();
+        wrap.innerHTML = "";
+
+        const rows = aFaire
+          .filter((i) => (i.unite || "").toLowerCase().includes(q))
+          .sort((a, b) => getDaysSince(b.date) - getDaysSince(a.date));
+
+        if (!rows.length) {
+          wrap.innerHTML = `<div class="text-center text-muted">Aucune réparation trouvée.</div>`;
+          updateCounters();
+          return;
+        }
+
+        rows.forEach((item) => {
+          const days = getDaysSince(item.date);
+          const chip = urgencyChip(days);
+          const hasFiles =
+            Array.isArray(item.fichiers) && item.fichiers.length > 0;
+
+          const el = document.createElement("details");
+          el.className = "list-card";
+          el.dataset.id = item.id;
+
+          const filesHtml = hasFiles
+            ? `
+        <div class="mb-3 d-flex flex-wrap gap-2 gallery" id="gallery-${
+          item.id
+        }">
+          ${item.fichiers
+            .map((u) => {
+              const id = safeDriveId(u);
+              if (!id) return "";
+              const isVideo = /\.(mp4|mov|webm)$/i.test(u);
+              if (isVideo) {
+                const v = driveVideo(id);
+                const t = driveThumb(id, false);
+                return `
+                <a class="gallery-link" href="${v}" data-pswp-width="1280" data-pswp-height="720" data-pswp-type="video">
+                  <img loading="lazy" src="${t}" class="img-thumbnail-mini" alt="Vidéo">
+                </a>`;
+              } else {
+                const full = driveThumb(id, true);
+                const th = driveThumb(id, false);
+                return `
+                <a class="gallery-link" href="${full}" data-pswp-width="1600" data-pswp-height="1200">
+                  <img loading="lazy" src="${th}" class="img-thumbnail-mini" alt="Photo">
+                </a>`;
+              }
+            })
+            .join("")}
+        </div>`
+            : "";
+
+          el.innerHTML = `
+        <summary class="card-head">
+          <div class="w-100 pe-2">
+            <h6 class="card-title mb-1">${escapeHtml(
+              item.unite
+            )} – ${escapeHtml(item.nom || "")}</h6>
+            ${
+              hasFiles
+                ? '<div class="text-warning small mb-1">📸 Fichiers attachés</div>'
+                : ""
+            }
+            <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
+              ${chip}
+              <small class="card-sub">${formatDate(item.date)}</small>
+            </div>
+            <div class="desc-preview">${escapeHtml(
+              (item.description || "").slice(0, 60)
+            )}${(item.description || "").length > 60 ? "…" : ""}</div>
+          </div>
+        </summary>
+
+        <div class="details-body">
+          <p class="mb-2"><strong>📄 Description complète :</strong></p>
+          <div class="p-2 bg-white border rounded shadow-sm"><span class="text-dark">${escapeHtml(
+            item.description || ""
+          )}</span></div>
+          ${filesHtml}
+
+          <label class="form-label mt-3"><strong>🛠️ Réparations effectuées</strong></label>
+          <textarea class="form-control mb-3 js-notes" rows="2" placeholder="Décrire la réparation…"></textarea>
+
+          <label class="form-label mt-2 fw-bold" for="range-${
+            item.id
+          }">⏱️ Temps de réparation</label>
+          <div class="mb-2 text-center" id="timeDisplay-${
+            item.id
+          }">Sélectionnez le temps</div>
+          <input id="range-${
+            item.id
+          }" type="range" class="form-range mb-3 range-ticks js-range" min="0" max="240" step="15" value="0" aria-valuetext="Sélectionnez le temps">
+
+          <button class="btn btn-success w-100 js-save" disabled>✅ Compléter</button>
+        </div>
+      `;
+
+          // attach handlers inside the details
+          el.addEventListener("toggle", () => {
+            if (el.open) initGallery(`#gallery-${item.id}`);
+          });
+
+          el.querySelector(".js-range").addEventListener("input", (ev) => {
+            const minutes = parseInt(ev.target.value, 10);
+            const h = Math.floor(minutes / 60),
+              m = minutes % 60;
+            const label =
+              minutes === 0
+                ? "Sélectionnez le temps"
+                : `${h ? h + "h" : ""}${m ? (h ? " " : "") + m + "min" : ""}`;
+            document.getElementById(`timeDisplay-${item.id}`).innerText = label;
+            ev.target.setAttribute("aria-valuetext", label);
+            enableSave(el);
+          });
+
+          el.querySelector(".js-notes").addEventListener("input", () =>
+            enableSave(el)
+          );
+          el.querySelector(".js-save").addEventListener("click", () =>
+            completer(el, item)
+          );
+
+          wrap.appendChild(el);
+        });
+
+        updateCounters();
+      }
+
+      function renderFait() {
+        const wrap = document.getElementById("faitList");
+        const loadMoreBtn = document.getElementById("loadMoreFait");
+        const q = (
+          document.getElementById("searchInput").value || ""
+        ).toLowerCase();
+        wrap.innerHTML = "";
+
+        const source = fait.filter((i) =>
+          (i.unite || "").toLowerCase().includes(q)
+        );
+        const visible = source.slice(0, faitPage * PAGE_SIZE);
+
+        if (!visible.length) {
+          wrap.innerHTML = `<div class="text-center text-muted">Aucune réparation complétée trouvée.</div>`;
+          loadMoreBtn.classList.add("d-none");
+          return;
+        }
+
+        visible.forEach((item) => {
+          const el = document.createElement("details");
+          el.className = "list-card";
+          el.innerHTML = `
+        <summary class="card-head">
+          <div class="w-100 pe-2">
+            <div class="d-flex align-items-center flex-wrap gap-2">
+              <h6 class="card-title mb-0">${escapeHtml(
+                item.unite
+              )} – ${escapeHtml(item.nom || "")}</h6>
+              <span class="chip chip-ok">Réparé le ${formatDate(
+                item.dateFin || item.date
+              )}</span>
+            </div>
+            <small class="card-sub">${formatDate(item.date)}</small>
+            <div class="desc-preview mt-1">${escapeHtml(
+              (item.description || "").slice(0, 60)
+            )}${(item.description || "").length > 60 ? "…" : ""}</div>
+          </div>
+        </summary>
+        <div class="details-body">
+          <p class="mb-2"><strong>📄 Description complète :</strong></p>
+          <div class="p-2 bg-white border rounded shadow-sm"><span class="text-muted">${escapeHtml(
+            item.description || ""
+          )}</span></div>
+          <p class="mb-2 mt-3"><strong>🛠️ Réparations effectuées :</strong><br><span class="text-muted">${escapeHtml(
+            item.notes || ""
+          )}</span></p>
+          <p class="mb-0"><strong>⏱️ Temps :</strong> <span class="text-muted">${escapeHtml(
+            item.temps || ""
+          )}</span></p>
+        </div>
+      `;
+          wrap.appendChild(el);
+        });
+
+        loadMoreBtn.classList.toggle("d-none", visible.length >= source.length);
+        updateCounters();
+      }
+
+      function loadMoreFait() {
+        faitPage++;
+        renderFait();
+      }
+
+      function enableSave(detailsEl) {
+        const notes = detailsEl.querySelector(".js-notes").value.trim();
+        const minutes = parseInt(
+          detailsEl.querySelector(".js-range").value,
+          10
+        );
+        detailsEl.querySelector(".js-save").disabled = !(notes && minutes > 0);
+      }
+
+      function initGallery(selector) {
+        const gallery = document.querySelector(selector);
+        if (!gallery || gallery.dataset.pswpInit) return;
+        gallery.dataset.pswpInit = "1";
+        const lightbox = new window.PhotoSwipeLightbox({
+          gallery: selector,
+          children: "a.gallery-link",
+          pswpModule: () =>
+            import("https://unpkg.com/photoswipe@5/dist/photoswipe.esm.min.js"),
+        });
+        lightbox.init();
+      }
+
+      async function completer(detailsEl, item) {
+        const id = detailsEl.dataset.id;
+        const notes = detailsEl.querySelector(".js-notes").value.trim();
+        const minutes = parseInt(
+          detailsEl.querySelector(".js-range").value,
+          10
+        );
+        const h = Math.floor(minutes / 60),
+          m = minutes % 60;
+        const temps = `${h ? h + "h" : ""}${
+          m ? (h ? " " : "") + m + "min" : ""
+        }`;
+        const desc =
+          detailsEl.querySelector(".details-body .text-dark")?.innerText ||
+          item.description ||
+          "";
+        const dateFin = new Date().toISOString();
+
+        // Mise à jour locale
+        const idx = aFaire.findIndex((r) => r.id === id);
+        if (idx > -1) {
+          aFaire[idx].notes = notes;
+          aFaire[idx].temps = temps;
+          aFaire[idx].description = desc;
+          aFaire[idx].dateFin = dateFin;
+          const moved = aFaire.splice(idx, 1)[0];
+          fait.unshift(moved);
+        }
+
+        // UI
+        detailsEl.remove();
+        renderCurrentTab();
+        updateCounters();
+        showToast("Réparation enregistrée ✅");
+
+        // Envoi serveur (fire and forget)
+        fetch(
+          "https://script.google.com/macros/s/AKfycbzuR03sbcehVxg8t3aiIGAiaUYHUMahYPjY1zjo3truIFaypot1Toohowk4GJz8TsN0/exec",
+          {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              update: true,
+              id: item.id,
+              notes,
+              temps,
+              description: desc,
+              dateFin,
+            }),
+          }
+        ).catch(console.error);
+
+        // resync léger
+        setTimeout(() => chargerReparations(true), 1500);
+      }
+
+      function updateCounters() {
+        const aFaireCount = aFaire.filter(
+          (x) => !x.notes || !x.notes.trim()
+        ).length;
+        const faitCount = fait.length;
+        document.getElementById(
+          "a-faire-tab"
+        ).innerText = `À faire (${aFaireCount})`;
+        document.getElementById("fait-tab").innerText = `Réparé (${faitCount})`;
+      }
+
+      function showToast(msg) {
+        const t = document.getElementById("toastConfirm");
+        t.lastChild.nodeValue = " " + msg;
+        t.style.display = "flex";
+        setTimeout(() => (t.style.display = "none"), 3000);
+      }
+
+      // Recherche (debounce)
+      document.getElementById("searchInput").addEventListener(
+        "input",
+        debounced(() => {
+          const v = document.getElementById("searchInput").value.trim();
+          document
+            .getElementById("clearButton")
+            .classList.toggle("d-none", v === "");
+          renderCurrentTab();
+        }, 180)
+      );
+      function resetSearch() {
+        const i = document.getElementById("searchInput");
+        i.value = "";
+        document.getElementById("clearButton").classList.add("d-none");
+        renderCurrentTab();
+        i.focus();
+      }
+    </script>
+  </body>
 </html>

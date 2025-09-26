@@ -1,595 +1,394 @@
 <!DOCTYPE html>
 <html lang="fr">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Punch Journalier + Sommaire</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Punch</title>
     <style>
+      :root {
+        --fg: #0f172a;
+        --muted: #64748b;
+        --ok: #16a34a;
+        --warn: #ef4444;
+        --card: #ffffff;
+        --bg: #f6f7fb;
+      }
+      html,
       body {
         margin: 0;
-        font-family: "Segoe UI", sans-serif;
-        background: #0f172a;
-        color: #fff;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        padding: 20px;
+        padding: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: system-ui, Roboto, Arial, sans-serif;
       }
-      .container {
-        background: #1e293b;
-        padding: 24px;
-        border-radius: 16px;
-        max-width: 780px;
+      .wrap {
+        min-height: 100dvh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+      }
+      .card {
         width: 100%;
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+        max-width: 460px;
+        background: var(--card);
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(2, 6, 23, 0.08);
+        padding: 22px;
       }
       h1 {
-        color: #38bdf8;
+        font-size: 18px;
         margin: 0 0 8px;
-      }
-      #date {
-        margin-bottom: 8px;
-        font-size: 1.05rem;
-        color: #cbd5e1;
-      }
-      #clock {
-        margin-bottom: 16px;
-        color: #94a3b8;
-      }
-      select,
-      button {
-        border: none;
-        border-radius: 10px;
-      }
-      select {
-        padding: 12px 40px 12px 12px;
-        background: #0f172a;
-        color: #f1f5f9;
-        width: 100%;
-        font-weight: 600;
-        border: 1px solid #334155;
-        appearance: none;
-        background-image: url("data:image/svg+xml;charset=US-ASCII,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22 viewBox=%220 0 20 20%22><polygon fill=%22%23f1f5f9%22 points=%225,7 10,12 15,7%22/></svg>");
-        background-repeat: no-repeat;
-        background-position: right 10px center;
-        background-size: 12px;
         text-align: center;
-        text-align-last: center;
       }
-      .actions {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-        justify-content: center;
-        margin: 16px 0;
+      .clock {
+        font-size: 40px;
+        line-height: 1.1;
+        font-variant-numeric: tabular-nums;
+        text-align: center;
+        margin: 4px 0 8px;
       }
-      .btn {
-        padding: 12px 18px;
-        font-weight: 700;
-        color: #fff;
-        cursor: pointer;
-        transition: 0.2s;
-      }
-      .btn-in {
-        background: #22c55e;
-      }
-      .btn-in:hover {
-        background: #15803d;
-      }
-      .btn-out {
-        background: #ef4444;
-      }
-      .btn-out:hover {
-        background: #b91c1c;
-      }
-      .result {
-        background: #0b1220;
-        border: 1px solid #334155;
-        border-radius: 12px;
-        padding: 14px;
-      }
-      .rowline {
-        display: flex;
-        gap: 10px;
+      /* Badge d’état sous l’horloge */
+      .since {
+        display: flex; /* block-level → margin auto fonctionne */
         align-items: center;
-        justify-content: space-between;
-        margin: 6px 0;
+        gap: 8px;
+        padding: 10px 14px;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 15px;
+        letter-spacing: 0.2px;
+        font-variant-numeric: tabular-nums;
+        width: fit-content; /* taille au contenu */
+        margin: 8px auto 18px; /* ← centre horizontalement */
+        text-align: center;
+        align-self: center; /* au cas où son parent est en flex */
       }
-      .label {
-        min-width: 180px;
-        color: #94a3b8;
-        font-weight: 500;
+
+      .since--active {
+        background: #eaf7ee;
+        color: #166534;
+        box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12) inset;
       }
-      .value {
-        font-weight: 700;
+      .since--idle {
+        background: #f1f5f9;
+        color: #475569;
       }
-      #liveTimer {
-        color: #facc15;
-        font-weight: 800;
-        margin-top: 10px;
-        border-top: 1px dashed #334155;
-        padding-top: 10px;
+
+      .since .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: currentColor;
+        box-shadow: 0 0 0 0 currentColor;
+        animation: pulse 1.6s ease-in-out infinite;
       }
-      .summary {
-        margin-top: 20px;
-        background: #0b1220;
-        border: 1px solid #334155;
-        border-radius: 12px;
+      .since--idle .dot {
+        opacity: 0.4;
+        animation: none;
       }
-      .summary-head {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        justify-content: space-between;
-        padding: 12px 14px;
-        border-bottom: 1px solid #334155;
-      }
-      .sum-table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-      .sum-table thead th {
-        color: #cbd5e1;
-        font-weight: 700;
-        text-align: left;
-        font-size: 0.92rem;
-        padding: 12px;
-        border-bottom: 1px solid #334155;
-      }
-      .sum-table tbody td {
-        padding: 10px 12px;
-        border-bottom: 1px solid #1f2937;
-        font-size: 0.95rem;
-      }
-      .sum-table tbody tr:hover {
-        background: #0f1a2f;
-      }
-      .totalbar {
-        display: flex;
-        justify-content: flex-end;
-        gap: 14px;
-        padding: 12px 14px;
-      }
-      .totalbar .tot {
-        background: #0f172a;
-        border: 1px solid #334155;
-        border-radius: 8px;
-        padding: 8px 12px;
-      }
-      .muted {
-        color: #94a3b8;
-      }
-      @media (max-width: 640px) {
-        .label {
-          min-width: 140px;
+
+      @keyframes pulse {
+        0% {
+          transform: scale(0.9);
+          box-shadow: 0 0 0 0 currentColor;
+        }
+        70% {
+          transform: scale(1);
+          box-shadow: 0 0 0 10px rgba(0, 0, 0, 0);
+        }
+        100% {
+          transform: scale(0.9);
+          box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
         }
       }
-      /* Centrer le titre et le sélecteur Employé */
-      .container h1 {
-        text-align: center;
-      }
-
-      label[for="employeeName"] {
+      .btn {
         display: block;
+        width: 100%;
+        padding: 16px 18px;
+        font-size: 18px;
+        border: 0;
+        border-radius: 12px;
+        margin: 10px 0;
+        cursor: pointer;
+      }
+      .in {
+        background: #eaf7ee;
+        color: var(--ok);
+      }
+      .out {
+        background: #fdecec;
+        color: var(--warn);
+      }
+      .status {
+        min-height: 18px;
         text-align: center;
+        font-size: 13px;
+        color: var(--muted);
+        margin-top: 6px;
       }
-      /* Centrer la date et l'heure */
-      #date,
-      #clock {
-        text-align: center;
+      h2 {
+        font-size: 16px;
+        margin: 18px 0 8px;
       }
-
-      /* Grossir un peu la zone Employé */
-      label[for="employeeName"] {
-        font-size: 1.08rem; /* + léger */
-        font-weight: 700;
+      .tbl {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
       }
-
-      #employeeName {
-        font-size: 1.05rem; /* texte du select un peu plus gros */
-        padding: 14px 40px; /* garde le look aéré */
-        display: block;
-        max-width: 600px;
-        margin: 0 auto 16px; /* reste centré */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+      th,
+      td {
+        padding: 10px;
+        border-bottom: 1px solid #eef2f7;
+        text-align: left;
+        white-space: nowrap;
+      }
+      tfoot td {
+        font-weight: 600;
+      }
+      /* Overlay de chargement (blur + spinner) */
+      .busy {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 12px;
+        background: rgba(246, 247, 251, 0.55); /* même teinte que --bg */
+        backdrop-filter: blur(6px);
+      }
+      .busy.show {
+        display: flex;
+      }
+      .busy .spinner {
+        width: 44px;
+        height: 44px;
+        border: 4px solid rgba(0, 0, 0, 0.12);
+        border-top-color: var(--fg);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      .busy .busy-text {
+        font-weight: 600;
+        color: var(--fg);
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
       }
     </style>
-
-    <!-- Firebase (punch temps réel inchangé) -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-    <script>
-      const firebaseConfig = {
-        apiKey: "AIzaSyD4U85mokKXsAP1AdwClWtcbt8udZrwlAw",
-        authDomain: "sommaireelz.firebaseapp.com",
-        projectId: "sommaireelz",
-        storageBucket: "sommaireelz.firebasestorage.app",
-        messagingSenderId: "171788284751",
-        appId: "1:171788284751:web:694f070d1cafe8b7c04b3a",
-      };
-      firebase.initializeApp(firebaseConfig);
-      const db = firebase.firestore();
-    </script>
   </head>
   <body>
-    <div class="container">
-      <h1>Punch de Travail</h1>
+    <div class="wrap">
+      <div class="card">
+        <h1>Sacha-Pierre Tournier</h1>
+        <div class="clock" id="clock">--:--:--</div>
+        <div class="since" id="since">Depuis le dernier IN : 00:00:00</div>
 
-      <label
-        for="employeeName"
-        style="display: block; margin: 10px 0 8px; font-weight: 700"
-        >Employé :</label
-      >
-      <select id="employeeName">
-        <option value="Sacha-Pierre Tournier" selected>
-          Sacha-Pierre Tournier
-        </option>
-        <option value="Mathieu Denis">Mathieu Denis</option>
-        <option value="Ann Déry">Ann Déry</option>
-      </select>
+        <button id="btnIn" class="btn in">IN</button>
+        <button id="btnOut" class="btn out">OUT</button>
+        <div id="status" class="status"></div>
 
-      <div id="date">Date: --/--/----</div>
-      <div id="clock">Heure: --:--:--</div>
-
-      <div class="actions">
-        <button id="punchInBtn" class="btn btn-in">🟢 Punch In</button>
-        <button id="punchOutBtn" class="btn btn-out">🔴 Punch Out</button>
-      </div>
-
-      <div class="result">
-        <div class="rowline">
-          <span class="label">🕓 Heure d'entrée</span
-          ><span class="value" id="inTime"></span>
-        </div>
-        <div class="rowline">
-          <span class="label">🏁 Heure de sortie</span
-          ><span class="value" id="outTime"></span>
-        </div>
-        <div class="rowline">
-          <span class="label">⏱ Temps travaillé</span
-          ><span class="value" id="workedTime"></span>
-        </div>
-        <div id="liveTimer">⏳ En cours: 00:00:00</div>
-      </div>
-
-      <!-- SOMMAIRE (7 jours fixes, basé sur Google Sheet) -->
-      <div class="summary" id="summary">
-        <div class="summary-head">
-          <div>
-            <strong>📊 Sommaire des heures</strong>
-            <span class="muted" id="rangeLabel">(7 derniers jours)</span>
-          </div>
-        </div>
-        <div style="overflow: auto">
-          <table class="sum-table" id="sumTable">
+        <h2>Historique de la semaine</h2>
+        <div class="tbl">
+          <table>
             <thead>
               <tr>
                 <th>Date</th>
-                <th>Entrée</th>
-                <th>Sortie</th>
-                <th>Durée</th>
+                <th>In</th>
+                <th>Out</th>
+                <th>Heures</th>
               </tr>
             </thead>
-            <tbody></tbody>
+            <tbody id="tbody"></tbody>
+            <tfoot>
+              <tr>
+                <td colspan="3">Total</td>
+                <td id="total">0</td>
+              </tr>
+            </tfoot>
           </table>
-        </div>
-        <div class="totalbar">
-          <div class="tot">Total: <strong id="sumTotal">00:00</strong></div>
         </div>
       </div>
     </div>
+    <div id="busy" class="busy" aria-live="polite" aria-busy="true">
+      <div class="spinner"></div>
+      <div class="busy-text">Chargement…</div>
+    </div>
 
     <script>
-      /* ------------------- DOM refs ------------------- */
-      const dateEl = document.getElementById("date");
-      const inTimeEl = document.getElementById("inTime");
-      const outTimeEl = document.getElementById("outTime");
-      const workedTimeEl = document.getElementById("workedTime");
-      const liveTimerEl = document.getElementById("liveTimer");
-      const employeeSelect = document.getElementById("employeeName");
-      const sumTableBody = document.querySelector("#sumTable tbody");
-      const sumTotalEl = document.getElementById("sumTotal");
-      const rangeLabel = document.getElementById("rangeLabel");
+      // ➊ Mets l'URL /exec de ton Apps Script ici :
+      const GAS_URL =
+        "https://script.google.com/macros/s/AKfycbx40dOw3fdp4BQQZ4LgCWliA90XjPx6ez8MJCcyFr4w9pfqF0xtViXXD07WmP4hCg93Mw/exec";
+      const TZ = "America/Toronto";
 
-      /* ------------------- Horloge ------------------- */
-      dateEl.textContent = `Date: ${new Date().toLocaleDateString("fr-FR")}`;
-      const clockEl = document.getElementById("clock");
-      function updateClock() {
-        clockEl.textContent = `Heure: ${new Date().toLocaleTimeString(
-          "fr-FR"
-        )}`;
-      }
-      updateClock();
-      setInterval(updateClock, 1000);
+      const $ = (s) => document.querySelector(s);
+      const clockEl = $("#clock"),
+        sinceEl = $("#since"),
+        tbody = $("#tbody"),
+        totalEl = $("#total"),
+        statusEl = $("#status");
+      let sinceTimer = null;
 
-      /* ------------------- Helpers ------------------- */
-      function getDateKey(d = new Date()) {
-        return d.toISOString().slice(0, 10);
+      const busyEl = document.getElementById("busy");
+      function showBusy(text = "Chargement…") {
+        busyEl.querySelector(".busy-text").textContent = text;
+        busyEl.classList.add("show");
       }
-      function pad2(n) {
-        return String(n).padStart(2, "0");
-      }
-      function minsToHHMM(mins) {
-        const h = Math.floor(mins / 60),
-          m = mins % 60;
-        return `${pad2(h)}:${pad2(m)}`;
+      function hideBusy() {
+        busyEl.classList.remove("show");
       }
 
-      /* ------------------- Firestore (punch temps réel) ------------------- */
-      async function savePunchIn(employee, atDate = new Date()) {
-        const dateKey = getDateKey(atDate),
-          deviceId = getDeviceId();
-        await db
-          .collection("punches")
-          .doc(employee)
-          .collection("entries")
-          .doc(dateKey)
-          .set(
-            {
-              status: "in",
-              punchInTime: atDate.toISOString(),
-              geoDataIn: geoData || {},
-              deviceId,
-            },
-            { merge: true }
-          );
+      function fmtClock(d) {
+        return new Intl.DateTimeFormat("fr-CA", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+          timeZone: TZ,
+        }).format(d);
       }
-      async function savePunchOut(employee, inISO, outDate = new Date()) {
-        const dateKey = getDateKey(new Date(inISO));
-        const inDate = new Date(inISO);
-        const workedMinutes = Math.max(
-          0,
-          Math.floor((outDate - inDate) / 60000)
-        );
-        await db
-          .collection("punches")
-          .doc(employee)
-          .collection("entries")
-          .doc(dateKey)
-          .set(
-            {
-              status: "done",
-              punchOutTime: outDate.toISOString(),
-              workedMinutes,
-              workedHHMM: minsToHHMM(workedMinutes),
-              geoDataOut: geoData || {},
-            },
-            { merge: true }
-          );
+      function fmtSince(ms) {
+        const s = Math.max(0, Math.floor(ms / 1000));
+        const h = String(Math.floor(s / 3600)).padStart(2, "0");
+        const m = String(Math.floor((s % 3600) / 60)).padStart(2, "0");
+        const ss = String(s % 60).padStart(2, "0");
+        return `${h}:${m}:${ss}`;
       }
-      async function loadTodayEntry(employee) {
-        const doc = await db
-          .collection("punches")
-          .doc(employee)
-          .collection("entries")
-          .doc(getDateKey())
-          .get();
-        return doc.exists ? doc.data() : null;
+      function startClock() {
+        clockEl.textContent = fmtClock(new Date());
+        setInterval(() => (clockEl.textContent = fmtClock(new Date())), 1000);
       }
+      function startSince(fromISO) {
+        if (sinceTimer) clearInterval(sinceTimer);
 
-      /* ------------------- Sommaire depuis Google Sheet ------------------- */
-      // ⚠️ Mets ici l’URL de TON web app Apps Script (celui qui écrit dans le Sheet) :
-// ✅ Mets TON URL déployée
-const SUMMARY_URL = "https://script.google.com/macros/s/AKfycbwAHBFhiWNt8kvJnoPDE9cnOAK0QwxnojkkYP6qch9GBcfFmWmsIm3qJTEsRq7Y0B0Mzw/exec";
+        // pas d’IN actif → badge gris
+        if (!fromISO) {
+          sinceEl.className = "since since--idle";
+          sinceEl.innerHTML = `<span class="dot"></span>Aucune session active`;
+          return;
+        }
 
-// Rend le tableau
-function renderSummary(json) {
-  sumTableBody.innerHTML = "";
-  let total = 0;
+        // IN actif → badge vert + chrono
+        sinceEl.className = "since since--active";
+        const base = new Date(fromISO.replace(" ", "T"));
 
-  (json.rows || []).forEach((r) => {
-    const dateStr = r.dateKey.split("-").reverse().join("/"); // DD/MM/YYYY
-    const inStr = r.in || "—";
-    const outStr = r.out || "—";
-    const dur = (r.workedMinutes != null) ? minsToHHMM(r.workedMinutes) : "—";
-    total += r.workedMinutes || 0;
-
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${dateStr}</td><td>${inStr}</td><td>${outStr}</td><td>${dur}</td>`;
-    sumTableBody.appendChild(tr);
-  });
-
-  sumTotalEl.textContent = minsToHHMM(total);
-}
-
-// JSONP fallback (pour Safari iOS)
-function jsonp(url) {
-  return new Promise((resolve, reject) => {
-    const cb = "cb_" + Math.random().toString(36).slice(2);
-    window[cb] = (data) => {
-      try { renderSummary(data); resolve(); }
-      finally { delete window[cb]; script.remove(); }
-    };
-    const script = document.createElement("script");
-    script.src = url + (url.includes("?") ? "&" : "?") + "callback=" + cb;
-    script.onerror = () => { delete window[cb]; script.remove(); reject(new Error("JSONP failed")); };
-    document.body.appendChild(script);
-  });
-}
-
-// Charge le sommaire (7 jours) avec fetch -> fallback JSONP
-async function refreshSummaryFromSheet(employee) {
-  rangeLabel.textContent = "(7 derniers jours)";
-  const base = `${SUMMARY_URL}?mode=summary&name=${encodeURIComponent(employee)}&days=7`;
-  try {
-    const res = await fetch(base, { cache: "no-store", mode: "cors", credentials: "omit" });
-    if (!res.ok) throw new Error("HTTP " + res.status);
-    const json = await res.json();
-    renderSummary(json);
-  } catch (err) {
-    console.warn("fetch échoué, passage en JSONP:", err);
-    try {
-      await jsonp(base);
-    } catch (e) {
-      console.error("JSONP échoué:", e);
-      sumTableBody.innerHTML = `<tr><td colspan="4">Impossible de charger le sommaire.</td></tr>`;
-      sumTotalEl.textContent = "00:00";
-    }
-  }
-}
-
-
-      /* ------------------- UI état du jour ------------------- */
-      let punchInTime = null,
-        liveInterval = null,
-        geoData = {};
-      function startLiveTimer() {
-        clearInterval(liveInterval);
-        liveInterval = setInterval(() => {
-          const now = new Date(),
-            diff = now - punchInTime;
-          const s = Math.floor(diff / 1000) % 60,
-            m = Math.floor(diff / 60000) % 60,
-            h = Math.floor(diff / 3600000);
-          liveTimerEl.textContent = `⏳ En cours: ${pad2(h)}:${pad2(m)}:${pad2(
-            s
+        const tick = () => {
+          sinceEl.innerHTML = `<span class="dot"></span>En cours depuis ${fmtSince(
+            Date.now() - base.getTime()
           )}`;
-        }, 1000);
-      }
-      function stopLiveTimer() {
-        clearInterval(liveInterval);
-        liveTimerEl.textContent = "⏳ En cours: 00:00:00";
+        };
+        tick();
+        sinceTimer = setInterval(tick, 1000);
       }
 
-      async function refreshTodayUI(employee) {
-        const data = await loadTodayEntry(employee);
-        if (data && data.punchInTime && data.status !== "done") {
-          punchInTime = new Date(data.punchInTime);
-          inTimeEl.textContent = punchInTime.toLocaleTimeString("fr-FR");
-          outTimeEl.textContent = "";
-          workedTimeEl.textContent = "";
-          startLiveTimer();
-        } else if (data && data.status === "done") {
-          inTimeEl.textContent = new Date(data.punchInTime).toLocaleTimeString(
-            "fr-FR"
+      function renderWeek(sessions, total) {
+        tbody.innerHTML = "";
+        (sessions || []).forEach((s) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${s.date}</td><td>${s.in || ""}</td><td>${
+            s.out || ""
+          }</td><td>${(s.hours || 0).toFixed(2)}</td>`;
+          tbody.appendChild(tr);
+        });
+        totalEl.textContent = (total || 0).toFixed(2);
+      }
+      function setStatus(msg) {
+        statusEl.textContent = msg || "";
+      }
+
+      function jsonp(url) {
+        return new Promise((resolve, reject) => {
+          const cb = "cb_" + Math.random().toString(36).slice(2);
+          const scr = document.createElement("script");
+          const sep = url.includes("?") ? "&" : "?";
+          let settled = false;
+
+          const timeoutMs = 60000; // 60s
+          const timer = setTimeout(() => {
+            if (settled) return;
+            settled = true;
+            cleanup();
+            reject(new Error("Timeout"));
+          }, timeoutMs);
+
+          function cleanup() {
+            clearTimeout(timer);
+            // laisser un no-op pour éviter "cb_xxx is not defined" si la réponse arrive après
+            window[cb] = () => {};
+            scr.remove();
+          }
+
+          window[cb] = (payload) => {
+            if (settled) return;
+            settled = true;
+            cleanup();
+            resolve(payload);
+          };
+
+          scr.onerror = () => {
+            if (settled) return;
+            settled = true;
+            cleanup();
+            reject(new Error("JSONP error"));
+          };
+
+          // anti-cache param
+          scr.src = `${url}${sep}callback=${cb}&_=${Date.now()}`;
+          document.head.appendChild(scr);
+        });
+      }
+
+      async function refresh() {
+        setStatus("Chargement…");
+        showBusy("Chargement…");
+        try {
+          const res = await jsonp(`${GAS_URL}?action=getWeek`);
+          if (!res.ok) throw new Error(res.error || "Erreur getWeek");
+          const d = res.data;
+          startSince(d.lastInISO);
+          renderWeek(d.sessions, d.weekTotal);
+          setStatus("");
+        } catch (err) {
+          setStatus("Erreur: " + err.message);
+        } finally {
+          hideBusy();
+        }
+      }
+      async function punch(act) {
+        setStatus(act + "…");
+        showBusy(act === "IN" ? "Enregistrement IN…" : "Enregistrement OUT…");
+        try {
+          const res = await jsonp(
+            `${GAS_URL}?action=record&do=${encodeURIComponent(act)}`
           );
-          outTimeEl.textContent = new Date(
-            data.punchOutTime
-          ).toLocaleTimeString("fr-FR");
-          workedTimeEl.textContent =
-            data.workedHHMM || minsToHHMM(data.workedMinutes || 0);
-          stopLiveTimer();
-          punchInTime = null;
-        } else {
-          inTimeEl.textContent = "";
-          outTimeEl.textContent = "";
-          workedTimeEl.textContent = "";
-          stopLiveTimer();
-          punchInTime = null;
+          if (!res.ok) throw new Error(res.error || "Erreur record");
+          const d = res.data;
+          startSince(d.lastInISO);
+          renderWeek(d.sessions, d.weekTotal);
+          setStatus("");
+        } catch (err) {
+          setStatus("Erreur: " + err.message);
+        } finally {
+          hideBusy();
         }
       }
 
-      /* ------------------- Géoloc, actions & init ------------------- */
-      if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            geoData.lat = pos.coords.latitude;
-            geoData.lng = pos.coords.longitude;
-            try {
-              geoData.inZone = checkIfInZone(geoData.lat, geoData.lng);
-            } catch (_) {}
-            document.getElementById("punchInBtn").disabled = false;
-          },
-          (err) => {
-            console.warn("Géoloc indisponible:", err.message);
-            geoData.error = err.message;
-            // on autorise quand même le punch
-            document.getElementById("punchInBtn").disabled = false;
-          },
-          { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 }
-        );
-      } else {
-        // pas de géoloc dispo
-        document.getElementById("punchInBtn").disabled = false;
-      }
+      document.getElementById("btnIn").onclick = () => punch("IN");
+      document.getElementById("btnOut").onclick = () => punch("OUT");
 
-      // --- PUNCH IN ---
-      document
-        .getElementById("punchInBtn")
-        .addEventListener("click", async () => {
-          const employee = employeeSelect.value;
-          const existing = await loadTodayEntry(employee);
-          if (existing && existing.punchInTime && existing.status !== "done") {
-            const ok = confirm(
-              `Un Punch In est déjà enregistré pour ${employee}. Écraser ?`
-            );
-            if (!ok) return;
-          }
-
-          punchInTime = new Date();
-          inTimeEl.textContent = punchInTime.toLocaleTimeString("fr-FR");
-          outTimeEl.textContent = "";
-          workedTimeEl.textContent = "";
-          await savePunchIn(employee, punchInTime);
-          startLiveTimer();
-
-          // Écriture Sheet via Apps Script (beacon sans CORS)
-          const urlIn = `${SUMMARY_URL}?status=in&lat=${
-            geoData.lat ?? ""
-          }&lng=${geoData.lng ?? ""}&inZone=${
-            geoData.inZone ?? ""
-          }&name=${encodeURIComponent(employee)}`;
-          new Image().src = urlIn;
-
-          refreshSummaryFromSheet(employee); // met à jour le tableau 7j
-        });
-
-      // --- PUNCH OUT ---
-      document
-        .getElementById("punchOutBtn")
-        .addEventListener("click", async () => {
-          const employee = employeeSelect.value;
-          const data = await loadTodayEntry(employee);
-          if (!data || !data.punchInTime || data.status === "done") {
-            alert("❌ Aucun Punch In actif pour aujourd’hui.");
-            return;
-          }
-
-          const out = new Date();
-          const inDt = new Date(data.punchInTime);
-          const minutes = Math.max(0, Math.floor((out - inDt) / 60000));
-
-          inTimeEl.textContent = inDt.toLocaleTimeString("fr-FR");
-          outTimeEl.textContent = out.toLocaleTimeString("fr-FR");
-          workedTimeEl.textContent = minsToHHMM(minutes);
-
-          await savePunchOut(employee, data.punchInTime, out);
-          stopLiveTimer();
-          punchInTime = null;
-
-          // Écriture Sheet via Apps Script (beacon sans CORS)
-          const urlOut = `${SUMMARY_URL}?status=out&lat=${
-            geoData.lat ?? ""
-          }&lng=${geoData.lng ?? ""}&inZone=${
-            geoData.inZone ?? ""
-          }&name=${encodeURIComponent(employee)}`;
-          new Image().src = urlOut;
-
-          refreshSummaryFromSheet(employee); // met à jour le tableau 7j
-        });
-
-      employeeSelect.addEventListener("change", async () => {
-        await refreshTodayUI(employeeSelect.value);
-        refreshSummaryFromSheet(employeeSelect.value);
-      });
-
-      function getDeviceId() {
-        let id = localStorage.getItem("deviceId");
-        if (!id) {
-          id =
-            "dev-" +
-            (crypto.randomUUID
-              ? crypto.randomUUID()
-              : Math.random().toString(36).slice(2));
-          localStorage.setItem("deviceId", id);
-        }
-        return id;
-      }
-
-      (async function init() {
-        await refreshTodayUI(employeeSelect.value);
-        await refreshSummaryFromSheet(employeeSelect.value); // 7 jours fixes
-      })();
+      startClock();
+      refresh();
     </script>
   </body>
 </html>

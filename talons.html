@@ -722,8 +722,9 @@
         viewer.style.display = "none";
         modal.classList.add("active");
 
-        // Charger le PDF
-        viewer.src = downloadURL;
+        // Charger le PDF avec zoom out pour affichage complet
+        viewer.src =
+          downloadURL + "#zoom=FitH&toolbar=1&navpanes=0&scrollbar=1";
         viewer.onload = () => {
           loading.style.display = "none";
           viewer.style.display = "block";

@@ -2,18 +2,17 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sommaire</title>
   <style>
-    
+    /* Styles de base */
     html, body {
       margin: 0;
-      padding-top: calc(60px + env(safe-area-inset-top));
       font-family: 'Segoe UI', sans-serif;
       background-color: #f4f4f4;
       font-size: 16px;
     }
+
     /* En-tête */
     header {
       background-color: #111;
@@ -27,6 +26,44 @@
     }
     header img {
       height: 40px;
+    }
+
+    /* Menu hamburger */
+    .menu-toggle {
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+    }
+    .menu-toggle span {
+      height: 3px;
+      width: 25px;
+      background: white;
+      margin: 4px 0;
+      transition: 0.3s;
+    }
+    .menu {
+      display: none;
+      position: absolute;
+      top: 60px;
+      right: 20px;
+      background-color: #111;
+      border: 1px solid #444;
+      border-radius: 6px;
+      padding: 10px;
+      z-index: 999;
+    }
+    .menu.show {
+      display: block;
+    }
+    .menu a {
+      display: block;
+      color: white;
+      padding: 8px 12px;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .menu a:hover {
+      background-color: #333;
     }
 
     /* Container et tableau */
@@ -68,6 +105,7 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
     table {
+      min-width: 900px;
       width: 100%;
       border-collapse: collapse;
     }
@@ -138,11 +176,7 @@
       border: none;
       box-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
-    
-#garageTable td {
-  min-height: 44px;
-  height: 44px;
-}
+
     /* Responsive */
     @media (max-width: 600px) {
       .container {
@@ -160,208 +194,21 @@
         font-size: 14px;
       }
     }
-    
-td[contenteditable], textarea, input {
-  font-size: 16px !important;
-  touch-action: manipulation;
-}
-
-#garageTable {
-  table-layout: fixed;
-  width: 100%;
-  max-width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-}
-
-#garageTable th, #garageTable td {
-  padding: 4px;
-  height: 34px; /* plus bas */
-  font-size: 13px;
-  text-align: center;
-  word-break: break-word;
-}
-
-#garageTable th:first-child,
-#garageTable td:first-child {
-  width: 30%;
-}
-
-#garageTable th:last-child,
-#garageTable td:last-child {
-  width: 70%;
-}
-
-@media (max-width: 600px) {
-  #garageTable th, #garageTable td {
-    font-size: 13px;
-    padding: 6px;
-  }
-}
-
-#dispoTable {
-  min-width: 900px;
-}
-
-.load-btn {
-  background-color: #f1c40f;
-  color: black;
-}
-
-
   </style>
-  <!-- Firebase SDKs en mode compat pour HTML classique -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyD4U85mokKXsAP1AdwClWtcbt8udZrwlAw",
-    authDomain: "sommaireelz.firebaseapp.com",
-    projectId: "sommaireelz",
-    storageBucket: "sommaireelz.firebasestorage.app",
-    messagingSenderId: "171788284751",
-    appId: "1:171788284751:web:694f070d1cafe8b7c04b3a"
-  };
-
-  // Initialisation Firebase
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-
-  window.saveToFirebase = function(data, callback) {
-  const collection = db.collection("disponibilites");
-  const TWO_YEARS_AGO = new Date();
-  TWO_YEARS_AGO.setFullYear(TWO_YEARS_AGO.getFullYear() - 2);
-
-  collection
-    .where("timestamp", "<", TWO_YEARS_AGO.toISOString())
-    .get()
-    .then(snapshot => {
-      const deletions = snapshot.docs.map(doc => doc.ref.delete());
-      return Promise.all(deletions);
-    })
-    .then(() => {
-      return collection.where("date", "==", data.date).get();
-    })
-    .then(snapshot => {
-      if (!snapshot.empty) {
-        const existingDocId = snapshot.docs[0].id;
-        return collection.doc(existingDocId).set(data, { merge: false });
-      } else {
-        return collection.add(data);
-      }
-    })
-    .then(() => {
-      console.log("✅ Données sauvegardées (ajout ou mise à jour).");
-      if (typeof callback === "function") callback();
-    })
-    .catch(error => {
-      console.error("❌ Erreur Firebase :", error);
-      alert("Erreur d’enregistrement Firebase : " + error.message);
-    });
-};
-
-
-window.loadFromFirebase = function(date) {
-  
-  db.collection("disponibilites")
-    .where("date", "==", date)
-    .orderBy("timestamp", "desc")
-    .limit(1)
-    .get()
-    .then(querySnapshot => {
-      if (!querySnapshot.empty) {
-        const data = querySnapshot.docs[0].data();
-
-        // Injecte les données dans les tables
-        const garageBody = document.getElementById("garageBody");
-        garageBody.innerHTML = "";
-        (data.garage || []).forEach(item => {
-          const tr = createGarageRow();
-          const cells = tr.querySelectorAll("td");
-          cells[0].textContent = item.unite || "";
-          cells[1].textContent = item.raison || "";
-          garageBody.appendChild(tr);
-        });
-
-        elements.noteField.value = data.note || "";
-        elements.dateSelect.value = data.date || "";
-        elements.tableBody.innerHTML = "";
-
-        data.rows.forEach(row => {
-          const tr = createRow();
-          const cells = tr.querySelectorAll("td");
-          cells[0].textContent = row.rang || "";
-          cells[1].textContent = row.client || "";
-          cells[2].textContent = row.type || "";
-          cells[3].textContent = row.depart || "";
-          cells[4].textContent = row.livraison || "";
-          cells[5].textContent = row.chauffeur || "";
-          cells[6].textContent = row.camion || "";
-          cells[7].textContent = row.remorque || "";
-          elements.tableBody.appendChild(tr);
-        });
-
-        console.log("✅ Données chargées depuis Firebase !");
-      } else {
-        console.log("📭 Aucune donnée trouvée dans Firebase. Réinitialisation...");
-
-        // Réinitialise le tableau (efface tout sauf la colonne rang et dernière ligne)
-        elements.noteField.value = "";
-        const rows = document.querySelectorAll("#tableBody tr");
-        rows.forEach((row, index) => {
-          if (index === rows.length - 1) return;
-          const cells = row.querySelectorAll("td");
-          for (let i = 1; i < cells.length - 1; i++) {
-            cells[i].textContent = "";
-          }
-        });
-          db.collection("disponibilites")
-            .orderBy("timestamp", "desc")
-            .limit(1)
-            .get()
-            .then(snapshot => {
-              const garageBody = document.getElementById("garageBody");
-              garageBody.innerHTML = "";
-
-              if (!snapshot.empty) {
-                const lastData = snapshot.docs[0].data();
-                const lastGarage = Array.isArray(lastData.garage) ? lastData.garage : [];
-
-                for (let i = 0; i < 3; i++) {
-                  const tr = createGarageRow();
-                  const cells = tr.querySelectorAll("td");
-
-                  if (lastGarage[i]) {
-                    cells[0].textContent = lastGarage[i].unite || "";
-                    cells[1].textContent = lastGarage[i].raison || "";
-                  }
-
-                  garageBody.appendChild(tr);
-                }
-
-              } else {
-                // Aucune sauvegarde garage trouvée → on génère 3 lignes vides
-                generateGarageRows(3);
-              }
-            });
-      }
-    })
-    .catch(error => {
-      console.error("❌ Erreur Firebase :", error);
-    });
-};
-
-</script>
-
 </head>
 <body>
-<div id="customHeader"></div>
-<script>
-  fetch("assets/header.html")
-    .then(res => res.text())
-    .then(html => document.getElementById("customHeader").innerHTML = html);
-</script>
+  <header>
+    <img src="assets/logo.jpeg" alt="Logo Transport ELZ">
+    <div class="menu-toggle" id="menuToggle">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <div class="menu" id="menuDropdown">
+      <a href="dispos.html">Disponibilités</a>
+      <a href="linktree.html">Menu</a>
+    </div>
+  </header>
   <div class="container">
     <div class="top-bar">
       <input type="date" id="dateSelect" />
@@ -386,45 +233,16 @@ window.loadFromFirebase = function(date) {
         <tbody id="tableBody"></tbody>
       </table>
     </div>
-<h3 style="text-align: center; font-size: 18px;">🛠️ Unités au garage</h3>
-<div class="table-wrapper">
-  <table id="garageTable">
-    <thead>
-      <tr>
-        <th style="width: 30%;">UNITÉ</th>
-        <th style="width: 70%;">RAISON</th>
-      </tr>
-    </thead>
-    <tbody id="garageBody">
-      <tr>
-        <td contenteditable style="height: 36px;"></td>
-        <td contenteditable style="height: 36px;"></td>
-      </tr>
-      <tr>
-        <td contenteditable style="height: 36px;"></td>
-        <td contenteditable style="height: 36px;"></td>
-      </tr>
-      <tr>
-        <td contenteditable style="height: 36px;"></td>
-        <td contenteditable style="height: 36px;"></td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<div class="buttons" style="margin-top: 16px;">
-  <button class="reset-btn" id="resetBtn">Reset</button>
-  <button class="save-btn" id="saveBtn">Save</button>
-  <button class="send-btn" id="sendBtn">Send</button>
-</div>
-
-
-
+    <div class="buttons">
+      <button class="reset-btn" id="resetBtn">Reset</button>
+      <button class="save-btn" id="saveBtn">Save</button>
+      <button class="send-btn" id="sendBtn">Send</button>
+    </div>
   </div>
 
   <script>
     // Configuration et constantes
-    const API_URL = "https://script.google.com/macros/s/AKfycbw5nEGTjiq37xzylQZHzXaNZZLWJJLEafeg_zWIoNHKk0A8Ep5PCSuT4DEjnrYNNXR_aw/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbww1QIrrp3tr4OmjwNtsGMe9RLq_ia2yOhHS_kR4wNnMrxK6qoThW5_IQAh3BzomO9P/exec";
     const CHAUFFEUR_MAP = {
       "JFJ": { nom: "Jeff", tel: "4185202502" },
       "AL": { nom: "Alain", tel: "4182710206" },
@@ -452,25 +270,10 @@ window.loadFromFirebase = function(date) {
       resetBtn: document.getElementById("resetBtn"),
       saveBtn: document.getElementById("saveBtn"),
       sendBtn: document.getElementById("sendBtn"),
+      menuToggle: document.getElementById("menuToggle"),
+      menuDropdown: document.getElementById("menuDropdown")
     };
     
-    function createGarageRow() {
-  const tr = document.createElement("tr");
-  tr.innerHTML = `
-    <td contenteditable></td>
-    <td contenteditable></td>
-  `;
-  return tr;
-}
-
-function generateGarageRows(n = 3) {
-  const garageBody = document.getElementById("garageBody");
-  garageBody.innerHTML = "";
-  for (let i = 0; i < n; i++) {
-    garageBody.appendChild(createGarageRow());
-  }
-}
-
     // Fonctions pour la gestion des lignes du tableau
     function createRow() {
       const row = document.createElement("tr");
@@ -500,17 +303,14 @@ function generateGarageRows(n = 3) {
     
     // Fonctions pour les opérations principales
     function formatDate(dateStr) {
-  if (!dateStr) return "";
-
-  const [year, month, day] = dateStr.split("-");
-  const dateObj = new Date(Number(year), Number(month) - 1, Number(day));
-
-  const dayName = DAYS_FR[dateObj.getDay()];
-  const dayNum = dateObj.getDate();
-  const monthName = MONTHS_FR[dateObj.getMonth()];
-
-  return `${dayName} le ${dayNum} ${monthName}`;
-}
+      if (!dateStr) return "";
+      
+      const dateObj = new Date(dateStr + "T00:00:00");
+      const dayName = DAYS_FR[dateObj.getDay()];
+      const dayNum = dateObj.getDate();
+      const monthName = MONTHS_FR[dateObj.getMonth()];
+      return `${dayName} le ${dayNum} ${monthName}`;
+    }
 
     function copyRow(row) {
       const cells = row.querySelectorAll("td");
@@ -551,124 +351,68 @@ function generateGarageRows(n = 3) {
       elements.noteField.value = "";
       elements.dateSelect.value = "";
       localStorage.clear();
-    
+      
       const rows = document.querySelectorAll("#tableBody tr");
-      rows.forEach((row, index) => {
-        // Si c’est la dernière ligne, on la saute
-        if (index === rows.length - 1) return;
-    
+      rows.forEach(row => {
         const cells = row.querySelectorAll("td");
-        // Ne pas effacer la 1re cellule (rang)
-        for (let i = 1; i < 8; i++) {
+        for (let i = 0; i < 8; i++) {
           if (cells[i]) cells[i].textContent = "";
         }
       });
     }
 
+    function saveData() {
+      try {
+        localStorage.setItem(STORAGE_KEYS.note, elements.noteField.value);
+        localStorage.setItem(STORAGE_KEYS.date, elements.dateSelect.value);
+        
+        const rows = Array.from(document.querySelectorAll("#dispoTable tbody tr")).map(tr =>
+          Array.from(tr.querySelectorAll("td")).slice(0, 8).map(td => td.textContent.trim())
+        );
+        localStorage.setItem(STORAGE_KEYS.rows, JSON.stringify(rows));
+        
+        alert("Données sauvegardées !");
+      } catch (err) {
+        alert("Erreur lors de la sauvegarde : " + err.message);
+      }
+    }
 
-function saveData() {
-  try {
-    const note = elements.noteField.value;
-    const date = elements.dateSelect.value;
-
-    const rows = Array.from(document.querySelectorAll("#dispoTable tbody tr")).map(tr => {
-      const cells = Array.from(tr.querySelectorAll("td")).slice(0, 8);
-      return {
-        rang: cells[0]?.textContent.trim() || "",
-        client: cells[1]?.textContent.trim() || "",
-        type: cells[2]?.textContent.trim() || "",
-        depart: cells[3]?.textContent.trim() || "",
-        livraison: cells[4]?.textContent.trim() || "",
-        chauffeur: cells[5]?.textContent.trim() || "",
-        camion: cells[6]?.textContent.trim() || "",
-        remorque: cells[7]?.textContent.trim() || ""
-      };
-    });
-
-    const garageRows = Array.from(document.querySelectorAll("#garageTable tbody tr")).map(tr => {
-      const tds = tr.querySelectorAll("td");
-      return {
-        unite: tds[0]?.textContent.trim() || "",
-        raison: tds[1]?.textContent.trim() || ""
-      };
-    });
-
-    const data = {
-      note,
-      date,
-      rows,
-      garage: garageRows,
-      timestamp: new Date().toISOString()
-    };
-
-    localStorage.setItem("garage_rows", JSON.stringify(garageRows));
-    localStorage.setItem(STORAGE_KEYS.note, note);
-    localStorage.setItem(STORAGE_KEYS.date, date);
-    localStorage.setItem(STORAGE_KEYS.rows, JSON.stringify(rows));
-
-    if (window.saveToFirebase) {
-      window.saveToFirebase(data, () => {
-        alert("✅ Données sauvegardées localement ET dans Firebase !");
+    function sendForm() {
+      const tableClone = elements.dispoTable.cloneNode(true);
+      const rows = tableClone.querySelectorAll("tbody tr");
+      
+      rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        
+        // Transformation en majuscules
+        for (let i = 0; i < 8; i++) {
+          const cell = cells[i];
+          if (cell.hasAttribute("contenteditable")) {
+            cell.innerText = cell.innerText.trim().toUpperCase();
+          }
+        }
+        
+        // Suppression des boutons de copie
+        const copyCell = cells[8];
+        if (copyCell) copyCell.innerHTML = "";
       });
+      
+      const data = {
+        note: elements.noteField.value,
+        date: elements.dateSelect.value,
+        table: tableClone.outerHTML
+      };
+      
+      fetch(API_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+      
+      alert("Sommaire envoyé !");
     }
-
-  } catch (err) {
-    alert("Erreur lors de la sauvegarde : " + err.message);
-  }
-}
-
-
-function sendForm() {
-  const tableClone = document.getElementById("dispoTable").cloneNode(true);
-  const rows = tableClone.querySelectorAll("tbody tr");
-
-  rows.forEach(row => {
-    const cells = row.querySelectorAll("td");
-    let isRowEmpty = true;
-
-    for (let i = 0; i < cells.length; i++) {
-      if (i === 8) continue;  // Skip the copy button cell
-      const text = cells[i]?.innerText?.trim();
-      if (text) {
-        isRowEmpty = false;
-        break;
-      }
-    }
-
-    for (let i = 0; i < cells.length; i++) {
-      const cell = cells[i];
-
-      if (i === 8) {  // Handle the copy button cell
-        cell.innerHTML = "";  // Remove the copy button
-      } else if (cell.hasAttribute("contenteditable")) {
-        cell.innerText = cell.innerText.trim().toUpperCase();
-      }
-    }
-  });
-
-  const selectedDate = document.querySelector("#dateSelect")?.value || "";
-if (!selectedDate) {
-  alert("Veuillez sélectionner une date.");
-  return;
-}
-const data = {
-  note: document.getElementById("note").value,
-  date: selectedDate,
-  table: tableClone.outerHTML
-};
-
-
-  fetch("https://script.google.com/macros/s/AKfycbzbkVG6TJQA0iTfHd_TX2hzQXLZmMAPOlhxAOJMej_Cr-Vo1dtZI0GuswIXNZnwVB5pAg/exec", {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  });
-
-  alert("Sommaire envoyé !");
-}
-
-
+    
     // Gestion de la navigation avec flèche
     function setupArrowNavigation() {
       const arrowBtn = document.createElement("button");
@@ -768,95 +512,59 @@ const data = {
         }
       }
     });
-  
     
-  function init() {
-  elements.resetBtn.addEventListener("click", resetForm);
-  elements.saveBtn.addEventListener("click", saveData);
-  elements.sendBtn.addEventListener("click", sendForm);
-  elements.dateSelect.addEventListener("change", () => {
-  const selectedDate = elements.dateSelect.value;
-  if (!selectedDate) return;
-  window.loadFromFirebase(selectedDate);
-});
-
-
-  elements.tableBody.innerHTML = "";
-
-  // 🚀 Toujours charger la dernière entrée Firebase (peu importe localStorage)
-  db.collection("disponibilites")
-    .orderBy("timestamp", "desc")
-    .limit(1)
-    .get()
-    .then(snapshot => {
-      if (!snapshot.empty) {
-        const data = snapshot.docs[0].data();
-        elements.dateSelect.value = data.date || "";
-        elements.noteField.value = data.note || "";
-
-        if (Array.isArray(data.rows) && data.rows.length > 0) {
-          data.rows.forEach(row => {
-            const tr = createRow();
-            const cells = tr.querySelectorAll("td");
-            cells[0].textContent = row.rang || "";
-            cells[1].textContent = row.client || "";
-            cells[2].textContent = row.type || "";
-            cells[3].textContent = row.depart || "";
-            cells[4].textContent = row.livraison || "";
-            cells[5].textContent = row.chauffeur || "";
-            cells[6].textContent = row.camion || "";
-            cells[7].textContent = row.remorque || "";
-            elements.tableBody.appendChild(tr);
-          });
-        } else {
-          generateDefaultRows(9);
-        }
-
-        const garageBody = document.getElementById("garageBody");
-        garageBody.innerHTML = "";
-
-        if (Array.isArray(data.garage) && data.garage.length > 0) {
-          data.garage.forEach(item => {
-            const tr = createGarageRow();
-            const cells = tr.querySelectorAll("td");
-            cells[0].textContent = item.unite || "";
-            cells[1].textContent = item.raison || "";
-            garageBody.appendChild(tr);
-          });
-        } else {
-          generateGarageRows(3);
-        }
-
-        localStorage.setItem(STORAGE_KEYS.note, data.note || "");
-        localStorage.setItem(STORAGE_KEYS.date, data.date || "");
-        localStorage.setItem(STORAGE_KEYS.rows, JSON.stringify(data.rows || []));
-
-        console.log("🟢 Données chargées depuis Firebase.");
-        } else {
-          console.log("📭 Aucune donnée trouvée dans Firebase. Réinitialisation ciblée.");
-          
-          elements.noteField.value = "";
-          const rows = document.querySelectorAll("#tableBody tr");
-
-          rows.forEach((row, index) => {
-            const cells = row.querySelectorAll("td");
-            if (index === rows.length - 1) return; // Garde la dernière ligne intacte
-
-            for (let i = 1; i < cells.length - 1; i++) {
-              cells[i].textContent = "";
-            }
-          });
-
-          generateGarageRows(3);
-        }
-
-    });
-    setupArrowNavigation();
-}
+    // Gestion du menu
+    function setupMenu() {
+      if (elements.menuToggle && elements.menuDropdown) {
+        elements.menuToggle.addEventListener("click", () => {
+          elements.menuDropdown.classList.toggle("show");
+        });
+        
+        document.addEventListener("click", (e) => {
+          if (!elements.menuToggle.contains(e.target) && !elements.menuDropdown.contains(e.target)) {
+            elements.menuDropdown.classList.remove("show");
+          }
+        });
+      }
+    }
     
-  // Démarrer l'application quand la page est chargée
-document.addEventListener("DOMContentLoaded", init);
-
+    // Initialisation
+    function init() {
+      // Attacher les gestionnaires d'événements
+      elements.resetBtn.addEventListener("click", resetForm);
+      elements.saveBtn.addEventListener("click", saveData);
+      elements.sendBtn.addEventListener("click", sendForm);
+      
+      // Charger les données sauvegardées
+      const note = localStorage.getItem(STORAGE_KEYS.note);
+      const date = localStorage.getItem(STORAGE_KEYS.date);
+      const savedRows = JSON.parse(localStorage.getItem(STORAGE_KEYS.rows) || "[]");
+      
+      elements.tableBody.innerHTML = "";
+      
+      if (savedRows.length > 0) {
+        savedRows.forEach(data => {
+          const row = createRow();
+          const cells = row.querySelectorAll("td");
+          data.forEach((val, idx) => {
+            cells[idx].textContent = val;
+          });
+          elements.tableBody.appendChild(row);
+        });
+      } else {
+        generateDefaultRows(9);
+      }
+      
+      if (note) elements.noteField.value = note;
+      if (date) elements.dateSelect.value = date;
+      
+      // Configurer les fonctionnalités
+      setupArrowNavigation();
+      setupMenu();
+    }
+    
+    // Démarrer l'application quand la page est chargée
+    document.addEventListener("DOMContentLoaded", init);
   </script>
 </body>
 </html>

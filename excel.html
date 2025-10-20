@@ -571,13 +571,19 @@
         const lines = Array.from(
           document.querySelectorAll("#tableBody tr td:nth-child(2)")
         )
-          .map((td) => td.textContent.trim())
-          .filter(
-            (text) =>
-              text &&
-              !text.includes("Aucune donnée") &&
-              !text.includes("Erreur")
-          );
+          .map((td) => {
+            const text = td.textContent.trim();
+            // Inclure les lignes vides mais exclure les messages d'état
+            if (
+              text.includes("Aucune donnée") ||
+              text.includes("Erreur") ||
+              text.includes("Sélectionnez")
+            ) {
+              return null; // Ignorer les messages d'état
+            }
+            return text; // Inclure les lignes vides (chaînes vides)
+          })
+          .filter((text) => text !== null); // Supprimer seulement les messages d'état
 
         if (lines.length === 0) {
           alert("Aucune donnée à copier.");
@@ -588,7 +594,9 @@
         navigator.clipboard
           .writeText(txt)
           .then(() =>
-            alert(`✅ ${lines.length} lieux copiés dans le presse-papiers.`)
+            alert(
+              `✅ ${lines.length} lignes copiées dans le presse-papiers (incluant les lignes vides).`
+            )
           )
           .catch(() => alert("❌ Échec de la copie."));
       }

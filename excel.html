@@ -1,161 +1,629 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Export Lieux Chauffeur</title>
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-  >
-  <style>
-    body { background: #f8f9fa; }
-    .card { border: none; border-radius: .75rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-    .form-control-sm { border-radius: .375rem; }
-    table { margin-top: 1rem; }
-    table td, table th { padding: .5rem .75rem; }
-  </style>
-</head>
-<body>
-  <div class="container py-5">
-    <div class="card p-4">
-      <h2 class="h5 mb-3">Extraction Lieux</h2>
-      <div class="row gx-2 gy-3 align-items-end">
-        <div class="col-md-3">
-          <label class="form-label small text-uppercase">Date début</label>
-          <input type="date" id="dateStart" class="form-control form-control-sm">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Export Lieux Chauffeur - Transport ELZ</title>
+    <link rel="icon" type="image/png" href="assets/favicon.png" />
+
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    />
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Comfortaa", sans-serif;
+        background: linear-gradient(
+          135deg,
+          #e74c3c 0%,
+          #c0392b 25%,
+          #a93226 50%,
+          #7b241c 75%,
+          #2c3e50 100%
+        );
+        background-size: 400% 400%;
+        animation: gradientShift 8s ease infinite;
+        min-height: 100vh;
+        color: white;
+        overflow-x: hidden;
+        padding: 20px;
+      }
+
+      @keyframes gradientShift {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .header p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+      }
+
+      .back-btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        z-index: 1000;
+      }
+
+      .back-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+        color: white;
+        text-decoration: none;
+      }
+
+      .section {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        padding: 25px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      }
+
+      .section-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        color: white;
+        text-align: center;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #e8e8e8;
+        font-size: 16px;
+      }
+
+      .form-group input {
+        width: 100%;
+        padding: 15px 20px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 15px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        color: white;
+        font-size: 16px;
+        font-family: "Comfortaa", sans-serif;
+        transition: all 0.3s ease;
+      }
+
+      .form-group input::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .form-group input:focus {
+        outline: none;
+        border-color: #e74c3c;
+        background: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 0 20px rgba(231, 76, 60, 0.3);
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+
+      .table-container {
+        overflow-x: auto;
+        border-radius: 15px;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        margin-top: 20px;
+      }
+
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 400px;
+      }
+
+      .table th {
+        background: rgba(231, 76, 60, 0.8);
+        color: white;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 15px 20px;
+        text-align: left;
+        font-size: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .table td {
+        padding: 15px 20px;
+        text-align: left;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        transition: all 0.3s ease;
+        font-size: 14px;
+      }
+
+      .table tr:nth-child(even) td {
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .table tr:hover td {
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      .buttons {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+      }
+
+      .btn {
+        padding: 15px 30px;
+        border: none;
+        border-radius: 15px;
+        font-size: 16px;
+        font-weight: 600;
+        font-family: "Comfortaa", sans-serif;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: white;
+        border: 2px solid rgba(231, 76, 60, 0.3);
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+      }
+
+      .btn-secondary {
+        background: linear-gradient(135deg, #2c3e50, #34495e);
+        color: white;
+        border: 2px solid rgba(44, 62, 80, 0.3);
+      }
+
+      .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(44, 62, 80, 0.4);
+      }
+
+      .loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9998;
+        backdrop-filter: blur(10px);
+      }
+
+      .loading-screen.show {
+        display: flex;
+      }
+
+      .loader {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid #e74c3c;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: rgba(255, 255, 255, 0.7);
+        font-style: italic;
+      }
+
+      /* Mobile optimizations */
+      @media (max-width: 768px) {
+        .container {
+          padding: 15px;
+        }
+
+        .header h1 {
+          font-size: 2rem;
+        }
+
+        .section {
+          padding: 20px;
+        }
+
+        .form-row {
+          grid-template-columns: 1fr;
+          gap: 15px;
+        }
+
+        .table {
+          font-size: 12px;
+        }
+
+        .table th,
+        .table td {
+          padding: 10px 12px;
+          font-size: 12px;
+        }
+
+        .btn {
+          padding: 12px 20px;
+          font-size: 14px;
+        }
+
+        .buttons {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .back-btn {
+          position: relative;
+          top: auto;
+          left: auto;
+          margin-bottom: 15px;
+          width: fit-content;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <a href="linktreev2.html" class="back-btn"> ← Retour </a>
+
+    <div class="container">
+      <div class="header">
+        <h1>📊 Export Lieux Chauffeur</h1>
+        <p>Extraction des lieux de livraison par chauffeur</p>
+      </div>
+
+      <div class="section">
+        <div class="section-title">🔍 Paramètres d'extraction</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="dateStart">Date début :</label>
+            <input type="date" id="dateStart" />
+          </div>
+          <div class="form-group">
+            <label for="dateEnd">Date fin :</label>
+            <input type="date" id="dateEnd" />
+          </div>
+          <div class="form-group">
+            <label for="driverCode">Code Chauffeur :</label>
+            <input
+              type="text"
+              id="driverCode"
+              placeholder="Ex: JFJ"
+              style="text-transform: uppercase"
+            />
+          </div>
         </div>
-        <div class="col-md-3">
-          <label class="form-label small text-uppercase">Date fin</label>
-          <input type="date" id="dateEnd" class="form-control form-control-sm">
-        </div>
-        <div class="col-md-3">
-          <label class="form-label small text-uppercase">Code Chauffeur</label>
-          <input type="text" id="driverCode" class="form-control form-control-sm" placeholder="Ex : JFJ">
-        </div>
-        <div class="col-md-3 text-end">
-          <button id="loadBtn" class="btn btn-sm btn-primary">Charger</button>
-          <button id="copyBtn" class="btn btn-sm btn-outline-secondary">Copier Lieux</button>
+
+        <div class="buttons">
+          <button class="btn btn-primary" id="loadBtn">
+            🔍 Charger les données
+          </button>
+          <button class="btn btn-secondary" id="copyBtn">
+            📋 Copier les lieux
+          </button>
         </div>
       </div>
 
-      <table class="table table-bordered table-sm mt-4">
-        <thead class="table-light">
-          <tr><th>Date</th><th>Lieu</th></tr>
-        </thead>
-        <tbody id="tableBody">
-          <!-- lignes dynamiques -->
-        </tbody>
-      </table>
+      <div class="section">
+        <div class="section-title">📋 Résultats</div>
+        <div class="table-container">
+          <table class="table" id="resultsTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Lieu</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <tr>
+                <td colspan="2" class="empty-state">
+                  Sélectionnez une période et un code chauffeur pour voir les
+                  résultats
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <!-- Firebase SDK (inchangé) -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <div id="loading-screen" class="loading-screen">
+      <div class="loader"></div>
+    </div>
 
-  <script>
-    const firebaseConfig = {
-    apiKey: "AIzaSyD4U85mokKXsAP1AdwClWtcbt8udZrwlAw",
-    authDomain: "sommaireelz.firebaseapp.com",
-    projectId: "sommaireelz",
-    storageBucket: "sommaireelz.firebasestorage.app",
-    messagingSenderId: "171788284751",
-    appId: "1:171788284751:web:694f070d1cafe8b7c04b3a"
-    };
-    firebase.initializeApp(firebaseConfig);
-
-    const db = firebase.firestore();
-
-    // Charger et afficher seulement Date+Lieu
-    async function loadFromFirebase() {
-      const rawStart = document.getElementById("dateStart").value;
-      const rawEnd   = document.getElementById("dateEnd").value;
-      const code     = document.getElementById("driverCode").value.trim().toUpperCase();
-      if (!rawStart || !rawEnd || !code) {
-        return alert("Date début, date fin et code chauffeur requis.");
-      }
-      // parser localement
-      const [yS,mS,dS] = rawStart.split("-");
-      const [yE,mE,dE] = rawEnd.split("-");
-      const start = new Date(+yS, +mS-1, +dS);
-      const end   = new Date(+yE, +mE-1, +dE);
-
-      const fmt = d => {
-        const mm = String(d.getMonth()+1).padStart(2,"0");
-        const dd = String(d.getDate()).padStart(2,"0");
-        return `${d.getFullYear()}-${mm}-${dd}`;
+    <script>
+      // Configuration Firebase
+      const firebaseConfig = {
+        apiKey: "AIzaSyD4U85mokKXsAP1AdwClWtcbt8udZrwlAw",
+        authDomain: "sommaireelz.firebaseapp.com",
+        projectId: "sommaireelz",
+        storageBucket: "sommaireelz.firebasestorage.app",
+        messagingSenderId: "171788284751",
+        appId: "1:171788284751:web:694f070d1cafe8b7c04b3a",
       };
-      const startKey = fmt(start), endKey = fmt(end);
 
-      const body = document.getElementById("tableBody");
-      body.innerHTML = "";
+      // Initialisation Firebase
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
 
-      const snap = await db.collection("disponibilites")
-        .where("date", ">=", startKey)
-        .where("date", "<=", endKey)
-        .orderBy("date","asc")
-        .get();
+      // Éléments DOM
+      const elements = {
+        dateStart: document.getElementById("dateStart"),
+        dateEnd: document.getElementById("dateEnd"),
+        driverCode: document.getElementById("driverCode"),
+        loadBtn: document.getElementById("loadBtn"),
+        copyBtn: document.getElementById("copyBtn"),
+        tableBody: document.getElementById("tableBody"),
+        loadingScreen: document.getElementById("loading-screen"),
+      };
 
-      // lookup date→lieu
-      const lookup = {};
-      snap.docs.forEach(doc => {
-        const data = doc.data();
-        (data.rows||[])
-          .filter(r => (r.chauffeur||"").toUpperCase()===code)
-          .forEach(r => {
-            if (!lookup[data.date]) lookup[data.date] = r.client||"";
+      // Fonction de formatage de date
+      function formatDate(date) {
+        const mm = String(date.getMonth() + 1).padStart(2, "0");
+        const dd = String(date.getDate()).padStart(2, "0");
+        return `${date.getFullYear()}-${mm}-${dd}`;
+      }
+
+      // Fonction de formatage d'affichage
+      function formatDisplayDate(date) {
+        return date.toLocaleDateString("fr-FR", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+        });
+      }
+
+      // Afficher le loader
+      function showLoading() {
+        elements.loadingScreen.classList.add("show");
+      }
+
+      // Masquer le loader
+      function hideLoading() {
+        elements.loadingScreen.classList.remove("show");
+      }
+
+      // Charger et afficher les données
+      async function loadFromFirebase() {
+        const rawStart = elements.dateStart.value;
+        const rawEnd = elements.dateEnd.value;
+        const code = elements.driverCode.value.trim().toUpperCase();
+
+        if (!rawStart || !rawEnd || !code) {
+          alert("Date début, date fin et code chauffeur requis.");
+          return;
+        }
+
+        showLoading();
+
+        try {
+          // Parser les dates
+          const [yS, mS, dS] = rawStart.split("-");
+          const [yE, mE, dE] = rawEnd.split("-");
+          const start = new Date(+yS, +mS - 1, +dS);
+          const end = new Date(+yE, +mE - 1, +dE);
+
+          const startKey = formatDate(start);
+          const endKey = formatDate(end);
+
+          // Vider le tableau
+          elements.tableBody.innerHTML = "";
+
+          // Requête Firebase
+          const snap = await db
+            .collection("disponibilites")
+            .where("date", ">=", startKey)
+            .where("date", "<=", endKey)
+            .orderBy("date", "asc")
+            .get();
+
+          // Créer un lookup date → lieu
+          const lookup = {};
+          snap.docs.forEach((doc) => {
+            const data = doc.data();
+            (data.rows || [])
+              .filter((r) => (r.chauffeur || "").toUpperCase() === code)
+              .forEach((r) => {
+                if (!lookup[data.date]) lookup[data.date] = r.client || "";
+              });
           });
+
+          // Générer les lignes pour chaque jour
+          let cur = new Date(start);
+          let hasData = false;
+
+          while (cur <= end) {
+            const key = formatDate(cur);
+            const label = formatDisplayDate(cur);
+            const lieu = lookup[key] || "";
+
+            if (lieu) hasData = true;
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>${label}</td>
+              <td>${lieu}</td>
+            `;
+            elements.tableBody.appendChild(tr);
+
+            cur.setDate(cur.getDate() + 1);
+          }
+
+          // Message si aucune donnée
+          if (!hasData) {
+            elements.tableBody.innerHTML = `
+              <tr>
+                <td colspan="2" class="empty-state">
+                  Aucune donnée trouvée pour le chauffeur ${code} sur cette période
+                </td>
+              </tr>
+            `;
+          }
+        } catch (error) {
+          console.error("Erreur lors du chargement:", error);
+          alert("Erreur lors du chargement des données: " + error.message);
+          elements.tableBody.innerHTML = `
+            <tr>
+              <td colspan="2" class="empty-state">
+                Erreur lors du chargement des données
+              </td>
+            </tr>
+          `;
+        } finally {
+          hideLoading();
+        }
+      }
+
+      // Copier les lieux en format Excel
+      function copyLieux() {
+        const lines = Array.from(
+          document.querySelectorAll("#tableBody tr td:nth-child(2)")
+        )
+          .map((td) => td.textContent.trim())
+          .filter(
+            (text) =>
+              text &&
+              !text.includes("Aucune donnée") &&
+              !text.includes("Erreur")
+          );
+
+        if (lines.length === 0) {
+          alert("Aucune donnée à copier.");
+          return;
+        }
+
+        const txt = lines.join("\n");
+        navigator.clipboard
+          .writeText(txt)
+          .then(() =>
+            alert(`✅ ${lines.length} lieux copiés dans le presse-papiers.`)
+          )
+          .catch(() => alert("❌ Échec de la copie."));
+      }
+
+      // Auto-remplir la date de fin (samedi suivant)
+      elements.dateStart.addEventListener("change", function () {
+        const raw = this.value;
+        if (!raw) return;
+
+        const [y, m, d] = raw.split("-");
+        const dt = new Date(+y, +m - 1, +d);
+
+        // Ajouter 6 jours pour tomber le samedi suivant
+        dt.setDate(dt.getDate() + 6);
+
+        // Formater et remplir
+        const formatted = formatDate(dt);
+        elements.dateEnd.value = formatted;
       });
 
-      // boucle
-      let cur = new Date(start);
-      while (cur<=end) {
-        const key = fmt(cur);
-        const label = cur.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"});
-        const lieu = lookup[key]||"";
-        const tr  = document.createElement("tr");
-        tr.innerHTML = `<td>${label}</td><td>${lieu}</td>`;
-        body.appendChild(tr);
-        cur.setDate(cur.getDate()+1);
-      }
-    }
+      // Conversion en majuscules pour le code chauffeur
+      elements.driverCode.addEventListener("input", function () {
+        this.value = this.value.toUpperCase();
+      });
 
-    // copie en Excel‑ready (tab + newline)
-    function copyLieux() {
-      const lines = Array.from(
-        document.querySelectorAll("#tableBody tr td:nth-child(2)")
-      ).map(td => td.textContent.trim());
-      const txt = lines.join("\t\n");
-      navigator.clipboard.writeText(txt)
-        .then(()=> alert("✅ Lieux copiés."))
-        .catch(()=> alert("❌ Échec du copier."));
-    }
+      // Événements des boutons
+      elements.loadBtn.addEventListener("click", loadFromFirebase);
+      elements.copyBtn.addEventListener("click", copyLieux);
 
-    // Lorsque l’on choisit Date de début (dimanche), on calcule le samedi suivant
-    document.getElementById("dateStart").addEventListener("change", function() {
-    const raw = this.value;           // ex. "2025-07-06"
-    if (!raw) return;
-
-    // parser en locale
-    const [y,m,d] = raw.split("-");
-    const dt = new Date(+y, +m-1, +d);
-
-    // ajouter 6 jours pour tomber le samedi suivant
-    dt.setDate(dt.getDate() + 6);
-
-    // formater YYYY-MM-DD
-    const mm = String(dt.getMonth()+1).padStart(2,"0");
-    const dd = String(dt.getDate()).padStart(2,"0");
-    const formatted = `${dt.getFullYear()}-${mm}-${dd}`;
-
-    // remplir la date de fin
-    document.getElementById("dateEnd").value = formatted;
-    });
-
-
-    document.getElementById("loadBtn").addEventListener("click", loadFromFirebase);
-    document.getElementById("copyBtn").addEventListener("click", copyLieux);
-  </script>
-</body>
+      // Raccourcis clavier
+      document.addEventListener("keydown", function (e) {
+        if (e.ctrlKey && e.key === "Enter") {
+          loadFromFirebase();
+        }
+      });
+    </script>
+  </body>
 </html>

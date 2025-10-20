@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Disponibilité des Équipements - Transport ELZ</title>
+    <link rel="icon" type="image/png" href="assets/favicon.png" />
+
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    />
+
+    <!-- Datepicker CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.3.4/dist/css/datepicker.min.css"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Comfortaa", sans-serif;
+        background: linear-gradient(
+          135deg,
+          #e74c3c 0%,
+          #c0392b 25%,
+          #a93226 50%,
+          #7b241c 75%,
+          #2c3e50 100%
+        );
+        background-size: 400% 400%;
+        animation: gradientShift 8s ease infinite;
+        min-height: 100vh;
+        color: white;
+        overflow-x: hidden;
+        padding: 20px;
+      }
+
+      @keyframes gradientShift {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .header p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+      }
+
+      .back-btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        z-index: 1000;
+      }
+
+      .back-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+        color: white;
+        text-decoration: none;
+      }
+
+      .date-selector-section {
+        margin-bottom: 30px;
+      }
+
+      .date-selector-container {
+        max-width: 300px;
+        margin: 0 auto;
+        position: relative;
+      }
+
+      .date-selector {
+        width: 100%;
+        padding: 15px 20px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 15px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        color: white;
+        font-size: 16px;
+        font-family: "Comfortaa", sans-serif;
+        transition: all 0.3s ease;
+        text-align: center;
+      }
+
+      .date-selector:focus {
+        outline: none;
+        border-color: #e74c3c;
+        background: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 0 20px rgba(231, 76, 60, 0.3);
+      }
+
+      .date-selector::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      /* Styles pour le datepicker - Version robuste */
+      .datepicker {
+        background: rgba(44, 62, 80, 0.95) !important;
+        backdrop-filter: blur(20px) !important;
+        border: 2px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 15px !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+        color: white !important;
+        z-index: 9999 !important;
+        font-family: "Comfortaa", sans-serif !important;
+      }
+
+      .datepicker-dropdown {
+        background: rgba(44, 62, 80, 0.95) !important;
+        backdrop-filter: blur(20px) !important;
+        border: 2px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 15px !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+        color: white !important;
+        z-index: 9999 !important;
+        font-family: "Comfortaa", sans-serif !important;
+      }
+
+      .datepicker .datepicker-header,
+      .datepicker-dropdown .datepicker-header {
+        background: rgba(231, 76, 60, 0.2) !important;
+        color: white !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+        padding: 15px !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+      }
+
+      .datepicker .datepicker-title,
+      .datepicker-dropdown .datepicker-title {
+        color: white !important;
+        font-weight: 600 !important;
+        font-size: 18px !important;
+        margin: 0 !important;
+      }
+
+      .datepicker .datepicker-nav,
+      .datepicker-dropdown .datepicker-nav {
+        color: white !important;
+        background: rgba(255, 255, 255, 0.1) !important;
+        border-radius: 8px !important;
+        padding: 8px 12px !important;
+        transition: all 0.3s ease !important;
+        border: none !important;
+        cursor: pointer !important;
+        font-size: 16px !important;
+      }
+
+      .datepicker .datepicker-nav:hover,
+      .datepicker-dropdown .datepicker-nav:hover {
+        background: rgba(231, 76, 60, 0.3) !important;
+        color: white !important;
+        transform: scale(1.1) !important;
+      }
+
+      .datepicker .datepicker-grid,
+      .datepicker-dropdown .datepicker-grid {
+        background: transparent !important;
+        padding: 15px !important;
+        display: grid !important;
+        grid-template-columns: repeat(7, 1fr) !important;
+        gap: 5px !important;
+      }
+
+      .datepicker .datepicker-cell,
+      .datepicker-dropdown .datepicker-cell {
+        color: white !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        background: rgba(255, 255, 255, 0.05) !important;
+        padding: 10px !important;
+        border-radius: 8px !important;
+        transition: all 0.3s ease !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        min-height: 40px !important;
+        text-align: center !important;
+      }
+
+      .datepicker .datepicker-cell:hover,
+      .datepicker-dropdown .datepicker-cell:hover {
+        background: rgba(231, 76, 60, 0.3) !important;
+        color: white !important;
+        transform: scale(1.05) !important;
+      }
+
+      .datepicker .datepicker-cell.selected,
+      .datepicker-dropdown .datepicker-cell.selected {
+        background: #e74c3c !important;
+        color: white !important;
+        font-weight: 700 !important;
+        border-color: #c0392b !important;
+        box-shadow: 0 2px 8px rgba(231, 76, 60, 0.4) !important;
+      }
+
+      .datepicker .datepicker-cell.today,
+      .datepicker-dropdown .datepicker-cell.today {
+        background: rgba(39, 174, 96, 0.3) !important;
+        color: white !important;
+        font-weight: 600 !important;
+        border-color: #27ae60 !important;
+      }
+
+      .datepicker .datepicker-cell.other-month,
+      .datepicker-dropdown .datepicker-cell.other-month {
+        color: rgba(255, 255, 255, 0.4) !important;
+        background: rgba(255, 255, 255, 0.02) !important;
+      }
+
+      .datepicker .datepicker-cell.disabled,
+      .datepicker-dropdown .datepicker-cell.disabled {
+        color: rgba(255, 255, 255, 0.2) !important;
+        background: rgba(0, 0, 0, 0.1) !important;
+        cursor: not-allowed !important;
+      }
+
+      .datepicker .datepicker-nav-prev,
+      .datepicker .datepicker-nav-next,
+      .datepicker-dropdown .datepicker-nav-prev,
+      .datepicker-dropdown .datepicker-nav-next {
+        color: white !important;
+        background: rgba(255, 255, 255, 0.1) !important;
+        border-radius: 8px !important;
+        transition: all 0.3s ease !important;
+        padding: 8px 12px !important;
+        margin: 0 5px !important;
+        border: none !important;
+        cursor: pointer !important;
+        font-size: 16px !important;
+      }
+
+      .datepicker .datepicker-nav-prev:hover,
+      .datepicker .datepicker-nav-next:hover,
+      .datepicker-dropdown .datepicker-nav-prev:hover,
+      .datepicker-dropdown .datepicker-nav-next:hover {
+        background: rgba(231, 76, 60, 0.3) !important;
+        color: white !important;
+        transform: scale(1.1) !important;
+      }
+
+      .datepicker .datepicker-view,
+      .datepicker-dropdown .datepicker-view {
+        color: white !important;
+        background: rgba(255, 255, 255, 0.1) !important;
+        border-radius: 8px !important;
+        padding: 5px 10px !important;
+        margin: 2px !important;
+        transition: all 0.3s ease !important;
+        cursor: pointer !important;
+      }
+
+      .datepicker .datepicker-view:hover,
+      .datepicker-dropdown .datepicker-view:hover {
+        background: rgba(231, 76, 60, 0.3) !important;
+        color: white !important;
+      }
+
+      /* Styles pour les jours de la semaine */
+      .datepicker .datepicker-grid .datepicker-cell:first-child,
+      .datepicker-dropdown .datepicker-grid .datepicker-cell:first-child {
+        font-weight: 700 !important;
+        background: rgba(231, 76, 60, 0.2) !important;
+        color: white !important;
+      }
+
+      /* Forcer l'affichage des cellules */
+      .datepicker *,
+      .datepicker-dropdown * {
+        box-sizing: border-box !important;
+      }
+
+      .datepicker .datepicker-grid .datepicker-cell,
+      .datepicker-dropdown .datepicker-grid .datepicker-cell {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 40px !important;
+        line-height: 1 !important;
+      }
+
+      .date-display {
+        text-align: center;
+        font-weight: 600;
+        font-size: 1rem;
+        margin: 1.5rem 0;
+        color: #e8e8e8;
+      }
+
+      .equipment-container {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .section-title {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        font-weight: 600;
+        text-align: center;
+        padding: 15px 20px;
+        font-size: 1.1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .equipment-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        transition: background 0.2s;
+        cursor: pointer;
+        position: relative;
+      }
+
+      .equipment-row:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .equipment-row.expandable {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .equipment-row.expanded .garage-reason {
+        display: block;
+      }
+
+      .equipment-name {
+        font-weight: 700;
+        font-size: 1.3rem;
+        flex: 1;
+        color: white;
+      }
+
+      .status-badge {
+        font-size: 0.9rem;
+        font-weight: 700;
+        padding: 10px 20px;
+        border-radius: 25px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-left: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        border: 2px solid;
+      }
+
+      .status-badge.planifie {
+        background: linear-gradient(135deg, #f39c12, #e67e22);
+        color: white;
+        border-color: #d68910;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+      }
+
+      .status-badge.disponible {
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        color: white;
+        border-color: #229954;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+      }
+
+      .status-badge.garage {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: white;
+        border-color: #a93226;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+      }
+
+      .garage-note {
+        font-size: 0.9rem;
+        color: #f39c12;
+        margin-left: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        white-space: nowrap;
+        background: rgba(243, 156, 18, 0.2);
+        padding: 4px 8px;
+        border-radius: 12px;
+        border: 1px solid rgba(243, 156, 18, 0.3);
+        transition: all 0.3s ease;
+      }
+
+      .garage-note:hover {
+        background: rgba(243, 156, 18, 0.3);
+        transform: scale(1.05);
+      }
+
+      .garage-reason {
+        display: none;
+        font-size: 1rem;
+        color: white;
+        margin-top: 15px;
+        width: 100%;
+        padding: 15px 20px;
+        background: linear-gradient(
+          135deg,
+          rgba(231, 76, 60, 0.2),
+          rgba(192, 57, 43, 0.2)
+        );
+        border-radius: 12px;
+        border: 2px solid rgba(231, 76, 60, 0.4);
+        box-shadow: 0 4px 15px rgba(231, 76, 60, 0.2);
+        backdrop-filter: blur(10px);
+        font-weight: 500;
+      }
+
+      .row-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex: 1;
+        gap: 8px;
+        width: 100%;
+      }
+
+      .loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9998;
+        backdrop-filter: blur(10px);
+      }
+
+      .loading-screen.show {
+        display: flex;
+      }
+
+      .loader {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid #e74c3c;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      .loading-spinner {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        gap: 20px;
+        padding: 40px;
+        color: white;
+      }
+
+      .spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      .loading-text {
+        font-size: 18px;
+        font-weight: 600;
+        opacity: 0.9;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Mobile optimizations */
+      @media (max-width: 768px) {
+        .container {
+          padding: 15px;
+        }
+
+        .header h1 {
+          font-size: 2rem;
+        }
+
+        .equipment-container {
+          margin: 0 -5px;
+        }
+
+        .equipment-row {
+          padding: 12px 15px;
+        }
+
+        .equipment-name {
+          font-size: 1.1rem;
+        }
+
+        .status-badge {
+          font-size: 0.8rem;
+          padding: 8px 16px;
+        }
+
+        .garage-note {
+          font-size: 0.8rem;
+          padding: 3px 6px;
+        }
+
+        .garage-reason {
+          font-size: 0.9rem;
+          padding: 12px 15px;
+        }
+
+        .back-btn {
+          position: relative;
+          top: auto;
+          left: auto;
+          margin-bottom: 15px;
+          width: fit-content;
+        }
+
+        .date-selector-container {
+          max-width: 100%;
+        }
+
+        .date-selector {
+          padding: 12px 15px;
+          font-size: 14px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <a href="linktreev2.html" class="back-btn"> ← Retour </a>
+
+    <div class="container">
+      <div class="header">
+        <h1>Disponibilité des équipements</h1>
+        <p>Consultez la disponibilité de vos équipements</p>
+      </div>
+
+      <div class="date-selector-section">
+        <div class="date-selector-container">
+          <input
+            type="text"
+            id="datepickerInput"
+            class="date-selector"
+            placeholder="Sélectionner une date"
+          />
+        </div>
+        <div id="dateDisplay" class="date-display"></div>
+      </div>
+
+      <div class="equipment-container" id="equipmentList">
+        <div class="loading-spinner" id="loadingSpinner">
+          <div class="spinner"></div>
+          <div class="loading-text">Chargement des équipements...</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="loading-screen" class="loading-screen">
+      <div class="loader"></div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <!-- Units API -->
+    <script src="units-api.js"></script>
+
+    <!-- Datepicker JS -->
+    <script src="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.3.4/dist/js/datepicker-full.min.js"></script>
+
+    <script>
+      // Configuration Firebase pour les unités (transportelz)
+      const unitsFirebaseConfig = {
+        apiKey: "AIzaSyAxbpNoGfMEK5N6sy3WYWMTD3WGelff0QA",
+        authDomain: "transportelz.firebaseapp.com",
+        projectId: "transportelz",
+        storageBucket: "transportelz.firebasestorage.app",
+        messagingSenderId: "290260714729",
+        appId: "1:290260714729:web:a433a445eb44fe5404dc78",
+        measurementId: "G-EKZYPTGFT7",
+      };
+
+      // Configuration Firebase pour les données de disponibilité (sommaireelz)
+      const dataFirebaseConfig = {
+        apiKey: "AIzaSyD4U85mokKXsAP1AdwClWtcbt8udZrwlAw",
+        authDomain: "sommaireelz.firebaseapp.com",
+        projectId: "sommaireelz",
+        storageBucket: "sommaireelz.firebasestorage.app",
+        messagingSenderId: "171788284751",
+        appId: "1:171788284751:web:694f070d1cafe8b7c04b3a",
+      };
+
+      // Initialiser Firebase pour les unités
+      if (!firebase.apps.length) {
+        firebase.initializeApp(unitsFirebaseConfig);
+      }
+
+      // Initialiser Firebase pour les données de disponibilité
+      const dataApp = firebase.initializeApp(dataFirebaseConfig, "dataApp");
+      const db = dataApp.firestore();
+
+      let currentRow = null;
+
+      async function fetchPlannedEquipments(date) {
+        const usedCamions = new Set();
+        const usedRemorques = new Set();
+        try {
+          const snapshot = await db
+            .collection("disponibilites")
+            .where("date", "==", date)
+            .get();
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            (data.rows || []).forEach((row) => {
+              const camion = String(row.camion || "").trim();
+              const remorque = String(row.remorque || "").trim();
+              if (camion) usedCamions.add(camion);
+              if (remorque) usedRemorques.add(remorque);
+            });
+          });
+          updateEquipementStatus(usedCamions, usedRemorques);
+        } catch (error) {
+          console.error("Erreur de lecture Firebase:", error);
+        }
+      }
+
+      async function fetchGarageEquipments() {
+        try {
+          const snapshot = await db.collection("garage").get();
+          const garageMap = new Map();
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            const unit = data.unit?.trim();
+            const reason = data.reason || "Pas de raison précisée";
+            if (unit) garageMap.set(unit, reason);
+          });
+          updateGarageStatus(garageMap);
+        } catch (error) {
+          console.error("Erreur lors du chargement des données garage:", error);
+        }
+      }
+
+      async function getLastRecordedEquipments() {
+        try {
+          const snapshot = await db
+            .collection("disponibilites")
+            .orderBy("timestamp", "desc")
+            .limit(1)
+            .get();
+          if (snapshot.empty) return null;
+          const data = snapshot.docs[0].data();
+          const usedCamions = new Set();
+          const usedRemorques = new Set();
+          (data.rows || []).forEach((row) => {
+            if (row.camion) usedCamions.add(row.camion.trim());
+            if (row.remorque) usedRemorques.add(row.remorque.trim());
+          });
+          const garageSet = new Map();
+          (data.garage || []).forEach((item) => {
+            if (item.unite)
+              garageSet.set(item.unite.trim(), item.raison || "Garage");
+          });
+          return {
+            date: data.date || "Date inconnue",
+            camions: usedCamions,
+            remorques: usedRemorques,
+            garage: garageSet,
+          };
+        } catch (error) {
+          console.error("Erreur Firebase:", error);
+          return null;
+        }
+      }
+
+      function updateEquipementStatus(
+        camionsSet,
+        remorquesSet,
+        garageMap = new Map()
+      ) {
+        const rows = document.querySelectorAll("#equipmentList .equipment-row");
+        rows.forEach((row) => {
+          const unit = row
+            .querySelector(".equipment-name")
+            ?.textContent?.trim();
+          let badge = row.querySelector(".status-badge");
+          row.classList.remove("expanded");
+          const oldNote = row.querySelector(".garage-note");
+          const oldReason = row.querySelector(".garage-reason");
+          if (oldNote) oldNote.remove();
+          if (oldReason) oldReason.remove();
+          if (!unit || !badge) return;
+
+          if (garageMap.has(unit)) {
+            badge.textContent = "GARAGE";
+            badge.className = "status-badge garage";
+
+            const contentWrapper = document.createElement("div");
+            contentWrapper.className = "row-content";
+
+            const note = document.createElement("span");
+            note.className = "garage-note";
+            note.textContent = "(Cliquez pour voir la raison)";
+
+            const unitSpan = row.querySelector(".equipment-name");
+            const badgeClone = badge.cloneNode(true);
+            badge.remove();
+
+            contentWrapper.appendChild(unitSpan.cloneNode(true));
+            contentWrapper.appendChild(note);
+            contentWrapper.appendChild(badgeClone);
+
+            row.innerHTML = "";
+            row.appendChild(contentWrapper);
+
+            const reason = document.createElement("div");
+            reason.className = "garage-reason";
+            reason.textContent = `🛠 ${garageMap.get(unit)}`;
+            row.appendChild(reason);
+
+            row.classList.add("expandable");
+            row.onclick = () => row.classList.toggle("expanded");
+          } else {
+            const planned = camionsSet.has(unit) || remorquesSet.has(unit);
+            badge.textContent = planned ? "PLANIFIÉ" : "DISPONIBLE";
+            badge.className = `status-badge ${
+              planned ? "planifie" : "disponible"
+            }`;
+          }
+        });
+      }
+
+      function updateGarageStatus(garageMap) {
+        const rows = document.querySelectorAll("#equipmentList .equipment-row");
+        rows.forEach((row) => {
+          const unit = row
+            .querySelector(".equipment-name")
+            ?.textContent?.trim();
+          const badge = row.querySelector(".status-badge");
+          if (!unit || !badge) return;
+          if (garageMap.has(unit)) {
+            badge.textContent = "GARAGE";
+            badge.className = "status-badge garage";
+
+            const note = document.createElement("span");
+            note.className = "garage-note";
+            note.textContent = "(Cliquez pour voir la raison)";
+
+            const reason = document.createElement("div");
+            reason.className = "garage-reason";
+            reason.textContent = `🛠 ${garageMap.get(unit)}`;
+
+            const unitSpan = row
+              .querySelector(".equipment-name")
+              .cloneNode(true);
+            const badgeClone = badge.cloneNode(true);
+
+            const wrapper = document.createElement("div");
+            wrapper.className = "row-content";
+            wrapper.appendChild(unitSpan);
+            wrapper.appendChild(note);
+            wrapper.appendChild(badgeClone);
+
+            row.innerHTML = "";
+            row.appendChild(wrapper);
+            row.appendChild(reason);
+
+            row.classList.add("expandable");
+            row.onclick = () => row.classList.toggle("expanded");
+          }
+        });
+      }
+
+      // Charger les unités depuis Firestore
+      async function loadUnitsFromFirestore() {
+        try {
+          // Vérifier que unitsAPI est disponible
+          if (typeof unitsAPI === "undefined") {
+            throw new Error("UnitsAPI n'est pas disponible");
+          }
+
+          const units = await unitsAPI.getActiveUnits();
+          const equipmentList = document.getElementById("equipmentList");
+          const loadingSpinner = document.getElementById("loadingSpinner");
+
+          // Masquer le spinner
+          loadingSpinner.style.display = "none";
+
+          // Grouper les unités par type
+          const camions = units.filter((unit) => unit.type === "camion");
+          const remorques3Essieux = units.filter(
+            (unit) =>
+              unit.type === "remorque" &&
+              unit.description?.includes("3 essieux")
+          );
+          const remorques4Essieux = units.filter(
+            (unit) =>
+              unit.type === "remorque" &&
+              unit.description?.includes("4 essieux")
+          );
+
+          let html = "";
+
+          // Camions
+          if (camions.length > 0) {
+            html += '<div class="section-title">CAMIONS</div>';
+            camions.forEach((unit) => {
+              html += `
+                <div class="equipment-row">
+                  <span class="equipment-name">${unit.number}</span>
+                  <span class="status-badge disponible">DISPONIBLE</span>
+                </div>
+              `;
+            });
+          }
+
+          // 3 Essieux
+          if (remorques3Essieux.length > 0) {
+            html += '<div class="section-title">3 ESSIEUX</div>';
+            remorques3Essieux.forEach((unit) => {
+              html += `
+                <div class="equipment-row">
+                  <span class="equipment-name">${unit.number}</span>
+                  <span class="status-badge disponible">DISPONIBLE</span>
+                </div>
+              `;
+            });
+          }
+
+          // 4 Essieux
+          if (remorques4Essieux.length > 0) {
+            html += '<div class="section-title">4 ESSIEUX</div>';
+            remorques4Essieux.forEach((unit) => {
+              html += `
+                <div class="equipment-row">
+                  <span class="equipment-name">${unit.number}</span>
+                  <span class="status-badge disponible">DISPONIBLE</span>
+                </div>
+              `;
+            });
+          }
+
+          equipmentList.innerHTML = html;
+        } catch (error) {
+          console.error("Erreur lors du chargement des unités:", error);
+          const loadingSpinner = document.getElementById("loadingSpinner");
+          loadingSpinner.innerHTML = `
+            <div class="spinner" style="border-color: #e74c3c; border-top-color: #e74c3c;"></div>
+            <div class="loading-text" style="color: #e74c3c;">Erreur de chargement</div>
+          `;
+        }
+      }
+
+      window.addEventListener("DOMContentLoaded", async () => {
+        // Attendre un peu pour s'assurer que tous les scripts sont chargés
+        setTimeout(async () => {
+          await loadUnitsFromFirestore();
+          await fetchGarageEquipments();
+          await initCalendrierAvecDates();
+        }, 100);
+      });
+
+      async function initCalendrierAvecDates() {
+        const input = document.getElementById("datepickerInput");
+
+        // Configuration robuste du datepicker
+        const picker = new Datepicker(input, {
+          format: "yyyy-mm-dd",
+          autohide: true,
+          language: "fr",
+          container: document.body,
+          orientation: "bottom auto",
+          clearBtn: true,
+          todayBtn: true,
+          todayHighlight: true,
+          weekStart: 1, // Lundi
+        });
+
+        // Fonction pour appliquer les styles
+        function applyDatepickerStyles() {
+          const datepicker =
+            document.querySelector(".datepicker-dropdown") ||
+            document.querySelector(".datepicker");
+          if (datepicker) {
+            // Forcer la visibilité de toutes les cellules
+            const cells = datepicker.querySelectorAll(".datepicker-cell");
+            cells.forEach((cell) => {
+              cell.style.display = "flex";
+              cell.style.visibility = "visible";
+              cell.style.opacity = "1";
+              cell.style.alignItems = "center";
+              cell.style.justifyContent = "center";
+            });
+
+            // Appliquer les styles au grid
+            const grid = datepicker.querySelector(".datepicker-grid");
+            if (grid) {
+              grid.style.display = "grid";
+              grid.style.gridTemplateColumns = "repeat(7, 1fr)";
+              grid.style.gap = "5px";
+            }
+          }
+        }
+
+        // Event listeners pour l'ouverture du datepicker
+        input.addEventListener("showDatepicker", function () {
+          setTimeout(applyDatepickerStyles, 50);
+        });
+
+        input.addEventListener("focus", function () {
+          setTimeout(applyDatepickerStyles, 100);
+        });
+
+        // Observer pour détecter les changements dans le DOM
+        const observer = new MutationObserver(function (mutations) {
+          mutations.forEach(function (mutation) {
+            if (mutation.type === "childList") {
+              const datepicker =
+                document.querySelector(".datepicker-dropdown") ||
+                document.querySelector(".datepicker");
+              if (datepicker) {
+                applyDatepickerStyles();
+              }
+            }
+          });
+        });
+
+        observer.observe(document.body, {
+          childList: true,
+          subtree: true,
+        });
+
+        const snapshot = await db.collection("disponibilites").get();
+        const datesDispo = new Set();
+        snapshot.forEach((doc) => {
+          const d = doc.data();
+          if (d.date) datesDispo.add(d.date);
+        });
+
+        input.addEventListener("changeDate", async () => {
+          const selectedDate = input.value;
+          if (!selectedDate) return;
+          const snapshot = await db
+            .collection("disponibilites")
+            .where("date", "==", selectedDate)
+            .limit(1)
+            .get();
+          const dateDisplay = document.getElementById("dateDisplay");
+
+          if (snapshot.empty) {
+            dateDisplay.textContent = `Aucune donnée pour le ${selectedDate}`;
+            updateEquipementStatus(new Set(), new Set(), new Map());
+            return;
+          }
+
+          const data = snapshot.docs[0].data();
+          const camions = new Set();
+          const remorques = new Set();
+          const garage = new Map();
+
+          (data.rows || []).forEach((row) => {
+            if (row.camion) camions.add(row.camion.trim());
+            if (row.remorque) remorques.add(row.remorque.trim());
+          });
+          (data.garage || []).forEach((item) => {
+            if (item.unite)
+              garage.set(item.unite.trim(), item.raison || "Garage");
+          });
+
+          dateDisplay.textContent = `Pour la journée du : ${selectedDate}`;
+          updateEquipementStatus(camions, remorques, garage);
+        });
+
+        const today = new Date().toISOString().split("T")[0];
+        console.log("Date d'aujourd'hui:", today);
+        console.log("Dates disponibles:", Array.from(datesDispo));
+
+        if (datesDispo.has(today)) {
+          input.value = today;
+          input.dispatchEvent(new Event("changeDate"));
+        } else {
+          // Afficher la première date disponible si aujourd'hui n'est pas disponible
+          const firstDate = Array.from(datesDispo).sort()[0];
+          if (firstDate) {
+            input.value = firstDate;
+            input.dispatchEvent(new Event("changeDate"));
+          }
+        }
+      }
+    </script>
+  </body>
+</html>

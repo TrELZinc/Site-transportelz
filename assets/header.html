@@ -1,0 +1,168 @@
+<style>
+  header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background-color: #111;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    z-index: 9999;
+    transition: transform 0.3s ease;
+  }
+  .header-logo img {
+    height: 40px;
+  }
+  .hamburger {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+  }
+  .hamburger div {
+    width: 25px;
+    height: 3px;
+    background-color: white;
+    transition: all 0.3s ease;
+  }
+  .nav-links {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 280px;
+    height: 100vh;
+    background: #111;
+    padding: 80px 25px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    transition: right 0.3s ease;
+    z-index: 10000;
+    overflow-y: auto;
+  }
+  .nav-links.show {
+    right: 0;
+  }
+  .nav-title {
+    color: #84b6f4;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid #333;
+  }
+  .nav-links a {
+    background-color: #1a1a1a;
+    color: white;
+    text-decoration: none;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.3s, transform 0.2s;
+  }
+  .nav-links a:hover {
+    background-color: #0d6efd;
+    transform: translateX(5px);
+  }
+  .nav-links a::before {
+    content: "👉";
+  }
+</style>
+
+<header id="mainHeader">
+  <div class="header-logo">
+    <img src="assets/logo.jpeg" alt="Logo ELZ" />
+  </div>
+
+  <div
+    class="hamburger"
+    onclick="document.querySelector('.nav-links').classList.toggle('show')"
+  >
+    <div></div>
+    <div></div>
+    <div></div>
+  </div>
+
+  <nav class="nav-links">
+    <button
+      onclick="document.querySelector('.nav-links').classList.remove('show')"
+      style="
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.8rem;
+        align-self: flex-end;
+        cursor: pointer;
+      "
+    >
+      &times;
+    </button>
+
+    <div class="nav-section">
+      <div class="nav-title">Actions</div>
+      <a href="#" onclick="logout()">Déconnexion</a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-title">Dispatch</div>
+      <a href="dispos.html">Disponibilités</a>
+      <a href="sommaire.html">Sommaire</a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-title">Réparations</div>
+      <a href="garage.html">Garage</a>
+      <a href="equipements.html">Flotte</a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-title">Administration</div>
+      <a href="mathieu.html">Paye</a>
+      <a href="permis.html">Permis</a>
+      <a href="cartes.html">Cartes à fuel</a>
+    </div>
+  </nav>
+
+  <script>
+    let lastScroll = 0;
+    const header = document.getElementById("mainHeader");
+    window.addEventListener("scroll", () => {
+      const currentScroll = window.pageYOffset;
+      if (currentScroll > lastScroll && currentScroll > 60) {
+        header.style.transform = "translateY(-100%)";
+      } else {
+        header.style.transform = "translateY(0)";
+      }
+      lastScroll = currentScroll;
+    });
+
+    // Garde de session: redirige si pas connecté
+    const remember = localStorage.getItem("rememberTransportelz");
+    const role = localStorage.getItem("roleTransportelz");
+    if (remember !== "true" || !role) {
+      window.location.href = "/index.html";
+    }
+
+    // Masque la section Administration si non-admin
+    if (role !== "admin") {
+      const adminSection = document.querySelector(
+        '.nav-section:has(.nav-title:contains("Administration"))'
+      );
+      if (adminSection) adminSection.style.display = "none";
+    }
+
+    function logout() {
+      localStorage.removeItem("rememberTransportelz");
+      localStorage.removeItem("roleTransportelz");
+      localStorage.removeItem("identifiantTransportelz");
+      window.location.href = "/index.html";
+    }
+  </script>
+</header>

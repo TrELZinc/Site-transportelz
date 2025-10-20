@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mes Talons de Paie – Transport E.L.Z inc.</title>
+    <link rel="icon" type="image/png" href="assets/favicon.png" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Comfortaa", sans-serif;
+        background: linear-gradient(
+          135deg,
+          #e74c3c 0%,
+          #c0392b 25%,
+          #a93226 50%,
+          #7b241c 75%,
+          #2c3e50 100%
+        );
+        background-size: 400% 400%;
+        animation: gradientShift 8s ease infinite;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      @keyframes gradientShift {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+        color: white;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .header p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+      }
+
+      .week-selector-section {
+        margin-bottom: 30px;
+      }
+
+      .week-selector-container {
+        max-width: 500px;
+        margin: 0 auto;
+        text-align: center;
+      }
+
+      .week-selector-label {
+        display: block;
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+
+      .selector-wrapper {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+        max-width: 500px;
+      }
+
+      .week-selector {
+        width: 100%;
+        padding: 15px 50px 15px 20px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 25px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        color: white;
+        font-size: 16px;
+        font-family: "Comfortaa", sans-serif;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+      }
+
+      .week-selector:focus {
+        outline: none;
+        border-color: #e74c3c;
+        background: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 0 20px rgba(231, 76, 60, 0.3);
+      }
+
+      .week-selector option {
+        background: #2c3e50;
+        color: white;
+        padding: 10px;
+      }
+
+      .clear-btn {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 30px;
+        height: 30px;
+        border: none;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+      }
+
+      .clear-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-50%) scale(1.1);
+      }
+
+      .payrolls-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+
+      .payroll-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .payroll-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+      }
+
+      .payroll-card.new {
+        border-color: #e74c3c;
+        background: linear-gradient(135deg, #fff 0%, #ffe6e6 100%);
+      }
+
+      .payroll-card.new::before {
+        content: "NOUVEAU";
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: #27ae60;
+        color: white;
+        padding: 8px 15px;
+        font-size: 11px;
+        font-weight: 700;
+        border-radius: 15px;
+        letter-spacing: 0.5px;
+        box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
+        z-index: 10;
+      }
+
+      .payroll-card.viewed::after {
+        content: "CONSULTÉ";
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: #f39c12;
+        color: white;
+        padding: 8px 15px;
+        font-size: 11px;
+        font-weight: 700;
+        border-radius: 15px;
+        letter-spacing: 0.5px;
+        box-shadow: 0 2px 8px rgba(243, 156, 18, 0.3);
+        z-index: 10;
+      }
+
+      .payroll-header {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 15px;
+      }
+
+      .payroll-week {
+        background: #e74c3c;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .payroll-info {
+        margin-bottom: 20px;
+      }
+
+      .payroll-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 8px;
+      }
+
+      .payroll-date {
+        color: #7f8c8d;
+        font-size: 14px;
+        margin-bottom: 5px;
+      }
+
+      .payroll-employee {
+        color: #34495e;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .payroll-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        font-family: "Comfortaa", sans-serif;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        justify-content: center;
+        min-width: 120px;
+      }
+
+      .btn-primary {
+        background: #3498db;
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background: #2980b9;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+      }
+
+      .loading {
+        text-align: center;
+        color: white;
+        font-size: 18px;
+        padding: 40px;
+      }
+
+      .spinner {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+        margin-right: 15px;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .empty-state {
+        text-align: center;
+        color: white;
+        padding: 60px 20px;
+      }
+
+      .empty-state h3 {
+        font-size: 24px;
+        margin-bottom: 15px;
+      }
+
+      .empty-state p {
+        font-size: 16px;
+        opacity: 0.8;
+        margin-bottom: 30px;
+      }
+
+      .back-btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: "Comfortaa", sans-serif;
+        font-weight: 600;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        z-index: 1000;
+      }
+
+      .back-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+      }
+
+      /* Mobile optimizations */
+      @media (max-width: 768px) {
+        .container {
+          padding: 15px;
+          margin: 5px;
+        }
+
+        .header h1 {
+          font-size: 1.8rem;
+        }
+
+        .week-selector-container {
+          max-width: 100%;
+        }
+
+        .week-selector {
+          padding: 12px 45px 12px 15px;
+          font-size: 14px;
+        }
+
+        .week-selector-label {
+          font-size: 14px;
+        }
+
+        .clear-btn {
+          width: 25px;
+          height: 25px;
+          font-size: 14px;
+          right: 12px;
+        }
+
+        .payroll-card {
+          padding: 15px;
+        }
+
+        .payroll-actions {
+          flex-direction: column;
+        }
+
+        .btn {
+          width: 100%;
+          padding: 10px 15px;
+          font-size: 13px;
+        }
+
+        .back-btn {
+          position: relative;
+          top: auto;
+          left: auto;
+          margin-bottom: 15px;
+          width: fit-content;
+          padding: 10px 15px;
+          font-size: 14px;
+        }
+      }
+
+      /* PDF Viewer Modal */
+      .pdf-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 2000;
+        display: none;
+        flex-direction: column;
+      }
+
+      .pdf-modal.active {
+        display: flex;
+      }
+
+      .pdf-header {
+        background: #2c3e50;
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .pdf-title {
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      .pdf-close {
+        background: #e74c3c;
+        border: none;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      .pdf-close:hover {
+        background: #c0392b;
+      }
+
+      .pdf-container {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
+
+      .pdf-viewer {
+        width: 100%;
+        height: 100%;
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
+
+      .pdf-loading {
+        color: white;
+        font-size: 18px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="linktreev2.html" class="back-btn"> ← Retour </a>
+
+    <div class="container">
+      <div class="header">
+        <h1>📄 Mes Talons de Paie</h1>
+        <p>Consultez et gérez vos talons de paie</p>
+      </div>
+
+      <div class="week-selector-section">
+        <div class="week-selector-container">
+          <label for="weekSelect" class="week-selector-label">
+            📅 Sélectionner une semaine :
+          </label>
+          <div class="selector-wrapper">
+            <select id="weekSelect" class="week-selector">
+              <option value="">Toutes les semaines</option>
+            </select>
+            <button id="clearSelection" class="clear-btn" style="display: none">
+              ✕
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="payrolls-grid" id="payrollsGrid">
+        <div class="loading">
+          <span class="spinner"></span>
+          Chargement de vos talons de paie...
+        </div>
+      </div>
+    </div>
+
+    <!-- PDF Viewer Modal -->
+    <div class="pdf-modal" id="pdfModal">
+      <div class="pdf-header">
+        <div class="pdf-title" id="pdfTitle">Chargement...</div>
+        <button class="pdf-close" onclick="closePdfModal()">Fermer</button>
+      </div>
+      <div class="pdf-container">
+        <div class="pdf-loading" id="pdfLoading">
+          <span class="spinner"></span>
+          Chargement du PDF...
+        </div>
+        <iframe
+          class="pdf-viewer"
+          id="pdfViewer"
+          style="display: none"
+        ></iframe>
+      </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+    <script>
+      // Configuration Firebase
+      const firebaseConfig = {
+        apiKey: "AIzaSyAxbpNoGfMEK5N6sy3WYWMTD3WGelff0QA",
+        authDomain: "transportelz.firebaseapp.com",
+        projectId: "transportelz",
+        storageBucket: "transportelz.firebasestorage.app",
+        messagingSenderId: "290260714729",
+        appId: "1:290260714729:web:a433a445eb44fe5404dc78",
+        measurementId: "G-EKZYPTGFT7",
+      };
+      firebase.initializeApp(firebaseConfig);
+
+      // Variables globales
+      let allPayrolls = [];
+      let filteredPayrolls = [];
+      let selectedWeek = "";
+
+      // Vérifier l'authentification
+      const userIdentifiant = localStorage.getItem("identifiantTransportelz");
+      if (!userIdentifiant) {
+        alert("Session expirée. Redirection vers la page de connexion.");
+        window.location.href = "indexv2.html";
+      }
+
+      // Charger les talons de paie
+      async function loadPayrolls() {
+        try {
+          const snapshot = await firebase
+            .firestore()
+            .collection("payrolls")
+            .where("employeeIdentifiant", "==", userIdentifiant)
+            .get();
+
+          allPayrolls = [];
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+
+            // Filtrer côté client : ne pas inclure les talons archivés
+            if (data.archived !== true) {
+              allPayrolls.push({
+                id: doc.id,
+                ...data,
+                viewed: data.viewed || false, // Par défaut non consulté
+                viewedAt: data.viewedAt || null,
+              });
+            }
+          });
+
+          // Trier par date de dépôt (plus récente en premier)
+          allPayrolls.sort((a, b) => {
+            const dateA = a.uploadedAt ? a.uploadedAt.toDate() : new Date(0);
+            const dateB = b.uploadedAt ? b.uploadedAt.toDate() : new Date(0);
+            return dateB - dateA; // Ordre décroissant (plus récent en premier)
+          });
+
+          populateWeekSelector();
+          applyWeekFilter();
+          displayPayrolls();
+        } catch (error) {
+          console.error("Erreur chargement talons:", error);
+          document.getElementById("payrollsGrid").innerHTML = `
+            <div class="empty-state">
+              <h3>❌ Erreur de chargement</h3>
+              <p>Impossible de charger vos talons de paie. Veuillez réessayer.</p>
+            </div>
+          `;
+        }
+      }
+
+      // Remplir le sélecteur de semaine
+      function populateWeekSelector() {
+        const weekSelect = document.getElementById("weekSelect");
+        const uniqueWeeks = [...new Set(allPayrolls.map((p) => p.week))].filter(
+          Boolean
+        );
+
+        // Vider les options existantes (sauf "Toutes les semaines")
+        weekSelect.innerHTML = '<option value="">Toutes les semaines</option>';
+
+        // Ajouter les semaines disponibles
+        uniqueWeeks.forEach((week) => {
+          const option = document.createElement("option");
+          option.value = week;
+          option.textContent = formatWeekDisplay(week);
+          weekSelect.appendChild(option);
+        });
+      }
+
+      // Appliquer le filtre par semaine
+      function applyWeekFilter() {
+        if (!selectedWeek) {
+          filteredPayrolls = allPayrolls;
+        } else {
+          filteredPayrolls = allPayrolls.filter(
+            (payroll) => payroll.week === selectedWeek
+          );
+        }
+      }
+
+      // Afficher les talons de paie
+      function displayPayrolls() {
+        const grid = document.getElementById("payrollsGrid");
+
+        if (filteredPayrolls.length === 0) {
+          grid.innerHTML = `
+            <div class="empty-state">
+              <h3>📄 Aucun talon trouvé</h3>
+              <p>${
+                selectedWeek
+                  ? `Aucun talon pour la semaine sélectionnée.`
+                  : "Vous n'avez pas encore de talons de paie."
+              }</p>
+            </div>
+          `;
+          return;
+        }
+
+        // Afficher les talons simplement
+        grid.innerHTML = filteredPayrolls
+          .map(
+            (payroll) => `
+          <div class="payroll-card ${!payroll.viewed ? "new" : "viewed"}">
+            <div class="payroll-header">
+              <div class="payroll-week">${formatWeekDisplay(payroll.week)}</div>
+            </div>
+            <div class="payroll-info">
+              <div class="payroll-title">Talon de paie</div>
+              <div class="payroll-date">Déposé le ${new Date(
+                payroll.uploadedAt.toDate()
+              ).toLocaleDateString("fr-FR")}</div>
+              <div class="payroll-employee">${
+                payroll.employeeName || payroll.employeeIdentifiant
+              }</div>
+            </div>
+            <div class="payroll-actions">
+              <button class="btn btn-primary" onclick="viewPayroll('${
+                payroll.id
+              }', '${payroll.downloadURL}', '${payroll.week}')">
+                👁️ Voir le PDF
+              </button>
+            </div>
+          </div>
+        `
+          )
+          .join("");
+      }
+
+      // Formater l'affichage de la semaine
+      function formatWeekDisplay(weekValue) {
+        if (!weekValue) return "Semaine non définie";
+
+        try {
+          const startDate = new Date(weekValue);
+          const endDate = new Date(startDate);
+          endDate.setDate(startDate.getDate() + 6);
+
+          const startStr = startDate.toLocaleDateString("fr-FR", {
+            day: "2-digit",
+            month: "2-digit",
+          });
+          const endStr = endDate.toLocaleDateString("fr-FR", {
+            day: "2-digit",
+            month: "2-digit",
+          });
+
+          return `Du ${startStr} au ${endStr}`;
+        } catch (error) {
+          return weekValue;
+        }
+      }
+
+      // Voir un talon de paie
+      function viewPayroll(payrollId, downloadURL, week) {
+        const modal = document.getElementById("pdfModal");
+        const title = document.getElementById("pdfTitle");
+        const viewer = document.getElementById("pdfViewer");
+        const loading = document.getElementById("pdfLoading");
+
+        title.textContent = `Talon de paie - ${formatWeekDisplay(week)}`;
+        loading.style.display = "block";
+        viewer.style.display = "none";
+        modal.classList.add("active");
+
+        // Charger le PDF
+        viewer.src = downloadURL;
+        viewer.onload = () => {
+          loading.style.display = "none";
+          viewer.style.display = "block";
+        };
+
+        // Marquer comme consulté automatiquement dès l'ouverture
+        markAsViewedAutomatically(payrollId);
+      }
+
+      // Marquer automatiquement comme consulté
+      async function markAsViewedAutomatically(payrollId) {
+        try {
+          await firebase
+            .firestore()
+            .collection("payrolls")
+            .doc(payrollId)
+            .update({
+              viewed: true,
+              viewedAt: new Date(),
+            });
+
+          // Mettre à jour localement
+          const payroll = allPayrolls.find((p) => p.id === payrollId);
+          if (payroll) {
+            payroll.viewed = true;
+            payroll.viewedAt = new Date();
+          }
+
+          // Mettre à jour l'affichage
+          applyWeekFilter();
+          displayPayrolls();
+        } catch (error) {
+          console.error("Erreur marquage automatique consulté:", error);
+        }
+      }
+
+      // Fermer le modal PDF
+      function closePdfModal() {
+        const modal = document.getElementById("pdfModal");
+        const viewer = document.getElementById("pdfViewer");
+
+        modal.classList.remove("active");
+        viewer.src = "";
+      }
+
+      // Gestion du sélecteur de semaine
+      document.addEventListener("DOMContentLoaded", function () {
+        loadPayrolls();
+
+        // Event listener pour le sélecteur de semaine
+        const weekSelect = document.getElementById("weekSelect");
+        const clearBtn = document.getElementById("clearSelection");
+
+        weekSelect.addEventListener("change", function () {
+          selectedWeek = this.value;
+          applyWeekFilter();
+          displayPayrolls();
+
+          // Afficher/masquer le bouton d'effacement
+          if (selectedWeek) {
+            clearBtn.style.display = "block";
+          } else {
+            clearBtn.style.display = "none";
+          }
+        });
+
+        // Event listener pour le bouton d'effacement
+        clearBtn.addEventListener("click", function () {
+          weekSelect.value = "";
+          selectedWeek = "";
+          applyWeekFilter();
+          displayPayrolls();
+          clearBtn.style.display = "none";
+        });
+
+        // Fermer le modal en cliquant à l'extérieur
+        document
+          .getElementById("pdfModal")
+          .addEventListener("click", function (e) {
+            if (e.target === this) {
+              closePdfModal();
+            }
+          });
+      });
+    </script>
+  </body>
+</html>

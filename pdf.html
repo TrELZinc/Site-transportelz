@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scanner PDF - Transport ELZ</title>
+    <link rel="icon" type="image/png" href="assets/favicon.png" />
+
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    />
+
+    <!-- PDF.js pour la génération de PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Comfortaa", sans-serif;
+        background: linear-gradient(
+          135deg,
+          #e74c3c 0%,
+          #c0392b 25%,
+          #a93226 50%,
+          #7b241c 75%,
+          #2c3e50 100%
+        );
+        background-size: 400% 400%;
+        animation: gradientShift 8s ease infinite;
+        min-height: 100vh;
+        color: white;
+        overflow-x: hidden;
+        padding: 20px;
+      }
+
+      @keyframes gradientShift {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .header p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+      }
+
+      .back-btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        z-index: 1000;
+      }
+
+      .back-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+        color: white;
+        text-decoration: none;
+      }
+
+      .scanner-container {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-bottom: 30px;
+      }
+
+      .scanner-section {
+        padding: 30px;
+      }
+
+      .scanner-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        text-align: center;
+        color: #e8e8e8;
+      }
+
+      .camera-container {
+        position: relative;
+        width: 100%;
+        max-width: 500px;
+        margin: 0 auto 20px;
+        border-radius: 15px;
+        overflow: hidden;
+        background: #000;
+        display: none;
+      }
+
+      .camera-container.active {
+        display: block;
+      }
+
+      #video {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      .camera-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        z-index: 10;
+      }
+
+      .document-frame {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80%;
+        height: 60%;
+        border: 3px solid #27ae60;
+        border-radius: 10px;
+        background: rgba(39, 174, 96, 0.1);
+        box-shadow: 0 0 20px rgba(39, 174, 96, 0.3);
+        animation: pulse 2s infinite;
+        transition: all 0.3s ease;
+      }
+
+      .document-frame.detected {
+        border-color: #f39c12;
+        background: rgba(243, 156, 18, 0.2);
+        box-shadow: 0 0 30px rgba(243, 156, 18, 0.6);
+        animation: detectedPulse 1s infinite;
+      }
+
+      @keyframes detectedPulse {
+        0% {
+          box-shadow: 0 0 30px rgba(243, 156, 18, 0.6);
+        }
+        50% {
+          box-shadow: 0 0 40px rgba(243, 156, 18, 0.8);
+        }
+        100% {
+          box-shadow: 0 0 30px rgba(243, 156, 18, 0.6);
+        }
+      }
+
+      .detection-status {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 20px;
+        font-weight: 600;
+        z-index: 30;
+        backdrop-filter: blur(10px);
+      }
+
+      .detection-status.detected {
+        background: rgba(243, 156, 18, 0.9);
+        color: #2c3e50;
+      }
+
+      .document-corners {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        border: 3px solid #27ae60;
+      }
+
+      .document-corners.top-left {
+        top: -3px;
+        left: -3px;
+        border-right: none;
+        border-bottom: none;
+      }
+
+      .document-corners.top-right {
+        top: -3px;
+        right: -3px;
+        border-left: none;
+        border-bottom: none;
+      }
+
+      .document-corners.bottom-left {
+        bottom: -3px;
+        left: -3px;
+        border-right: none;
+        border-top: none;
+      }
+
+      .document-corners.bottom-right {
+        bottom: -3px;
+        right: -3px;
+        border-left: none;
+        border-top: none;
+      }
+
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 20px rgba(39, 174, 96, 0.3);
+        }
+        50% {
+          box-shadow: 0 0 30px rgba(39, 174, 96, 0.6);
+        }
+        100% {
+          box-shadow: 0 0 20px rgba(39, 174, 96, 0.3);
+        }
+      }
+
+      .camera-controls {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 15px;
+        z-index: 20;
+      }
+
+      .camera-btn {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: 3px solid white;
+        background: rgba(231, 76, 60, 0.8);
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+      }
+
+      .camera-btn:hover {
+        background: rgba(231, 76, 60, 1);
+        transform: scale(1.1);
+      }
+
+      .camera-btn.capture {
+        background: rgba(39, 174, 96, 0.8);
+      }
+
+      .camera-btn.capture:hover {
+        background: rgba(39, 174, 96, 1);
+      }
+
+      .camera-btn.close {
+        background: rgba(231, 76, 60, 0.8);
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 15px 30px;
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        color: white;
+        text-decoration: none;
+        border-radius: 25px;
+        font-weight: 600;
+        font-size: 16px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        text-align: center;
+        width: 100%;
+        margin: 10px 0;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+      }
+
+      .btn.secondary {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+      }
+
+      .btn.secondary:hover {
+        box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+      }
+
+      .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .scanned-pages {
+        margin-top: 20px;
+      }
+
+      .page-item {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 15px;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .page-preview {
+        width: 80px;
+        height: 100px;
+        border-radius: 8px;
+        object-fit: cover;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .page-info {
+        flex: 1;
+      }
+
+      .page-number {
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 5px;
+      }
+
+      .page-size {
+        font-size: 0.9rem;
+        opacity: 0.8;
+      }
+
+      .page-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .btn-small {
+        padding: 8px 12px;
+        font-size: 12px;
+        border-radius: 15px;
+        width: auto;
+        margin: 0;
+      }
+
+      .btn-small.danger {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+      }
+
+      .email-section {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        margin-bottom: 30px;
+        display: none;
+      }
+
+      .email-section.active {
+        display: block;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #e8e8e8;
+      }
+
+      .form-group input,
+      .form-group textarea {
+        width: 100%;
+        padding: 15px 20px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 15px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        color: white;
+        font-family: "Comfortaa", sans-serif;
+        font-size: 16px;
+        transition: all 0.3s ease;
+      }
+
+      .form-group input:focus,
+      .form-group textarea:focus {
+        outline: none;
+        border-color: #e74c3c;
+        background: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 0 20px rgba(231, 76, 60, 0.3);
+      }
+
+      .form-group input::placeholder,
+      .form-group textarea::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9998;
+        backdrop-filter: blur(10px);
+      }
+
+      .loading-screen.show {
+        display: flex;
+      }
+
+      .loader {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid #e74c3c;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .status-message {
+        background: rgba(39, 174, 96, 0.2);
+        border: 2px solid rgba(39, 174, 96, 0.4);
+        border-radius: 15px;
+        padding: 15px;
+        text-align: center;
+        color: #27ae60;
+        font-weight: 600;
+        margin: 15px 0;
+        display: none;
+      }
+
+      .status-message.error {
+        background: rgba(231, 76, 60, 0.2);
+        border-color: rgba(231, 76, 60, 0.4);
+        color: #e74c3c;
+      }
+
+      .status-message.show {
+        display: block;
+      }
+
+      /* Mobile optimizations */
+      @media (max-width: 768px) {
+        .container {
+          padding: 15px;
+        }
+
+        .header h1 {
+          font-size: 2rem;
+        }
+
+        .scanner-container,
+        .email-section {
+          margin: 0 -5px 20px -5px;
+          padding: 20px 15px;
+        }
+
+        .camera-container {
+          max-width: 100%;
+        }
+
+        .camera-btn {
+          width: 50px;
+          height: 50px;
+          font-size: 20px;
+        }
+
+        .page-item {
+          flex-direction: column;
+          text-align: center;
+        }
+
+        .page-preview {
+          width: 100px;
+          height: 120px;
+        }
+
+        .page-actions {
+          justify-content: center;
+        }
+
+        .back-btn {
+          position: relative;
+          top: auto;
+          left: auto;
+          margin-bottom: 15px;
+          width: fit-content;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <a href="linktreev2.html" class="back-btn"> ← Retour </a>
+
+    <div class="container">
+      <div class="header">
+        <h1>📄 Scanner PDF</h1>
+        <p>Numérisez vos documents et créez un PDF</p>
+      </div>
+
+      <div class="scanner-container">
+        <div class="scanner-section">
+          <div class="scanner-title">📷 Appareil photo</div>
+
+          <div class="camera-container" id="cameraContainer">
+            <video id="video" autoplay playsinline></video>
+            <canvas id="canvas" style="display: none"></canvas>
+
+            <div class="camera-overlay">
+              <div class="detection-status" id="detectionStatus">
+                🔍 Recherche de document...
+              </div>
+              <div class="document-frame" id="documentFrame">
+                <div class="document-corners top-left"></div>
+                <div class="document-corners top-right"></div>
+                <div class="document-corners bottom-left"></div>
+                <div class="document-corners bottom-right"></div>
+              </div>
+            </div>
+
+            <div class="camera-controls">
+              <button class="camera-btn close" id="closeCamera" title="Fermer">
+                <i class="bi bi-x-lg"></i>
+              </button>
+              <button
+                class="camera-btn capture"
+                id="captureBtn"
+                title="Capturer"
+              >
+                <i class="bi bi-camera"></i>
+              </button>
+            </div>
+          </div>
+
+          <button class="btn" id="openCameraBtn">
+            <i class="bi bi-camera"></i> Ouvrir l'appareil photo
+          </button>
+
+          <div class="scanned-pages" id="scannedPages">
+            <!-- Pages scannées apparaîtront ici -->
+          </div>
+
+          <div id="statusMessage" class="status-message"></div>
+        </div>
+      </div>
+
+      <div class="email-section" id="emailSection">
+        <div class="scanner-title">📧 Envoyer par email</div>
+
+        <div class="form-group">
+          <label for="emailTo">Destinataire :</label>
+          <input
+            type="email"
+            id="emailTo"
+            placeholder="exemple@email.com"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="emailSubject">Sujet :</label>
+          <input
+            type="text"
+            id="emailSubject"
+            placeholder="Document scanné"
+            value="Document scanné"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="emailMessage">Message :</label>
+          <textarea
+            id="emailMessage"
+            rows="4"
+            placeholder="Message optionnel..."
+          ></textarea>
+        </div>
+
+        <button class="btn" id="sendEmailBtn">
+          <i class="bi bi-send"></i> Envoyer le PDF
+        </button>
+      </div>
+
+      <div style="text-align: center">
+        <button class="btn secondary" id="generatePdfBtn" style="display: none">
+          <i class="bi bi-file-pdf"></i> Générer PDF
+        </button>
+      </div>
+    </div>
+
+    <div id="loading-screen" class="loading-screen">
+      <div class="loader"></div>
+    </div>
+
+    <script>
+      let stream = null;
+      let scannedPages = [];
+      let currentPageNumber = 1;
+      let detectionInterval = null;
+      let isDetecting = false;
+      let autoCaptureTimeout = null;
+
+      const video = document.getElementById("video");
+      const canvas = document.getElementById("canvas");
+      const cameraContainer = document.getElementById("cameraContainer");
+      const openCameraBtn = document.getElementById("openCameraBtn");
+      const closeCameraBtn = document.getElementById("closeCamera");
+      const captureBtn = document.getElementById("captureBtn");
+      const scannedPagesContainer = document.getElementById("scannedPages");
+      const emailSection = document.getElementById("emailSection");
+      const generatePdfBtn = document.getElementById("generatePdfBtn");
+      const sendEmailBtn = document.getElementById("sendEmailBtn");
+      const statusMessage = document.getElementById("statusMessage");
+      const loadingScreen = document.getElementById("loading-screen");
+      const detectionStatus = document.getElementById("detectionStatus");
+      const documentFrame = document.getElementById("documentFrame");
+
+      // Vérifier les permissions de caméra
+      async function checkCameraPermission() {
+        try {
+          const permission = await navigator.permissions.query({
+            name: "camera",
+          });
+          console.log("Permission caméra:", permission.state);
+          return permission.state === "granted";
+        } catch (error) {
+          console.log("Permissions API non supportée");
+          return true; // On essaie quand même
+        }
+      }
+
+      // Ouvrir l'appareil photo
+      openCameraBtn.addEventListener("click", async () => {
+        try {
+          showLoading();
+
+          // Vérifier si getUserMedia est supporté
+          if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            throw new Error("getUserMedia non supporté par ce navigateur");
+          }
+
+          // Vérifier les permissions
+          const hasPermission = await checkCameraPermission();
+          if (!hasPermission) {
+            showStatus(
+              "Permission caméra refusée. Veuillez autoriser l'accès à la caméra.",
+              "error"
+            );
+            hideLoading();
+            return;
+          }
+
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              facingMode: "environment",
+              width: { ideal: 1280 },
+              height: { ideal: 720 },
+            },
+          });
+
+          video.srcObject = stream;
+          cameraContainer.classList.add("active");
+          openCameraBtn.style.display = "none";
+          hideLoading();
+          showStatus("Positionnez le document dans le cadre vert", "success");
+
+          // Démarrer la détection automatique
+          startDocumentDetection();
+        } catch (error) {
+          hideLoading();
+          showStatus(
+            "Erreur: Impossible d'accéder à l'appareil photo",
+            "error"
+          );
+          console.error("Erreur caméra:", error);
+        }
+      });
+
+      // Fermer l'appareil photo
+      closeCameraBtn.addEventListener("click", () => {
+        closeCamera();
+      });
+
+      // Capturer une photo
+      captureBtn.addEventListener("click", () => {
+        capturePhoto();
+      });
+
+      // Générer PDF
+      generatePdfBtn.addEventListener("click", () => {
+        generatePDF();
+      });
+
+      // Envoyer par email
+      sendEmailBtn.addEventListener("click", () => {
+        sendEmail();
+      });
+
+      function closeCamera() {
+        if (stream) {
+          stream.getTracks().forEach((track) => track.stop());
+          stream = null;
+        }
+        cameraContainer.classList.remove("active");
+        openCameraBtn.style.display = "block";
+
+        // Arrêter la détection
+        stopDocumentDetection();
+      }
+
+      function capturePhoto() {
+        const context = canvas.getContext("2d");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        // Dessiner l'image de la vidéo sur le canvas
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Recadrer pour ne garder que la zone du cadre vert
+        const croppedCanvas = cropToDocumentFrame(canvas);
+
+        // Convertir en blob
+        croppedCanvas.toBlob(
+          (blob) => {
+            if (blob) {
+              const imageUrl = URL.createObjectURL(blob);
+              addScannedPage(imageUrl, blob);
+              showStatus(
+                `Page ${currentPageNumber} ajoutée avec succès!`,
+                "success"
+              );
+              currentPageNumber++;
+
+              // Redémarrer la détection après capture
+              setTimeout(() => {
+                startDocumentDetection();
+              }, 2000);
+            }
+          },
+          "image/jpeg",
+          0.8
+        );
+      }
+
+      function cropToDocumentFrame(sourceCanvas) {
+        const croppedCanvas = document.createElement("canvas");
+        const ctx = croppedCanvas.getContext("2d");
+
+        // Calculer les coordonnées du cadre vert (80% largeur, 60% hauteur, centré)
+        const frameWidth = sourceCanvas.width * 0.8;
+        const frameHeight = sourceCanvas.height * 0.6;
+        const frameX = (sourceCanvas.width - frameWidth) / 2;
+        const frameY = (sourceCanvas.height - frameHeight) / 2;
+
+        // Définir la taille du canvas de sortie
+        croppedCanvas.width = frameWidth;
+        croppedCanvas.height = frameHeight;
+
+        // Dessiner la zone recadrée
+        ctx.drawImage(
+          sourceCanvas,
+          frameX,
+          frameY,
+          frameWidth,
+          frameHeight,
+          0,
+          0,
+          frameWidth,
+          frameHeight
+        );
+
+        return croppedCanvas;
+      }
+
+      function addScannedPage(imageUrl, blob) {
+        const pageItem = document.createElement("div");
+        pageItem.className = "page-item";
+        pageItem.innerHTML = `
+          <img src="${imageUrl}" class="page-preview" alt="Page ${currentPageNumber}">
+          <div class="page-info">
+            <div class="page-number">Page ${currentPageNumber}</div>
+            <div class="page-size">${Math.round(blob.size / 1024)} KB</div>
+          </div>
+          <div class="page-actions">
+            <button class="btn-small danger" onclick="removePage(${
+              scannedPages.length
+            })">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        `;
+
+        scannedPagesContainer.appendChild(pageItem);
+        scannedPages.push({ imageUrl, blob, pageNumber: currentPageNumber });
+
+        // Afficher les boutons de génération et email
+        generatePdfBtn.style.display = "block";
+        emailSection.classList.add("active");
+      }
+
+      function removePage(index) {
+        const pageItem = scannedPagesContainer.children[index];
+        if (pageItem) {
+          pageItem.remove();
+          scannedPages.splice(index, 1);
+
+          // Mettre à jour les numéros de page
+          updatePageNumbers();
+
+          if (scannedPages.length === 0) {
+            generatePdfBtn.style.display = "none";
+            emailSection.classList.remove("active");
+          }
+        }
+      }
+
+      function updatePageNumbers() {
+        const pageItems = scannedPagesContainer.children;
+        for (let i = 0; i < pageItems.length; i++) {
+          const pageNumber = pageItems[i].querySelector(".page-number");
+          if (pageNumber) {
+            pageNumber.textContent = `Page ${i + 1}`;
+          }
+        }
+      }
+
+      async function generatePDF() {
+        if (scannedPages.length === 0) {
+          showStatus("Aucune page à convertir", "error");
+          return;
+        }
+
+        try {
+          showLoading();
+          showStatus("Génération du PDF en cours...", "success");
+
+          const { jsPDF } = window.jspdf;
+          const pdf = new jsPDF("p", "mm", "a4");
+
+          for (let i = 0; i < scannedPages.length; i++) {
+            const page = scannedPages[i];
+
+            // Charger l'image
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+
+            await new Promise((resolve, reject) => {
+              img.onload = resolve;
+              img.onerror = reject;
+              img.src = page.imageUrl;
+            });
+
+            // Calculer les dimensions pour s'adapter à la page A4
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            const imgWidth = img.width;
+            const imgHeight = img.height;
+
+            const ratio = Math.min(
+              pageWidth / imgWidth,
+              pageHeight / imgHeight
+            );
+            const finalWidth = imgWidth * ratio;
+            const finalHeight = imgHeight * ratio;
+
+            const x = (pageWidth - finalWidth) / 2;
+            const y = (pageHeight - finalHeight) / 2;
+
+            if (i > 0) {
+              pdf.addPage();
+            }
+
+            pdf.addImage(img, "JPEG", x, y, finalWidth, finalHeight);
+          }
+
+          // Sauvegarder le PDF
+          const pdfBlob = pdf.output("blob");
+          const pdfUrl = URL.createObjectURL(pdfBlob);
+
+          // Créer un lien de téléchargement
+          const downloadLink = document.createElement("a");
+          downloadLink.href = pdfUrl;
+          downloadLink.download = `document_scanne_${
+            new Date().toISOString().split("T")[0]
+          }.pdf`;
+          downloadLink.click();
+
+          hideLoading();
+          showStatus(
+            `PDF généré avec succès! (${Math.round(pdfBlob.size / 1024)} KB)`,
+            "success"
+          );
+
+          // Stocker le PDF pour l'envoi par email
+          window.generatedPdfBlob = pdfBlob;
+        } catch (error) {
+          hideLoading();
+          showStatus("Erreur lors de la génération du PDF", "error");
+          console.error("Erreur PDF:", error);
+        }
+      }
+
+      async function sendEmail() {
+        const emailTo = document.getElementById("emailTo").value;
+        const emailSubject = document.getElementById("emailSubject").value;
+        const emailMessage = document.getElementById("emailMessage").value;
+
+        if (!emailTo) {
+          showStatus("Veuillez saisir une adresse email", "error");
+          return;
+        }
+
+        if (!window.generatedPdfBlob) {
+          showStatus("Veuillez d'abord générer le PDF", "error");
+          return;
+        }
+
+        try {
+          showLoading();
+          showStatus("Envoi en cours...", "success");
+
+          // Créer un FormData pour l'envoi
+          const formData = new FormData();
+          formData.append("to", emailTo);
+          formData.append("subject", emailSubject);
+          formData.append("message", emailMessage);
+          formData.append("pdf", window.generatedPdfBlob, "document.pdf");
+
+          // Ici vous devriez remplacer par votre endpoint d'envoi d'email
+          // Pour l'instant, on simule l'envoi
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+
+          hideLoading();
+          showStatus("Email envoyé avec succès!", "success");
+
+          // Réinitialiser le formulaire
+          document.getElementById("emailTo").value = "";
+          document.getElementById("emailSubject").value = "Document scanné";
+          document.getElementById("emailMessage").value = "";
+        } catch (error) {
+          hideLoading();
+          showStatus("Erreur lors de l'envoi de l'email", "error");
+          console.error("Erreur email:", error);
+        }
+      }
+
+      function showLoading() {
+        loadingScreen.classList.add("show");
+      }
+
+      function hideLoading() {
+        loadingScreen.classList.remove("show");
+      }
+
+      function showStatus(message, type = "success") {
+        statusMessage.textContent = message;
+        statusMessage.className = `status-message ${type} show`;
+
+        setTimeout(() => {
+          statusMessage.classList.remove("show");
+        }, 3000);
+      }
+
+      // Fonctions de détection automatique
+      function startDocumentDetection() {
+        if (isDetecting) return;
+
+        isDetecting = true;
+        detectionStatus.textContent = "🔍 Recherche de document...";
+        documentFrame.classList.remove("detected");
+
+        detectionInterval = setInterval(() => {
+          detectDocument();
+        }, 500); // Vérifier toutes les 500ms
+      }
+
+      function stopDocumentDetection() {
+        isDetecting = false;
+        if (detectionInterval) {
+          clearInterval(detectionInterval);
+          detectionInterval = null;
+        }
+        if (autoCaptureTimeout) {
+          clearTimeout(autoCaptureTimeout);
+          autoCaptureTimeout = null;
+        }
+        detectionStatus.textContent = "🔍 Recherche de document...";
+        documentFrame.classList.remove("detected");
+      }
+
+      function detectDocument() {
+        if (!video.videoWidth || !video.videoHeight) return;
+
+        const tempCanvas = document.createElement("canvas");
+        const tempCtx = tempCanvas.getContext("2d");
+        tempCanvas.width = video.videoWidth;
+        tempCanvas.height = video.videoHeight;
+
+        // Dessiner l'image de la vidéo
+        tempCtx.drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
+
+        // Analyser la zone du cadre vert
+        const frameWidth = tempCanvas.width * 0.8;
+        const frameHeight = tempCanvas.height * 0.6;
+        const frameX = (tempCanvas.width - frameWidth) / 2;
+        const frameY = (tempCanvas.height - frameHeight) / 2;
+
+        const imageData = tempCtx.getImageData(
+          frameX,
+          frameY,
+          frameWidth,
+          frameHeight
+        );
+        const documentDetected = analyzeImageForDocument(imageData);
+
+        if (documentDetected) {
+          if (!documentFrame.classList.contains("detected")) {
+            documentFrame.classList.add("detected");
+            detectionStatus.textContent = "📄 Document détecté!";
+            detectionStatus.classList.add("detected");
+
+            // Capture automatique après 1.5 secondes
+            autoCaptureTimeout = setTimeout(() => {
+              if (isDetecting) {
+                capturePhoto();
+                stopDocumentDetection();
+              }
+            }, 1500);
+          }
+        } else {
+          if (documentFrame.classList.contains("detected")) {
+            documentFrame.classList.remove("detected");
+            detectionStatus.textContent = "🔍 Recherche de document...";
+            detectionStatus.classList.remove("detected");
+
+            if (autoCaptureTimeout) {
+              clearTimeout(autoCaptureTimeout);
+              autoCaptureTimeout = null;
+            }
+          }
+        }
+      }
+
+      function analyzeImageForDocument(imageData) {
+        const data = imageData.data;
+        const width = imageData.width;
+        const height = imageData.height;
+
+        let edgeCount = 0;
+        let contrastSum = 0;
+        let sampleCount = 0;
+
+        // Analyser les bords et le contraste
+        for (let y = 0; y < height; y += 10) {
+          for (let x = 0; x < width; x += 10) {
+            const index = (y * width + x) * 4;
+            const r = data[index];
+            const g = data[index + 1];
+            const b = data[index + 2];
+            const brightness = (r + g + b) / 3;
+
+            // Vérifier les bords (gradients importants)
+            if (x > 0 && x < width - 1 && y > 0 && y < height - 1) {
+              const leftIndex = (y * width + (x - 1)) * 4;
+              const rightIndex = (y * width + (x + 1)) * 4;
+              const topIndex = ((y - 1) * width + x) * 4;
+              const bottomIndex = ((y + 1) * width + x) * 4;
+
+              const leftBrightness =
+                (data[leftIndex] + data[leftIndex + 1] + data[leftIndex + 2]) /
+                3;
+              const rightBrightness =
+                (data[rightIndex] +
+                  data[rightIndex + 1] +
+                  data[rightIndex + 2]) /
+                3;
+              const topBrightness =
+                (data[topIndex] + data[topIndex + 1] + data[topIndex + 2]) / 3;
+              const bottomBrightness =
+                (data[bottomIndex] +
+                  data[bottomIndex + 1] +
+                  data[bottomIndex + 2]) /
+                3;
+
+              const horizontalContrast =
+                Math.abs(brightness - leftBrightness) +
+                Math.abs(brightness - rightBrightness);
+              const verticalContrast =
+                Math.abs(brightness - topBrightness) +
+                Math.abs(brightness - bottomBrightness);
+
+              if (horizontalContrast > 30 || verticalContrast > 30) {
+                edgeCount++;
+              }
+
+              contrastSum += horizontalContrast + verticalContrast;
+              sampleCount++;
+            }
+          }
+        }
+
+        const edgeRatio = edgeCount / sampleCount;
+        const avgContrast = contrastSum / sampleCount;
+
+        // Critères de détection : bords nets et contraste suffisant
+        return edgeRatio > 0.1 && avgContrast > 20;
+      }
+
+      // Nettoyage lors de la fermeture de la page
+      window.addEventListener("beforeunload", () => {
+        if (stream) {
+          stream.getTracks().forEach((track) => track.stop());
+        }
+        stopDocumentDetection();
+      });
+    </script>
+  </body>
+</html>

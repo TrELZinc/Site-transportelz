@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Connexion – Transport E.L.Z inc.</title>
+    <link rel="icon" type="image/png" href="assets/favicon.png" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Comfortaa", sans-serif;
+        background: linear-gradient(
+          135deg,
+          #e74c3c 0%,
+          #c0392b 25%,
+          #a93226 50%,
+          #7b241c 75%,
+          #2c3e50 100%
+        );
+        background-size: 400% 400%;
+        animation: gradientShift 8s ease infinite;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      @keyframes gradientShift {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .login-container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        padding: 40px 30px;
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .logo {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 30px;
+        border-radius: 50%;
+        overflow: hidden;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      h1 {
+        color: #333;
+        font-size: 28px;
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+
+      .subtitle {
+        color: #666;
+        font-size: 16px;
+        margin-bottom: 40px;
+      }
+
+      .form-group {
+        margin-bottom: 25px;
+        text-align: left;
+      }
+
+      .form-group label {
+        display: block;
+        color: #555;
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 8px;
+      }
+
+      .input-container {
+        position: relative;
+      }
+
+      input[type="text"],
+      input[type="password"] {
+        width: 100%;
+        padding: 15px 20px;
+        border: 2px solid #e1e5e9;
+        border-radius: 12px;
+        font-size: 16px;
+        font-family: "Comfortaa", sans-serif;
+        transition: all 0.3s ease;
+        background: #fff;
+      }
+
+      input[type="text"]:focus,
+      input[type="password"]:focus {
+        outline: none;
+        border-color: #e74c3c;
+        box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+        transform: translateY(-2px);
+      }
+
+      .checkbox-container {
+        display: flex;
+        align-items: center;
+        margin: 25px 0;
+        cursor: pointer;
+      }
+
+      .checkbox-container input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        margin-right: 12px;
+        cursor: pointer;
+        accent-color: #e74c3c;
+      }
+
+      .checkbox-container label {
+        color: #555;
+        font-size: 14px;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .login-btn {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        font-family: "Comfortaa", sans-serif;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 10px;
+      }
+
+      .login-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(231, 76, 60, 0.3);
+      }
+
+      .login-btn:active {
+        transform: translateY(0);
+      }
+
+      .error-message {
+        color: #e74c3c;
+        font-size: 14px;
+        margin-top: 15px;
+        padding: 10px;
+        background: rgba(231, 76, 60, 0.1);
+        border-radius: 8px;
+        display: none;
+      }
+
+      .loading {
+        display: none;
+        color: #e74c3c;
+        font-size: 14px;
+        margin-top: 15px;
+      }
+
+      .spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(231, 76, 60, 0.3);
+        border-radius: 50%;
+        border-top-color: #e74c3c;
+        animation: spin 1s ease-in-out infinite;
+        margin-right: 10px;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Mobile optimizations */
+      @media (max-width: 480px) {
+        .login-container {
+          padding: 30px 20px;
+          margin: 10px;
+        }
+
+        h1 {
+          font-size: 24px;
+        }
+
+        .subtitle {
+          font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+          padding: 12px 16px;
+          font-size: 16px; /* Prevents zoom on iOS */
+        }
+      }
+
+      /* Dark mode support */
+      @media (prefers-color-scheme: dark) {
+        .login-container {
+          background: rgba(30, 30, 30, 0.95);
+          color: #fff;
+        }
+
+        h1 {
+          color: #fff;
+        }
+
+        .subtitle {
+          color: #ccc;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+          background: #2a2a2a;
+          border-color: #444;
+          color: #fff;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+          border-color: #e74c3c;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="logo">
+        <img src="assets/logo1.png" alt="Logo Transport ELZ" />
+      </div>
+
+      <h1>Connexion</h1>
+      <p class="subtitle">Accédez à votre portail employé</p>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="identifiant">Identifiant</label>
+          <div class="input-container">
+            <input
+              type="text"
+              id="identifiant"
+              placeholder="Votre identifiant"
+              autocomplete="username"
+              autocapitalize="off"
+              autocorrect="off"
+              spellcheck="false"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="motdepasse">Mot de passe</label>
+          <div class="input-container">
+            <input
+              type="password"
+              id="motdepasse"
+              placeholder="Votre mot de passe"
+              autocomplete="current-password"
+              autocapitalize="off"
+              autocorrect="off"
+              spellcheck="false"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="checkbox-container">
+          <input type="checkbox" id="rememberMe" />
+          <label for="rememberMe">Rester connecté</label>
+        </div>
+
+        <button type="submit" class="login-btn">Se connecter</button>
+
+        <div class="error-message" id="errorMessage"></div>
+        <div class="loading" id="loadingMessage">
+          <span class="spinner"></span>
+          Connexion en cours...
+        </div>
+      </form>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+    <script>
+      // Configuration Firebase
+      const firebaseConfig = {
+        apiKey: "AIzaSyAxbpNoGfMEK5N6sy3WYWMTD3WGelff0QA",
+        authDomain: "transportelz.firebaseapp.com",
+        projectId: "transportelz",
+        storageBucket: "transportelz.firebasestorage.app",
+        messagingSenderId: "290260714729",
+        appId: "1:290260714729:web:a433a445eb44fe5404dc78",
+        measurementId: "G-EKZYPTGFT7",
+      };
+
+      firebase.initializeApp(firebaseConfig);
+
+      // Variables globales
+      let utilisateurs = [];
+
+      // Charger les utilisateurs depuis Firestore
+      async function chargerUtilisateurs() {
+        try {
+          const snapshot = await firebase
+            .firestore()
+            .collection("utilisateurs")
+            .get();
+          utilisateurs = [];
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            utilisateurs.push({
+              id: doc.id,
+              identifiant: data.identifiant,
+              hash: data.hash,
+              role: data.role,
+              nom: data.nom || "",
+              actif: data.actif !== false,
+            });
+          });
+          console.log(`${utilisateurs.length} utilisateurs chargés`);
+        } catch (error) {
+          console.error("Erreur chargement utilisateurs:", error);
+          showError("Erreur de connexion à la base de données");
+        }
+      }
+
+      // Fonction de hachage SHA-256
+      async function hacherTexte(texte) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(texte);
+        const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+      }
+
+      // Afficher une erreur
+      function showError(message) {
+        const errorDiv = document.getElementById("errorMessage");
+        errorDiv.textContent = message;
+        errorDiv.style.display = "block";
+        setTimeout(() => {
+          errorDiv.style.display = "none";
+        }, 5000);
+      }
+
+      // Afficher le loading
+      function showLoading(show) {
+        document.getElementById("loadingMessage").style.display = show
+          ? "block"
+          : "none";
+        document.querySelector(".login-btn").disabled = show;
+      }
+
+      // Vérifier la connexion
+      async function verifierConnexion(identifiant, motdepasse, rememberMe) {
+        // Attendre que les utilisateurs soient chargés
+        if (utilisateurs.length === 0) {
+          await chargerUtilisateurs();
+        }
+
+        // Chercher l'utilisateur
+        const utilisateur = utilisateurs.find(
+          (u) => u.identifiant.toLowerCase() === identifiant.toLowerCase()
+        );
+
+        if (!utilisateur) {
+          showError("Identifiant ou mot de passe incorrect");
+          return false;
+        }
+
+        // Vérifier si l'utilisateur est actif
+        if (utilisateur.actif === false) {
+          showError("Compte désactivé. Contactez l'administrateur.");
+          return false;
+        }
+
+        // Vérifier le mot de passe (insensible à la casse)
+        const hashEntre = await hacherTexte(motdepasse);
+        const hashEntreLower = await hacherTexte(motdepasse.toLowerCase());
+        const hashEntreUpper = await hacherTexte(motdepasse.toUpperCase());
+
+        if (
+          hashEntre !== utilisateur.hash &&
+          hashEntreLower !== utilisateur.hash &&
+          hashEntreUpper !== utilisateur.hash
+        ) {
+          showError("Identifiant ou mot de passe incorrect");
+          return false;
+        }
+
+        // Debug pour voir les données récupérées
+        console.log("Utilisateur trouvé:", utilisateur);
+        console.log("Nom:", utilisateur.nom);
+        console.log("Identifiant:", utilisateur.identifiant);
+
+        // Sauvegarder les données de session
+        localStorage.setItem(
+          "rememberTransportelz",
+          rememberMe ? "true" : "false"
+        );
+        localStorage.setItem("roleTransportelz", utilisateur.role);
+        localStorage.setItem(
+          "identifiantTransportelz",
+          utilisateur.identifiant
+        );
+        // Ne sauvegarder le nom que s'il existe et n'est pas vide
+        if (utilisateur.nom && utilisateur.nom.trim() !== "") {
+          localStorage.setItem("nomTransportelz", utilisateur.nom);
+        } else {
+          localStorage.removeItem("nomTransportelz");
+        }
+
+        return true;
+      }
+
+      // Gestion du formulaire
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const identifiant = document
+            .getElementById("identifiant")
+            .value.trim();
+          const motdepasse = document.getElementById("motdepasse").value;
+          const rememberMe = document.getElementById("rememberMe").checked;
+
+          if (!identifiant || !motdepasse) {
+            showError("Veuillez remplir tous les champs");
+            return;
+          }
+
+          showLoading(true);
+
+          try {
+            const success = await verifierConnexion(
+              identifiant,
+              motdepasse,
+              rememberMe
+            );
+
+            if (success) {
+              // Redirection vers le portail
+              window.location.href = "linktreev2.html";
+            }
+          } catch (error) {
+            console.error("Erreur de connexion:", error);
+            showError("Une erreur est survenue. Veuillez réessayer.");
+          } finally {
+            showLoading(false);
+          }
+        });
+
+      // Vérifier si déjà connecté (TEMPORAIREMENT DÉSACTIVÉ POUR TEST)
+      document.addEventListener("DOMContentLoaded", function () {
+        const remember = localStorage.getItem("rememberTransportelz");
+        const role = localStorage.getItem("roleTransportelz");
+
+        // Redirection automatique si déjà connecté
+        const identifiant = localStorage.getItem("identifiantTransportelz");
+        if (role && identifiant) {
+          window.location.href = "linktreev2.html";
+        }
+
+        // Charger les utilisateurs au démarrage
+        chargerUtilisateurs();
+      });
+
+      // Améliorer l'UX mobile
+      document.addEventListener("DOMContentLoaded", function () {
+        // Focus sur le premier champ
+        document.getElementById("identifiant").focus();
+
+        // Gestion du clavier virtuel mobile
+        const inputs = document.querySelectorAll(
+          'input[type="text"], input[type="password"]'
+        );
+        inputs.forEach((input) => {
+          input.addEventListener("blur", function () {
+            // Scroll vers le haut si nécessaire
+            setTimeout(() => {
+              window.scrollTo(0, 0);
+            }, 300);
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

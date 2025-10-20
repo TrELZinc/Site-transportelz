@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nettoyer la session</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        text-align: center;
+        background: #f5f5f5;
+      }
+      .container {
+        max-width: 400px;
+        margin: 50px auto;
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      button {
+        background: #dc3545;
+        color: white;
+        padding: 15px 30px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        margin: 10px;
+      }
+      button:hover {
+        background: #c82333;
+      }
+      .success {
+        color: green;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Nettoyer la session</h2>
+      <p>
+        Cliquez sur le bouton pour vider le localStorage et pouvoir tester la
+        connexion.
+      </p>
+
+      <button onclick="clearSession()">Vider la session</button>
+      <button onclick="goToLogin()">Aller à la connexion</button>
+
+      <div id="result"></div>
+    </div>
+
+    <script>
+      function clearSession() {
+        // Vider tout le localStorage
+        localStorage.clear();
+
+        // Ou vider seulement les clés spécifiques
+        localStorage.removeItem("rememberTransportelz");
+        localStorage.removeItem("roleTransportelz");
+        localStorage.removeItem("identifiantTransportelz");
+        localStorage.removeItem("nomTransportelz");
+
+        document.getElementById("result").innerHTML =
+          '<div class="success">✅ Session vidée ! Vous pouvez maintenant tester la connexion.</div>';
+      }
+
+      function goToLogin() {
+        window.location.href = "indexv2.html";
+      }
+
+      // Afficher l'état actuel
+      document.addEventListener("DOMContentLoaded", function () {
+        const remember = localStorage.getItem("rememberTransportelz");
+        const role = localStorage.getItem("roleTransportelz");
+        const identifiant = localStorage.getItem("identifiantTransportelz");
+
+        if (remember || role || identifiant) {
+          document.getElementById(
+            "result"
+          ).innerHTML = `<p><strong>Session actuelle :</strong><br>
+                    Remember: ${remember}<br>
+                    Role: ${role}<br>
+                    Identifiant: ${identifiant}</p>`;
+        } else {
+          document.getElementById("result").innerHTML =
+            "<p>Aucune session active.</p>";
+        }
+      });
+    </script>
+  </body>
+</html>

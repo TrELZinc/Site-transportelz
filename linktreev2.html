@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portail Employé – Transport E.L.Z inc.</title>
+    <link rel="icon" type="image/png" href="assets/favicon.png" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Comfortaa", sans-serif;
+        background: linear-gradient(
+          135deg,
+          #e74c3c 0%,
+          #c0392b 25%,
+          #a93226 50%,
+          #7b241c 75%,
+          #2c3e50 100%
+        );
+        background-size: 400% 400%;
+        animation: gradientShift 8s ease infinite;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      @keyframes gradientShift {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .container {
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      .logo {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 20px;
+        border-radius: 50%;
+        overflow: hidden;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      .logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .welcome {
+        color: white;
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .subtitle {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 16px;
+        margin-bottom: 30px;
+      }
+
+      .menu-section {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .section-title {
+        color: #333;
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .menu-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+      }
+
+      .menu-item {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(20px);
+        color: white;
+        text-decoration: none;
+        padding: 20px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .menu-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        background: rgba(255, 255, 255, 0.25);
+        border: 2px solid rgba(255, 255, 255, 0.5);
+      }
+
+      .menu-item.admin {
+        background: rgba(241, 196, 15, 0.9);
+        backdrop-filter: blur(20px);
+        box-shadow: 0 8px 32px rgba(241, 196, 15, 0.3);
+        border: 2px solid rgba(241, 196, 15, 0.6);
+        color: #2c3e50;
+      }
+
+      .menu-item.admin:hover {
+        box-shadow: 0 12px 40px rgba(241, 196, 15, 0.4);
+        background: rgba(241, 196, 15, 1);
+        border: 2px solid rgba(241, 196, 15, 0.8);
+      }
+
+      .menu-icon {
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+      }
+
+      .menu-text {
+        flex: 1;
+      }
+
+      .menu-title {
+        font-weight: 600;
+        font-size: 16px;
+        margin-bottom: 5px;
+      }
+
+      .menu-desc {
+        font-size: 12px;
+        opacity: 0.9;
+      }
+
+      .logout-section {
+        text-align: center;
+        margin-top: 30px;
+      }
+
+      .logout-btn {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        padding: 12px 30px;
+        border-radius: 25px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+      }
+
+      .logout-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-2px);
+      }
+
+      .user-info {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 15px;
+        margin-bottom: 20px;
+        text-align: center;
+        color: white;
+      }
+
+      .user-name {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 5px;
+      }
+
+      .user-role {
+        font-size: 14px;
+        opacity: 0.8;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      /* Mobile optimizations */
+      @media (max-width: 480px) {
+        .container {
+          padding: 10px;
+        }
+
+        .menu-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .menu-item {
+          padding: 15px;
+        }
+
+        .welcome {
+          font-size: 20px;
+        }
+      }
+
+      /* Styles pour les talons de paie */
+      .notification-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: #e74c3c;
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: bold;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.1);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .payroll-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        backdrop-filter: blur(5px);
+      }
+
+      .payroll-modal-content {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        max-width: 500px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      }
+
+      .payroll-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #eee;
+      }
+
+      .payroll-modal-header h3 {
+        color: #333;
+        margin: 0;
+        font-size: 20px;
+      }
+
+      .close-btn {
+        background: none;
+        border: none;
+        font-size: 24px;
+        color: #999;
+        cursor: pointer;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+      }
+
+      .close-btn:hover {
+        background: #f5f5f5;
+        color: #333;
+      }
+
+      .payroll-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        margin-bottom: 10px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+      }
+
+      .payroll-item:hover {
+        background: #e9ecef;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .payroll-info {
+        flex: 1;
+      }
+
+      .payroll-week {
+        font-weight: 600;
+        color: #333;
+        font-size: 16px;
+        margin-bottom: 5px;
+      }
+
+      .payroll-date {
+        color: #666;
+        font-size: 14px;
+      }
+
+      .btn-view-payroll {
+        background: #3498db;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: "Comfortaa", sans-serif;
+      }
+
+      .btn-view-payroll:hover {
+        background: #2980b9;
+        transform: translateY(-1px);
+        box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+      }
+
+      /* Dark mode support */
+      @media (prefers-color-scheme: dark) {
+        .menu-section {
+          background: rgba(30, 30, 30, 0.95);
+          color: #fff;
+        }
+
+        .section-title {
+          color: #fff;
+        }
+
+        .payroll-modal-content {
+          background: #2a2a2a;
+          color: #fff;
+        }
+
+        .payroll-modal-header h3 {
+          color: #fff;
+        }
+
+        .payroll-item {
+          background: #3a3a3a;
+          border-color: #4a4a4a;
+        }
+
+        .payroll-item:hover {
+          background: #4a4a4a;
+        }
+
+        .payroll-week {
+          color: #fff;
+        }
+
+        .payroll-date {
+          color: #ccc;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <div class="logo">
+          <img src="assets/logo1.png" alt="Logo Transport ELZ" />
+        </div>
+        <h1 class="welcome" id="welcomeText">Bienvenue</h1>
+        <p class="subtitle">Votre portail employé</p>
+      </div>
+
+      <div class="user-info" id="userInfo">
+        <div class="user-name" id="userName">Chargement...</div>
+        <div class="user-role" id="userRole">Utilisateur</div>
+      </div>
+
+      <!-- Menu principal pour tous les utilisateurs -->
+      <div class="menu-section">
+        <h2 class="section-title">
+          <span>📋</span>
+          Menu Principal
+        </h2>
+        <div class="menu-grid" id="mainMenu">
+          <!-- Les éléments seront ajoutés dynamiquement -->
+        </div>
+      </div>
+
+      <!-- Menu administration (visible seulement pour les admins) -->
+      <div class="menu-section" id="adminSection" style="display: none">
+        <h2 class="section-title">
+          <span>⚙️</span>
+          Administration
+        </h2>
+        <div class="menu-grid" id="adminMenu">
+          <!-- Les éléments seront ajoutés dynamiquement -->
+        </div>
+      </div>
+
+      <!-- Section des fichiers personnels -->
+      <div class="menu-section" id="filesSection">
+        <h2 class="section-title">
+          <span>📁</span>
+          Mes Fichiers
+        </h2>
+        <div class="menu-grid" id="filesMenu">
+          <!-- Les éléments seront ajoutés dynamiquement -->
+        </div>
+      </div>
+
+      <div class="logout-section">
+        <button class="logout-btn" onclick="logout()">Se déconnecter</button>
+      </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+    <script>
+      // Configuration Firebase
+      const firebaseConfig = {
+        apiKey: "AIzaSyAxbpNoGfMEK5N6sy3WYWMTD3WGelff0QA",
+        authDomain: "transportelz.firebaseapp.com",
+        projectId: "transportelz",
+        storageBucket: "transportelz.firebasestorage.app",
+        messagingSenderId: "290260714729",
+        appId: "1:290260714729:web:a433a445eb44fe5404dc78",
+        measurementId: "G-EKZYPTGFT7",
+      };
+
+      firebase.initializeApp(firebaseConfig);
+
+      // Variables globales
+      let userRole = "user";
+      let userName = "";
+      let userIdentifiant = "";
+      let userPayrolls = [];
+
+      // Fonction pour mettre à jour la notification des talons de paie
+      function updatePayrollNotification() {
+        const unviewedPayrolls = userPayrolls.filter(
+          (payroll) => !payroll.viewed
+        );
+        const notificationBadge = document.querySelector(".notification-badge");
+
+        if (unviewedPayrolls.length > 0) {
+          if (!notificationBadge) {
+            const menuItem = document.querySelector('a[href="talons.html"]');
+            if (menuItem) {
+              menuItem.innerHTML += '<span class="notification-badge">!</span>';
+            }
+          }
+        } else {
+          if (notificationBadge) {
+            notificationBadge.remove();
+          }
+        }
+      }
+
+      // Vérifier l'authentification
+      function checkAuth() {
+        const remember = localStorage.getItem("rememberTransportelz");
+        const role = localStorage.getItem("roleTransportelz");
+        const identifiant = localStorage.getItem("identifiantTransportelz");
+        const nom = localStorage.getItem("nomTransportelz");
+
+        // Vérifier si on a les données de session (même si remember = "false")
+        if (!role || !identifiant) {
+          window.location.href = "indexv2.html";
+          return false;
+        }
+
+        userRole = role;
+        userName = nom || identifiant;
+        userIdentifiant = identifiant;
+
+        return true;
+      }
+
+      // Afficher les informations utilisateur
+      function displayUserInfo() {
+        // Récupérer le nom complet depuis localStorage
+        const nomComplet = localStorage.getItem("nomTransportelz");
+        const identifiant = localStorage.getItem("identifiantTransportelz");
+
+        // Debug pour voir ce qui est stocké
+        console.log("nomTransportelz:", nomComplet);
+        console.log("identifiantTransportelz:", identifiant);
+
+        const displayName =
+          nomComplet && nomComplet.trim() !== "" ? nomComplet : identifiant;
+
+        document.getElementById("userName").textContent = displayName;
+
+        let roleDisplay = "Employé";
+        if (userRole === "admin") {
+          roleDisplay = "Administrateur";
+        } else if (userRole === "autre") {
+          roleDisplay = "Utilisateur";
+        }
+
+        document.getElementById("userRole").textContent = roleDisplay;
+        document.getElementById(
+          "welcomeText"
+        ).textContent = `Bonjour ${displayName}`;
+      }
+
+      // Créer un élément de menu
+      function createMenuItem(title, description, icon, href, isAdmin = false) {
+        const menuItem = document.createElement("a");
+        menuItem.href = href;
+        menuItem.className = `menu-item ${isAdmin ? "admin" : ""}`;
+        menuItem.style.position = "relative";
+        menuItem.innerHTML = `
+                <div class="menu-icon">${icon}</div>
+                <div class="menu-text">
+                    <div class="menu-title">${title}</div>
+                    <div class="menu-desc">${description}</div>
+                </div>
+            `;
+        return menuItem;
+      }
+
+      // Charger le menu principal
+      function loadMainMenu() {
+        const mainMenu = document.getElementById("mainMenu");
+        mainMenu.innerHTML = "";
+
+        const mainItems = [
+          {
+            title: "Demande de réparation",
+            description: "Signaler un problème d'équipement",
+            icon: "🔧",
+            href: "reparationv2.html",
+          },
+          {
+            title: "Disponibilité équipements",
+            description: "Consulter les équipements disponibles",
+            icon: "🚛",
+            href: "equipementsv2.html",
+          },
+          {
+            title: "Carte à fuel",
+            description: "Consulter les cartes à fuel",
+            icon: "💳",
+            href: "cartesv2.html",
+          },
+          {
+            title: "Prix du diesel",
+            description: "Consulter les prix actuels",
+            icon: "⛽",
+            href: "fuelv2.html",
+          },
+          {
+            title: "Liste des charges",
+            description: "Consulter les charges autorisées",
+            icon: "📋",
+            href: "poidsv2.html",
+          },
+        ];
+
+        mainItems.forEach((item) => {
+          mainMenu.appendChild(
+            createMenuItem(item.title, item.description, item.icon, item.href)
+          );
+        });
+      }
+
+      // Charger le menu admin
+      function loadAdminMenu() {
+        const adminMenu = document.getElementById("adminMenu");
+        adminMenu.innerHTML = "";
+
+        const adminItems = [
+          {
+            title: "Gestion des utilisateurs",
+            description: "Ajouter, modifier, supprimer des utilisateurs",
+            icon: "👥",
+            href: "admin.html",
+          },
+          {
+            title: "Dossiers employés",
+            description: "Consulter les dossiers des employés",
+            icon: "📁",
+            href: "employe.html",
+          },
+          {
+            title: "Rapports de paie",
+            description: "Gérer les rapports de paie",
+            icon: "💰",
+            href: "mathieu.html",
+          },
+          {
+            title: "Gestion des permis",
+            description: "Suivre les permis des employés",
+            icon: "🪪",
+            href: "permis.html",
+          },
+          {
+            title: "Cartes à fuel",
+            description: "Gérer les cartes de carburant",
+            icon: "⛽",
+            href: "cartes.html",
+          },
+        ];
+
+        adminItems.forEach((item) => {
+          adminMenu.appendChild(
+            createMenuItem(
+              item.title,
+              item.description,
+              item.icon,
+              item.href,
+              true
+            )
+          );
+        });
+      }
+
+      // Charger le menu des fichiers
+      async function loadFilesMenu() {
+        const filesMenu = document.getElementById("filesMenu");
+        filesMenu.innerHTML = "";
+
+        // Charger les talons de paie pour cet utilisateur
+        await loadUserPayrolls();
+
+        // Compter les talons non consultés
+        const unviewedPayrolls = userPayrolls.filter(
+          (payroll) => !payroll.viewed
+        );
+
+        const fileItems = [
+          {
+            title: "Mes talons de paie",
+            description: "Consulter mes talons de paie",
+            icon: "📄",
+            href: "talons.html",
+            hasNotification: unviewedPayrolls.length > 0,
+          },
+        ];
+
+        fileItems.forEach((item) => {
+          const menuItem = createMenuItem(
+            item.title,
+            item.description,
+            item.icon,
+            item.href
+          );
+          if (item.onclick) {
+            menuItem.onclick = item.onclick;
+            menuItem.href = "#";
+          }
+          if (item.hasNotification) {
+            menuItem.innerHTML += '<span class="notification-badge">!</span>';
+          }
+          filesMenu.appendChild(menuItem);
+        });
+      }
+
+      // Charger les talons de paie de l'utilisateur
+      async function loadUserPayrolls() {
+        try {
+          const snapshot = await firebase
+            .firestore()
+            .collection("payrolls")
+            .where("employeeIdentifiant", "==", userIdentifiant)
+            .get();
+
+          userPayrolls = [];
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+
+            // Filtrer côté client : ne pas inclure les talons archivés
+            if (data.archived !== true) {
+              userPayrolls.push({
+                id: doc.id,
+                ...data,
+              });
+            }
+          });
+
+          // Trier par date de téléchargement (plus récent en premier)
+          userPayrolls.sort((a, b) => {
+            const dateA = a.uploadedAt ? a.uploadedAt.toDate() : new Date(0);
+            const dateB = b.uploadedAt ? b.uploadedAt.toDate() : new Date(0);
+            return dateB - dateA;
+          });
+
+          // Mettre à jour la notification
+          updatePayrollNotification();
+        } catch (error) {
+          console.error("Erreur chargement talons:", error);
+          userPayrolls = [];
+        }
+      }
+
+      // Voir un talon de paie
+      function viewPayroll(downloadURL) {
+        window.open(downloadURL, "_blank");
+      }
+
+      // Fonction de déconnexion
+      function logout() {
+        if (confirm("Êtes-vous sûr de vouloir vous déconnecter ?")) {
+          localStorage.removeItem("rememberTransportelz");
+          localStorage.removeItem("roleTransportelz");
+          localStorage.removeItem("identifiantTransportelz");
+          localStorage.removeItem("nomTransportelz");
+          window.location.href = "indexv2.html";
+        }
+      }
+
+      // Initialisation
+      document.addEventListener("DOMContentLoaded", function () {
+        if (!checkAuth()) return;
+
+        displayUserInfo();
+        loadFilesMenu();
+
+        // Afficher les menus selon le rôle
+        if (userRole === "admin") {
+          // Admin : tous les menus
+          document.getElementById("adminSection").style.display = "block";
+          loadAdminMenu();
+          loadMainMenu();
+        } else if (userRole === "autre") {
+          // Rôle "autre" : seulement les fichiers
+          document.getElementById("mainMenu").innerHTML = "";
+          document.getElementById("adminSection").style.display = "none";
+        } else {
+          // Employé : menu principal + fichiers
+          loadMainMenu();
+          document.getElementById("adminSection").style.display = "none";
+        }
+      });
+
+      // Mettre à jour la notification quand l'utilisateur revient sur la page
+      window.addEventListener("focus", function () {
+        if (userIdentifiant) {
+          loadUserPayrolls();
+        }
+      });
+    </script>
+  </body>
+</html>

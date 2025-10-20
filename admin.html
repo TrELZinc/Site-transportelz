@@ -1,0 +1,2899 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Administration – Transport E.L.Z inc.</title>
+    <link rel="icon" type="image/png" href="assets/favicon.png" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Comfortaa", sans-serif;
+        background: linear-gradient(
+          135deg,
+          #e74c3c 0%,
+          #c0392b 25%,
+          #a93226 50%,
+          #7b241c 75%,
+          #2c3e50 100%
+        );
+        background-size: 400% 400%;
+        animation: gradientShift 8s ease infinite;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      @keyframes gradientShift {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      /* Barre de recherche et filtres */
+      .search-filters {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .search-container {
+        position: relative;
+        margin-bottom: 15px;
+      }
+
+      .search-input {
+        width: 100%;
+        padding: 12px 45px 12px 16px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 25px;
+        background: rgba(255, 255, 255, 0.9);
+        color: #333;
+        font-size: 14px;
+        font-family: "Comfortaa", sans-serif;
+        transition: all 0.3s ease;
+      }
+
+      .search-input:focus {
+        outline: none;
+        border-color: #e74c3c;
+        box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+        background: white;
+      }
+
+      .search-icon {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #666;
+        font-size: 16px;
+      }
+
+      .filter-container {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+      }
+
+      .filter-select {
+        flex: 1;
+        min-width: 150px;
+        padding: 10px 16px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.9);
+        color: #333;
+        font-size: 14px;
+        font-family: "Comfortaa", sans-serif;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .filter-select:focus {
+        outline: none;
+        border-color: #e74c3c;
+        box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+        background: white;
+      }
+
+      .tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 30px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .tab-btn {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        padding: 12px 24px;
+        border-radius: 25px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        font-family: "Comfortaa", sans-serif;
+      }
+
+      .tab-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-2px);
+      }
+
+      .tab-btn.active {
+        background: rgba(255, 255, 255, 0.95);
+        color: #333;
+        border-color: rgba(255, 255, 255, 0.8);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .section {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        display: none;
+        position: relative;
+        z-index: 1;
+      }
+
+      .section.active {
+        display: block;
+      }
+
+      .section-title {
+        color: #333;
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .add-btn {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 25px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+        font-family: "Comfortaa", sans-serif;
+        box-shadow: 0 5px 15px rgba(231, 76, 60, 0.2);
+      }
+
+      .add-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(231, 76, 60, 0.3);
+      }
+
+      .users-grid,
+      .units-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      .user-card,
+      .unit-card {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        border: 1px solid #eee;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .user-card:hover,
+      .unit-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        border-color: #e74c3c;
+      }
+
+      .user-header,
+      .unit-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+
+      .user-name,
+      .unit-name {
+        font-size: 18px;
+        font-weight: 700;
+        color: #2c3e50;
+      }
+
+      .user-role,
+      .unit-type {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      }
+
+      .role-admin {
+        background: linear-gradient(135deg, #8e44ad 0%, #6c3483 100%);
+        color: white;
+      }
+
+      .role-user {
+        background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        color: white;
+      }
+
+      .role-autre {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        color: white;
+      }
+
+      .type-camion {
+        background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+        color: white;
+      }
+
+      .type-remorque {
+        background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        color: white;
+      }
+
+      .user-info,
+      .unit-info {
+        margin-bottom: 15px;
+      }
+
+      .user-detail,
+      .unit-detail {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 14px;
+        padding: 4px 0;
+      }
+
+      .user-detail-label,
+      .unit-detail-label {
+        color: #ffffff;
+        font-weight: 600;
+      }
+
+      .user-detail-value,
+      .unit-detail-value {
+        color: #34495e;
+        font-weight: 600;
+      }
+
+      .user-actions,
+      .unit-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .action-btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: "Comfortaa", sans-serif;
+      }
+
+      .btn-edit {
+        background: #6c757d;
+        color: white;
+      }
+
+      .btn-edit:hover {
+        background: #5a6268;
+        transform: translateY(-1px);
+      }
+
+      .btn-toggle {
+        background: #f39c12;
+        color: white;
+      }
+
+      .btn-toggle:hover {
+        background: #e67e22;
+        transform: translateY(-1px);
+      }
+
+      .btn-delete {
+        background: #e74c3c;
+        color: white;
+      }
+
+      .btn-delete:hover {
+        background: #c0392b;
+        transform: translateY(-1px);
+      }
+
+      /* Styles pour le dépôt de talons de paie */
+      .upload-section {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .upload-form {
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        color: #e8e8e8;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+
+      .form-select,
+      .form-input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.9);
+        color: #333;
+        font-size: 14px;
+        font-family: "Comfortaa", sans-serif;
+        transition: all 0.3s ease;
+      }
+
+      .form-select:focus,
+      .form-input:focus {
+        outline: none;
+        border-color: #e74c3c;
+        box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+        background: white;
+      }
+
+      .file-upload-area {
+        border: 2px dashed rgba(255, 255, 255, 0.3);
+        border-radius: 12px;
+        padding: 40px 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .file-upload-area:hover {
+        border-color: #e74c3c;
+        background: rgba(231, 76, 60, 0.1);
+      }
+
+      .file-upload-area.dragover {
+        border-color: #e74c3c;
+        background: rgba(231, 76, 60, 0.2);
+        transform: scale(1.02);
+      }
+
+      .file-upload-content {
+        color: #e8e8e8;
+      }
+
+      .file-icon {
+        font-size: 48px;
+        display: block;
+        margin-bottom: 10px;
+      }
+
+      .file-info {
+        margin-top: 10px;
+        padding: 10px;
+        background: rgba(46, 204, 113, 0.2);
+        border-radius: 8px;
+        color: #2ecc71;
+        font-size: 14px;
+      }
+
+      .btn-upload {
+        background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 25px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: "Comfortaa", sans-serif;
+        width: 100%;
+      }
+
+      .btn-upload:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(39, 174, 96, 0.3);
+      }
+
+      .btn-upload:disabled {
+        background: #7f8c8d;
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+
+      .payroll-grid {
+        display: flex;
+        gap: 20px;
+        overflow-x: auto;
+        padding: 10px 0;
+        margin-top: 20px;
+        scrollbar-width: thin;
+        scrollbar-color: #3498db #2c3e50;
+      }
+
+      .payroll-grid::-webkit-scrollbar {
+        height: 8px;
+      }
+
+      .payroll-grid::-webkit-scrollbar-track {
+        background: #2c3e50;
+        border-radius: 4px;
+      }
+
+      .payroll-grid::-webkit-scrollbar-thumb {
+        background: #3498db;
+        border-radius: 4px;
+      }
+
+      .payroll-grid::-webkit-scrollbar-thumb:hover {
+        background: #2980b9;
+      }
+
+      .payroll-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+        min-width: 300px;
+        flex-shrink: 0;
+      }
+
+      .payroll-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      }
+
+      .payroll-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+
+      .payroll-employee {
+        font-weight: 600;
+        color: white;
+        font-size: 16px;
+      }
+
+      .payroll-week {
+        background: rgba(231, 76, 60, 0.2);
+        color: #e74c3c;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .payroll-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .btn-view,
+      .btn-delete-payroll {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: "Comfortaa", sans-serif;
+      }
+
+      .btn-view {
+        background: #3498db;
+        color: white;
+      }
+
+      .btn-view:hover {
+        background: #2980b9;
+        transform: translateY(-1px);
+      }
+
+      .btn-delete-payroll {
+        background: #e74c3c;
+        color: white;
+      }
+
+      .btn-delete-payroll:hover {
+        background: #c0392b;
+        transform: translateY(-1px);
+      }
+
+      /* Styles pour le PDF existant */
+      .existing-payroll {
+        margin-top: 15px;
+        padding: 15px;
+        background: rgba(52, 152, 219, 0.1);
+        border: 2px solid #3498db;
+        border-radius: 12px;
+        display: none;
+      }
+
+      .existing-payroll-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .existing-payroll-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex: 1;
+      }
+
+      .existing-payroll-icon {
+        font-size: 24px;
+      }
+
+      .existing-payroll-info {
+        flex: 1;
+      }
+
+      .existing-payroll-title {
+        color: #3498db;
+        font-weight: 600;
+        font-size: 16px;
+        margin-bottom: 4px;
+      }
+
+      .existing-payroll-details {
+        color: #7f8c8d;
+        font-size: 14px;
+      }
+
+      .existing-payroll-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .btn-view-existing,
+      .btn-delete-existing {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: "Comfortaa", sans-serif;
+      }
+
+      .btn-view-existing {
+        background: #3498db;
+        color: white;
+      }
+
+      .btn-view-existing:hover {
+        background: #2980b9;
+        transform: translateY(-1px);
+      }
+
+      .btn-delete-existing {
+        background: #e74c3c;
+        color: white;
+      }
+
+      .btn-delete-existing:hover {
+        background: #c0392b;
+        transform: translateY(-1px);
+      }
+
+      /* Avertissement d'expiration */
+      .expiry-warning {
+        background: #e74c3c;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 10px;
+        font-weight: 600;
+        margin-left: 10px;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.7;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      .logout-section {
+        text-align: center;
+        margin-top: 30px;
+      }
+
+      .logout-btn {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        padding: 12px 30px;
+        border-radius: 25px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        font-family: "Comfortaa", sans-serif;
+      }
+
+      .logout-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-2px);
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        color: #e8e8e8;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e1e5e9;
+        border-radius: 12px;
+        font-size: 14px;
+        font-family: "Comfortaa", sans-serif;
+        transition: all 0.3s ease;
+        background: #fff;
+        color: #333;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: #e74c3c;
+        box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+      }
+
+      .form-group select option {
+        background: #fff;
+        color: #333;
+        padding: 8px;
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 20px;
+      }
+
+      .btn-cancel {
+        background: #6c757d;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: "Comfortaa", sans-serif;
+      }
+
+      .btn-save {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: "Comfortaa", sans-serif;
+      }
+
+      .btn-save:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+      }
+
+      .loading {
+        text-align: center;
+        color: #666;
+        font-size: 16px;
+        padding: 40px;
+      }
+
+      .spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(231, 76, 60, 0.3);
+        border-radius: 50%;
+        border-top-color: #e74c3c;
+        animation: spin 1s ease-in-out infinite;
+        margin-right: 10px;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Modal styles */
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        backdrop-filter: blur(5px);
+      }
+
+      .modal-content {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        max-width: 500px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .modal-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #333;
+      }
+
+      .close-btn {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #666;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+      }
+
+      .close-btn:hover {
+        background: #f0f0f0;
+        color: #333;
+      }
+
+      /* Mobile optimizations */
+      @media (max-width: 768px) {
+        .container {
+          padding: 10px;
+        }
+
+        .users-grid,
+        .units-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .tabs {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .tab-btn {
+          width: 100%;
+          max-width: 300px;
+        }
+
+        .welcome {
+          font-size: 24px;
+        }
+
+        .user-actions,
+        .unit-actions {
+          justify-content: center;
+        }
+
+        .action-btn {
+          flex: 1;
+          min-width: 80px;
+        }
+
+        .filter-container {
+          flex-direction: column;
+        }
+
+        .filter-select {
+          min-width: 100%;
+        }
+      }
+
+      /* Dark mode support */
+      @media (prefers-color-scheme: dark) {
+        .section {
+          background: rgba(30, 30, 30, 0.95);
+          color: #fff;
+        }
+
+        .section-title {
+          color: #fff;
+        }
+
+        .user-card {
+          background: #2a2a2a;
+          color: #fff;
+          border-color: #444;
+        }
+
+        .user-name {
+          color: #fff;
+        }
+
+        .user-detail-value,
+        .unit-detail-value {
+          color: #fff;
+        }
+
+        .unit-name {
+          color: #fff;
+        }
+
+        .unit-card {
+          background: #2a2a2a;
+          color: #fff;
+          border-color: #444;
+        }
+
+        .modal-content {
+          background: #2a2a2a;
+          color: #fff;
+        }
+
+        .modal-title {
+          color: #fff;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header ultra simple -->
+      <div
+        class="bg-white/10 backdrop-blur-md rounded-2xl p-6 mb-8 border border-white/20 shadow-xl"
+      >
+        <div class="flex justify-between items-center">
+          <!-- Logo et titre -->
+          <div class="flex items-center space-x-4">
+            <div class="w-16 h-16 rounded-full overflow-hidden shadow-lg">
+              <img
+                src="assets/logo1.png"
+                alt="Logo Transport ELZ"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div>
+              <h1 class="text-2xl font-semibold text-white">Administration</h1>
+              <p class="text-white/80 text-sm">
+                Gestion des employés et fichiers
+              </p>
+            </div>
+          </div>
+
+          <!-- Menu hamburger ultra simple -->
+          <button
+            id="hamburgerBtn"
+            onclick="toggleAdminMenu()"
+            class="p-3 bg-white/20 hover:bg-white/30 rounded-xl border border-white/30 transition-all duration-300 hover:scale-105"
+          >
+            <div class="w-6 h-6 flex flex-col justify-center space-y-1">
+              <div
+                class="hamburger-line w-full h-0.5 bg-white rounded transition-all duration-300"
+              ></div>
+              <div
+                class="hamburger-line w-full h-0.5 bg-white rounded transition-all duration-300"
+              ></div>
+              <div
+                class="hamburger-line w-full h-0.5 bg-white rounded transition-all duration-300"
+              ></div>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Menu déroulant fixe -->
+      <div
+        id="adminMenu"
+        class="fixed top-20 right-4 w-64 bg-white rounded-xl shadow-2xl border border-gray-200 z-[99999]"
+        style="display: none"
+      >
+        <div class="p-4">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="font-semibold text-gray-800">Menu Administration</h3>
+            <button
+              onclick="toggleAdminMenu()"
+              class="text-gray-400 hover:text-gray-600 text-xl"
+            >
+              &times;
+            </button>
+          </div>
+          <div class="space-y-2">
+            <a
+              href="linktreev2.html"
+              class="flex items-center space-x-3 p-3 rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors"
+            >
+              <span class="text-lg">🏠</span>
+              <span>Portail Principal</span>
+            </a>
+            <a
+              href="employe.html"
+              class="flex items-center space-x-3 p-3 rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors"
+            >
+              <span class="text-lg">📁</span>
+              <span>Dossiers Employés</span>
+            </a>
+            <a
+              href="mathieu.html"
+              class="flex items-center space-x-3 p-3 rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors"
+            >
+              <span class="text-lg">💰</span>
+              <span>Rapports de Paie</span>
+            </a>
+            <a
+              href="permis.html"
+              class="flex items-center space-x-3 p-3 rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors"
+            >
+              <span class="text-lg">🪪</span>
+              <span>Gestion Permis</span>
+            </a>
+            <a
+              href="cartes.html"
+              class="flex items-center space-x-3 p-3 rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors"
+            >
+              <span class="text-lg">⛽</span>
+              <span>Cartes Fuel</span>
+            </a>
+            <div class="border-t border-gray-200 my-2"></div>
+            <a
+              href="#"
+              onclick="logout()"
+              class="flex items-center space-x-3 p-3 rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors"
+            >
+              <span class="text-lg">🚪</span>
+              <span>Se déconnecter</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="showSection('users')">
+          👥 Gestion Utilisateurs
+        </button>
+        <button class="tab-btn" onclick="showSection('units')">
+          🚛 Gestion des Unités
+        </button>
+        <button class="tab-btn" onclick="showSection('files')">
+          📁 Fichiers Employés
+        </button>
+      </div>
+
+      <!-- Section Gestion Utilisateurs -->
+      <div id="usersSection" class="section active">
+        <h2 class="section-title">
+          <span>👥</span>
+          Gestion des Utilisateurs
+        </h2>
+
+        <!-- Barre de recherche et filtres -->
+        <div class="search-filters">
+          <div class="search-container">
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Rechercher par nom ou identifiant..."
+              class="search-input"
+            />
+            <span class="search-icon">🔍</span>
+          </div>
+          <div class="filter-container">
+            <select id="roleFilter" class="filter-select">
+              <option value="">Tous les rôles</option>
+              <option value="admin">Administrateurs</option>
+              <option value="user">Employés</option>
+              <option value="autre">Utilisateurs</option>
+            </select>
+            <select id="statusFilter" class="filter-select">
+              <option value="">Tous les statuts</option>
+              <option value="active">Actifs</option>
+              <option value="inactive">Inactifs</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="add-btn" onclick="showAddUserForm()">
+          + Ajouter un utilisateur
+        </button>
+        <div id="users">Chargement…</div>
+      </div>
+
+      <!-- Section Gestion des Unités -->
+      <div id="unitsSection" class="section">
+        <h2 class="section-title">
+          <span>🚛</span>
+          Gestion des Unités
+        </h2>
+
+        <!-- Barre de recherche et filtres pour les unités -->
+        <div class="search-filters">
+          <div class="search-container">
+            <input
+              type="text"
+              id="unitSearchInput"
+              placeholder="Rechercher une unité..."
+              class="search-input"
+            />
+            <span class="search-icon">🔍</span>
+          </div>
+          <div class="filter-container">
+            <select id="unitTypeFilter" class="filter-select">
+              <option value="">Tous les types</option>
+              <option value="camion">Camions</option>
+              <option value="remorque">Remorques</option>
+            </select>
+            <select id="unitStatusFilter" class="filter-select">
+              <option value="">Tous les statuts</option>
+              <option value="active">Actives</option>
+              <option value="inactive">Inactives</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="add-btn" onclick="showAddUnitForm()">
+          + Ajouter une unité
+        </button>
+        <div id="units">Chargement…</div>
+      </div>
+
+      <!-- Section Fichiers Employés -->
+      <div id="filesSection" class="section">
+        <h2 class="section-title">
+          <span>📁</span>
+          Fichiers Employés
+        </h2>
+
+        <!-- Formulaire de dépôt de talon de paie -->
+        <div class="upload-section">
+          <h3 style="color: white; margin-bottom: 20px; text-align: center">
+            📄 Déposer un talon de paie
+          </h3>
+
+          <div class="upload-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Employé:</label>
+                <select id="employeeSelect" class="form-select">
+                  <option value="">Sélectionner un employé</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Semaine (Dimanche au Samedi):</label>
+                <select id="weekSelect" class="form-select">
+                  <option value="">Sélectionner une semaine</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Fichier PDF:</label>
+              <div class="file-upload-area" id="fileUploadArea">
+                <div class="file-upload-content">
+                  <span class="file-icon">📄</span>
+                  <p>
+                    Glissez-déposez votre PDF ici ou cliquez pour sélectionner
+                  </p>
+                  <input
+                    type="file"
+                    id="fileInput"
+                    accept=".pdf"
+                    style="display: none"
+                  />
+                </div>
+              </div>
+              <div id="fileInfo" class="file-info" style="display: none"></div>
+            </div>
+
+            <div class="form-actions">
+              <button class="btn-cancel" onclick="clearForm()" id="clearBtn">
+                🗑️ Annuler
+              </button>
+              <button
+                class="btn-upload"
+                onclick="uploadPayroll()"
+                disabled
+                id="uploadBtn"
+              >
+                📤 Déposer le talon de paie
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Liste des talons de paie déposés -->
+        <div class="payroll-list">
+          <h3 style="color: white; margin: 30px 0 20px 0">
+            📋 Talons de paie déposés
+          </h3>
+          <p style="color: #ccc; margin-bottom: 20px; font-size: 14px">
+            💡 <strong>Utilité :</strong> Consultez, visualisez et supprimez les
+            talons de paie déjà déposés. Cliquez sur "Voir" pour ouvrir le PDF,
+            ou "Supprimer" pour corriger une erreur.
+          </p>
+          <div id="payrollList" class="payroll-grid">
+            <!-- Les talons seront affichés ici -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+
+    <script>
+      // Configuration Firebase
+      const firebaseConfig = {
+        apiKey: "AIzaSyAxbpNoGfMEK5N6sy3WYWMTD3WGelff0QA",
+        authDomain: "transportelz.firebaseapp.com",
+        projectId: "transportelz",
+        storageBucket: "transportelz.firebasestorage.app",
+        messagingSenderId: "290260714729",
+        appId: "1:290260714729:web:a433a445eb44fe5404dc78",
+        measurementId: "G-EKZYPTGFT7",
+      };
+      firebase.initializeApp(firebaseConfig);
+
+      // Sécurité : vérifier le rôle admin via localStorage
+      const role = localStorage.getItem("roleTransportelz");
+      const identifiant = localStorage.getItem("identifiantTransportelz");
+
+      if (!role || !identifiant || role !== "admin") {
+        window.location.href = "indexv2.html";
+      }
+      // Fonctions de gestion des onglets
+      function showSection(section) {
+        document.getElementById("usersSection").style.display =
+          section === "users" ? "block" : "none";
+        document.getElementById("unitsSection").style.display =
+          section === "units" ? "block" : "none";
+        document.getElementById("filesSection").style.display =
+          section === "files" ? "block" : "none";
+
+        // Mettre à jour les boutons d'onglets
+        document.querySelectorAll(".tab-btn").forEach((btn) => {
+          btn.classList.remove("active");
+        });
+
+        // Activer le bon bouton selon la section
+        if (section === "users") {
+          document
+            .querySelector("button[onclick=\"showSection('users')\"]")
+            .classList.add("active");
+        } else if (section === "units") {
+          document
+            .querySelector("button[onclick=\"showSection('units')\"]")
+            .classList.add("active");
+        } else if (section === "files") {
+          document
+            .querySelector("button[onclick=\"showSection('files')\"]")
+            .classList.add("active");
+        }
+      }
+
+      // Variables globales pour le filtrage
+      let allUsers = [];
+      let allUnits = [];
+
+      // Charger les utilisateurs
+      async function loadUsers() {
+        const usersDiv = document.getElementById("users");
+        usersDiv.innerHTML =
+          '<div class="loading"><span class="spinner"></span>Chargement des utilisateurs...</div>';
+
+        try {
+          const snapshot = await firebase
+            .firestore()
+            .collection("utilisateurs")
+            .get();
+
+          if (snapshot.empty) {
+            usersDiv.innerHTML =
+              '<p style="text-align: center; color: #666; padding: 40px;">Aucun utilisateur trouvé</p>';
+            allUsers = [];
+            return;
+          }
+
+          // Stocker tous les utilisateurs pour le filtrage
+          allUsers = [];
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            allUsers.push({
+              id: doc.id,
+              ...data,
+            });
+          });
+
+          displayUsers(allUsers);
+        } catch (error) {
+          console.error("Erreur lors du chargement des utilisateurs:", error);
+          usersDiv.innerHTML =
+            '<p style="text-align: center; color: #e74c3c; padding: 40px;">Erreur lors du chargement des utilisateurs</p>';
+        }
+      }
+
+      // Charger les unités
+      async function loadUnits() {
+        const unitsDiv = document.getElementById("units");
+        unitsDiv.innerHTML =
+          '<div class="loading"><span class="spinner"></span>Chargement des unités...</div>';
+
+        try {
+          const snapshot = await firebase.firestore().collection("units").get();
+
+          if (snapshot.empty) {
+            // Initialiser avec les unités par défaut si la collection est vide
+            await initializeDefaultUnits();
+            // Recharger après initialisation
+            const newSnapshot = await firebase
+              .firestore()
+              .collection("units")
+              .get();
+
+            allUnits = [];
+            newSnapshot.forEach((doc) => {
+              const data = doc.data();
+              allUnits.push({
+                id: doc.id,
+                ...data,
+              });
+            });
+            displayUnits(allUnits);
+            return;
+          }
+
+          // Stocker toutes les unités pour le filtrage
+          allUnits = [];
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            allUnits.push({
+              id: doc.id,
+              ...data,
+            });
+          });
+
+          displayUnits(allUnits);
+        } catch (error) {
+          console.error("Erreur lors du chargement des unités:", error);
+          unitsDiv.innerHTML =
+            '<p style="text-align: center; color: #e74c3c; padding: 40px;">Erreur lors du chargement des unités</p>';
+        }
+      }
+
+      // Initialiser les unités par défaut
+      async function initializeDefaultUnits() {
+        const defaultUnits = [
+          // Camions
+          {
+            number: "1003",
+            type: "camion",
+            description: "Camion de livraison",
+          },
+          {
+            number: "1103",
+            type: "camion",
+            description: "Camion de livraison",
+          },
+          {
+            number: "1203",
+            type: "camion",
+            description: "Camion de livraison",
+          },
+          {
+            number: "1303",
+            type: "camion",
+            description: "Camion de livraison",
+          },
+          {
+            number: "1404",
+            type: "camion",
+            description: "Camion de livraison",
+          },
+          {
+            number: "1403",
+            type: "camion",
+            description: "Camion de livraison",
+          },
+          {
+            number: "1503",
+            type: "camion",
+            description: "Camion de livraison",
+          },
+          {
+            number: "1603",
+            type: "camion",
+            description: "Camion de livraison",
+          },
+          {
+            number: "1703",
+            type: "camion",
+            description: "Camion de livraison",
+          },
+          {
+            number: "1803",
+            type: "camion",
+            description: "Camion de livraison",
+          },
+          // 3 Essieux
+          {
+            number: "1806",
+            type: "remorque",
+            description: "Remorque 3 essieux",
+          },
+          {
+            number: "1906",
+            type: "remorque",
+            description: "Remorque 3 essieux",
+          },
+          {
+            number: "2006",
+            type: "remorque",
+            description: "Remorque 3 essieux",
+          },
+          {
+            number: "2506",
+            type: "remorque",
+            description: "Remorque 3 essieux",
+          },
+          {
+            number: "2706",
+            type: "remorque",
+            description: "Remorque 3 essieux",
+          },
+          // 4 Essieux
+          {
+            number: "1505",
+            type: "remorque",
+            description: "Remorque 4 essieux",
+          },
+          {
+            number: "1605",
+            type: "remorque",
+            description: "Remorque 4 essieux",
+          },
+          {
+            number: "1805",
+            type: "remorque",
+            description: "Remorque 4 essieux",
+          },
+          {
+            number: "1905",
+            type: "remorque",
+            description: "Remorque 4 essieux",
+          },
+          {
+            number: "2205",
+            type: "remorque",
+            description: "Remorque 4 essieux",
+          },
+          {
+            number: "2405",
+            type: "remorque",
+            description: "Remorque 4 essieux",
+          },
+        ];
+
+        const batch = firebase.firestore().batch();
+        const unitsRef = firebase.firestore().collection("units");
+
+        defaultUnits.forEach((unit) => {
+          const docRef = unitsRef.doc();
+          batch.set(docRef, {
+            ...unit,
+            active: true,
+            dateCreation: new Date(),
+          });
+        });
+
+        await batch.commit();
+        console.log("Unités par défaut initialisées");
+      }
+
+      // Afficher les unités
+      function displayUnits(units) {
+        const unitsDiv = document.getElementById("units");
+
+        if (units.length === 0) {
+          unitsDiv.innerHTML =
+            '<p style="text-align: center; color: #666; padding: 40px;">Aucune unité trouvée</p>';
+          return;
+        }
+
+        // Trier les unités : camions d'abord (croissant), puis remorques (croissant)
+        const sortedUnits = units.sort((a, b) => {
+          // Si les types sont différents, camions en premier
+          if (a.type !== b.type) {
+            if (a.type === "camion" && b.type === "remorque") return -1;
+            if (a.type === "remorque" && b.type === "camion") return 1;
+          }
+          // Si même type, trier par numéro croissant
+          return a.number.localeCompare(b.number, undefined, { numeric: true });
+        });
+
+        let unitsHTML = '<div class="units-grid">';
+        sortedUnits.forEach((unit) => {
+          const typeClass =
+            unit.type === "camion" ? "type-camion" : "type-remorque";
+          const typeLabel = unit.type === "camion" ? "Camion" : "Remorque";
+
+          unitsHTML += `
+            <div class="unit-card" onclick="toggleUnitActions('${unit.id}')">
+              <div class="unit-header">
+                <div class="unit-name">${unit.number}</div>
+                <div class="unit-type ${typeClass}">${typeLabel}</div>
+              </div>
+              <div class="unit-info">
+                <div class="unit-detail">
+                  <span class="unit-detail-label">Type:</span>
+                  <span class="unit-detail-value">${typeLabel}</span>
+                </div>
+                <div class="unit-detail">
+                  <span class="unit-detail-label">Statut:</span>
+                  <span class="unit-detail-value">${
+                    unit.active !== false ? "Actif" : "Inactif"
+                  }</span>
+                </div>
+                ${
+                  unit.description
+                    ? `
+                <div class="unit-detail">
+                  <span class="unit-detail-label">Description:</span>
+                  <span class="unit-detail-value">${unit.description}</span>
+                </div>
+                `
+                    : ""
+                }
+              </div>
+              <div class="unit-actions" id="unit-actions-${
+                unit.id
+              }" style="display: none;" onclick="event.stopPropagation()">
+                <button class="action-btn btn-edit" onclick="editUnit('${
+                  unit.id
+                }')">
+                  Modifier
+                </button>
+                <button class="action-btn btn-toggle" onclick="toggleUnitStatus('${
+                  unit.id
+                }', ${unit.active !== false})">
+                  ${unit.active !== false ? "Désactiver" : "Activer"}
+                </button>
+                <button class="action-btn btn-delete" onclick="deleteUnit('${
+                  unit.id
+                }')">
+                  Supprimer
+                </button>
+              </div>
+            </div>
+          `;
+        });
+        unitsHTML += "</div>";
+        unitsDiv.innerHTML = unitsHTML;
+      }
+
+      // Filtrer les unités
+      function filterUnits() {
+        const searchTerm = document
+          .getElementById("unitSearchInput")
+          .value.toLowerCase();
+        const typeFilter = document.getElementById("unitTypeFilter").value;
+        const statusFilter = document.getElementById("unitStatusFilter").value;
+
+        let filteredUnits = allUnits.filter((unit) => {
+          // Filtre par recherche
+          const matchesSearch =
+            unit.number?.toLowerCase().includes(searchTerm) ||
+            unit.description?.toLowerCase().includes(searchTerm);
+
+          // Filtre par type
+          const matchesType = !typeFilter || unit.type === typeFilter;
+
+          // Filtre par statut
+          const isActive = unit.active !== false;
+          const matchesStatus =
+            !statusFilter ||
+            (statusFilter === "active" && isActive) ||
+            (statusFilter === "inactive" && !isActive);
+
+          return matchesSearch && matchesType && matchesStatus;
+        });
+
+        displayUnits(filteredUnits);
+      }
+
+      // Toggle les boutons d'action d'une unité
+      function toggleUnitActions(unitId) {
+        // Masquer tous les autres boutons d'action
+        document.querySelectorAll(".unit-actions").forEach((actions) => {
+          if (actions.id !== `unit-actions-${unitId}`) {
+            actions.style.display = "none";
+          }
+        });
+
+        // Toggle les boutons de l'unité cliquée
+        const unitActions = document.getElementById(`unit-actions-${unitId}`);
+        if (unitActions.style.display === "none") {
+          unitActions.style.display = "block";
+        } else {
+          unitActions.style.display = "none";
+        }
+      }
+
+      // Afficher le formulaire d'ajout d'unité
+      function showAddUnitForm() {
+        const modal = document.createElement("div");
+        modal.className = "modal";
+        modal.innerHTML = `
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3 class="modal-title">Ajouter une unité</h3>
+              <button class="close-btn" onclick="this.parentElement.parentElement.parentElement.remove()">&times;</button>
+            </div>
+            <div class="form-group">
+              <label>Numéro de l'unité:</label>
+              <input type="text" id="newUnitNumber" placeholder="ex: 1003">
+            </div>
+            <div class="form-group">
+              <label>Type:</label>
+              <select id="newUnitType">
+                <option value="camion">Camion</option>
+                <option value="remorque">Remorque</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Description (optionnel):</label>
+              <input type="text" id="newUnitDescription" placeholder="ex: Camion de livraison">
+            </div>
+            <div class="form-actions">
+              <button class="btn-cancel" onclick="this.parentElement.parentElement.parentElement.remove()">Annuler</button>
+              <button class="btn-save" onclick="addUnit()">Ajouter</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+      }
+
+      // Ajouter une unité
+      async function addUnit() {
+        const number = document.getElementById("newUnitNumber").value;
+        const type = document.getElementById("newUnitType").value;
+        const description = document.getElementById("newUnitDescription").value;
+
+        if (!number) {
+          alert("Veuillez saisir le numéro de l'unité");
+          return;
+        }
+
+        try {
+          // Vérifier si l'unité existe déjà
+          const existingSnapshot = await firebase
+            .firestore()
+            .collection("units")
+            .where("number", "==", number)
+            .get();
+
+          if (!existingSnapshot.empty) {
+            alert("Une unité avec ce numéro existe déjà");
+            return;
+          }
+
+          // Ajouter à Firestore
+          await firebase
+            .firestore()
+            .collection("units")
+            .add({
+              number: number,
+              type: type,
+              description: description || "",
+              active: true,
+              dateCreation: new Date(),
+            });
+
+          alert("Unité ajoutée avec succès!");
+          document.querySelector(".modal").remove();
+          loadUnits();
+        } catch (error) {
+          alert("Erreur: " + error.message);
+        }
+      }
+
+      // Modifier une unité
+      function editUnit(unitId) {
+        // Récupérer les données de l'unité depuis Firestore
+        firebase
+          .firestore()
+          .collection("units")
+          .doc(unitId)
+          .get()
+          .then((doc) => {
+            if (doc.exists) {
+              const data = doc.data();
+              const modal = document.createElement("div");
+              modal.className = "modal";
+              modal.innerHTML = `
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h3 class="modal-title">Modifier l'unité</h3>
+                  <button class="close-btn" onclick="this.parentElement.parentElement.parentElement.remove()">&times;</button>
+                </div>
+                <div class="form-group">
+                  <label>Numéro de l'unité:</label>
+                  <input type="text" id="editUnitNumber" value="${data.number}">
+                </div>
+                <div class="form-group">
+                  <label>Type:</label>
+                  <select id="editUnitType">
+                    <option value="camion" ${
+                      data.type === "camion" ? "selected" : ""
+                    }>Camion</option>
+                    <option value="remorque" ${
+                      data.type === "remorque" ? "selected" : ""
+                    }>Remorque</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Description:</label>
+                  <input type="text" id="editUnitDescription" value="${
+                    data.description || ""
+                  }">
+                </div>
+                <div class="form-actions">
+                  <button class="btn-cancel" onclick="this.parentElement.parentElement.parentElement.remove()">Annuler</button>
+                  <button class="btn-save" onclick="updateUnit('${unitId}')">Mettre à jour</button>
+                </div>
+              </div>
+            `;
+              document.body.appendChild(modal);
+            }
+          });
+      }
+
+      // Mettre à jour une unité
+      async function updateUnit(unitId) {
+        const number = document.getElementById("editUnitNumber").value;
+        const type = document.getElementById("editUnitType").value;
+        const description = document.getElementById(
+          "editUnitDescription"
+        ).value;
+
+        if (!number) {
+          alert("Le numéro de l'unité est obligatoire");
+          return;
+        }
+
+        try {
+          await firebase
+            .firestore()
+            .collection("units")
+            .doc(unitId)
+            .update({
+              number: number,
+              type: type,
+              description: description || "",
+            });
+          alert("Unité mise à jour avec succès!");
+          document.querySelector(".modal").remove();
+          loadUnits();
+        } catch (error) {
+          alert("Erreur: " + error.message);
+        }
+      }
+
+      // Basculer le statut d'une unité
+      async function toggleUnitStatus(unitId, currentStatus) {
+        try {
+          await firebase.firestore().collection("units").doc(unitId).update({
+            active: !currentStatus,
+          });
+          alert(
+            `Unité ${!currentStatus ? "activée" : "désactivée"} avec succès!`
+          );
+          loadUnits();
+        } catch (error) {
+          alert("Erreur: " + error.message);
+        }
+      }
+
+      // Supprimer une unité
+      async function deleteUnit(unitId) {
+        if (confirm("Êtes-vous sûr de vouloir supprimer cette unité ?")) {
+          try {
+            await firebase.firestore().collection("units").doc(unitId).delete();
+            alert("Unité supprimée avec succès!");
+            loadUnits();
+          } catch (error) {
+            alert("Erreur: " + error.message);
+          }
+        }
+      }
+
+      // Afficher les utilisateurs
+      function displayUsers(users) {
+        const usersDiv = document.getElementById("users");
+
+        if (users.length === 0) {
+          usersDiv.innerHTML =
+            '<p style="text-align: center; color: #666; padding: 40px;">Aucun utilisateur trouvé</p>';
+          return;
+        }
+
+        // Trier les utilisateurs : admins d'abord, puis employés, puis autres (par nom croissant)
+        const sortedUsers = users.sort((a, b) => {
+          // Ordre des rôles : admin, user, autre
+          const roleOrder = { admin: 0, user: 1, autre: 2 };
+          const roleA = roleOrder[a.role] || 3;
+          const roleB = roleOrder[b.role] || 3;
+
+          if (roleA !== roleB) {
+            return roleA - roleB;
+          }
+
+          // Si même rôle, trier par nom croissant
+          const nameA = (a.nom || a.identifiant || "").toLowerCase();
+          const nameB = (b.nom || b.identifiant || "").toLowerCase();
+          return nameA.localeCompare(nameB);
+        });
+
+        let usersHTML = '<div class="users-grid">';
+        sortedUsers.forEach((user) => {
+          const roleClass =
+            user.role === "admin"
+              ? "role-admin"
+              : user.role === "autre"
+              ? "role-autre"
+              : "role-user";
+
+          const roleLabel =
+            user.role === "admin"
+              ? "Administrateur"
+              : user.role === "autre"
+              ? "Utilisateur"
+              : "Employé";
+
+          usersHTML += `
+            <div class="user-card" onclick="toggleUserActions('${user.id}')">
+              <div class="user-header">
+                <div class="user-name">${user.nom || user.identifiant}</div>
+                <div class="user-role ${roleClass}">${roleLabel}</div>
+              </div>
+              <div class="user-info">
+                <div class="user-detail">
+                  <span class="user-detail-label">Identifiant:</span>
+                  <span class="user-detail-value">${user.identifiant}</span>
+                </div>
+                <div class="user-detail">
+                  <span class="user-detail-label">Statut:</span>
+                  <span class="user-detail-value">${
+                    user.actif !== false ? "Actif" : "Inactif"
+                  }</span>
+                </div>
+              </div>
+              <div class="user-actions" id="actions-${
+                user.id
+              }" style="display: none;" onclick="event.stopPropagation()">
+                <button class="action-btn btn-edit" onclick="editUser('${
+                  user.id
+                }')">
+                  Modifier
+                </button>
+              </div>
+        </div>
+        `;
+        });
+        usersHTML += "</div>";
+        usersDiv.innerHTML = usersHTML;
+      }
+
+      // Filtrer les utilisateurs
+      function filterUsers() {
+        const searchTerm = document
+          .getElementById("searchInput")
+          .value.toLowerCase();
+        const roleFilter = document.getElementById("roleFilter").value;
+        const statusFilter = document.getElementById("statusFilter").value;
+
+        let filteredUsers = allUsers.filter((user) => {
+          // Filtre par recherche
+          const matchesSearch =
+            user.nom?.toLowerCase().includes(searchTerm) ||
+            user.identifiant?.toLowerCase().includes(searchTerm);
+
+          // Filtre par rôle
+          const matchesRole = !roleFilter || user.role === roleFilter;
+
+          // Filtre par statut
+          const isActive = user.actif !== false;
+          const matchesStatus =
+            !statusFilter ||
+            (statusFilter === "active" && isActive) ||
+            (statusFilter === "inactive" && !isActive);
+
+          return matchesSearch && matchesRole && matchesStatus;
+        });
+
+        displayUsers(filteredUsers);
+      }
+
+      // Toggle les boutons d'action d'un utilisateur
+      function toggleUserActions(userId) {
+        // Masquer tous les autres boutons d'action
+        document.querySelectorAll(".user-actions").forEach((actions) => {
+          if (actions.id !== `actions-${userId}`) {
+            actions.style.display = "none";
+          }
+        });
+
+        // Toggle les boutons de l'utilisateur cliqué
+        const userActions = document.getElementById(`actions-${userId}`);
+        if (userActions.style.display === "none") {
+          userActions.style.display = "block";
+        } else {
+          userActions.style.display = "none";
+        }
+      }
+
+      // Afficher le formulaire d'ajout d'utilisateur
+      function showAddUserForm() {
+        const modal = document.createElement("div");
+        modal.className = "modal";
+        modal.innerHTML = `
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3 class="modal-title">Ajouter un utilisateur</h3>
+              <button class="close-btn" onclick="this.parentElement.parentElement.parentElement.remove()">&times;</button>
+            </div>
+            <div class="form-group">
+              <label>Identifiant:</label>
+              <input type="text" id="newIdentifiant" placeholder="ex: jd123">
+            </div>
+            <div class="form-group">
+              <label>Nom complet:</label>
+              <input type="text" id="newNom" placeholder="ex: Jean Dupont">
+            </div>
+            <div class="form-group">
+              <label>Mot de passe:</label>
+              <input type="password" id="newPassword" placeholder="Mot de passe simple">
+            </div>
+            <div class="form-group">
+              <label>Rôle:</label>
+              <select id="newRole">
+                <option value="user">Employé</option>
+                <option value="autre">Utilisateur</option>
+                <option value="admin">Administrateur</option>
+              </select>
+            </div>
+            <div class="form-actions">
+              <button class="btn-cancel" onclick="this.parentElement.parentElement.parentElement.remove()">Annuler</button>
+              <button class="btn-save" onclick="addUser()">Ajouter</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+      }
+
+      // Ajouter un utilisateur
+      async function addUser() {
+        const identifiant = document.getElementById("newIdentifiant").value;
+        const nom = document.getElementById("newNom").value;
+        const password = document.getElementById("newPassword").value;
+        const role = document.getElementById("newRole").value;
+
+        if (!identifiant || !nom || !password) {
+          alert("Veuillez remplir tous les champs");
+          return;
+        }
+
+        try {
+          // Hacher le mot de passe
+          const encoder = new TextEncoder();
+          const data = encoder.encode(password.toLowerCase());
+          const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          const hash = hashArray
+            .map((b) => b.toString(16).padStart(2, "0"))
+            .join("");
+
+          // Ajouter à Firestore
+          await firebase.firestore().collection("utilisateurs").add({
+            identifiant: identifiant,
+            nom: nom,
+            hash: hash,
+            role: role,
+            actif: true,
+            dateCreation: new Date(),
+          });
+
+          alert("Utilisateur ajouté avec succès!");
+          document.querySelector(".modal").remove();
+          loadUsers();
+        } catch (error) {
+          alert("Erreur: " + error.message);
+        }
+      }
+
+      // Modifier un utilisateur
+      function editUser(userId) {
+        // Récupérer les données de l'utilisateur depuis Firestore
+        firebase
+          .firestore()
+          .collection("utilisateurs")
+          .doc(userId)
+          .get()
+          .then((doc) => {
+            if (doc.exists) {
+              const data = doc.data();
+              const modal = document.createElement("div");
+              modal.className = "modal";
+              modal.innerHTML = `
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h3 class="modal-title">Modifier l'utilisateur</h3>
+                  <button class="close-btn" onclick="this.parentElement.parentElement.parentElement.remove()">&times;</button>
+                </div>
+                <div class="form-group">
+                  <label>Identifiant:</label>
+                  <input type="text" id="editIdentifiant" value="${
+                    data.identifiant
+                  }" readonly>
+                </div>
+                <div class="form-group">
+                  <label>Nom complet:</label>
+                  <input type="text" id="editNom" value="${data.nom || ""}">
+                </div>
+                <div class="form-group">
+                  <label>Nouveau mot de passe (laisser vide pour ne pas changer):</label>
+                  <input type="password" id="editPassword" placeholder="Nouveau mot de passe">
+                </div>
+                <div class="form-group">
+                  <label>Rôle:</label>
+                  <select id="editRole">
+                    <option value="user" ${
+                      data.role === "user" ? "selected" : ""
+                    }>Employé</option>
+                    <option value="autre" ${
+                      data.role === "autre" ? "selected" : ""
+                    }>Utilisateur</option>
+                    <option value="admin" ${
+                      data.role === "admin" ? "selected" : ""
+                    }>Administrateur</option>
+                  </select>
+                </div>
+                <div class="form-actions">
+                  <button class="btn-cancel" onclick="this.parentElement.parentElement.parentElement.remove()">Annuler</button>
+                  <button class="btn-save" onclick="updateUser('${userId}')">Mettre à jour</button>
+                </div>
+              </div>
+            `;
+              document.body.appendChild(modal);
+            }
+          });
+      }
+
+      // Mettre à jour un utilisateur
+      async function updateUser(userId) {
+        const nom = document.getElementById("editNom").value;
+        const password = document.getElementById("editPassword").value;
+        const role = document.getElementById("editRole").value;
+
+        if (!nom) {
+          alert("Le nom est obligatoire");
+          return;
+        }
+
+        try {
+          const updateData = {
+            nom: nom,
+            role: role,
+          };
+
+          if (password) {
+            // Hacher le nouveau mot de passe
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password.toLowerCase());
+            const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hash = hashArray
+              .map((b) => b.toString(16).padStart(2, "0"))
+              .join("");
+            updateData.hash = hash;
+          }
+
+          await firebase
+            .firestore()
+            .collection("utilisateurs")
+            .doc(userId)
+            .update(updateData);
+          alert("Utilisateur mis à jour avec succès!");
+          document.querySelector(".modal").remove();
+          loadUsers();
+        } catch (error) {
+          alert("Erreur: " + error.message);
+        }
+      }
+
+      // Basculer le statut d'un utilisateur
+      async function toggleUserStatus(userId, currentStatus) {
+        try {
+          await firebase
+            .firestore()
+            .collection("utilisateurs")
+            .doc(userId)
+            .update({
+              actif: !currentStatus,
+            });
+          alert(
+            `Utilisateur ${
+              !currentStatus ? "activé" : "désactivé"
+            } avec succès!`
+          );
+          loadUsers();
+        } catch (error) {
+          alert("Erreur: " + error.message);
+        }
+      }
+
+      // Supprimer un utilisateur
+      async function deleteUser(userId) {
+        if (confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?")) {
+          try {
+            await firebase
+              .firestore()
+              .collection("utilisateurs")
+              .doc(userId)
+              .delete();
+            alert("Utilisateur supprimé avec succès!");
+            loadUsers();
+          } catch (error) {
+            alert("Erreur: " + error.message);
+          }
+        }
+      }
+
+      // Toggle menu hamburger ultra simple
+      function toggleAdminMenu() {
+        const menu = document.getElementById("adminMenu");
+        const btn = document.getElementById("hamburgerBtn");
+
+        // Toggle display simple
+        if (menu.style.display === "none") {
+          menu.style.display = "block";
+          // Animation hamburger
+          const lines = btn.querySelectorAll(".hamburger-line");
+          lines[0].style.transform = "rotate(45deg) translate(5px, 5px)";
+          lines[1].style.opacity = "0";
+          lines[2].style.transform = "rotate(-45deg) translate(7px, -6px)";
+        } else {
+          menu.style.display = "none";
+          // Reset hamburger
+          const lines = btn.querySelectorAll(".hamburger-line");
+          lines[0].style.transform = "none";
+          lines[1].style.opacity = "1";
+          lines[2].style.transform = "none";
+        }
+      }
+
+      // Fermer le menu en cliquant à l'extérieur
+      document.addEventListener("click", function (event) {
+        const menu = document.getElementById("adminMenu");
+        const btn = document.getElementById("hamburgerBtn");
+
+        if (
+          !btn.contains(event.target) &&
+          !menu.contains(event.target) &&
+          menu.style.display === "block"
+        ) {
+          toggleAdminMenu();
+        }
+      });
+
+      // Fonction de déconnexion
+      function logout() {
+        if (confirm("Êtes-vous sûr de vouloir vous déconnecter ?")) {
+          localStorage.removeItem("rememberTransportelz");
+          localStorage.removeItem("roleTransportelz");
+          localStorage.removeItem("identifiantTransportelz");
+          localStorage.removeItem("nomTransportelz");
+          window.location.href = "indexv2.html";
+        }
+      }
+
+      // Variables pour le dépôt de talons de paie
+      let selectedFile = null;
+      let allEmployees = [];
+
+      // Charger les employés pour le select
+      async function loadEmployees() {
+        try {
+          const snapshot = await firebase
+            .firestore()
+            .collection("utilisateurs")
+            .get();
+          allEmployees = [];
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            allEmployees.push({
+              id: doc.id,
+              identifiant: data.identifiant,
+              nom: data.nom || data.identifiant,
+              role: data.role,
+            });
+          });
+
+          // Remplir le select des employés
+          const select = document.getElementById("employeeSelect");
+          select.innerHTML =
+            '<option value="">Sélectionner un employé</option>';
+
+          allEmployees.forEach((employee) => {
+            const option = document.createElement("option");
+            option.value = employee.id;
+            option.textContent = `${employee.nom} (${employee.identifiant})`;
+            select.appendChild(option);
+          });
+        } catch (error) {
+          console.error("Erreur chargement employés:", error);
+        }
+      }
+
+      // Générer les semaines du dimanche au samedi
+      function loadWeeks() {
+        const weekSelect = document.getElementById("weekSelect");
+        weekSelect.innerHTML =
+          '<option value="">Sélectionner une semaine</option>';
+
+        // Générer les 3 semaines passées + 12 semaines futures
+        const today = new Date();
+        for (let i = -3; i < 12; i++) {
+          const weekStart = getWeekStart(today, i);
+          const weekEnd = new Date(weekStart);
+          weekEnd.setDate(weekStart.getDate() + 6);
+
+          const weekValue = formatWeekValue(weekStart);
+          const weekLabel = formatWeekLabel(weekStart, weekEnd);
+
+          const option = document.createElement("option");
+          option.value = weekValue;
+          option.textContent = weekLabel;
+
+          // Marquer la semaine actuelle
+          if (i === 0) {
+            option.textContent += " (Cette semaine)";
+          }
+
+          weekSelect.appendChild(option);
+        }
+      }
+
+      // Obtenir le début de semaine (dimanche)
+      function getWeekStart(date, weeksFromNow) {
+        const d = new Date(date);
+        d.setDate(d.getDate() + weeksFromNow * 7);
+
+        // Trouver le dimanche de cette semaine
+        const day = d.getDay();
+        const diff = d.getDate() - day; // dimanche = 0
+        const sunday = new Date(d.setDate(diff));
+
+        return sunday;
+      }
+
+      // Formater la valeur de la semaine (YYYY-MM-DD)
+      function formatWeekValue(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      }
+
+      // Formater le label de la semaine
+      function formatWeekLabel(startDate, endDate) {
+        const startStr = startDate.toLocaleDateString("fr-FR", {
+          day: "2-digit",
+          month: "2-digit",
+        });
+        const endStr = endDate.toLocaleDateString("fr-FR", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "2-digit",
+        });
+        return `Semaine du ${startStr} au ${endStr}`;
+      }
+
+      // Formater l'affichage de la semaine pour la liste
+      function formatWeekDisplay(weekValue) {
+        if (!weekValue) return "Semaine non définie";
+
+        try {
+          const startDate = new Date(weekValue);
+          const endDate = new Date(startDate);
+          endDate.setDate(startDate.getDate() + 6);
+
+          const startStr = startDate.toLocaleDateString("fr-FR", {
+            day: "2-digit",
+            month: "2-digit",
+          });
+          const endStr = endDate.toLocaleDateString("fr-FR", {
+            day: "2-digit",
+            month: "2-digit",
+          });
+
+          return `Du ${startStr} au ${endStr}`;
+        } catch (error) {
+          return weekValue; // Retourner la valeur originale si erreur
+        }
+      }
+
+      // Gestion du drag & drop
+      function setupFileUpload() {
+        const uploadArea = document.getElementById("fileUploadArea");
+        const fileInput = document.getElementById("fileInput");
+
+        // Clic pour sélectionner un fichier
+        uploadArea.addEventListener("click", () => fileInput.click());
+
+        // Drag & drop
+        uploadArea.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          uploadArea.classList.add("dragover");
+        });
+
+        uploadArea.addEventListener("dragleave", () => {
+          uploadArea.classList.remove("dragover");
+        });
+
+        uploadArea.addEventListener("drop", (e) => {
+          e.preventDefault();
+          uploadArea.classList.remove("dragover");
+          const files = e.dataTransfer.files;
+          if (files.length > 0) {
+            handleFileSelect(files[0]);
+          }
+        });
+
+        // Sélection de fichier
+        fileInput.addEventListener("change", (e) => {
+          if (e.target.files.length > 0) {
+            handleFileSelect(e.target.files[0]);
+          }
+        });
+      }
+
+      // Gérer la sélection d'un fichier
+      function handleFileSelect(file) {
+        if (file.type !== "application/pdf") {
+          alert("Veuillez sélectionner un fichier PDF");
+          return;
+        }
+
+        selectedFile = file;
+        const fileInfo = document.getElementById("fileInfo");
+        fileInfo.style.display = "block";
+        fileInfo.innerHTML = `
+          <strong>📄 ${file.name}</strong><br>
+          Taille: ${(file.size / 1024 / 1024).toFixed(2)} MB
+        `;
+
+        // Activer le bouton d'upload si tous les champs sont remplis
+        checkFormValidity();
+      }
+
+      // Vérifier si le formulaire est valide
+      function checkFormValidity() {
+        const employee = document.getElementById("employeeSelect").value;
+        const week = document.getElementById("weekSelect").value;
+        const uploadBtn = document.getElementById("uploadBtn");
+
+        uploadBtn.disabled = !(employee && week && selectedFile);
+      }
+
+      // Vider le fichier sélectionné
+      function clearSelectedFile() {
+        selectedFile = null;
+        document.getElementById("fileInput").value = "";
+        document.getElementById("fileInfo").style.display = "none";
+        document.getElementById("uploadBtn").disabled = true;
+      }
+
+      // Vider tout le formulaire
+      function clearForm() {
+        document.getElementById("employeeSelect").value = "";
+        document.getElementById("weekSelect").value = "";
+        clearSelectedFile();
+        hideExistingPayroll();
+      }
+
+      // Vérifier s'il existe déjà un PDF pour cette combinaison
+      async function checkExistingPayroll() {
+        const employeeId = document.getElementById("employeeSelect").value;
+        const week = document.getElementById("weekSelect").value;
+
+        if (!employeeId || !week) {
+          hideExistingPayroll();
+          return;
+        }
+
+        try {
+          const snapshot = await firebase
+            .firestore()
+            .collection("payrolls")
+            .where("employeeId", "==", employeeId)
+            .where("week", "==", week)
+            .get();
+
+          if (!snapshot.empty) {
+            const payroll = snapshot.docs[0].data();
+            showExistingPayroll(payroll, snapshot.docs[0].id);
+          } else {
+            hideExistingPayroll();
+          }
+        } catch (error) {
+          console.error("Erreur vérification PDF existant:", error);
+          hideExistingPayroll();
+        }
+      }
+
+      // Afficher le PDF existant
+      function showExistingPayroll(payroll, payrollId) {
+        let existingPayrollDiv = document.getElementById("existingPayroll");
+        if (!existingPayrollDiv) {
+          // Créer le div s'il n'existe pas
+          const formGroup = document.querySelector(
+            ".form-group:has(#fileUploadArea)"
+          );
+          const newDiv = document.createElement("div");
+          newDiv.id = "existingPayroll";
+          newDiv.className = "existing-payroll";
+          formGroup.appendChild(newDiv);
+          existingPayrollDiv = document.getElementById("existingPayroll");
+        }
+        existingPayrollDiv.innerHTML = `
+          <div class="existing-payroll-content">
+            <div class="existing-payroll-header">
+              <span class="existing-payroll-icon">📄</span>
+              <div class="existing-payroll-info">
+                <div class="existing-payroll-title">PDF déjà déposé</div>
+                <div class="existing-payroll-details">
+                  Déposé le ${new Date(
+                    payroll.uploadedAt.toDate()
+                  ).toLocaleDateString("fr-FR")} 
+                  par ${payroll.uploadedBy}
+                </div>
+              </div>
+            </div>
+            <div class="existing-payroll-actions">
+              <button class="btn-view-existing" onclick="viewPayroll('${
+                payroll.downloadURL
+              }')">
+                👁️ Voir
+              </button>
+              <button class="btn-delete-existing" onclick="deleteExistingPayroll('${payrollId}', '${
+          payroll.fileName
+        }')">
+                🗑️ Supprimer
+              </button>
+            </div>
+          </div>
+        `;
+        existingPayrollDiv.style.display = "block";
+      }
+
+      // Masquer le PDF existant
+      function hideExistingPayroll() {
+        const existingPayrollDiv = document.getElementById("existingPayroll");
+        if (existingPayrollDiv) {
+          existingPayrollDiv.style.display = "none";
+        }
+      }
+
+      // Supprimer le PDF existant
+      async function deleteExistingPayroll(payrollId, fileName) {
+        if (
+          !confirm(
+            "⚠️ Êtes-vous sûr de vouloir supprimer ce talon de paie existant ?\n\nCette action supprimera définitivement le PDF et ses métadonnées."
+          )
+        ) {
+          return;
+        }
+
+        try {
+          // Supprimer de Firestore
+          await firebase
+            .firestore()
+            .collection("payrolls")
+            .doc(payrollId)
+            .delete();
+
+          // Supprimer de Storage
+          const storageRef = firebase.storage().ref();
+          const fileRef = storageRef.child(`payrolls/${fileName}`);
+          await fileRef.delete();
+
+          alert("✅ Talon de paie supprimé avec succès !");
+          hideExistingPayroll();
+          loadPayrolls(); // Recharger la liste
+        } catch (error) {
+          console.error("Erreur suppression:", error);
+          alert("❌ Erreur lors de la suppression: " + error.message);
+        }
+      }
+
+      // Déposer un talon de paie
+      async function uploadPayroll() {
+        const employeeId = document.getElementById("employeeSelect").value;
+        const week = document.getElementById("weekSelect").value;
+
+        if (!employeeId || !week || !selectedFile) {
+          alert("Veuillez remplir tous les champs");
+          return;
+        }
+
+        const employee = allEmployees.find((emp) => emp.id === employeeId);
+        if (!employee) {
+          alert("Employé non trouvé");
+          return;
+        }
+
+        // Vérifier s'il existe déjà un PDF pour cette combinaison
+        try {
+          const existingSnapshot = await firebase
+            .firestore()
+            .collection("payrolls")
+            .where("employeeId", "==", employeeId)
+            .where("week", "==", week)
+            .get();
+
+          if (!existingSnapshot.empty) {
+            if (
+              !confirm(
+                "⚠️ Un talon de paie existe déjà pour cet employé et cette semaine.\n\nVoulez-vous le remplacer par le nouveau fichier ?\n\nL'ancien PDF sera supprimé définitivement."
+              )
+            ) {
+              return;
+            }
+
+            // Supprimer l'ancien PDF
+            const oldPayroll = existingSnapshot.docs[0].data();
+            const oldPayrollId = existingSnapshot.docs[0].id;
+
+            // Supprimer de Firestore
+            await firebase
+              .firestore()
+              .collection("payrolls")
+              .doc(oldPayrollId)
+              .delete();
+
+            // Supprimer de Storage
+            const storageRef = firebase.storage().ref();
+            const oldFileRef = storageRef.child(
+              `payrolls/${oldPayroll.fileName}`
+            );
+            await oldFileRef.delete();
+          }
+        } catch (error) {
+          console.error("Erreur vérification PDF existant:", error);
+          // Continuer l'upload même en cas d'erreur de vérification
+        }
+
+        try {
+          // Créer un nom de fichier unique
+          const fileName = `payroll_${
+            employee.identifiant
+          }_${week}_${Date.now()}.pdf`;
+
+          // Upload vers Firebase Storage
+          const storageRef = firebase.storage().ref();
+          const fileRef = storageRef.child(`payrolls/${fileName}`);
+
+          const uploadTask = fileRef.put(selectedFile);
+
+          // Afficher le progrès
+          const uploadBtn = document.getElementById("uploadBtn");
+          uploadBtn.disabled = true;
+          uploadBtn.textContent = "📤 Upload en cours...";
+
+          uploadTask.on(
+            "state_changed",
+            (snapshot) => {
+              const progress =
+                (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              uploadBtn.textContent = `📤 Upload ${Math.round(progress)}%`;
+            },
+            (error) => {
+              console.error("Erreur upload:", error);
+              alert("Erreur lors de l'upload: " + error.message);
+              uploadBtn.disabled = false;
+              uploadBtn.textContent = "📤 Déposer le talon de paie";
+            },
+            async () => {
+              try {
+                // Récupérer l'URL de téléchargement
+                const downloadURL =
+                  await uploadTask.snapshot.ref.getDownloadURL();
+
+                // Sauvegarder les métadonnées dans Firestore
+                await firebase
+                  .firestore()
+                  .collection("payrolls")
+                  .add({
+                    employeeId: employeeId,
+                    employeeName: employee.nom,
+                    employeeIdentifiant: employee.identifiant,
+                    week: week,
+                    fileName: fileName,
+                    downloadURL: downloadURL,
+                    uploadedAt: new Date(),
+                    uploadedBy: localStorage.getItem("identifiantTransportelz"),
+                  });
+
+                alert("Talon de paie déposé avec succès!");
+
+                // Réinitialiser le formulaire
+                document.getElementById("employeeSelect").value = "";
+                document.getElementById("weekSelect").value = "";
+                selectedFile = null;
+                document.getElementById("fileInfo").style.display = "none";
+                uploadBtn.disabled = true;
+                uploadBtn.textContent = "📤 Déposer le talon de paie";
+
+                // Recharger la liste et vérifier le PDF existant
+                loadPayrolls();
+                checkExistingPayroll();
+              } catch (error) {
+                console.error("Erreur sauvegarde:", error);
+                alert("Erreur lors de la sauvegarde: " + error.message);
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = "📤 Déposer le talon de paie";
+              }
+            }
+          );
+        } catch (error) {
+          console.error("Erreur upload:", error);
+          alert("Erreur: " + error.message);
+        }
+      }
+
+      // Marquer les talons de plus de 5 jours comme "archivés" (masqués de l'affichage)
+      async function archiveOldPayrolls() {
+        try {
+          const fiveDaysAgo = new Date();
+          fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+
+          // Récupérer tous les talons non archivés
+          const snapshot = await firebase
+            .firestore()
+            .collection("payrolls")
+            .where("archived", "!=", true)
+            .get();
+
+          const archivePromises = [];
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            const uploadedDate = data.uploadedAt.toDate();
+
+            // Vérifier côté client si le talon a plus de 5 jours
+            if (uploadedDate < fiveDaysAgo) {
+              archivePromises.push(
+                firebase
+                  .firestore()
+                  .collection("payrolls")
+                  .doc(doc.id)
+                  .update({ archived: true, archivedAt: new Date() })
+              );
+            }
+          });
+
+          if (archivePromises.length > 0) {
+            await Promise.all(archivePromises);
+            console.log(
+              `📦 ${archivePromises.length} talons de paie archivés automatiquement (plus de 5 jours)`
+            );
+          }
+        } catch (error) {
+          console.error("Erreur archivage automatique:", error);
+        }
+      }
+
+      // Charger la liste des talons de paie
+      async function loadPayrolls() {
+        try {
+          // Archiver les anciens talons d'abord
+          await archiveOldPayrolls();
+
+          const snapshot = await firebase
+            .firestore()
+            .collection("payrolls")
+            .orderBy("uploadedAt", "desc")
+            .get();
+
+          const payrollList = document.getElementById("payrollList");
+          payrollList.innerHTML = "";
+
+          if (snapshot.empty) {
+            payrollList.innerHTML =
+              '<p style="text-align: center; color: #666; padding: 20px;">Aucun talon de paie déposé</p>';
+            return;
+          }
+
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+
+            // Filtrer côté client : ne pas afficher les talons archivés
+            if (data.archived === true) {
+              return; // Skip this talon
+            }
+
+            const payrollCard = document.createElement("div");
+            payrollCard.className = "payroll-card";
+
+            // Vérifier si le talon va bientôt expirer (dans 1 jour)
+            const uploadedDate = data.uploadedAt.toDate();
+            const daysSinceUpload = Math.floor(
+              (new Date() - uploadedDate) / (1000 * 60 * 60 * 24)
+            );
+            const isExpiringSoon = daysSinceUpload >= 4; // 4 jours ou plus
+            payrollCard.innerHTML = `
+                <div class="payroll-header">
+                  <div class="payroll-employee">${data.employeeName}</div>
+                  <div class="payroll-week">${formatWeekDisplay(
+                    data.week
+                  )}</div>
+                  ${
+                    isExpiringSoon
+                      ? '<div class="expiry-warning">⚠️ Expire bientôt</div>'
+                      : ""
+                  }
+                </div>
+                <div style="color: #ccc; font-size: 12px; margin-bottom: 10px;">
+                  Déposé le ${new Date(
+                    data.uploadedAt.toDate()
+                  ).toLocaleDateString("fr-FR")}
+                </div>
+                <div class="payroll-actions">
+                  <button class="btn-view" onclick="viewPayroll('${
+                    data.downloadURL
+                  }')">
+                    👁️ Voir
+                  </button>
+                  <button class="btn-delete-payroll" onclick="deletePayroll('${
+                    doc.id
+                  }', '${data.fileName}')">
+                    🗑️ Supprimer
+                  </button>
+                </div>
+              `;
+            payrollList.appendChild(payrollCard);
+          });
+        } catch (error) {
+          console.error("Erreur chargement talons:", error);
+        }
+      }
+
+      // Voir un talon de paie
+      function viewPayroll(downloadURL) {
+        window.open(downloadURL, "_blank");
+      }
+
+      // Supprimer un talon de paie
+      async function deletePayroll(payrollId, fileName) {
+        if (
+          !confirm(
+            "⚠️ Êtes-vous sûr de vouloir supprimer ce talon de paie ?\n\nCette action supprimera définitivement :\n• Le fichier PDF du stockage\n• Les métadonnées de la base de données\n\nCette action est irréversible !"
+          )
+        ) {
+          return;
+        }
+
+        try {
+          // Supprimer de Firestore
+          await firebase
+            .firestore()
+            .collection("payrolls")
+            .doc(payrollId)
+            .delete();
+
+          // Supprimer de Storage
+          const storageRef = firebase.storage().ref();
+          const fileRef = storageRef.child(`payrolls/${fileName}`);
+          await fileRef.delete();
+
+          alert(
+            "✅ Talon de paie supprimé avec succès !\n\nLe fichier PDF et les métadonnées ont été supprimés définitivement."
+          );
+          loadPayrolls();
+        } catch (error) {
+          console.error("Erreur suppression:", error);
+          alert("❌ Erreur lors de la suppression: " + error.message);
+        }
+      }
+
+      // Restaurer un talon archivé (fonction admin)
+      async function restoreArchivedPayroll(payrollId) {
+        try {
+          await firebase
+            .firestore()
+            .collection("payrolls")
+            .doc(payrollId)
+            .update({
+              archived: false,
+              restoredAt: new Date(),
+              archivedAt: null,
+            });
+
+          alert("✅ Talon de paie restauré avec succès !");
+          loadPayrolls();
+        } catch (error) {
+          console.error("Erreur restauration:", error);
+          alert("❌ Erreur lors de la restauration: " + error.message);
+        }
+      }
+
+      // Charger les utilisateurs au démarrage
+      document.addEventListener("DOMContentLoaded", function () {
+        loadUsers();
+        loadUnits();
+        loadEmployees();
+        loadWeeks();
+        loadPayrolls();
+        setupFileUpload();
+
+        // Event listeners pour la recherche et le filtrage
+        document
+          .getElementById("searchInput")
+          .addEventListener("input", filterUsers);
+        document
+          .getElementById("roleFilter")
+          .addEventListener("change", filterUsers);
+        document
+          .getElementById("statusFilter")
+          .addEventListener("change", filterUsers);
+
+        // Event listeners pour les unités
+        document
+          .getElementById("unitSearchInput")
+          .addEventListener("input", filterUnits);
+        document
+          .getElementById("unitTypeFilter")
+          .addEventListener("change", filterUnits);
+        document
+          .getElementById("unitStatusFilter")
+          .addEventListener("change", filterUnits);
+
+        // Event listeners pour le formulaire de dépôt
+        document
+          .getElementById("employeeSelect")
+          .addEventListener("change", function () {
+            // Vider le PDF quand on change d'employé
+            clearSelectedFile();
+            checkFormValidity();
+          });
+        document
+          .getElementById("weekSelect")
+          .addEventListener("change", function () {
+            // Vérifier s'il existe déjà un PDF pour cette combinaison
+            checkExistingPayroll();
+            checkFormValidity();
+          });
+      });
+    </script>
+  </body>
+</html>

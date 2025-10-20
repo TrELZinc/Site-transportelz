@@ -459,6 +459,25 @@
         background: #c0392b;
       }
 
+      .pdf-export {
+        background: #27ae60;
+        border: none;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        margin-right: 10px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .pdf-export:hover {
+        background: #229954;
+      }
+
       .pdf-container {
         flex: 1;
         display: flex;
@@ -473,6 +492,16 @@
         border: none;
         border-radius: 10px;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
+
+      /* Mobile PDF optimizations */
+      @media (max-width: 768px) {
+        .pdf-viewer {
+          width: 100vw;
+          height: calc(100vh - 120px);
+          transform: scale(1);
+          transform-origin: top left;
+        }
       }
 
       .pdf-loading {
@@ -519,7 +548,12 @@
     <div class="pdf-modal" id="pdfModal">
       <div class="pdf-header">
         <div class="pdf-title" id="pdfTitle">Chargement...</div>
-        <button class="pdf-close" onclick="closePdfModal()">Fermer</button>
+        <div>
+          <button class="pdf-export" onclick="exportPdf()" id="exportBtn">
+            📤 Partager
+          </button>
+          <button class="pdf-close" onclick="closePdfModal()">Fermer</button>
+        </div>
       </div>
       <div class="pdf-container">
         <div class="pdf-loading" id="pdfLoading">
@@ -555,6 +589,7 @@
       let allPayrolls = [];
       let filteredPayrolls = [];
       let selectedWeek = "";
+      let currentPdfUrl = "";
 
       // Vérifier l'authentification
       const userIdentifiant = localStorage.getItem("identifiantTransportelz");
@@ -722,9 +757,14 @@
         viewer.style.display = "none";
         modal.classList.add("active");
 
-        // Charger le PDF avec zoom out pour affichage complet
+        // Stocker l'URL du PDF pour l'export
+        currentPdfUrl = downloadURL;
+
+        // Charger le PDF avec zoom optimisé pour mobile et desktop
+        const isMobile = window.innerWidth <= 768;
+        const zoomParam = isMobile ? "zoom=Fit" : "zoom=FitH";
         viewer.src =
-          downloadURL + "#zoom=FitH&toolbar=1&navpanes=0&scrollbar=1";
+          downloadURL + `#${zoomParam}&toolbar=1&navpanes=0&scrollbar=1`;
         viewer.onload = () => {
           loading.style.display = "none";
           viewer.style.display = "block";
@@ -761,6 +801,52 @@
         }
       }
 
+      // Fonction d'export PDF
+      function exportPdf() {
+        if (!currentPdfUrl) {
+          alert("Aucun PDF à partager");
+          return;
+        }
+
+        // Vérifier si l'API Web Share est supportée
+        if (navigator.share) {
+          // Utiliser l'API Web Share native (mobile)
+          navigator
+            .share({
+              title: "Talon de paie",
+              text: "Consultez votre talon de paie",
+              url: currentPdfUrl,
+            })
+            .catch((err) => {
+              console.log("Erreur partage:", err);
+              fallbackShare();
+            });
+        } else {
+          // Fallback pour desktop et navigateurs non compatibles
+          fallbackShare();
+        }
+      }
+
+      // Fonction de partage de fallback
+      function fallbackShare() {
+        // Copier l'URL dans le presse-papier
+        navigator.clipboard
+          .writeText(currentPdfUrl)
+          .then(() => {
+            alert("Lien du PDF copié dans le presse-papier !");
+          })
+          .catch(() => {
+            // Fallback si clipboard API n'est pas disponible
+            const textArea = document.createElement("textarea");
+            textArea.value = currentPdfUrl;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand("copy");
+            document.body.removeChild(textArea);
+            alert("Lien du PDF copié dans le presse-papier !");
+          });
+      }
+
       // Fermer le modal PDF
       function closePdfModal() {
         const modal = document.getElementById("pdfModal");
@@ -768,6 +854,7 @@
 
         modal.classList.remove("active");
         viewer.src = "";
+        currentPdfUrl = "";
       }
 
       // Gestion du sélecteur de semaine

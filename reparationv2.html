@@ -562,11 +562,12 @@
 
           const uniteSelect = document.getElementById("unite");
           uniteSelect.innerHTML =
+            '<option value="">-- Sélectionnez une unité --</option>' +
             unitsAPI.generateRepairSelectOptions(sortedUnits);
         } catch (error) {
           console.error("Erreur lors du chargement des unités:", error);
           document.getElementById("unite").innerHTML =
-            '<option value="">Erreur de chargement</option>';
+            '<option value="">-- Erreur de chargement --</option>';
         }
       }
 

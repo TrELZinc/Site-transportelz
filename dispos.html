@@ -2,69 +2,48 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <title>Disponibilités</title>
   <style>
     html, body {
       margin: 0;
+      padding-top: calc(60px + env(safe-area-inset-top));
       font-family: 'Segoe UI', sans-serif;
       background-color: #f4f4f4;
       font-size: 16px;
     }
+
     header {
-      background-color: #111;
-      padding: 10px 20px;
-      margin: 0;
-      width: 100vw;
-      box-sizing: border-box;
-      overflow: hidden;
-      position: relative;
-      left: 50%;
-      right: 50%;
-      margin-left: -50vw;
-      margin-right: -50vw;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 60px;
+      background-color: #000;
+      color: white;
+      padding: env(safe-area-inset-top) 20px 0 20px;
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
+      box-sizing: border-box;
+      z-index: 9999;
     }
+
+    .flatpickr-day.has-event-future {
+      background-color: #f1c40f !important;
+      color: black !important;
+      border-radius: 6px !important;
+    }
+
+    .load-btn {
+      background-color: #f1c40f;
+      color: black;
+    }
+
     header img {
       height: 40px;
-    }
-    .menu-toggle {
-      display: flex;
-      flex-direction: column;
-      cursor: pointer;
-    }
-    .menu-toggle span {
-      height: 3px;
-      width: 25px;
-      background: white;
-      margin: 4px 0;
-      transition: 0.3s;
-    }
-    .menu {
-      display: none;
-      position: absolute;
-      top: 60px;
-      right: 20px;
-      background-color: #111;
-      border: 1px solid #444;
-      border-radius: 6px;
-      padding: 10px;
-      z-index: 999;
-    }
-    .menu.show {
-      display: block;
-    }
-    .menu a {
-      display: block;
-      color: white;
-      padding: 8px 12px;
-      text-decoration: none;
-      font-size: 14px;
-    }
-    .menu a:hover {
-      background-color: #333;
     }
     .container {
       padding: 20px;
@@ -76,12 +55,12 @@
       justify-content: center;
       margin-bottom: 10px;
     }
-    .top-bar input[type="date"] {
-      padding: 8px 12px;
+
+    .top-bar input {
+      width: 200px;
       font-size: 16px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
     }
+
     label {
       font-weight: bold;
       display: block;
@@ -143,6 +122,7 @@
       gap: 10px;
       flex-wrap: wrap;
     }
+
     .buttons button {
       padding: 12px 24px;
       border: none;
@@ -179,26 +159,78 @@
         font-size: 14px !important;
       }
     }
+
+    #dp_custom_981 {
+        background-image: url('https://img.icons8.com/ios-filled/20/000000/calendar.png');
+        background-repeat: no-repeat;
+        background-position: 12px center;
+        padding-left: 38px;
+        padding: 12px 16px;
+        font-size: 16px;
+        border: 2px solid #ccc;
+        border-radius: 8px;
+        background-color: #ffffff;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        transition: border-color 0.2s, box-shadow 0.2s;
+        width: 200px;
+        text-align: center;
+    }
+
+
+
+    #dp_custom_981:focus {
+      border-color: #d32f2f;
+      box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.15);
+      outline: none;
+    }
+
+    input:-webkit-autofill {
+    transition: background-color 9999s ease-out;
+    }    
+
   </style>
+  <!-- Firebase SDK en mode compat -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyD4U85mokKXsAP1AdwClWtcbt8udZrwlAw",
+    authDomain: "sommaireelz.firebaseapp.com",
+    projectId: "sommaireelz",
+    storageBucket: "sommaireelz.firebasestorage.app",
+    messagingSenderId: "171788284751",
+    appId: "1:171788284751:web:694f070d1cafe8b7c04b3a"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+</script>
+<!-- En-tête dynamique avec menu hamburger -->
+<div id="customHeader"></div>
+<script>
+  fetch("assets/header.html")
+    .then(res => res.text())
+    .then(html => document.getElementById("customHeader").innerHTML = html);
+</script>
+
 </head>
 <body>
-  <header>
-    <img src="assets/logo.jpeg" alt="Logo Transport ELZ">
-    <!-- Removed ID to simplify and use direct onclick -->
-    <div class="menu-toggle" onclick="toggleMenu()">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
-    <div class="menu" id="menuDropdown">
-      <a href="test.html">Sommaire</a>
-      <a href="linktree.html">Menu</a>
-    </div>
-  </header>
+
   <div class="container">
-    <div class="top-bar">
-      <input type="date" id="dateSelect" />
-    </div>
+<div class="top-bar">
+  <input 
+    id="dp_custom_981" 
+    type="text" 
+    placeholder="Sélectionnez une date" 
+    autocomplete="off"
+    autocorrect="off"
+    autocapitalize="off"
+    spellcheck="false"
+    inputmode="none"
+    readonly
+  />
+  </div>
     <label for="note">Note:</label>
     <textarea id="note" rows="2"></textarea>
     <div class="table-wrapper">
@@ -219,22 +251,47 @@
   </div>
   
   <script>
-    // Toggle menu function - simple direct approach
-    function toggleMenu() {
-      const menu = document.getElementById("menuDropdown");
-      menu.classList.toggle("show");
+
+    let fpInstance = null;
+
+    
+    function saveToFirebase(data, callback) {
+      const collection = db.collection("disponibilites_dispos");
+
+      const TWO_YEARS_AGO = new Date();
+      TWO_YEARS_AGO.setFullYear(TWO_YEARS_AGO.getFullYear() - 2);
+
+      // Étape 1 : suppression des documents de +2 ans
+      collection
+        .where("timestamp", "<", TWO_YEARS_AGO.toISOString())
+        .get()
+        .then(snapshot => {
+          const deletions = snapshot.docs.map(doc => doc.ref.delete());
+          return Promise.all(deletions);
+        })
+        .then(() => {
+          // Étape 2 : on cherche s’il existe déjà une entrée pour cette date
+          return collection.where("date", "==", data.date).get();
+        })
+        .then(snapshot => {
+          if (!snapshot.empty) {
+            const existingDocId = snapshot.docs[0].id;
+            return collection.doc(existingDocId).set(data, { merge: false });
+          } else {
+            return collection.add(data);
+          }
+        })
+        .then(() => {
+          console.log("✅ Données enregistrées ou mises à jour.");
+          if (typeof callback === "function") callback();
+        })
+        .catch(error => {
+          console.error("❌ Erreur Firestore :", error);
+          alert("Erreur Firestore : " + error.message);
+        });
     }
-    
-    // Close menu when clicking outside
-    document.addEventListener("click", function(e) {
-      const menu = document.getElementById("menuDropdown");
-      const toggle = document.querySelector(".menu-toggle");
-      
-      if (!toggle.contains(e.target) && !menu.contains(e.target)) {
-        menu.classList.remove("show");
-      }
-    });
-    
+
+
     function createRow() {
       const row = document.createElement("tr");
       row.innerHTML = `
@@ -299,13 +356,19 @@
         }
       });
 
+      const selectedDate = document.querySelector("#dp_custom_981")?.value || "";
+      if (!selectedDate) {
+        alert("Veuillez sélectionner une date.");
+        return;
+      }
+
       const data = {
         note: document.getElementById("note").value,
-        date: document.getElementById("dateSelect").value,
+        date: selectedDate,
         table: tableClone.outerHTML
       };
 
-      fetch("https://script.google.com/macros/s/AKfycbyL41eZb4kui5TESIyRfNX-h3f7um9_A_AFDV8DzLESqS984jdHcdVl-lFnPttXD4RBoQ/exec", {
+      fetch("https://script.google.com/macros/s/AKfycbyq8lsT9xzM2AEpBEyHcH4PgCa0egwnHLvYTMP9S66C6HufgmYK3YIxzAKoXsS-XpsUTg/exec", {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/json" },
@@ -317,20 +380,78 @@
 
     function resetForm() {
       document.getElementById("note").value = "";
-      document.getElementById("dateSelect").value = "";
+      document.getElementById("dp_custom_981").value = "";
       localStorage.clear();
-      generateDefaultRows(9); // Use the existing function to reset rows
+
+      const rows = document.querySelectorAll("#dispoTable tbody tr");
+      rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        if (cells[4]) cells[4].textContent = "";
+        if (cells[5]) cells[5].textContent = "";
+      });
     }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return "Date non sélectionnée";
+      const d = new Date(dateStr);
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function resetMinimal() {
+      document.getElementById("note").value = "";
+
+      const rows = document.querySelectorAll("#dispoTable tbody tr");
+      rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        if (cells[4]) cells[4].textContent = ""; // colonne "départ"
+        if (cells[5]) cells[5].textContent = ""; // colonne "note"
+      });
+
+      console.log("🧹 Colonnes 'départ', 'note' et la note globale ont été réinitialisées.");
+    }
+
 
     function saveData() {
       try {
         const table = document.getElementById("dispoTable");
         if (!table) throw new Error("Table introuvable");
 
-        localStorage.setItem("dispo_note", document.getElementById("note").value);
-        localStorage.setItem("dispo_date", document.getElementById("dateSelect").value);
+        const date = document.getElementById("dp_custom_981").value;
+        const note = document.getElementById("note").value;
+
+        const rows = Array.from(document.querySelectorAll("#dispoTable tbody tr")).map(tr => {
+          const cells = Array.from(tr.querySelectorAll("td")).slice(0, 6).map(td => td.textContent.trim());
+          return {
+            chauffeur: cells[0] || "",
+            us: cells[1] || "",
+            camion: cells[2] || "",
+            remorque: cells[3] || "",
+            depart: cells[4] || "",
+            note: cells[5] || ""
+          };
+        });
+
+        const data = {
+          date,
+          note,
+          table: table.outerHTML,
+          rows,
+          timestamp: new Date().toISOString()
+        };
+
+        // 🧠 Enregistrement local
+        localStorage.setItem("dispo_note", note);
+        localStorage.setItem("dispo_date", date);
         localStorage.setItem("dispo_table", table.outerHTML);
-        alert("Données sauvegardées !");
+
+        // ☁️ Enregistrement dans Firestore
+        saveToFirebase(data, () => {
+          alert("✅ Données sauvegardées localement et dans Firebase !");
+        });
+
       } catch (err) {
         alert("Erreur lors de la sauvegarde : " + err.message);
       }
@@ -355,21 +476,99 @@
       }
     });
 
-    // Initialize on load
-    window.onload = function() {
-      const note = localStorage.getItem("dispo_note");
-      const date = localStorage.getItem("dispo_date");
-      const table = localStorage.getItem("dispo_table");
+    window.onload = function () {
+  const note = localStorage.getItem("dispo_note");
+  const date = localStorage.getItem("dispo_date");
+  const table = localStorage.getItem("dispo_table");
+  const filledDates = [];
 
-      if (note) document.getElementById("note").value = note;
-      if (date) document.getElementById("dateSelect").value = date;
+  if (note) document.getElementById("note").value = note;
+  if (date) document.getElementById("dp_custom_981").value = date;
 
-      if (table) {
-        document.getElementById("dispoTable").outerHTML = table;
-      } else {
-        generateDefaultRows(9);
+  if (table) {
+    document.getElementById("dispoTable").outerHTML = table;
+    setTimeout(() => {
+      const newTable = document.getElementById("dispoTable");
+      const usCells = newTable.querySelectorAll(".us-cell");
+      usCells.forEach(cell => {
+        cell.onclick = () => toggleUS(cell);
+      });
+    }, 0);
+  } else {
+    generateDefaultRows(9);
+  }
+
+  // Charger toutes les dates existantes
+  db.collection("disponibilites_dispos")
+    .get()
+    .then(snapshot => {
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.date) {
+          filledDates.push(data.date);
+        }
+      });
+
+      fpInstance = flatpickr("#dp_custom_981", {
+      dateFormat: "Y-m-d",
+      disableMobile: true,
+      onChange: function (selectedDates, dateStr) {
+        document.getElementById("dp_custom_981").value = dateStr;
+
+          db.collection("disponibilites_dispos")
+            .where("date", "==", dateStr)
+            .orderBy("timestamp", "desc")
+            .limit(1)
+            .get()
+            .then(snapshot => {
+              if (!snapshot.empty) {
+                const data = snapshot.docs[0].data();
+                document.getElementById("note").value = data.note || "";
+                document.getElementById("dispoTable").outerHTML = data.table;
+                setTimeout(() => {
+                  document.querySelectorAll(".us-cell").forEach(cell => {
+                    cell.onclick = () => toggleUS(cell);
+                  });
+                }, 0);
+              } else {
+                resetMinimal();
+              }
+            });
+        },
+          onDayCreate: function (dObj, dStr, fp, dayElem) {
+            const date = dayElem.dateObj.toISOString().split("T")[0];
+            const today = new Date().toISOString().split("T")[0];
+            if (filledDates.includes(date) && date > today) {
+              dayElem.classList.add("has-event-future");
+          }
+        }
+      });
+    });
+
+  // Charger la dernière sauvegarde Firebase
+  db.collection("disponibilites_dispos")
+    .orderBy("timestamp", "desc")
+    .limit(1)
+    .get()
+    .then(snapshot => {
+      if (!snapshot.empty) {
+        const data = snapshot.docs[0].data();
+        document.getElementById("note").value = data.note || "";
+        document.getElementById("dp_custom_981").value = data.date || "";
+        document.getElementById("dispoTable").outerHTML = data.table;
+
+        setTimeout(() => {
+          const usCells = document.querySelectorAll(".us-cell");
+          usCells.forEach(cell => {
+            cell.onclick = () => toggleUS(cell);
+          });
+        }, 0);
+
+        console.log("✅ Dernière donnée Firebase chargée");
       }
-    };
+    });
+};
+
   </script>
 </body>
 </html>

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Punch</title>
+    <style>
+      :root {
+        --fg: #0f172a;
+        --muted: #64748b;
+        --ok: #16a34a;
+        --warn: #ef4444;
+        --card: #ffffff;
+        --bg: #f6f7fb;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: system-ui, Roboto, Arial, sans-serif;
+      }
+      .wrap {
+        min-height: 100dvh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+      }
+      .card {
+        width: 100%;
+        max-width: 460px;
+        background: var(--card);
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(2, 6, 23, 0.08);
+        padding: 22px;
+      }
+      h1 {
+        font-size: 18px;
+        margin: 0 0 8px;
+        text-align: center;
+      }
+      .clock {
+        font-size: 40px;
+        line-height: 1.1;
+        font-variant-numeric: tabular-nums;
+        text-align: center;
+        margin: 4px 0 8px;
+      }
+      /* Badge d’état sous l’horloge */
+      .since {
+        display: flex; /* block-level → margin auto fonctionne */
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 15px;
+        letter-spacing: 0.2px;
+        font-variant-numeric: tabular-nums;
+        width: fit-content; /* taille au contenu */
+        margin: 8px auto 18px; /* ← centre horizontalement */
+        text-align: center;
+        align-self: center; /* au cas où son parent est en flex */
+      }
+
+      .since--active {
+        background: #eaf7ee;
+        color: #166534;
+        box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12) inset;
+      }
+      .since--idle {
+        background: #f1f5f9;
+        color: #475569;
+      }
+
+      .since .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: currentColor;
+        box-shadow: 0 0 0 0 currentColor;
+        animation: pulse 1.6s ease-in-out infinite;
+      }
+      .since--idle .dot {
+        opacity: 0.4;
+        animation: none;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(0.9);
+          box-shadow: 0 0 0 0 currentColor;
+        }
+        70% {
+          transform: scale(1);
+          box-shadow: 0 0 0 10px rgba(0, 0, 0, 0);
+        }
+        100% {
+          transform: scale(0.9);
+          box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+        }
+      }
+      .btn {
+        display: block;
+        width: 100%;
+        padding: 16px 18px;
+        font-size: 18px;
+        border: 0;
+        border-radius: 12px;
+        margin: 10px 0;
+        cursor: pointer;
+      }
+      .in {
+        background: #eaf7ee;
+        color: var(--ok);
+      }
+      .out {
+        background: #fdecec;
+        color: var(--warn);
+      }
+      .status {
+        min-height: 18px;
+        text-align: center;
+        font-size: 13px;
+        color: var(--muted);
+        margin-top: 6px;
+      }
+      h2 {
+        font-size: 16px;
+        margin: 18px 0 8px;
+      }
+      .tbl {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+      th,
+      td {
+        padding: 10px;
+        border-bottom: 1px solid #eef2f7;
+        text-align: left;
+        white-space: nowrap;
+      }
+      tfoot td {
+        font-weight: 600;
+      }
+      /* Overlay de chargement (blur + spinner) */
+      .busy {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 12px;
+        background: rgba(246, 247, 251, 0.55); /* même teinte que --bg */
+        backdrop-filter: blur(6px);
+      }
+      .busy.show {
+        display: flex;
+      }
+      .busy .spinner {
+        width: 44px;
+        height: 44px;
+        border: 4px solid rgba(0, 0, 0, 0.12);
+        border-top-color: var(--fg);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      .busy .busy-text {
+        font-weight: 600;
+        color: var(--fg);
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="card">
+        <h1>Sacha-Pierre Tournier</h1>
+        <div class="clock" id="clock">--:--:--</div>
+        <div class="since" id="since">Depuis le dernier IN : 00:00:00</div>
+
+        <button id="btnIn" class="btn in">IN</button>
+        <button id="btnOut" class="btn out">OUT</button>
+        <div id="status" class="status"></div>
+
+        <h2>Historique de la semaine</h2>
+        <div class="tbl">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>In</th>
+                <th>Out</th>
+                <th>Heures</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+            <tfoot>
+              <tr>
+                <td colspan="3">Total</td>
+                <td id="total">0</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div id="busy" class="busy" aria-live="polite" aria-busy="true">
+      <div class="spinner"></div>
+      <div class="busy-text">Chargement…</div>
+    </div>
+
+    <script>
+      // ➊ Mets l'URL /exec de ton Apps Script ici :
+      const GAS_URL =
+        "https://script.google.com/macros/s/AKfycbx40dOw3fdp4BQQZ4LgCWliA90XjPx6ez8MJCcyFr4w9pfqF0xtViXXD07WmP4hCg93Mw/exec";
+      const TZ = "America/Toronto";
+
+      const $ = (s) => document.querySelector(s);
+      const clockEl = $("#clock"),
+        sinceEl = $("#since"),
+        tbody = $("#tbody"),
+        totalEl = $("#total"),
+        statusEl = $("#status");
+      let sinceTimer = null;
+
+      const busyEl = document.getElementById("busy");
+      function showBusy(text = "Chargement…") {
+        busyEl.querySelector(".busy-text").textContent = text;
+        busyEl.classList.add("show");
+      }
+      function hideBusy() {
+        busyEl.classList.remove("show");
+      }
+
+      function fmtClock(d) {
+        return new Intl.DateTimeFormat("fr-CA", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+          timeZone: TZ,
+        }).format(d);
+      }
+      function fmtSince(ms) {
+        const s = Math.max(0, Math.floor(ms / 1000));
+        const h = String(Math.floor(s / 3600)).padStart(2, "0");
+        const m = String(Math.floor((s % 3600) / 60)).padStart(2, "0");
+        const ss = String(s % 60).padStart(2, "0");
+        return `${h}:${m}:${ss}`;
+      }
+      function startClock() {
+        clockEl.textContent = fmtClock(new Date());
+        setInterval(() => (clockEl.textContent = fmtClock(new Date())), 1000);
+      }
+      function startSince(fromISO) {
+        if (sinceTimer) clearInterval(sinceTimer);
+
+        // pas d’IN actif → badge gris
+        if (!fromISO) {
+          sinceEl.className = "since since--idle";
+          sinceEl.innerHTML = `<span class="dot"></span>Aucune session active`;
+          return;
+        }
+
+        // IN actif → badge vert + chrono
+        sinceEl.className = "since since--active";
+        const base = new Date(fromISO.replace(" ", "T"));
+
+        const tick = () => {
+          sinceEl.innerHTML = `<span class="dot"></span>En cours depuis ${fmtSince(
+            Date.now() - base.getTime()
+          )}`;
+        };
+        tick();
+        sinceTimer = setInterval(tick, 1000);
+      }
+
+      function renderWeek(sessions, total) {
+        tbody.innerHTML = "";
+        (sessions || []).forEach((s) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${s.date}</td><td>${s.in || ""}</td><td>${
+            s.out || ""
+          }</td><td>${(s.hours || 0).toFixed(2)}</td>`;
+          tbody.appendChild(tr);
+        });
+        totalEl.textContent = (total || 0).toFixed(2);
+      }
+      function setStatus(msg) {
+        statusEl.textContent = msg || "";
+      }
+
+      function jsonp(url) {
+        return new Promise((resolve, reject) => {
+          const cb = "cb_" + Math.random().toString(36).slice(2);
+          const scr = document.createElement("script");
+          const sep = url.includes("?") ? "&" : "?";
+          let settled = false;
+
+          const timeoutMs = 60000; // 60s
+          const timer = setTimeout(() => {
+            if (settled) return;
+            settled = true;
+            cleanup();
+            reject(new Error("Timeout"));
+          }, timeoutMs);
+
+          function cleanup() {
+            clearTimeout(timer);
+            // laisser un no-op pour éviter "cb_xxx is not defined" si la réponse arrive après
+            window[cb] = () => {};
+            scr.remove();
+          }
+
+          window[cb] = (payload) => {
+            if (settled) return;
+            settled = true;
+            cleanup();
+            resolve(payload);
+          };
+
+          scr.onerror = () => {
+            if (settled) return;
+            settled = true;
+            cleanup();
+            reject(new Error("JSONP error"));
+          };
+
+          // anti-cache param
+          scr.src = `${url}${sep}callback=${cb}&_=${Date.now()}`;
+          document.head.appendChild(scr);
+        });
+      }
+
+      async function refresh() {
+        setStatus("Chargement…");
+        showBusy("Chargement…");
+        try {
+          const res = await jsonp(`${GAS_URL}?action=getWeek`);
+          if (!res.ok) throw new Error(res.error || "Erreur getWeek");
+          const d = res.data;
+          startSince(d.lastInISO);
+          renderWeek(d.sessions, d.weekTotal);
+          setStatus("");
+        } catch (err) {
+          setStatus("Erreur: " + err.message);
+        } finally {
+          hideBusy();
+        }
+      }
+      async function punch(act) {
+        setStatus(act + "…");
+        showBusy(act === "IN" ? "Enregistrement IN…" : "Enregistrement OUT…");
+        try {
+          const res = await jsonp(
+            `${GAS_URL}?action=record&do=${encodeURIComponent(act)}`
+          );
+          if (!res.ok) throw new Error(res.error || "Erreur record");
+          const d = res.data;
+          startSince(d.lastInISO);
+          renderWeek(d.sessions, d.weekTotal);
+          setStatus("");
+        } catch (err) {
+          setStatus("Erreur: " + err.message);
+        } finally {
+          hideBusy();
+        }
+      }
+
+      document.getElementById("btnIn").onclick = () => punch("IN");
+      document.getElementById("btnOut").onclick = () => punch("OUT");
+
+      startClock();
+      refresh();
+    </script>
+  </body>
+</html>

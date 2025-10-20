@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Réparations Mécanique</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- PhotoSwipe -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/photoswipe@5/dist/photoswipe.css"
+    />
+
+    <style>
+      :root {
+        --bg: #f3f4f6;
+        --card: #fff;
+        --ink: #111;
+        --muted: #6b7280;
+        --brand: #0d6efd;
+        --shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        --shadow-lg: 0 6px 16px rgba(0, 0, 0, 0.08);
+        --radius: 16px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        font-family: "Comfortaa", cursive, sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        margin: 0;
+      }
+
+      /* Header (injecté) */
+      #customHeader {
+        position: sticky;
+        top: 0;
+        z-index: 1030;
+      }
+
+      /* Loader plein écran */
+      #loadingOverlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.9);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+      }
+
+      .container {
+        overflow: visible !important;
+      }
+
+      /* Onglets a11y */
+      .nav[role="tablist"] .nav-link {
+        border-radius: 999px;
+      }
+      .nav[role="tablist"] .nav-link:focus-visible {
+        outline: 3px solid #84b6f4;
+        outline-offset: 2px;
+      }
+
+      /* Listes */
+      .list-group {
+        display: block;
+        overflow: visible !important;
+      }
+      details.list-card {
+        border: 1px solid #dce6f9;
+        border-radius: var(--radius);
+        background: var(--card);
+        box-shadow: var(--shadow);
+        transition: transform 0.2s ease, box-shadow 0.2s ease,
+          background 0.2s ease;
+        margin-bottom: 24px;
+        position: relative;
+      }
+      details.list-card::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 3px;
+        width: 100%;
+        background: linear-gradient(90deg, var(--brand), #84b6f4);
+        border-radius: var(--radius) var(--radius) 0 0;
+      }
+      details.list-card[open] {
+        background: #f0f7ff;
+        box-shadow: var(--shadow-lg);
+      }
+      summary.card-head {
+        list-style: none;
+        cursor: pointer;
+        padding: 20px 24px;
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+      }
+      summary.card-head::-webkit-details-marker {
+        display: none;
+      }
+      .card-title {
+        font-weight: 700;
+        margin: 0;
+      }
+      .card-sub {
+        font-size: 0.86rem;
+        color: var(--muted);
+      }
+      .chip {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 0.78rem;
+      }
+      .chip-warn {
+        background: #ffe08a;
+        color: #4d3f00;
+      }
+      .chip-ok {
+        background: #d1fae5;
+        color: #065f46;
+      }
+      .chip-bad {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+      .desc-preview {
+        color: #111;
+        opacity: 0.9;
+      }
+
+      .details-body {
+        border-top: 1px solid #dde7f1;
+        padding: 16px 20px 20px;
+      }
+      .img-thumbnail-mini {
+        height: 80px;
+        width: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 3px solid var(--brand);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+      .img-thumbnail-mini:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.28);
+      }
+      @media (max-width: 768px) {
+        .img-thumbnail-mini {
+          height: 70px;
+          width: 70px;
+        }
+      }
+
+      /* Slider temps */
+      input[type="range"].range-ticks {
+        background: var(--brand);
+        height: 8px;
+        border-radius: 5px;
+        appearance: none;
+      }
+      input[type="range"].range-ticks::-webkit-slider-runnable-track {
+        background: repeating-linear-gradient(
+          to right,
+          var(--brand),
+          var(--brand) 2px,
+          transparent 2px,
+          transparent 13px
+        );
+        height: 8px;
+        border-radius: 5px;
+      }
+      input[type="range"].range-ticks::-webkit-slider-thumb {
+        appearance: none;
+        background: #fff;
+        border: 3px solid var(--brand);
+        height: 30px;
+        width: 30px;
+        border-radius: 50%;
+        margin-top: -11px;
+        cursor: pointer;
+      }
+      input[type="range"].range-ticks::-moz-range-track {
+        background: repeating-linear-gradient(
+          to right,
+          var(--brand),
+          var(--brand) 2px,
+          transparent 2px,
+          transparent 13px
+        );
+        height: 8px;
+        border-radius: 5px;
+      }
+      input[type="range"].range-ticks::-moz-range-thumb {
+        background: #fff;
+        border: 3px solid var(--brand);
+        height: 30px;
+        width: 30px;
+        border-radius: 50%;
+      }
+      #timeDisplay {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--brand);
+        text-align: center;
+      }
+
+      /* Toast confirmé (custom) */
+      #toastConfirm {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 3000;
+        background: #28a745;
+        color: #fff;
+        padding: 14px 24px;
+        border-radius: 8px;
+        font-weight: 700;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        display: none;
+        align-items: center;
+        gap: 12px;
+      }
+      #toastConfirm svg {
+        width: 24px;
+        height: 24px;
+      }
+
+      /* Focus clavier */
+      :focus-visible {
+        outline: 3px solid #84b6f4;
+        outline-offset: 2px;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Loader -->
+    <div id="loadingOverlay">
+      <div
+        class="spinner-border text-primary"
+        style="width: 4rem; height: 4rem"
+        role="status"
+      >
+        <span class="visually-hidden">Chargement…</span>
+      </div>
+    </div>
+
+    <!-- Header dynamique -->
+    <div id="customHeader"></div>
+    <script>
+      fetch("assets/header.html")
+        .then((r) => r.text())
+        .then((html) => {
+          document.getElementById("customHeader").innerHTML = html;
+        });
+    </script>
+
+    <div class="container py-4">
+      <h2 class="text-center mb-4">🔧 Réparations Mécanique</h2>
+
+      <!-- Onglets -->
+      <ul
+        class="nav nav-pills nav-justified mb-3"
+        role="tablist"
+        aria-label="Filtres d'état"
+      >
+        <li class="nav-item">
+          <button
+            class="nav-link active"
+            id="a-faire-tab"
+            role="tab"
+            aria-selected="true"
+            onclick="showTab('faire')"
+          >
+            À faire
+          </button>
+        </li>
+        <li class="nav-item">
+          <button
+            class="nav-link"
+            id="fait-tab"
+            role="tab"
+            aria-selected="false"
+            onclick="showTab('fait')"
+          >
+            Réparé
+          </button>
+        </li>
+      </ul>
+
+      <!-- Filtre -->
+      <div id="filterZone" class="mb-3">
+        <div class="input-group">
+          <input
+            type="text"
+            class="form-control"
+            id="searchInput"
+            placeholder="🔎 Filtrer par unité…"
+          />
+          <button
+            class="btn btn-outline-secondary d-none"
+            id="clearButton"
+            type="button"
+            onclick="resetSearch()"
+          >
+            ❌ Effacer
+          </button>
+        </div>
+      </div>
+
+      <!-- Listes -->
+      <div
+        id="faireList"
+        class="list-group"
+        role="region"
+        aria-label="Réparations à faire"
+      ></div>
+
+      <div id="faitWrap">
+        <div
+          id="faitList"
+          class="list-group d-none"
+          role="region"
+          aria-label="Réparations complétées"
+        ></div>
+        <div class="text-center my-3">
+          <button
+            id="loadMoreFait"
+            class="btn btn-secondary btn-sm d-none"
+            onclick="loadMoreFait()"
+          >
+            Charger plus
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast custom -->
+    <div id="toastConfirm">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="white"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M5 13l4 4L19 7"
+        />
+      </svg>
+      Réparation enregistrée
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    ></script>
+
+    <!-- PhotoSwipe (module) -->
+    <script type="module">
+      import PhotoSwipeLightbox from "https://unpkg.com/photoswipe@5/dist/photoswipe-lightbox.esm.min.js";
+      window.PhotoSwipeLightbox = PhotoSwipeLightbox; // exposé pour init dynamique
+    </script>
+
+    <script>
+      // --- State ---
+      let aFaire = [];
+      let fait = [];
+      let currentTab = "faire";
+      let faitPage = 1;
+      const PAGE_SIZE = 20;
+
+      // --- Utils ---
+      const debounced = (fn, d = 180) => {
+        let t;
+        return (...a) => {
+          clearTimeout(t);
+          t = setTimeout(() => fn(...a), d);
+        };
+      };
+
+      function escapeHtml(text = "") {
+        const div = document.createElement("div");
+        div.innerText = text;
+        return div.innerHTML;
+      }
+
+      function safeDriveId(u) {
+        try {
+          const url = new URL(u);
+          if (!/^(https?:)?\/\/(drive\.google\.com)/.test(url.href))
+            return null;
+          const m =
+            url.pathname.match(/\/d\/([^\/]+)/) ||
+            url.search.match(/id=([^&]+)/);
+          return m ? m[1] : null;
+        } catch {
+          return null;
+        }
+      }
+
+      function driveThumb(id, big = false) {
+        return `https://drive.google.com/thumbnail?id=${id}&sz=${
+          big ? "w1600-h1200" : "w400-h400"
+        }`;
+      }
+      function driveVideo(id) {
+        return `https://drive.google.com/uc?export=download&id=${id}`;
+      }
+
+      function formatDate(dateStr) {
+        const d = new Date(dateStr);
+        const opt = {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        };
+        return d.toLocaleDateString("fr-CA", opt).replace(",", " à");
+      }
+      function getDaysSince(dateStr) {
+        return Math.floor((Date.now() - new Date(dateStr)) / 86400000);
+      }
+      function urgencyChip(days) {
+        const unit = days > 1 ? "jours" : "jour";
+        if (days <= 2)
+          return `<span class="chip chip-ok">Nouvelle (${days} ${unit})</span>`;
+        if (days <= 5)
+          return `<span class="chip chip-warn">À traiter (${days} ${unit})</span>`;
+        return `<span class="chip chip-bad">Urgent (${days} ${unit})</span>`;
+      }
+
+      // --- Fetch ---
+      async function chargerReparations(noReset = false) {
+        try {
+          document.getElementById("loadingOverlay").style.display = "flex";
+          const res = await fetch(
+            "https://script.google.com/macros/s/AKfycbzuR03sbcehVxg8t3aiIGAiaUYHUMahYPjY1zjo3truIFaypot1Toohowk4GJz8TsN0/exec?read=1&ts=" +
+              Date.now()
+          );
+          const data = await res.json();
+
+          aFaire = data
+            .filter((r) => !String(r.notes || "").trim())
+            .sort((a, b) => new Date(b.date) - new Date(a.date));
+          fait = data
+            .filter((r) => String(r.notes || "").trim())
+            .sort(
+              (a, b) =>
+                new Date(b.dateFin || b.date) - new Date(a.dateFin || a.date)
+            );
+
+          if (!noReset) {
+            showTab("faire");
+          } else {
+            renderCurrentTab();
+            updateCounters();
+          }
+        } catch (e) {
+          console.error(e);
+          alert("Erreur de chargement des réparations.");
+        } finally {
+          document.getElementById("loadingOverlay").style.display = "none";
+        }
+      }
+      chargerReparations();
+
+      // --- Tabs ---
+      function showTab(tab) {
+        currentTab = tab;
+        document
+          .getElementById("a-faire-tab")
+          .classList.toggle("active", tab === "faire");
+        document
+          .getElementById("fait-tab")
+          .classList.toggle("active", tab === "fait");
+        document
+          .getElementById("a-faire-tab")
+          .setAttribute("aria-selected", tab === "faire");
+        document
+          .getElementById("fait-tab")
+          .setAttribute("aria-selected", tab === "fait");
+
+        document
+          .getElementById("faireList")
+          .classList.toggle("d-none", tab !== "faire");
+        document
+          .getElementById("faitList")
+          .classList.toggle("d-none", tab !== "fait");
+        document.getElementById("filterZone").classList.remove("d-none");
+
+        if (tab === "faire") {
+          renderAFaire();
+        } else {
+          faitPage = 1;
+          renderFait();
+        }
+
+        updateCounters();
+      }
+      function renderCurrentTab() {
+        currentTab === "faire" ? renderAFaire() : renderFait();
+      }
+
+      // --- Renderers ---
+      function renderAFaire() {
+        const wrap = document.getElementById("faireList");
+        const q = (
+          document.getElementById("searchInput").value || ""
+        ).toLowerCase();
+        wrap.innerHTML = "";
+
+        const rows = aFaire
+          .filter((i) => (i.unite || "").toLowerCase().includes(q))
+          .sort((a, b) => getDaysSince(b.date) - getDaysSince(a.date));
+
+        if (!rows.length) {
+          wrap.innerHTML = `<div class="text-center text-muted">Aucune réparation trouvée.</div>`;
+          updateCounters();
+          return;
+        }
+
+        rows.forEach((item) => {
+          const days = getDaysSince(item.date);
+          const chip = urgencyChip(days);
+          const hasFiles =
+            Array.isArray(item.fichiers) && item.fichiers.length > 0;
+
+          const el = document.createElement("details");
+          el.className = "list-card";
+          el.dataset.id = item.id;
+
+          const filesHtml = hasFiles
+            ? `
+        <div class="mb-3 d-flex flex-wrap gap-2 gallery" id="gallery-${
+          item.id
+        }">
+          ${item.fichiers
+            .map((u) => {
+              const id = safeDriveId(u);
+              if (!id) return "";
+              const isVideo = /\.(mp4|mov|webm)$/i.test(u);
+              if (isVideo) {
+                const v = driveVideo(id);
+                const t = driveThumb(id, false);
+                return `
+                <a class="gallery-link" href="${v}" data-pswp-width="1280" data-pswp-height="720" data-pswp-type="video">
+                  <img loading="lazy" src="${t}" class="img-thumbnail-mini" alt="Vidéo">
+                </a>`;
+              } else {
+                const full = driveThumb(id, true);
+                const th = driveThumb(id, false);
+                return `
+                <a class="gallery-link" href="${full}" data-pswp-width="1600" data-pswp-height="1200">
+                  <img loading="lazy" src="${th}" class="img-thumbnail-mini" alt="Photo">
+                </a>`;
+              }
+            })
+            .join("")}
+        </div>`
+            : "";
+
+          el.innerHTML = `
+        <summary class="card-head">
+          <div class="w-100 pe-2">
+            <h6 class="card-title mb-1">${escapeHtml(
+              item.unite
+            )} – ${escapeHtml(item.nom || "")}</h6>
+            ${
+              hasFiles
+                ? '<div class="text-warning small mb-1">📸 Fichiers attachés</div>'
+                : ""
+            }
+            <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
+              ${chip}
+              <small class="card-sub">${formatDate(item.date)}</small>
+            </div>
+            <div class="desc-preview">${escapeHtml(
+              (item.description || "").slice(0, 60)
+            )}${(item.description || "").length > 60 ? "…" : ""}</div>
+          </div>
+        </summary>
+
+        <div class="details-body">
+          <p class="mb-2"><strong>📄 Description complète :</strong></p>
+          <div class="p-2 bg-white border rounded shadow-sm"><span class="text-dark">${escapeHtml(
+            item.description || ""
+          )}</span></div>
+          ${filesHtml}
+
+          <label class="form-label mt-3"><strong>🛠️ Réparations effectuées</strong></label>
+          <textarea class="form-control mb-3 js-notes" rows="2" placeholder="Décrire la réparation…"></textarea>
+
+          <label class="form-label mt-2 fw-bold" for="range-${
+            item.id
+          }">⏱️ Temps de réparation</label>
+          <div class="mb-2 text-center" id="timeDisplay-${
+            item.id
+          }">Sélectionnez le temps</div>
+          <input id="range-${
+            item.id
+          }" type="range" class="form-range mb-3 range-ticks js-range" min="0" max="240" step="15" value="0" aria-valuetext="Sélectionnez le temps">
+
+          <button class="btn btn-success w-100 js-save" disabled>✅ Compléter</button>
+        </div>
+      `;
+
+          // attach handlers inside the details
+          el.addEventListener("toggle", () => {
+            if (el.open) initGallery(`#gallery-${item.id}`);
+          });
+
+          el.querySelector(".js-range").addEventListener("input", (ev) => {
+            const minutes = parseInt(ev.target.value, 10);
+            const h = Math.floor(minutes / 60),
+              m = minutes % 60;
+            const label =
+              minutes === 0
+                ? "Sélectionnez le temps"
+                : `${h ? h + "h" : ""}${m ? (h ? " " : "") + m + "min" : ""}`;
+            document.getElementById(`timeDisplay-${item.id}`).innerText = label;
+            ev.target.setAttribute("aria-valuetext", label);
+            enableSave(el);
+          });
+
+          el.querySelector(".js-notes").addEventListener("input", () =>
+            enableSave(el)
+          );
+          el.querySelector(".js-save").addEventListener("click", () =>
+            completer(el, item)
+          );
+
+          wrap.appendChild(el);
+        });
+
+        updateCounters();
+      }
+
+      function renderFait() {
+        const wrap = document.getElementById("faitList");
+        const loadMoreBtn = document.getElementById("loadMoreFait");
+        const q = (
+          document.getElementById("searchInput").value || ""
+        ).toLowerCase();
+        wrap.innerHTML = "";
+
+        const source = fait.filter((i) =>
+          (i.unite || "").toLowerCase().includes(q)
+        );
+        const visible = source.slice(0, faitPage * PAGE_SIZE);
+
+        if (!visible.length) {
+          wrap.innerHTML = `<div class="text-center text-muted">Aucune réparation complétée trouvée.</div>`;
+          loadMoreBtn.classList.add("d-none");
+          return;
+        }
+
+        visible.forEach((item) => {
+          const el = document.createElement("details");
+          el.className = "list-card";
+          el.innerHTML = `
+        <summary class="card-head">
+          <div class="w-100 pe-2">
+            <div class="d-flex align-items-center flex-wrap gap-2">
+              <h6 class="card-title mb-0">${escapeHtml(
+                item.unite
+              )} – ${escapeHtml(item.nom || "")}</h6>
+              <span class="chip chip-ok">Réparé le ${formatDate(
+                item.dateFin || item.date
+              )}</span>
+            </div>
+            <small class="card-sub">${formatDate(item.date)}</small>
+            <div class="desc-preview mt-1">${escapeHtml(
+              (item.description || "").slice(0, 60)
+            )}${(item.description || "").length > 60 ? "…" : ""}</div>
+          </div>
+        </summary>
+        <div class="details-body">
+          <p class="mb-2"><strong>📄 Description complète :</strong></p>
+          <div class="p-2 bg-white border rounded shadow-sm"><span class="text-muted">${escapeHtml(
+            item.description || ""
+          )}</span></div>
+          <p class="mb-2 mt-3"><strong>🛠️ Réparations effectuées :</strong><br><span class="text-muted">${escapeHtml(
+            item.notes || ""
+          )}</span></p>
+          <p class="mb-0"><strong>⏱️ Temps :</strong> <span class="text-muted">${escapeHtml(
+            item.temps || ""
+          )}</span></p>
+        </div>
+      `;
+          wrap.appendChild(el);
+        });
+
+        loadMoreBtn.classList.toggle("d-none", visible.length >= source.length);
+        updateCounters();
+      }
+
+      function loadMoreFait() {
+        faitPage++;
+        renderFait();
+      }
+
+      function enableSave(detailsEl) {
+        const notes = detailsEl.querySelector(".js-notes").value.trim();
+        const minutes = parseInt(
+          detailsEl.querySelector(".js-range").value,
+          10
+        );
+        detailsEl.querySelector(".js-save").disabled = !(notes && minutes > 0);
+      }
+
+      function initGallery(selector) {
+        const gallery = document.querySelector(selector);
+        if (!gallery || gallery.dataset.pswpInit) return;
+        gallery.dataset.pswpInit = "1";
+        const lightbox = new window.PhotoSwipeLightbox({
+          gallery: selector,
+          children: "a.gallery-link",
+          pswpModule: () =>
+            import("https://unpkg.com/photoswipe@5/dist/photoswipe.esm.min.js"),
+        });
+        lightbox.init();
+      }
+
+      async function completer(detailsEl, item) {
+        const id = detailsEl.dataset.id;
+        const notes = detailsEl.querySelector(".js-notes").value.trim();
+        const minutes = parseInt(
+          detailsEl.querySelector(".js-range").value,
+          10
+        );
+        const h = Math.floor(minutes / 60),
+          m = minutes % 60;
+        const temps = `${h ? h + "h" : ""}${
+          m ? (h ? " " : "") + m + "min" : ""
+        }`;
+        const desc =
+          detailsEl.querySelector(".details-body .text-dark")?.innerText ||
+          item.description ||
+          "";
+        const dateFin = new Date().toISOString();
+
+        // Mise à jour locale
+        const idx = aFaire.findIndex((r) => r.id === id);
+        if (idx > -1) {
+          aFaire[idx].notes = notes;
+          aFaire[idx].temps = temps;
+          aFaire[idx].description = desc;
+          aFaire[idx].dateFin = dateFin;
+          const moved = aFaire.splice(idx, 1)[0];
+          fait.unshift(moved);
+        }
+
+        // UI
+        detailsEl.remove();
+        renderCurrentTab();
+        updateCounters();
+        showToast("Réparation enregistrée ✅");
+
+        // Envoi serveur (fire and forget)
+        fetch(
+          "https://script.google.com/macros/s/AKfycbzuR03sbcehVxg8t3aiIGAiaUYHUMahYPjY1zjo3truIFaypot1Toohowk4GJz8TsN0/exec",
+          {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              update: true,
+              id: item.id,
+              notes,
+              temps,
+              description: desc,
+              dateFin,
+            }),
+          }
+        ).catch(console.error);
+
+        // resync léger
+        setTimeout(() => chargerReparations(true), 1500);
+      }
+
+      function updateCounters() {
+        const aFaireCount = aFaire.filter(
+          (x) => !x.notes || !x.notes.trim()
+        ).length;
+        const faitCount = fait.length;
+        document.getElementById(
+          "a-faire-tab"
+        ).innerText = `À faire (${aFaireCount})`;
+        document.getElementById("fait-tab").innerText = `Réparé (${faitCount})`;
+      }
+
+      function showToast(msg) {
+        const t = document.getElementById("toastConfirm");
+        t.lastChild.nodeValue = " " + msg;
+        t.style.display = "flex";
+        setTimeout(() => (t.style.display = "none"), 3000);
+      }
+
+      // Recherche (debounce)
+      document.getElementById("searchInput").addEventListener(
+        "input",
+        debounced(() => {
+          const v = document.getElementById("searchInput").value.trim();
+          document
+            .getElementById("clearButton")
+            .classList.toggle("d-none", v === "");
+          renderCurrentTab();
+        }, 180)
+      );
+      function resetSearch() {
+        const i = document.getElementById("searchInput");
+        i.value = "";
+        document.getElementById("clearButton").classList.add("d-none");
+        renderCurrentTab();
+        i.focus();
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Dossiers employés</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #f8f9fa;
+        padding-top: 350px !important;
+      }
+
+      h1.text-center.mb-4 {
+        margin-top: 0 !important;
+        padding-top: 3.5rem;
+        line-height: 1.5;
+      }
+
+      .file-entry {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.3rem 0.75rem;
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+        margin: 4px 0;
+      }
+      summary {
+        cursor: pointer;
+        font-weight: 500;
+        padding: 4px 0;
+      }
+      .nested-folder {
+        margin-left: 1rem;
+        border-left: 2px dashed #ccc;
+        padding-left: 0.75rem;
+        margin-top: 0.5rem;
+      }
+
+      #loaderBox {
+        transition: opacity 0.3s ease;
+      }
+
+      .file-entry .btn {
+        white-space: nowrap;
+      }
+
+      #progressBar {
+        transition: width 0.2s ease;
+        background: repeating-linear-gradient(
+          45deg,
+          #0d6efd,
+          #0d6efd 10px,
+          #007bff 10px,
+          #007bff 20px
+        );
+      }
+
+      #explorerContainer details {
+        animation: fadeIn 0.4s ease;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body class="py-4">
+    <div id="customHeader"></div>
+    <div class="container">
+      <h1 class="text-center mb-4">🗂️ Dossiers employés 🗂️</h1>
+
+      <div class="mb-3">
+        <input
+          type="text"
+          class="form-control"
+          id="searchInput"
+          placeholder="🔍 Rechercher un chauffeur..."
+        />
+      </div>
+
+      <div class="mb-4">
+        <select id="employeeSelect" class="form-select">
+          <option selected disabled>Choisir un chauffeur</option>
+        </select>
+      </div>
+
+      <div class="mb-3 d-none" id="bulkSelectBox">
+        <div class="d-flex gap-2 justify-content-center">
+          <button class="btn btn-outline-primary btn-sm" id="selectAllBtn">
+            Tout sélectionner
+          </button>
+          <button class="btn btn-outline-secondary btn-sm" id="deselectAllBtn">
+            Tout désélectionner
+          </button>
+        </div>
+      </div>
+
+      <div class="mb-3 mt-1 text-center d-none" id="resetBox">
+        <button class="btn btn-outline-secondary btn-sm" id="resetBtn">
+          ↺ Réinitialiser
+        </button>
+      </div>
+
+      <div
+        class="text-center text-muted fw-medium d-none"
+        id="loadingFilesMessage"
+      >
+        ⏳ Chargement des fichiers du chauffeur...
+      </div>
+
+      <div id="explorerContainer"></div>
+
+      <div class="mt-4 d-none" id="emailSection">
+        <h5>📧 Envoyer les fichiers par email</h5>
+        <div class="input-group mb-2">
+          <input
+            type="email"
+            class="form-control"
+            id="emailInput"
+            placeholder="adresse@email.com"
+          />
+          <button class="btn btn-warning" id="sendEmailBtn">Envoyer</button>
+        </div>
+        <div id="emailStatus" class="mt-2 fw-bold small"></div>
+      </div>
+    </div>
+
+    <script>
+      const LIST_API =
+        "https://script.google.com/macros/s/AKfycbx-MRmzM0aX3Br0XDeX2o4tl3XWHW0qWEYsosXSyWNdgPLSl26T_98fINfmqZgSBjkEbw/exec";
+      const FILES_API =
+        "https://script.google.com/macros/s/AKfycbxaF2SHvQ2tbbn_c_OkKPfQn9wNLwr5L2-EwG8nIIqnsb6q_CJuvX8pMKFzX3HHQ3GC/exec";
+      const API_URL =
+        "https://script.google.com/macros/s/AKfycbyLj8vv9-yf7ZASgHnufj9Xo8x0yukat3WL6jeg1j78j0GryU3zZAjfBHPkXruTOZRTTw/exec";
+
+      let selectedFiles = [];
+      let selectedEmploye = "";
+      let allEmployees = [];
+
+      async function chargerListe() {
+        const select = document.getElementById("employeeSelect");
+        select.innerHTML =
+          "<option selected disabled>Choisir un chauffeur</option>";
+        try {
+          const res = await fetch(LIST_API);
+          const data = await res.json();
+          allEmployees = data || [];
+          allEmployees.forEach((name) => {
+            const opt = document.createElement("option");
+            opt.value = name;
+            opt.textContent = name;
+            select.appendChild(opt);
+          });
+          // Pré-sélection du dernier chauffeur utilisé
+          const last = localStorage.getItem("lastEmployeTransportelz");
+          if (last && allEmployees.includes(last)) {
+            select.value = last;
+            // Déclenche le chargement direct
+            chargerFichiers();
+          }
+
+          select.addEventListener("change", (e) => {
+            localStorage.setItem("lastEmployeTransportelz", e.target.value);
+            chargerFichiers();
+          });
+        } catch (err) {
+          alert("❌ Erreur chargement liste: " + err.message);
+        }
+      }
+
+      function naturalCompare(a, b) {
+        return a.localeCompare(b, undefined, {
+          numeric: true,
+          sensitivity: "base",
+        });
+      }
+
+      async function chargerFichiers() {
+        const name = document.getElementById("employeeSelect").value;
+        selectedEmploye = name;
+
+        const explorer = document.getElementById("explorerContainer");
+        const emailBox = document.getElementById("emailSection");
+        const resetBox = document.getElementById("resetBox");
+        const bulkBox = document.getElementById("bulkSelectBox");
+
+        // 🧼 Nettoie visuellement avant d'afficher le nouveau chauffeur
+        explorer.innerHTML = "";
+        emailBox.classList.add("d-none");
+
+        // ⏳ Ajoute le message de chargement
+        const loadingMsg = document.createElement("div");
+        loadingMsg.id = "loadingMessage";
+        loadingMsg.className = "text-muted text-center mb-2";
+        loadingMsg.innerHTML = "⏳ Chargement des fichiers du chauffeur...";
+        explorer.before(loadingMsg);
+
+        try {
+          const res = await fetch(
+            `${FILES_API}?employe=${encodeURIComponent(name)}`
+          );
+          const emp = await res.json();
+
+          document.getElementById("loadingMessage")?.remove();
+          emailBox.classList.remove("d-none");
+          resetBox.classList.remove("d-none");
+          bulkBox.classList.remove("d-none");
+
+          afficherExplorateur(emp);
+        } catch (err) {
+          alert("❌ Erreur chargement fichiers: " + err.message);
+          document.getElementById("loadingMessage")?.remove();
+        }
+      }
+
+      function afficherExplorateur(files) {
+        const container = document.getElementById("explorerContainer");
+        container.innerHTML = "";
+        selectedFiles = [];
+
+        const tree = buildTree(files);
+        const root = document.createElement("details");
+        root.open = true;
+        root.innerHTML = `<summary>📁 ${selectedEmploye}</summary>`;
+        renderTree(tree, root);
+        container.appendChild(root);
+      }
+
+      function buildTree(files) {
+        const tree = {};
+        for (const file of files) {
+          const parts = file.chemin.split("/");
+          let node = tree;
+          for (const part of parts) {
+            node[part] = node[part] || {};
+            node = node[part];
+          }
+          node._files = node._files || [];
+          node._files.push(file);
+        }
+        return tree;
+      }
+
+      function renderTree(node, parentEl) {
+        const fichiersReels = (node._files || []).filter(
+          (file) => !file.isFolder
+        );
+        const sousDossiers = Object.keys(node).filter((k) => k !== "_files");
+
+        // Affichage des sous-dossiers (trié)
+        sousDossiers.sort(naturalCompare).forEach((key) => {
+          const folderEl = document.createElement("details");
+          folderEl.className = "nested-folder";
+          folderEl.innerHTML = `<summary>📁 ${key}</summary>`;
+          renderTree(node[key], folderEl);
+          parentEl.appendChild(folderEl);
+        });
+
+        // ✅ Affiche (vide) si aucun sous-dossier ET aucun fichier
+        if (sousDossiers.length === 0 && fichiersReels.length === 0) {
+          const videEl = document.createElement("div");
+          videEl.className = "text-muted ps-3";
+          videEl.textContent = "📂 (vide)";
+          parentEl.appendChild(videEl);
+        }
+
+        // Affichage des fichiers
+        fichiersReels
+          .sort((a, b) => naturalCompare(a.nom, b.nom))
+          .forEach((file) => {
+            const entry = document.createElement("div");
+            entry.className = "file-entry";
+
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.className = "form-check-input me-2";
+            checkbox.addEventListener("change", () => {
+              if (checkbox.checked) selectedFiles.push(file.fileId);
+              else
+                selectedFiles = selectedFiles.filter((f) => f !== file.fileId);
+            });
+
+            const name = document.createElement("span");
+            name.textContent = file.nom;
+
+            const viewLink = document.createElement("a");
+            viewLink.href = file.url;
+            viewLink.target = "_blank";
+            viewLink.className = "btn btn-sm btn-outline-primary ms-2";
+            viewLink.textContent = "Voir";
+
+            const downloadLink = document.createElement("a");
+            downloadLink.href = `https://drive.google.com/uc?export=download&id=${file.fileId}`;
+            downloadLink.className = "btn btn-sm btn-outline-success ms-2";
+            downloadLink.textContent = "Télécharger";
+
+            const line = document.createElement("div");
+            line.className =
+              "d-flex justify-content-between align-items-center w-100";
+
+            const left = document.createElement("div");
+            left.className = "d-flex align-items-center";
+            left.append(checkbox, name);
+
+            const right = document.createElement("div");
+            right.className = "d-flex align-items-center gap-2";
+            right.append(viewLink, downloadLink);
+
+            line.append(left, right);
+            entry.appendChild(line);
+
+            parentEl.appendChild(entry);
+          });
+      }
+
+      document
+        .getElementById("sendEmailBtn")
+        .addEventListener("click", async () => {
+          const email = document.getElementById("emailInput").value;
+          const status = document.getElementById("emailStatus");
+
+          if (!email || selectedFiles.length === 0) {
+            alert("Sélectionnez des fichiers et entrez un email.");
+            return;
+          }
+
+          status.textContent = "⏳ Envoi...";
+          const params = new URLSearchParams({
+            email: email,
+            fileIds: selectedFiles.join(","),
+            employe: selectedEmploye,
+          });
+
+          try {
+            const res = await fetch(API_URL, {
+              method: "POST",
+              body: params,
+            });
+            const txt = await res.text();
+            if (txt === "OK") {
+              status.textContent = "✅ Email envoyé !";
+              status.className = "text-success mt-2 fw-bold";
+            } else {
+              status.textContent = "❌ Erreur : " + txt;
+              status.className = "text-danger mt-2 fw-bold";
+            }
+          } catch (err) {
+            status.textContent = "❌ Erreur réseau : " + err.message;
+            status.className = "text-danger mt-2 fw-bold";
+          }
+
+          setTimeout(() => (status.textContent = ""), 3000);
+        });
+
+      // Recherche en direct dans la liste des chauffeurs
+      document.getElementById("searchInput").addEventListener("input", (e) => {
+        const term = e.target.value.toLowerCase();
+        const select = document.getElementById("employeeSelect");
+        const current = select.value;
+        select.innerHTML =
+          "<option selected disabled>Choisir un chauffeur</option>";
+        allEmployees
+          .filter((name) => name.toLowerCase().includes(term))
+          .forEach((name) => {
+            const opt = document.createElement("option");
+            opt.value = name;
+            opt.textContent = name;
+            select.appendChild(opt);
+          });
+        // Si le filtre vide la sélection courante, on réinitialise l'explorateur
+        if (!Array.from(select.options).some((o) => o.value === current)) {
+          document.getElementById("explorerContainer").innerHTML = "";
+          document.getElementById("emailSection").classList.add("d-none");
+          document.getElementById("bulkSelectBox").classList.add("d-none");
+        } else {
+          select.value = current;
+        }
+      });
+
+      // Sélection/Désélection globale
+      document.getElementById("selectAllBtn").addEventListener("click", () => {
+        const checkboxes = document.querySelectorAll(
+          "#explorerContainer input[type='checkbox']"
+        );
+        checkboxes.forEach((cb) => {
+          if (!cb.checked) cb.click();
+        });
+      });
+      document
+        .getElementById("deselectAllBtn")
+        .addEventListener("click", () => {
+          const checkboxes = document.querySelectorAll(
+            "#explorerContainer input[type='checkbox']"
+          );
+          checkboxes.forEach((cb) => {
+            if (cb.checked) cb.click();
+          });
+        });
+
+      chargerListe();
+      document.getElementById("resetBtn").addEventListener("click", () => {
+        document.getElementById("searchInput").value = "";
+        document.getElementById("employeeSelect").selectedIndex = 0;
+        document.getElementById("explorerContainer").innerHTML = "";
+        document.getElementById("emailSection").classList.add("d-none");
+        document.getElementById("bulkSelectBox").classList.add("d-none");
+        document.getElementById("resetBox").classList.add("d-none");
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        fetch("assets/header.html")
+          .then((res) => res.text())
+          .then((html) => {
+            const container = document.getElementById("customHeader");
+            container.innerHTML = html;
+
+            // ✅ après injection, calcule dynamiquement la hauteur du header
+            const waitForHeader = () => {
+              const header = document.querySelector("#mainHeader");
+              if (header) {
+                const height = header.offsetHeight;
+                document.body.style.paddingTop = `${height + 10}px`;
+              } else {
+                setTimeout(waitForHeader, 50); // réessaie tant qu’il n’est pas là
+              }
+            };
+
+            waitForHeader();
+          })
+          .catch((err) => {
+            console.warn("❌ Impossible de charger le header :", err);
+          });
+      });
+    </script>
+  </body>
+</html>

@@ -1,482 +1,513 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sommaire</title>
-  <style>
-    
-    html, body {
-      margin: 0;
-      padding-top: calc(60px + env(safe-area-inset-top));
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f4f4f4;
-      font-size: 16px;
-    }
-    /* En-tête */
-    header {
-      background-color: #111;
-      width: 100%;
-      padding: 10px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-sizing: border-box;
-      z-index: 1000;
-    }
-    header img {
-      height: 40px;
-    }
-
-    /* Container et tableau */
-    .container {
-      padding: 20px;
-      max-width: 1000px;
-      margin: auto;
-    }
-    .top-bar {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 10px;
-    }
-    .top-bar input[type="date"] {
-      padding: 8px 12px;
-      font-size: 16px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-    }
-    label {
-      font-weight: bold;
-      display: block;
-      margin-bottom: 5px;
-    }
-    textarea {
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      resize: vertical;
-      box-sizing: border-box;
-      font-size: 15px;
-    }
-    .table-wrapper {
-      overflow-x: auto;
-      margin-top: 20px;
-      background-color: white;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    th, td {
-      border: 1px solid #999;
-      text-align: center;
-      vertical-align: middle;
-      padding: 6px;
-    }
-    th {
-      background-color: #d32f2f;
-      color: white;
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-    tr:nth-child(even) td {
-      background-color: #f7f7f7;
-    }
-    tr:nth-child(odd) td {
-      background-color: #ffffff;
-    }
-    td[contenteditable] {
-      outline: none;
-      text-transform: uppercase;
-    }
-
-    /* Boutons */
-    .buttons {
-      margin-top: 20px;
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .buttons button {
-      padding: 12px 24px;
-      border: none;
-      border-radius: 6px;
-      color: white;
-      font-weight: bold;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    .reset-btn { background-color: #e74c3c; }
-    .save-btn { background-color: #2ecc71; }
-    .send-btn { background-color: black; }
-    .copy-btn {
-      font-size: 12px;
-      padding: 3px 6px;
-      background-color: #555;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .copy-btn:hover {
-      background-color: #333;
-    }
-    .arrow-next {
-      position: absolute;
-      z-index: 1000;
-      display: none;
-      padding: 2px 6px;
-      font-size: 14px;
-      border-radius: 6px;
-      background: #111;
-      color: #fff;
-      border: none;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    }
-    
-#garageTable td {
-  min-height: 44px;
-  height: 44px;
-}
-    /* Responsive */
-    @media (max-width: 600px) {
-      .container {
-        padding: 12px;
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sommaire</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding-top: calc(60px + env(safe-area-inset-top));
+        font-family: "Segoe UI", sans-serif;
+        background-color: #f4f4f4;
+        font-size: 16px;
       }
-      .buttons {
-        margin-bottom: 40px;
+      /* En-tête */
+      header {
+        background-color: #111;
+        width: 100%;
+        padding: 10px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-sizing: border-box;
+        z-index: 1000;
+      }
+      header img {
+        height: 40px;
+      }
+
+      /* Container et tableau */
+      .container {
+        padding: 20px;
+        max-width: 1000px;
+        margin: auto;
+      }
+      .top-bar {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 10px;
+      }
+      .top-bar input[type="date"] {
+        padding: 8px 12px;
+        font-size: 16px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+      }
+      label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+      }
+      textarea {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        resize: vertical;
+        box-sizing: border-box;
+        font-size: 15px;
+      }
+      .table-wrapper {
+        overflow-x: auto;
+        margin-top: 20px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
       }
       table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        border: 1px solid #999;
+        text-align: center;
+        vertical-align: middle;
+        padding: 6px;
+      }
+      th {
+        background-color: #d32f2f;
+        color: white;
+        font-weight: bold;
+        text-transform: uppercase;
+      }
+      tr:nth-child(even) td {
+        background-color: #f7f7f7;
+      }
+      tr:nth-child(odd) td {
+        background-color: #ffffff;
+      }
+      td[contenteditable] {
+        outline: none;
+        text-transform: uppercase;
+      }
+
+      /* Boutons */
+      .buttons {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .buttons button {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 6px;
+        color: white;
+        font-weight: bold;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      .reset-btn {
+        background-color: #e74c3c;
+      }
+      .save-btn {
+        background-color: #2ecc71;
+      }
+      .send-btn {
+        background-color: black;
+      }
+      .copy-btn {
+        font-size: 12px;
+        padding: 3px 6px;
+        background-color: #555;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .copy-btn:hover {
+        background-color: #333;
+      }
+      .arrow-next {
+        position: absolute;
+        z-index: 1000;
+        display: none;
+        padding: 2px 6px;
+        font-size: 14px;
+        border-radius: 6px;
+        background: #111;
+        color: #fff;
+        border: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      #garageTable td {
+        min-height: 44px;
+        height: 44px;
+      }
+      /* Responsive */
+      @media (max-width: 600px) {
+        .container {
+          padding: 12px;
+        }
+        .buttons {
+          margin-bottom: 40px;
+        }
+        table {
+          font-size: 13px;
+        }
+        th,
+        td {
+          padding: 6px;
+          height: 32px;
+          font-size: 14px;
+        }
+      }
+
+      td[contenteditable],
+      textarea,
+      input {
+        font-size: 16px !important;
+        touch-action: manipulation;
+      }
+
+      #garageTable {
+        table-layout: fixed;
+        width: 100%;
+        max-width: 100%;
+        border-collapse: collapse;
         font-size: 13px;
       }
-      th, td {
-        padding: 6px;
-        height: 32px;
-        font-size: 14px;
+
+      #garageTable th,
+      #garageTable td {
+        padding: 4px;
+        height: 34px; /* plus bas */
+        font-size: 13px;
+        text-align: center;
+        word-break: break-word;
       }
-    }
-    
-td[contenteditable], textarea, input {
-  font-size: 16px !important;
-  touch-action: manipulation;
-}
 
-#garageTable {
-  table-layout: fixed;
-  width: 100%;
-  max-width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-}
-
-#garageTable th, #garageTable td {
-  padding: 4px;
-  height: 34px; /* plus bas */
-  font-size: 13px;
-  text-align: center;
-  word-break: break-word;
-}
-
-#garageTable th:first-child,
-#garageTable td:first-child {
-  width: 30%;
-}
-
-#garageTable th:last-child,
-#garageTable td:last-child {
-  width: 70%;
-}
-
-@media (max-width: 600px) {
-  #garageTable th, #garageTable td {
-    font-size: 13px;
-    padding: 6px;
-  }
-}
-
-#dispoTable {
-  min-width: 900px;
-}
-
-.load-btn {
-  background-color: #f1c40f;
-  color: black;
-}
-
-
-  </style>
-  <!-- Firebase SDKs en mode compat pour HTML classique -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyD4U85mokKXsAP1AdwClWtcbt8udZrwlAw",
-    authDomain: "sommaireelz.firebaseapp.com",
-    projectId: "sommaireelz",
-    storageBucket: "sommaireelz.firebasestorage.app",
-    messagingSenderId: "171788284751",
-    appId: "1:171788284751:web:694f070d1cafe8b7c04b3a"
-  };
-
-  // Initialisation Firebase
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-
-  window.saveToFirebase = function(data, callback) {
-  const collection = db.collection("disponibilites");
-  const TWO_YEARS_AGO = new Date();
-  TWO_YEARS_AGO.setFullYear(TWO_YEARS_AGO.getFullYear() - 2);
-
-  collection
-    .where("timestamp", "<", TWO_YEARS_AGO.toISOString())
-    .get()
-    .then(snapshot => {
-      const deletions = snapshot.docs.map(doc => doc.ref.delete());
-      return Promise.all(deletions);
-    })
-    .then(() => {
-      return collection.where("date", "==", data.date).get();
-    })
-    .then(snapshot => {
-      if (!snapshot.empty) {
-        const existingDocId = snapshot.docs[0].id;
-        return collection.doc(existingDocId).set(data, { merge: false });
-      } else {
-        return collection.add(data);
+      #garageTable th:first-child,
+      #garageTable td:first-child {
+        width: 30%;
       }
-    })
-    .then(() => {
-      console.log("✅ Données sauvegardées (ajout ou mise à jour).");
-      if (typeof callback === "function") callback();
-    })
-    .catch(error => {
-      console.error("❌ Erreur Firebase :", error);
-      alert("Erreur d’enregistrement Firebase : " + error.message);
-    });
-};
 
+      #garageTable th:last-child,
+      #garageTable td:last-child {
+        width: 70%;
+      }
 
-window.loadFromFirebase = function(date) {
-  
-  db.collection("disponibilites")
-    .where("date", "==", date)
-    .orderBy("timestamp", "desc")
-    .limit(1)
-    .get()
-    .then(querySnapshot => {
-      if (!querySnapshot.empty) {
-        const data = querySnapshot.docs[0].data();
+      @media (max-width: 600px) {
+        #garageTable th,
+        #garageTable td {
+          font-size: 13px;
+          padding: 6px;
+        }
+      }
 
-        // Injecte les données dans les tables
-        const garageBody = document.getElementById("garageBody");
-        garageBody.innerHTML = "";
-        (data.garage || []).forEach(item => {
-          const tr = createGarageRow();
-          const cells = tr.querySelectorAll("td");
-          cells[0].textContent = item.unite || "";
-          cells[1].textContent = item.raison || "";
-          garageBody.appendChild(tr);
-        });
+      #dispoTable {
+        min-width: 900px;
+      }
 
-        elements.noteField.value = data.note || "";
-        elements.dateSelect.value = data.date || "";
-        elements.tableBody.innerHTML = "";
+      .load-btn {
+        background-color: #f1c40f;
+        color: black;
+      }
+    </style>
+    <!-- Firebase SDKs en mode compat pour HTML classique -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-        data.rows.forEach(row => {
-          const tr = createRow();
-          const cells = tr.querySelectorAll("td");
-          cells[0].textContent = row.rang || "";
-          cells[1].textContent = row.client || "";
-          cells[2].textContent = row.type || "";
-          cells[3].textContent = row.depart || "";
-          cells[4].textContent = row.livraison || "";
-          cells[5].textContent = row.chauffeur || "";
-          cells[6].textContent = row.camion || "";
-          cells[7].textContent = row.remorque || "";
-          elements.tableBody.appendChild(tr);
-        });
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyD4U85mokKXsAP1AdwClWtcbt8udZrwlAw",
+        authDomain: "sommaireelz.firebaseapp.com",
+        projectId: "sommaireelz",
+        storageBucket: "sommaireelz.firebasestorage.app",
+        messagingSenderId: "171788284751",
+        appId: "1:171788284751:web:694f070d1cafe8b7c04b3a",
+      };
 
-        console.log("✅ Données chargées depuis Firebase !");
-      } else {
-        console.log("📭 Aucune donnée trouvée dans Firebase. Réinitialisation...");
+      // Initialisation Firebase
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
 
-        // Réinitialise le tableau (efface tout sauf la colonne rang et dernière ligne)
-        elements.noteField.value = "";
-const rows = document.querySelectorAll("#tableBody tr");
+      window.saveToFirebase = function (data, callback) {
+        const collection = db.collection("disponibilites");
+        const TWO_YEARS_AGO = new Date();
+        TWO_YEARS_AGO.setFullYear(TWO_YEARS_AGO.getFullYear() - 2);
 
-rows.forEach((row, index) => {
-  if (index >= rows.length - 2) return; // Protège les deux dernières lignes
-  const cells = row.querySelectorAll("td");
-  for (let i = 1; i < cells.length - 1; i++) {
-    cells[i].textContent = "";
-  }
-});
+        collection
+          .where("timestamp", "<", TWO_YEARS_AGO.toISOString())
+          .get()
+          .then((snapshot) => {
+            const deletions = snapshot.docs.map((doc) => doc.ref.delete());
+            return Promise.all(deletions);
+          })
+          .then(() => {
+            return collection.where("date", "==", data.date).get();
+          })
+          .then((snapshot) => {
+            if (!snapshot.empty) {
+              const existingDocId = snapshot.docs[0].id;
+              return collection.doc(existingDocId).set(data, { merge: false });
+            } else {
+              return collection.add(data);
+            }
+          })
+          .then(() => {
+            console.log("✅ Données sauvegardées (ajout ou mise à jour).");
+            if (typeof callback === "function") callback();
+          })
+          .catch((error) => {
+            console.error("❌ Erreur Firebase :", error);
+            alert("Erreur d’enregistrement Firebase : " + error.message);
+          });
+      };
 
-          db.collection("disponibilites")
-            .orderBy("timestamp", "desc")
-            .limit(1)
-            .get()
-            .then(snapshot => {
+      window.loadFromFirebase = function (date) {
+        db.collection("disponibilites")
+          .where("date", "==", date)
+          .orderBy("timestamp", "desc")
+          .limit(1)
+          .get()
+          .then((querySnapshot) => {
+            if (!querySnapshot.empty) {
+              const data = querySnapshot.docs[0].data();
+
+              // Injecte les données dans les tables
               const garageBody = document.getElementById("garageBody");
               garageBody.innerHTML = "";
+              (data.garage || []).forEach((item) => {
+                const tr = createGarageRow();
+                const cells = tr.querySelectorAll("td");
+                cells[0].textContent = item.unite || "";
+                cells[1].textContent = item.raison || "";
+                garageBody.appendChild(tr);
+              });
 
-              if (!snapshot.empty) {
-                const lastData = snapshot.docs[0].data();
-                const lastGarage = Array.isArray(lastData.garage) ? lastData.garage : [];
+              elements.noteField.value = data.note || "";
+              elements.dateSelect.value = data.date || "";
+              elements.tableBody.innerHTML = "";
 
-                for (let i = 0; i < 3; i++) {
-                  const tr = createGarageRow();
-                  const cells = tr.querySelectorAll("td");
+              data.rows.forEach((row) => {
+                const tr = createRow();
+                const cells = tr.querySelectorAll("td");
+                cells[0].textContent = row.rang || "";
+                cells[1].textContent = row.client || "";
+                cells[2].textContent = row.type || "";
+                cells[3].textContent = row.depart || "";
+                cells[4].textContent = row.livraison || "";
+                cells[5].textContent = row.chauffeur || "";
+                cells[6].textContent = row.camion || "";
+                cells[7].textContent = row.remorque || "";
+                elements.tableBody.appendChild(tr);
+              });
 
-                  if (lastGarage[i]) {
-                    cells[0].textContent = lastGarage[i].unite || "";
-                    cells[1].textContent = lastGarage[i].raison || "";
-                  }
+              console.log("✅ Données chargées depuis Firebase !");
+            } else {
+              console.log(
+                "📭 Aucune donnée trouvée dans Firebase. Réinitialisation..."
+              );
 
-                  garageBody.appendChild(tr);
+              // Réinitialise le tableau (efface tout sauf la colonne rang et dernière ligne)
+              elements.noteField.value = "";
+              const rows = document.querySelectorAll("#tableBody tr");
+              rows.forEach((row, index) => {
+                if (index === rows.length - 1) return;
+                const cells = row.querySelectorAll("td");
+                for (let i = 1; i < cells.length - 1; i++) {
+                  cells[i].textContent = "";
                 }
+              });
+              db.collection("disponibilites")
+                .orderBy("timestamp", "desc")
+                .limit(1)
+                .get()
+                .then((snapshot) => {
+                  const garageBody = document.getElementById("garageBody");
+                  garageBody.innerHTML = "";
 
-              } else {
-                // Aucune sauvegarde garage trouvée → on génère 3 lignes vides
-                generateGarageRows(3);
-              }
-            });
-      }
-    })
-    .catch(error => {
-      console.error("❌ Erreur Firebase :", error);
-    });
-};
+                  if (!snapshot.empty) {
+                    const lastData = snapshot.docs[0].data();
+                    const lastGarage = Array.isArray(lastData.garage)
+                      ? lastData.garage
+                      : [];
 
-</script>
+                    for (let i = 0; i < 3; i++) {
+                      const tr = createGarageRow();
+                      const cells = tr.querySelectorAll("td");
 
-</head>
-<body>
-<div id="customHeader"></div>
-<script>
-  fetch("assets/header.html")
-    .then(res => res.text())
-    .then(html => document.getElementById("customHeader").innerHTML = html);
-</script>
-  <div class="container">
-    <div class="top-bar">
-      <input type="date" id="dateSelect" />
+                      if (lastGarage[i]) {
+                        cells[0].textContent = lastGarage[i].unite || "";
+                        cells[1].textContent = lastGarage[i].raison || "";
+                      }
+
+                      garageBody.appendChild(tr);
+                    }
+                  } else {
+                    // Aucune sauvegarde garage trouvée → on génère 3 lignes vides
+                    generateGarageRows(3);
+                  }
+                });
+            }
+          })
+          .catch((error) => {
+            console.error("❌ Erreur Firebase :", error);
+          });
+      };
+    </script>
+  </head>
+  <body>
+    <div id="customHeader"></div>
+    <script>
+      fetch("assets/header.html")
+        .then((res) => res.text())
+        .then(
+          (html) => (document.getElementById("customHeader").innerHTML = html)
+        );
+    </script>
+    <div class="container">
+      <div class="top-bar">
+        <input type="date" id="dateSelect" />
+      </div>
+      <label for="note">Note:</label>
+      <textarea id="note" rows="2"></textarea>
+      <div class="table-wrapper">
+        <table id="dispoTable">
+          <thead>
+            <tr>
+              <th style="width: 70px">RANG</th>
+              <th style="width: 200px">CLIENT</th>
+              <th style="width: 80px">TYPE</th>
+              <th style="width: 80px">DÉPART</th>
+              <th style="width: 80px">LIVRAISON</th>
+              <th style="width: 100px">CHAUFFEUR</th>
+              <th style="width: 90px">CAMION</th>
+              <th style="width: 100px">REMORQUE</th>
+              <th style="width: 60px">COPIE</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+      <h3 style="text-align: center; font-size: 18px">🛠️ Unités au garage</h3>
+      <div class="table-wrapper">
+        <table id="garageTable">
+          <thead>
+            <tr>
+              <th style="width: 30%">UNITÉ</th>
+              <th style="width: 70%">RAISON</th>
+            </tr>
+          </thead>
+          <tbody id="garageBody">
+            <tr>
+              <td contenteditable style="height: 36px"></td>
+              <td contenteditable style="height: 36px"></td>
+            </tr>
+            <tr>
+              <td contenteditable style="height: 36px"></td>
+              <td contenteditable style="height: 36px"></td>
+            </tr>
+            <tr>
+              <td contenteditable style="height: 36px"></td>
+              <td contenteditable style="height: 36px"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="buttons" style="margin-top: 16px">
+        <button class="reset-btn" id="resetBtn">Reset</button>
+        <button class="save-btn" id="saveBtn">Save</button>
+        <button class="send-btn" id="sendBtn">Send</button>
+      </div>
     </div>
-    <label for="note">Note:</label>
-    <textarea id="note" rows="2"></textarea>
-    <div class="table-wrapper">
-      <table id="dispoTable">
-        <thead>
-          <tr>
-            <th style="width:70px;">RANG</th>
-            <th style="width:200px;">CLIENT</th>
-            <th style="width:80px;">TYPE</th>
-            <th style="width:80px;">DÉPART</th>
-            <th style="width:80px;">LIVRAISON</th>
-            <th style="width:100px;">CHAUFFEUR</th>
-            <th style="width:90px;">CAMION</th>
-            <th style="width:100px;">REMORQUE</th>
-            <th style="width:60px;">COPIE</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-      </table>
-    </div>
-<h3 style="text-align: center; font-size: 18px;">🛠️ Unités au garage</h3>
-<div class="table-wrapper">
-  <table id="garageTable">
-    <thead>
-      <tr>
-        <th style="width: 30%;">UNITÉ</th>
-        <th style="width: 70%;">RAISON</th>
-      </tr>
-    </thead>
-    <tbody id="garageBody">
-      <tr>
-        <td contenteditable style="height: 36px;"></td>
-        <td contenteditable style="height: 36px;"></td>
-      </tr>
-      <tr>
-        <td contenteditable style="height: 36px;"></td>
-        <td contenteditable style="height: 36px;"></td>
-      </tr>
-      <tr>
-        <td contenteditable style="height: 36px;"></td>
-        <td contenteditable style="height: 36px;"></td>
-      </tr>
-    </tbody>
-  </table>
-</div>
 
-<div class="buttons" style="margin-top: 16px;">
-  <button class="reset-btn" id="resetBtn">Reset</button>
-  <button class="save-btn" id="saveBtn">Save</button>
-  <button class="send-btn" id="sendBtn">Send</button>
-</div>
+    <script>
+      // Configuration et constantes
+      const API_URL =
+        "https://script.google.com/macros/s/AKfycbw5nEGTjiq37xzylQZHzXaNZZLWJJLEafeg_zWIoNHKk0A8Ep5PCSuT4DEjnrYNNXR_aw/exec";
+      const CHAUFFEUR_MAP = {
+        JFJ: { nom: "Jeff", tel: "4185202502" },
+        AL: { nom: "Alain", tel: "4182710206" },
+        PF: { nom: "Patrick", tel: "4185696346" },
+        RPE: { nom: "Rraymond", tel: "4186706104" },
+        CYR: { nom: "Clement", tel: "5819223336" },
+        BPQ: { nom: "Benoit", tel: "5819933470" },
+        RED: { nom: "Rejean", tel: "4183254436" },
+        SIR: { nom: "Simon", tel: "4185760436" },
+      };
+      const STORAGE_KEYS = {
+        note: "dispo_note",
+        date: "dispo_date",
+        rows: "dispo_rows",
+      };
+      const DAYS_FR = [
+        "Dimanche",
+        "Lundi",
+        "Mardi",
+        "Mercredi",
+        "Jeudi",
+        "Vendredi",
+        "Samedi",
+      ];
+      const MONTHS_FR = [
+        "janvier",
+        "février",
+        "mars",
+        "avril",
+        "mai",
+        "juin",
+        "juillet",
+        "août",
+        "septembre",
+        "octobre",
+        "novembre",
+        "décembre",
+      ];
 
+      // Éléments DOM
+      const elements = {
+        dateSelect: document.getElementById("dateSelect"),
+        noteField: document.getElementById("note"),
+        tableBody: document.getElementById("tableBody"),
+        dispoTable: document.getElementById("dispoTable"),
+        resetBtn: document.getElementById("resetBtn"),
+        saveBtn: document.getElementById("saveBtn"),
+        sendBtn: document.getElementById("sendBtn"),
+      };
 
-
-  </div>
-
-  <script>
-    // Configuration et constantes
-    const API_URL = "https://script.google.com/macros/s/AKfycbwCAgSIfQhyWIIZdGMixV8JlnGRsVr6shKhj9M9mlwVqS-bjNfSOmGl16nRKhySQCwz/exec";
-    const CHAUFFEUR_MAP = {
-      "JFJ": { nom: "Jeff", tel: "4185202502" },
-      "AL": { nom: "Alain", tel: "4182710206" },
-      "PF": { nom: "Patrick", tel: "4185696346" },
-      "RPE": { nom: "Rraymond", tel: "4186706104" },
-      "CYR": { nom: "Clement", tel: "5819223336" },
-      "BPQ": { nom: "Benoit", tel: "5819933470" },
-      "RED": { nom: "Rejean", tel: "4183254436" },
-      "SIR": { nom: "Simon", tel: "4185760436" },
-    };
-    const STORAGE_KEYS = {
-      note: "dispo_note",
-      date: "dispo_date",
-      rows: "dispo_rows"
-    };
-    const DAYS_FR = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
-    const MONTHS_FR = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
-
-    // Éléments DOM
-    const elements = {
-      dateSelect: document.getElementById("dateSelect"),
-      noteField: document.getElementById("note"),
-      tableBody: document.getElementById("tableBody"),
-      dispoTable: document.getElementById("dispoTable"),
-      resetBtn: document.getElementById("resetBtn"),
-      saveBtn: document.getElementById("saveBtn"),
-      sendBtn: document.getElementById("sendBtn"),
-    };
-    
-    function createGarageRow() {
-  const tr = document.createElement("tr");
-  tr.innerHTML = `
+      function createGarageRow() {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
     <td contenteditable></td>
     <td contenteditable></td>
   `;
-  return tr;
-}
+        return tr;
+      }
 
-function generateGarageRows(n = 3) {
-  const garageBody = document.getElementById("garageBody");
-  garageBody.innerHTML = "";
-  for (let i = 0; i < n; i++) {
-    garageBody.appendChild(createGarageRow());
-  }
-}
+      function generateGarageRows(n = 3) {
+        const garageBody = document.getElementById("garageBody");
+        garageBody.innerHTML = "";
+        for (let i = 0; i < n; i++) {
+          garageBody.appendChild(createGarageRow());
+        }
+      }
 
-    // Fonctions pour la gestion des lignes du tableau
-    function createRow() {
-      const row = document.createElement("tr");
-      row.innerHTML = `
+      // Fonctions pour la gestion des lignes du tableau
+      function createRow() {
+        const row = document.createElement("tr");
+        row.innerHTML = `
         <td contenteditable inputmode="numeric"></td>
         <td contenteditable></td>
         <td contenteditable></td>
@@ -487,378 +518,594 @@ function generateGarageRows(n = 3) {
         <td contenteditable inputmode="numeric"></td>
         <td><button class="copy-btn">📋</button></td>
       `;
-      // Attacher l'événement directement lors de la création
-      const copyBtn = row.querySelector(".copy-btn");
-      copyBtn.addEventListener("click", () => copyRow(row));
-      return row;
-    }
-
-    function generateDefaultRows(n = 9) {
-      elements.tableBody.innerHTML = "";
-      for (let i = 0; i < n; i++) {
-        elements.tableBody.appendChild(createRow());
+        // Attacher l'événement directement lors de la création
+        const copyBtn = row.querySelector(".copy-btn");
+        copyBtn.addEventListener("click", () => copyRow(row));
+        return row;
       }
-    }
-    
-    // Fonctions pour les opérations principales
-    function formatDate(dateStr) {
-  if (!dateStr) return "";
 
-  const [year, month, day] = dateStr.split("-");
-  const dateObj = new Date(Number(year), Number(month) - 1, Number(day));
-
-  const dayName = DAYS_FR[dateObj.getDay()];
-  const dayNum = dateObj.getDate();
-  const monthName = MONTHS_FR[dateObj.getMonth()];
-
-  return `${dayName} le ${dayNum} ${monthName}`;
-}
-
-    function copyRow(row) {
-      const cells = row.querySelectorAll("td");
-      
-      const rawCode = (cells[5]?.textContent || "").trim().toUpperCase();
-      const chauffeur = CHAUFFEUR_MAP[rawCode] || { nom: rawCode, tel: "" };
-      
-      const values = [
-        chauffeur.nom,
-        (cells[1]?.textContent || "").trim().toUpperCase(),
-        (cells[2]?.textContent || "").trim().toUpperCase(),
-        (cells[3]?.textContent || "").trim().toUpperCase(),
-        (cells[4]?.textContent || "").trim().toUpperCase(),
-        (cells[6]?.textContent || "").trim().toUpperCase(),
-        (cells[7]?.textContent || "").trim().toUpperCase()
-      ];
-      
-      const labels = ["Chauffeur", "Client", "Type", "Départ", "Livraison", "Camion", "Remorque"];
-      const dayFormatted = formatDate(elements.dateSelect.value);
-      
-      let sms = `Salut,\nVoici ton voyage pour ${dayFormatted}\n\n`;
-      sms += labels.map((label, idx) => `${label}: ${values[idx]}`).join("\n");
-      sms += `\n\nMerci !`;
-      
-      const smsEncoded = encodeURIComponent(sms);
-      const href = chauffeur.tel ? `sms:${chauffeur.tel}?body=${smsEncoded}` : `sms:?body=${smsEncoded}`;
-      
-      // Création et clic du lien
-      const link = document.createElement("a");
-      link.href = href;
-      link.style.display = "none";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
-    function resetForm() {
-      elements.noteField.value = "";
-      elements.dateSelect.value = "";
-      localStorage.clear();
-    
-      const rows = document.querySelectorAll("#tableBody tr");
-      rows.forEach((row, index) => {
-        // Ne pas effacer les deux dernières lignes
-        if (index >= rows.length - 2) return;
-    
-        const cells = row.querySelectorAll("td");
-        for (let i = 1; i < 8; i++) {
-          if (cells[i]) cells[i].textContent = "";
+      function generateDefaultRows(n = 9) {
+        elements.tableBody.innerHTML = "";
+        for (let i = 0; i < n; i++) {
+          elements.tableBody.appendChild(createRow());
         }
-      });
-    }
-
-
-
-function saveData() {
-  try {
-    const note = elements.noteField.value;
-    const date = elements.dateSelect.value;
-
-    const rows = Array.from(document.querySelectorAll("#dispoTable tbody tr")).map(tr => {
-      const cells = Array.from(tr.querySelectorAll("td")).slice(0, 8);
-      return {
-        rang: cells[0]?.textContent.trim() || "",
-        client: cells[1]?.textContent.trim() || "",
-        type: cells[2]?.textContent.trim() || "",
-        depart: cells[3]?.textContent.trim() || "",
-        livraison: cells[4]?.textContent.trim() || "",
-        chauffeur: cells[5]?.textContent.trim() || "",
-        camion: cells[6]?.textContent.trim() || "",
-        remorque: cells[7]?.textContent.trim() || ""
-      };
-    });
-
-    const garageRows = Array.from(document.querySelectorAll("#garageTable tbody tr")).map(tr => {
-      const tds = tr.querySelectorAll("td");
-      return {
-        unite: tds[0]?.textContent.trim() || "",
-        raison: tds[1]?.textContent.trim() || ""
-      };
-    });
-
-    const data = {
-      note,
-      date,
-      rows,
-      garage: garageRows,
-      timestamp: new Date().toISOString()
-    };
-
-    localStorage.setItem("garage_rows", JSON.stringify(garageRows));
-    localStorage.setItem(STORAGE_KEYS.note, note);
-    localStorage.setItem(STORAGE_KEYS.date, date);
-    localStorage.setItem(STORAGE_KEYS.rows, JSON.stringify(rows));
-
-    if (window.saveToFirebase) {
-      window.saveToFirebase(data, () => {
-        alert("✅ Données sauvegardées localement ET dans Firebase !");
-      });
-    }
-
-  } catch (err) {
-    alert("Erreur lors de la sauvegarde : " + err.message);
-  }
-}
-
-
-function sendForm() {
-  const tableClone = document.getElementById("dispoTable").cloneNode(true);
-  const rows = tableClone.querySelectorAll("tbody tr");
-
-  rows.forEach(row => {
-    const cells = row.querySelectorAll("td");
-    let isRowEmpty = true;
-
-    for (let i = 0; i < cells.length; i++) {
-      if (i === 8) continue;  // Skip the copy button cell
-      const text = cells[i]?.innerText?.trim();
-      if (text) {
-        isRowEmpty = false;
-        break;
       }
-    }
 
-    for (let i = 0; i < cells.length; i++) {
-      const cell = cells[i];
+      // Fonctions pour les opérations principales
+      function formatDate(dateStr) {
+        if (!dateStr) return "";
 
-      if (i === 8) {  // Handle the copy button cell
-        cell.innerHTML = "";  // Remove the copy button
-      } else if (cell.hasAttribute("contenteditable")) {
-        cell.innerText = cell.innerText.trim().toUpperCase();
+        const [year, month, day] = dateStr.split("-");
+        const dateObj = new Date(Number(year), Number(month) - 1, Number(day));
+
+        const dayName = DAYS_FR[dateObj.getDay()];
+        const dayNum = dateObj.getDate();
+        const monthName = MONTHS_FR[dateObj.getMonth()];
+
+        return `${dayName} le ${dayNum} ${monthName}`;
       }
-    }
-  });
 
-  const selectedDate = document.querySelector("#dateSelect")?.value || "";
-if (!selectedDate) {
-  alert("Veuillez sélectionner une date.");
-  return;
-}
-const data = {
-  note: document.getElementById("note").value,
-  date: selectedDate,
-  table: tableClone.outerHTML
-};
+      function copyRow(row) {
+        const cells = row.querySelectorAll("td");
 
+        const rawCode = (cells[5]?.textContent || "").trim().toUpperCase();
+        const chauffeur = CHAUFFEUR_MAP[rawCode] || { nom: rawCode, tel: "" };
 
-  fetch("https://script.google.com/macros/s/AKfycbwCAgSIfQhyWIIZdGMixV8JlnGRsVr6shKhj9M9mlwVqS-bjNfSOmGl16nRKhySQCwz/exec", {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  });
+        const values = [
+          chauffeur.nom,
+          (cells[1]?.textContent || "").trim().toUpperCase(),
+          (cells[2]?.textContent || "").trim().toUpperCase(),
+          (cells[3]?.textContent || "").trim().toUpperCase(),
+          (cells[4]?.textContent || "").trim().toUpperCase(),
+          (cells[6]?.textContent || "").trim().toUpperCase(),
+          (cells[7]?.textContent || "").trim().toUpperCase(),
+        ];
 
-  alert("Sommaire envoyé !");
-}
+        const labels = [
+          "Chauffeur",
+          "Client",
+          "Type",
+          "Départ",
+          "Livraison",
+          "Camion",
+          "Remorque",
+        ];
+        const dayFormatted = formatDate(elements.dateSelect.value);
 
+        let sms = `Salut,\nVoici ton voyage pour ${dayFormatted}\n\n`;
+        sms += labels
+          .map((label, idx) => `${label}: ${values[idx]}`)
+          .join("\n");
+        sms += `\n\nMerci !`;
 
-    // Gestion de la navigation avec flèche
-    function setupArrowNavigation() {
-      const arrowBtn = document.createElement("button");
-      arrowBtn.textContent = "➡️";
-      arrowBtn.className = "arrow-next";
-      document.body.appendChild(arrowBtn);
-      
-      let currentCell = null;
-      
-      // Fonction pour mettre à jour la position du bouton flèche
-      function updateArrowPosition() {
-        if (!currentCell) return;
-        const rect = currentCell.getBoundingClientRect();
-        arrowBtn.style.top = `${window.scrollY + rect.top + 5}px`;
-        arrowBtn.style.left = `${window.scrollX + rect.right + 5}px`;
-        arrowBtn.style.display = "inline-block";
+        const smsEncoded = encodeURIComponent(sms);
+        const href = chauffeur.tel
+          ? `sms:${chauffeur.tel}?body=${smsEncoded}`
+          : `sms:?body=${smsEncoded}`;
+
+        // Création et clic du lien
+        const link = document.createElement("a");
+        link.href = href;
+        link.style.display = "none";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
       }
-      
-      // Déplacement vers la cellule suivante
-      function moveToNextCell() {
-        if (!currentCell) return;
-        const row = currentCell.closest("tr");
-        const cells = Array.from(row.querySelectorAll("td[contenteditable]"));
-        const idx = cells.indexOf(currentCell);
-        
-        let next = null;
-        
-        if (idx < cells.length - 1) {
-          next = cells[idx + 1];
-        } else {
-          const nextRow = row.nextElementSibling;
-          if (nextRow) {
-            const nextCells = Array.from(nextRow.querySelectorAll("td[contenteditable]"));
-            if (nextCells.length) next = nextCells[0];
+
+      function resetForm() {
+        elements.noteField.value = "";
+        elements.dateSelect.value = "";
+        localStorage.clear();
+
+        const rows = document.querySelectorAll("#tableBody tr");
+        rows.forEach((row, index) => {
+          // Si c’est la dernière ligne, on la saute
+          if (index === rows.length - 1) return;
+
+          const cells = row.querySelectorAll("td");
+          // Ne pas effacer la 1re cellule (rang)
+          for (let i = 1; i < 8; i++) {
+            if (cells[i]) cells[i].textContent = "";
+          }
+        });
+      }
+
+      function saveData() {
+        try {
+          const note = elements.noteField.value;
+          const date = elements.dateSelect.value;
+
+          const rows = Array.from(
+            document.querySelectorAll("#dispoTable tbody tr")
+          ).map((tr) => {
+            const cells = Array.from(tr.querySelectorAll("td")).slice(0, 8);
+            return {
+              rang: cells[0]?.textContent.trim() || "",
+              client: cells[1]?.textContent.trim() || "",
+              type: cells[2]?.textContent.trim() || "",
+              depart: cells[3]?.textContent.trim() || "",
+              livraison: cells[4]?.textContent.trim() || "",
+              chauffeur: cells[5]?.textContent.trim() || "",
+              camion: cells[6]?.textContent.trim() || "",
+              remorque: cells[7]?.textContent.trim() || "",
+            };
+          });
+
+          const garageRows = Array.from(
+            document.querySelectorAll("#garageTable tbody tr")
+          ).map((tr) => {
+            const tds = tr.querySelectorAll("td");
+            return {
+              unite: tds[0]?.textContent.trim() || "",
+              raison: tds[1]?.textContent.trim() || "",
+            };
+          });
+
+          const data = {
+            note,
+            date,
+            rows,
+            garage: garageRows,
+            timestamp: new Date().toISOString(),
+          };
+
+          localStorage.setItem("garage_rows", JSON.stringify(garageRows));
+          localStorage.setItem(STORAGE_KEYS.note, note);
+          localStorage.setItem(STORAGE_KEYS.date, date);
+          localStorage.setItem(STORAGE_KEYS.rows, JSON.stringify(rows));
+
+          if (window.saveToFirebase) {
+            window.saveToFirebase(data, () => {
+              alert("✅ Données sauvegardées localement ET dans Firebase !");
+            });
+          }
+        } catch (err) {
+          alert("Erreur lors de la sauvegarde : " + err.message);
+        }
+      }
+
+      function sendForm() {
+        const tableClone = document
+          .getElementById("dispoTable")
+          .cloneNode(true);
+        const rows = tableClone.querySelectorAll("tbody tr");
+
+        rows.forEach((row) => {
+          const cells = row.querySelectorAll("td");
+          let isRowEmpty = true;
+
+          for (let i = 0; i < cells.length; i++) {
+            if (i === 8) continue; // Skip the copy button cell
+            const text = cells[i]?.innerText?.trim();
+            if (text) {
+              isRowEmpty = false;
+              break;
+            }
+          }
+
+          for (let i = 0; i < cells.length; i++) {
+            const cell = cells[i];
+
+            if (i === 8) {
+              // Handle the copy button cell
+              cell.innerHTML = ""; // Remove the copy button
+            } else if (cell.hasAttribute("contenteditable")) {
+              cell.innerText = cell.innerText.trim().toUpperCase();
+            }
+          }
+        });
+
+        const selectedDate = document.querySelector("#dateSelect")?.value || "";
+        if (!selectedDate) {
+          alert("Veuillez sélectionner une date.");
+          return;
+        }
+        const data = {
+          note: document.getElementById("note").value,
+          date: selectedDate,
+          table: tableClone.outerHTML,
+        };
+
+        fetch(
+          "https://script.google.com/macros/s/AKfycbzbkVG6TJQA0iTfHd_TX2hzQXLZmMAPOlhxAOJMej_Cr-Vo1dtZI0GuswIXNZnwVB5pAg/exec",
+          {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          }
+        );
+
+        alert("Sommaire envoyé !");
+      }
+
+      // Gestion de la navigation avec flèche
+      function setupArrowNavigation() {
+        const arrowBtn = document.createElement("button");
+        arrowBtn.textContent = "➡️";
+        arrowBtn.className = "arrow-next";
+        document.body.appendChild(arrowBtn);
+
+        let currentCell = null;
+
+        // Fonction pour mettre à jour la position du bouton flèche
+        function updateArrowPosition() {
+          if (!currentCell) return;
+          const rect = currentCell.getBoundingClientRect();
+          arrowBtn.style.top = `${window.scrollY + rect.top + 5}px`;
+          arrowBtn.style.left = `${window.scrollX + rect.right + 5}px`;
+          arrowBtn.style.display = "inline-block";
+        }
+
+        // Déplacement vers la cellule suivante
+        function moveToNextCell() {
+          if (!currentCell) return;
+          const row = currentCell.closest("tr");
+          const cells = Array.from(row.querySelectorAll("td[contenteditable]"));
+          const idx = cells.indexOf(currentCell);
+
+          let next = null;
+
+          if (idx < cells.length - 1) {
+            next = cells[idx + 1];
+          } else {
+            const nextRow = row.nextElementSibling;
+            if (nextRow) {
+              const nextCells = Array.from(
+                nextRow.querySelectorAll("td[contenteditable]")
+              );
+              if (nextCells.length) next = nextCells[0];
+            }
+          }
+
+          if (next) {
+            next.focus();
+            currentCell = next;
+
+            // Attendre le rendu avant scroll
+            setTimeout(() => {
+              next.scrollIntoView({
+                behavior: "smooth",
+                block: "nearest",
+                inline: "center",
+              });
+              updateArrowPosition();
+            }, 50);
           }
         }
-        
-        if (next) {
-          next.focus();
-          currentCell = next;
-          
-          // Attendre le rendu avant scroll
-          setTimeout(() => {
-            next.scrollIntoView({
+
+        // Événements
+        elements.dispoTable.addEventListener("focusin", (e) => {
+          if (
+            e.target.tagName === "TD" &&
+            e.target.hasAttribute("contenteditable")
+          ) {
+            currentCell = e.target;
+            updateArrowPosition();
+
+            // Assurer que la cellule est visible
+            currentCell.scrollIntoView({
               behavior: "smooth",
               block: "nearest",
-              inline: "center"
+              inline: "center",
             });
-            updateArrowPosition();
-          }, 50);
-        }
+          }
+        });
+
+        document.addEventListener("scroll", updateArrowPosition);
+
+        arrowBtn.addEventListener("click", moveToNextCell);
+
+        document.addEventListener("click", (e) => {
+          if (!e.target.closest("td") && e.target !== arrowBtn) {
+            arrowBtn.style.display = "none";
+            currentCell = null;
+          }
+        });
       }
-      
-      // Événements
-      elements.dispoTable.addEventListener("focusin", (e) => {
-        if (e.target.tagName === "TD" && e.target.hasAttribute("contenteditable")) {
-          currentCell = e.target;
-          updateArrowPosition();
-          
-          // Assurer que la cellule est visible
-          currentCell.scrollIntoView({
-            behavior: "smooth",
-            block: "nearest",
-            inline: "center"
-          });
+
+      // Événement pour convertir le texte en majuscules pendant la saisie
+      document.addEventListener("input", (e) => {
+        if (e.target.matches("td[contenteditable]")) {
+          const selection = window.getSelection();
+          const range = selection.getRangeAt(0);
+          const cursorPos = range.startOffset;
+
+          const upper = e.target.textContent.toUpperCase();
+          e.target.textContent = upper;
+
+          // Remet le curseur à la bonne place
+          if (e.target.firstChild) {
+            range.setStart(
+              e.target.firstChild,
+              Math.min(cursorPos, e.target.textContent.length)
+            );
+            range.setEnd(
+              e.target.firstChild,
+              Math.min(cursorPos, e.target.textContent.length)
+            );
+            selection.removeAllRanges();
+            selection.addRange(range);
+          }
         }
       });
-      
-      document.addEventListener("scroll", updateArrowPosition);
-      
-      arrowBtn.addEventListener("click", moveToNextCell);
-      
-      document.addEventListener("click", (e) => {
-        if (!e.target.closest("td") && e.target !== arrowBtn) {
-          arrowBtn.style.display = "none";
-          currentCell = null;
-        }
-      });
-    }
-    
-    // Événement pour convertir le texte en majuscules pendant la saisie
-    document.addEventListener("input", (e) => {
-      if (e.target.matches("td[contenteditable]")) {
-        const selection = window.getSelection();
-        const range = selection.getRangeAt(0);
-        const cursorPos = range.startOffset;
-        
-        const upper = e.target.textContent.toUpperCase();
-        e.target.textContent = upper;
-        
-        // Remet le curseur à la bonne place
-        if (e.target.firstChild) {
-          range.setStart(e.target.firstChild, Math.min(cursorPos, e.target.textContent.length));
-          range.setEnd(e.target.firstChild, Math.min(cursorPos, e.target.textContent.length));
-          selection.removeAllRanges();
-          selection.addRange(range);
-        }
+
+      function init() {
+        elements.resetBtn.addEventListener("click", resetForm);
+        elements.saveBtn.addEventListener("click", saveData);
+        elements.sendBtn.addEventListener("click", sendForm);
+        elements.dateSelect.addEventListener("change", () => {
+          const selectedDate = elements.dateSelect.value;
+          if (!selectedDate) return;
+          window.loadFromFirebase(selectedDate);
+        });
+
+        elements.tableBody.innerHTML = "";
+
+        // 🚀 Toujours charger la dernière entrée Firebase (peu importe localStorage)
+        db.collection("disponibilites")
+          .orderBy("timestamp", "desc")
+          .limit(1)
+          .get()
+          .then((snapshot) => {
+            if (!snapshot.empty) {
+              const data = snapshot.docs[0].data();
+              elements.dateSelect.value = data.date || "";
+              elements.noteField.value = data.note || "";
+
+              if (Array.isArray(data.rows) && data.rows.length > 0) {
+                data.rows.forEach((row) => {
+                  const tr = createRow();
+                  const cells = tr.querySelectorAll("td");
+                  cells[0].textContent = row.rang || "";
+                  cells[1].textContent = row.client || "";
+                  cells[2].textContent = row.type || "";
+                  cells[3].textContent = row.depart || "";
+                  cells[4].textContent = row.livraison || "";
+                  cells[5].textContent = row.chauffeur || "";
+                  cells[6].textContent = row.camion || "";
+                  cells[7].textContent = row.remorque || "";
+                  elements.tableBody.appendChild(tr);
+                });
+              } else {
+                generateDefaultRows(9);
+              }
+
+              const garageBody = document.getElementById("garageBody");
+              garageBody.innerHTML = "";
+
+              if (Array.isArray(data.garage) && data.garage.length > 0) {
+                data.garage.forEach((item) => {
+                  const tr = createGarageRow();
+                  const cells = tr.querySelectorAll("td");
+                  cells[0].textContent = item.unite || "";
+                  cells[1].textContent = item.raison || "";
+                  garageBody.appendChild(tr);
+                });
+              } else {
+                generateGarageRows(3);
+              }
+
+              localStorage.setItem(STORAGE_KEYS.note, data.note || "");
+              localStorage.setItem(STORAGE_KEYS.date, data.date || "");
+              localStorage.setItem(
+                STORAGE_KEYS.rows,
+                JSON.stringify(data.rows || [])
+              );
+
+              console.log("🟢 Données chargées depuis Firebase.");
+            } else {
+              console.log(
+                "📭 Aucune donnée trouvée dans Firebase. Réinitialisation ciblée."
+              );
+
+              elements.noteField.value = "";
+              const rows = document.querySelectorAll("#tableBody tr");
+
+              rows.forEach((row, index) => {
+                const cells = row.querySelectorAll("td");
+                if (index === rows.length - 1) return; // Garde la dernière ligne intacte
+
+                for (let i = 1; i < cells.length - 1; i++) {
+                  cells[i].textContent = "";
+                }
+              });
+
+              generateGarageRows(3);
+            }
+          });
+        setupArrowNavigation();
       }
-    });
-  
-    
-  function init() {
-  elements.resetBtn.addEventListener("click", resetForm);
-  elements.saveBtn.addEventListener("click", saveData);
-  elements.sendBtn.addEventListener("click", sendForm);
-  elements.dateSelect.addEventListener("change", () => {
-  const selectedDate = elements.dateSelect.value;
-  if (!selectedDate) return;
-  window.loadFromFirebase(selectedDate);
-});
 
+      // ---------- DÉBUT : Autosave Firebase (debounce + fin de mot) ----------
+      (function () {
+        const DEBOUNCE_MS = 1200; // délai après la dernière frappe avant sauvegarde (si pas d'espace)
+        const MIN_SAVE_INTERVAL = 1500; // intervalle minimal entre 2 saves pour éviter spams
+        let debounceTimer = null;
+        let lastSaveAt = 0;
 
-  elements.tableBody.innerHTML = "";
-
-  // 🚀 Toujours charger la dernière entrée Firebase (peu importe localStorage)
-  db.collection("disponibilites")
-    .orderBy("timestamp", "desc")
-    .limit(1)
-    .get()
-    .then(snapshot => {
-      if (!snapshot.empty) {
-        const data = snapshot.docs[0].data();
-        elements.dateSelect.value = data.date || "";
-        elements.noteField.value = data.note || "";
-
-        if (Array.isArray(data.rows) && data.rows.length > 0) {
-          data.rows.forEach(row => {
-            const tr = createRow();
-            const cells = tr.querySelectorAll("td");
-            cells[0].textContent = row.rang || "";
-            cells[1].textContent = row.client || "";
-            cells[2].textContent = row.type || "";
-            cells[3].textContent = row.depart || "";
-            cells[4].textContent = row.livraison || "";
-            cells[5].textContent = row.chauffeur || "";
-            cells[6].textContent = row.camion || "";
-            cells[7].textContent = row.remorque || "";
-            elements.tableBody.appendChild(tr);
-          });
-        } else {
-          generateDefaultRows(9);
+        function now() {
+          return Date.now();
         }
 
-        const garageBody = document.getElementById("garageBody");
-        garageBody.innerHTML = "";
-
-        if (Array.isArray(data.garage) && data.garage.length > 0) {
-          data.garage.forEach(item => {
-            const tr = createGarageRow();
-            const cells = tr.querySelectorAll("td");
-            cells[0].textContent = item.unite || "";
-            cells[1].textContent = item.raison || "";
-            garageBody.appendChild(tr);
-          });
-        } else {
-          generateGarageRows(3);
+        function canSaveNow() {
+          return now() - lastSaveAt > MIN_SAVE_INTERVAL;
         }
 
-        localStorage.setItem(STORAGE_KEYS.note, data.note || "");
-        localStorage.setItem(STORAGE_KEYS.date, data.date || "");
-        localStorage.setItem(STORAGE_KEYS.rows, JSON.stringify(data.rows || []));
+        // wrapper qui évite les sauvegardes trop rapprochées
+        function doAutoSave(reason) {
+          if (!canSaveNow()) {
+            // si trop proche, on replanifie légèrement
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(
+              () => doAutoSave(reason),
+              MIN_SAVE_INTERVAL
+            );
+            return;
+          }
+          lastSaveAt = now();
+          // utilise la fonction existante saveData() pour construire + faire localStorage + call firebase
+          try {
+            saveData(); // saveData déclenchera window.saveToFirebase si dispo
+            console.log("Autosave Firebase déclenchée ->", reason || "auto");
+          } catch (err) {
+            console.error("Autosave erreur:", err);
+          }
+        }
 
-        console.log("🟢 Données chargées depuis Firebase.");
-        } else {
-          console.log("📭 Aucune donnée trouvée dans Firebase. Réinitialisation ciblée.");
-          
-          elements.noteField.value = "";
-          const rows = document.querySelectorAll("#tableBody tr");
+        // événement "intelligent" sur saisie : sauvegarde immédiatement si fin de mot (espace/entrée)
+        function onEditableInput(e) {
+          // e.data peut être null selon le navigateur; on vérifie la présence d'un ' ' dans la dernière insertion
+          const target = e.target;
+          // ignore si ce n'est pas un champ éditable que nous voulons surveiller
+          if (!target) return;
 
-          rows.forEach((row, index) => {
-            const cells = row.querySelectorAll("td");
-            if (index >= rows.length - 2) return; // Protège les deux dernières lignes
-          
-            for (let i = 1; i < cells.length - 1; i++) {
-              cells[i].textContent = "";
+          // réinitialise debounce
+          clearTimeout(debounceTimer);
+
+          // si l'input contient un espace en fin (ou si l'inputEvent signale 'insertParagraph'), on sauvegarde tout de suite
+          const text = (target.innerText || target.value || "").trimEnd();
+          const lastChar = text.length > 0 ? text[text.length - 1] : "";
+          const inputIsSpace =
+            (e.inputType &&
+              (e.inputType === "insertParagraph" ||
+                e.inputType === "insertLineBreak")) ||
+            lastChar === " ";
+
+          if (inputIsSpace || e.inputType === "insertFromPaste") {
+            // sauvegarde immédiate (fin de mot ou collage)
+            doAutoSave("fin de mot / saut de ligne / collage");
+          } else {
+            // debounce : attend pause de frappe
+            debounceTimer = setTimeout(
+              () => doAutoSave("pause frappe"),
+              DEBOUNCE_MS
+            );
+          }
+        }
+
+        // Sur certains navigateurs, keyup fournit mieux la détection de 'espace' et 'Entrée'
+        function onEditableKeyup(e) {
+          if (e.key === " " || e.key === "Enter") {
+            clearTimeout(debounceTimer);
+            // petite latence pour laisser le DOM se mettre à jour
+            setTimeout(() => doAutoSave("touche espace/enter"), 40);
+          }
+        }
+
+        // On sauvegarde aussi à la sortie du champ (blur)
+        function onEditableBlur(e) {
+          clearTimeout(debounceTimer);
+          // sauvegarde quasi-immédiate
+          setTimeout(() => doAutoSave("blur"), 80);
+        }
+
+        // Sur changement de date -> sauvegarde immédiate (c'est une info importante)
+        function onDateChange(e) {
+          clearTimeout(debounceTimer);
+          setTimeout(() => doAutoSave("date change"), 50);
+        }
+
+        function attachAutosaveListeners() {
+          // textarea note
+          const note = document.getElementById("note");
+          if (note) {
+            note.addEventListener("input", onEditableInput);
+            note.addEventListener("keyup", onEditableKeyup);
+            note.addEventListener("blur", onEditableBlur);
+          }
+
+          // cellules contenteditable du tableau (dynamique) : on surveille le container et on délègue
+          const table = document.getElementById("dispoTable");
+          if (table) {
+            // Délégation d'événement : input/keyup/blur sur les TD contenteditable
+            table.addEventListener("input", function (e) {
+              if (e.target && e.target.matches("td[contenteditable]"))
+                onEditableInput(e);
+            });
+            table.addEventListener(
+              "keyup",
+              function (e) {
+                if (e.target && e.target.matches("td[contenteditable]"))
+                  onEditableKeyup(e);
+              },
+              true
+            );
+            table.addEventListener(
+              "focusout",
+              function (e) {
+                if (e.target && e.target.matches("td[contenteditable]"))
+                  onEditableBlur(e);
+              },
+              true
+            );
+          }
+
+          // garageTable contenteditable fields
+          const garage = document.getElementById("garageTable");
+          if (garage) {
+            garage.addEventListener("input", function (e) {
+              if (e.target && e.target.matches("td[contenteditable]"))
+                onEditableInput(e);
+            });
+            garage.addEventListener(
+              "keyup",
+              function (e) {
+                if (e.target && e.target.matches("td[contenteditable]"))
+                  onEditableKeyup(e);
+              },
+              true
+            );
+            garage.addEventListener(
+              "focusout",
+              function (e) {
+                if (e.target && e.target.matches("td[contenteditable]"))
+                  onEditableBlur(e);
+              },
+              true
+            );
+          }
+
+          // date change
+          const dateSelect = document.getElementById("dateSelect");
+          if (dateSelect) {
+            dateSelect.addEventListener("change", onDateChange);
+          }
+
+          // sauvegarde lorsque l'utilisateur quitte la page (sécurité)
+          window.addEventListener("beforeunload", function () {
+            // on force un petit sync save via saveData (sans alert) : ça sauvera en localStorage et tentera firebase
+            try {
+              saveData();
+            } catch (e) {
+              /* silent */
             }
           });
 
-          generateGarageRows(3);
+          console.log("Autosave Firebase: listeners attachés.");
         }
 
-    });
-    setupArrowNavigation();
-}
-    
-  // Démarrer l'application quand la page est chargée
-document.addEventListener("DOMContentLoaded", init);
+        // expose pour debug (optionnel)
+        window._autosave = {
+          attach: attachAutosaveListeners,
+          trigger: () => doAutoSave("manuel"),
+        };
 
-  </script>
-</body>
+        // Lorsque la page est initialisée, on attache les listeners (init() appellera attach s'il est placé après)
+        // Si tu préfères l'appeler explicitement dans init(), commente la ligne suivante et appelle window._autosave.attach() dans init().
+        // ATTENTION: appeler ici uniquement si le DOM est prêt — nous vérifions existence des éléments.
+        document.addEventListener("DOMContentLoaded", () => {
+          // Si init() refait des éléments dynamiquement, préfère l'appel explicite dans init()
+          // On vérifie si les éléments existent maintenant
+          if (document.getElementById("dispoTable")) {
+            attachAutosaveListeners();
+          }
+        });
+      })();
+      // ---------- FIN : Autosave Firebase ----------
+
+      // Démarrer l'application quand la page est chargée
+      document.addEventListener("DOMContentLoaded", init);
+    </script>
+  </body>
 </html>

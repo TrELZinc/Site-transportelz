@@ -390,11 +390,12 @@
               <th style="width: 200px">CLIENT</th>
               <th style="width: 80px">TYPE</th>
               <th style="width: 80px">DÉPART</th>
-              <th style="width: 80px">LIVRAISON</th>
-              <th style="width: 100px">CHAUFFEUR</th>
+              <th style="width: 80px">LIVRS</th>
+              <th style="width: 100px">CHAUF</th>
               <th style="width: 90px">CAMION</th>
               <th style="width: 100px">REMORQUE</th>
               <th style="width: 60px">COPIE</th>
+              <th style="width: 50px">✅</th>
             </tr>
           </thead>
           <tbody id="tableBody"></tbody>
@@ -428,7 +429,7 @@
 
       <div class="buttons" style="margin-top: 16px">
         <button class="reset-btn" id="resetBtn">Reset</button>
-        <button class="save-btn" id="saveBtn">Save</button>
+        <button class="load-btn" id="copySelectedBtn">Copie</button>
         <button class="send-btn" id="sendBtn">Send</button>
       </div>
     </div>
@@ -446,6 +447,8 @@
         BPQ: { nom: "Benoit", tel: "5819933470" },
         RED: { nom: "Rejean", tel: "4183254436" },
         SIR: { nom: "Simon", tel: "4185760436" },
+        AC: { nom: "Alain", tel: "4182843106" },
+        CEM: { nom: "Charles-Étienne", tel: "5819892459" },
       };
       const STORAGE_KEYS = {
         note: "dispo_note",
@@ -483,7 +486,7 @@
         tableBody: document.getElementById("tableBody"),
         dispoTable: document.getElementById("dispoTable"),
         resetBtn: document.getElementById("resetBtn"),
-        saveBtn: document.getElementById("saveBtn"),
+        copySelectedBtn: document.getElementById("copySelectedBtn"),
         sendBtn: document.getElementById("sendBtn"),
       };
 
@@ -517,6 +520,7 @@
         <td contenteditable inputmode="numeric"></td>
         <td contenteditable inputmode="numeric"></td>
         <td><button class="copy-btn">📋</button></td>
+        <td><input type="checkbox" class="row-select" /></td>
       `;
         // Attacher l'événement directement lors de la création
         const copyBtn = row.querySelector(".copy-btn");
@@ -599,8 +603,8 @@
 
         const rows = document.querySelectorAll("#tableBody tr");
         rows.forEach((row, index) => {
-          // Si c’est la dernière ligne, on la saute
-          if (index === rows.length - 1) return;
+          // Si c'est l'une des deux dernières lignes, on la saute
+          if (index === rows.length - 1 || index === rows.length - 2) return;
 
           const cells = row.querySelectorAll("td");
           // Ne pas effacer la 1re cellule (rang)
@@ -610,7 +614,7 @@
         });
       }
 
-      function saveData() {
+      function saveData(silent = false) {
         try {
           const note = elements.noteField.value;
           const date = elements.dateSelect.value;
@@ -656,11 +660,17 @@
 
           if (window.saveToFirebase) {
             window.saveToFirebase(data, () => {
-              alert("✅ Données sauvegardées localement ET dans Firebase !");
+              if (!silent) {
+                alert("✅ Données sauvegardées localement ET dans Firebase !");
+              }
             });
           }
         } catch (err) {
-          alert("Erreur lors de la sauvegarde : " + err.message);
+          if (!silent) {
+            alert("Erreur lors de la sauvegarde : " + err.message);
+          } else {
+            console.error("Erreur lors de la sauvegarde :", err);
+          }
         }
       }
 
@@ -675,7 +685,7 @@
           let isRowEmpty = true;
 
           for (let i = 0; i < cells.length; i++) {
-            if (i === 8) continue; // Skip the copy button cell
+            if (i >= 8) continue; // Skip the copy button and checkbox cells
             const text = cells[i]?.innerText?.trim();
             if (text) {
               isRowEmpty = false;
@@ -686,9 +696,9 @@
           for (let i = 0; i < cells.length; i++) {
             const cell = cells[i];
 
-            if (i === 8) {
-              // Handle the copy button cell
-              cell.innerHTML = ""; // Remove the copy button
+            if (i >= 8) {
+              // Handle the copy button and checkbox cells
+              cell.innerHTML = ""; // Remove interactive elements
             } else if (cell.hasAttribute("contenteditable")) {
               cell.innerText = cell.innerText.trim().toUpperCase();
             }
@@ -717,6 +727,51 @@
         );
 
         alert("Sommaire envoyé !");
+      }
+
+      function copySelectedLines() {
+        const rows = Array.from(document.querySelectorAll("#tableBody tr"));
+        const lines = [];
+        rows.forEach((row) => {
+          const checkbox = row.querySelector("input.row-select");
+          if (checkbox && checkbox.checked) {
+            const cells = row.querySelectorAll("td");
+            const client = (cells[1]?.textContent || "").trim().toUpperCase();
+            const livrs = (cells[4]?.textContent || "").trim().toUpperCase();
+            if (client || livrs) {
+              lines.push(`${client} ${livrs}`.trim());
+            }
+          }
+        });
+        const text = lines.join("\n");
+        if (!text) {
+          alert("Aucune ligne sélectionnée.");
+          return;
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(
+            () => alert("Lignes copiées dans le presse-papiers."),
+            () => fallbackCopyText(text)
+          );
+        } else {
+          fallbackCopyText(text);
+        }
+      }
+
+      function fallbackCopyText(text) {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand("copy");
+          alert("Lignes copiées dans le presse-papiers.");
+        } catch (e) {
+          alert("Impossible de copier.");
+        }
+        document.body.removeChild(ta);
       }
 
       // Gestion de la navigation avec flèche
@@ -832,7 +887,7 @@
 
       function init() {
         elements.resetBtn.addEventListener("click", resetForm);
-        elements.saveBtn.addEventListener("click", saveData);
+        elements.copySelectedBtn.addEventListener("click", copySelectedLines);
         elements.sendBtn.addEventListener("click", sendForm);
         elements.dateSelect.addEventListener("change", () => {
           const selectedDate = elements.dateSelect.value;
@@ -914,15 +969,17 @@
               generateGarageRows(3);
             }
           });
-        setupArrowNavigation();
+        // setupArrowNavigation(); // Désactivé - flèche visuelle retirée
       }
 
       // ---------- DÉBUT : Autosave Firebase (debounce + fin de mot) ----------
       (function () {
-        const DEBOUNCE_MS = 1200; // délai après la dernière frappe avant sauvegarde (si pas d'espace)
-        const MIN_SAVE_INTERVAL = 1500; // intervalle minimal entre 2 saves pour éviter spams
+        const DEBOUNCE_MS = 2000; // délai après la dernière frappe avant sauvegarde (si pas d'espace)
+        const MIN_SAVE_INTERVAL = 3000; // intervalle minimal entre 2 saves pour éviter spams
         let debounceTimer = null;
         let lastSaveAt = 0;
+        let isSaving = false;
+        let hasPendingChange = false; // Flag pour suivre si une modification est en cours
 
         function now() {
           return Date.now();
@@ -934,22 +991,30 @@
 
         // wrapper qui évite les sauvegardes trop rapprochées
         function doAutoSave(reason) {
-          if (!canSaveNow()) {
-            // si trop proche, on replanifie légèrement
+          if (!canSaveNow() || isSaving) {
+            // si trop proche ou déjà en train de sauvegarder, on annule/repousse
             clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(
-              () => doAutoSave(reason),
-              MIN_SAVE_INTERVAL
-            );
+            if (!isSaving) {
+              debounceTimer = setTimeout(
+                () => doAutoSave(reason),
+                MIN_SAVE_INTERVAL
+              );
+            }
             return;
           }
+          isSaving = true;
           lastSaveAt = now();
           // utilise la fonction existante saveData() pour construire + faire localStorage + call firebase
           try {
-            saveData(); // saveData déclenchera window.saveToFirebase si dispo
+            saveData(true); // saveData avec silent=true pour éviter les popups
             console.log("Autosave Firebase déclenchée ->", reason || "auto");
+            // Réinitialiser le flag après un court délai
+            setTimeout(() => {
+              isSaving = false;
+            }, 500);
           } catch (err) {
             console.error("Autosave erreur:", err);
+            isSaving = false;
           }
         }
 
@@ -962,6 +1027,7 @@
 
           // réinitialise debounce
           clearTimeout(debounceTimer);
+          hasPendingChange = true; // Marque qu'une modification est en cours
 
           // si l'input contient un espace en fin (ou si l'inputEvent signale 'insertParagraph'), on sauvegarde tout de suite
           const text = (target.innerText || target.value || "").trimEnd();
@@ -974,30 +1040,34 @@
 
           if (inputIsSpace || e.inputType === "insertFromPaste") {
             // sauvegarde immédiate (fin de mot ou collage)
+            hasPendingChange = false; // Reset car on sauvegarde immédiatement
             doAutoSave("fin de mot / saut de ligne / collage");
           } else {
             // debounce : attend pause de frappe
-            debounceTimer = setTimeout(
-              () => doAutoSave("pause frappe"),
-              DEBOUNCE_MS
-            );
+            debounceTimer = setTimeout(() => {
+              hasPendingChange = false; // Reset après sauvegarde
+              doAutoSave("pause frappe");
+            }, DEBOUNCE_MS);
           }
         }
 
         // Sur certains navigateurs, keyup fournit mieux la détection de 'espace' et 'Entrée'
+        // NOTE: on ne déclenche pas de sauvegarde ici car input() le fera déjà
+        // Cela évite les double sauvegardes
         function onEditableKeyup(e) {
-          if (e.key === " " || e.key === "Enter") {
-            clearTimeout(debounceTimer);
-            // petite latence pour laisser le DOM se mettre à jour
-            setTimeout(() => doAutoSave("touche espace/enter"), 40);
-          }
+          // La sauvegarde sera gérée par onEditableInput
         }
 
-        // On sauvegarde aussi à la sortie du champ (blur)
+        // On sauvegarde aussi à la sortie du champ (blur) - SEULEMENT si une modification était en cours
         function onEditableBlur(e) {
-          clearTimeout(debounceTimer);
-          // sauvegarde quasi-immédiate
-          setTimeout(() => doAutoSave("blur"), 80);
+          // Sauvegarde seulement s'il y a eu une modification détectée
+          if (hasPendingChange || debounceTimer !== null) {
+            clearTimeout(debounceTimer);
+            debounceTimer = null;
+            hasPendingChange = false;
+            setTimeout(() => doAutoSave("blur"), 80);
+          }
+          // Sinon, aucune sauvegarde - la cellule a juste été sélectionnée sans modification
         }
 
         // Sur changement de date -> sauvegarde immédiate (c'est une info importante)
@@ -1076,7 +1146,7 @@
           window.addEventListener("beforeunload", function () {
             // on force un petit sync save via saveData (sans alert) : ça sauvera en localStorage et tentera firebase
             try {
-              saveData();
+              saveData(true);
             } catch (e) {
               /* silent */
             }

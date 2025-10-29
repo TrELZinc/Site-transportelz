@@ -414,7 +414,7 @@
     }
 
 
-    function saveData() {
+    function saveData(silent = false) {
       try {
         const table = document.getElementById("dispoTable");
         if (!table) throw new Error("Table introuvable");
@@ -449,13 +449,116 @@
 
         // ☁️ Enregistrement dans Firestore
         saveToFirebase(data, () => {
-          alert("✅ Données sauvegardées localement et dans Firebase !");
+          if (!silent) {
+            alert("✅ Données sauvegardées localement et dans Firebase !");
+          }
         });
 
       } catch (err) {
         alert("Erreur lors de la sauvegarde : " + err.message);
       }
     }
+
+    // ---------- DÉBUT : Autosave (debounce + détection de vraie modif) ----------
+    (function () {
+      const DEBOUNCE_MS = 2000;
+      const MIN_SAVE_INTERVAL = 3000;
+      let debounceTimer = null;
+      let lastSaveAt = 0;
+      let isSaving = false;
+      let hasPendingChange = false;
+
+      function now() { return Date.now(); }
+      function canSaveNow() { return now() - lastSaveAt > MIN_SAVE_INTERVAL; }
+
+      function doAutoSave(reason) {
+        if (!canSaveNow() || isSaving) {
+          clearTimeout(debounceTimer);
+          if (!isSaving) {
+            debounceTimer = setTimeout(() => doAutoSave(reason), MIN_SAVE_INTERVAL);
+          }
+          return;
+        }
+        isSaving = true;
+        lastSaveAt = now();
+        try {
+          saveData(true);
+          console.log("Autosave dispos déclenchée ->", reason || "auto");
+          setTimeout(() => { isSaving = false; }, 500);
+        } catch (e) {
+          console.error("Autosave dispos erreur:", e);
+          isSaving = false;
+        }
+      }
+
+      function onEditableInput(e) {
+        const target = e.target;
+        if (!target) return;
+        clearTimeout(debounceTimer);
+        hasPendingChange = true;
+
+        const text = (target.innerText || target.value || "").trimEnd();
+        const lastChar = text.length > 0 ? text[text.length - 1] : "";
+        const inputIsSpace = (e.inputType && (e.inputType === "insertParagraph" || e.inputType === "insertLineBreak")) || lastChar === " ";
+
+        if (inputIsSpace || e.inputType === "insertFromPaste") {
+          hasPendingChange = false;
+          doAutoSave("fin de mot / saut de ligne / collage");
+        } else {
+          debounceTimer = setTimeout(() => {
+            hasPendingChange = false;
+            doAutoSave("pause frappe");
+          }, DEBOUNCE_MS);
+        }
+      }
+
+      function onEditableBlur() {
+        if (hasPendingChange || debounceTimer !== null) {
+          clearTimeout(debounceTimer);
+          debounceTimer = null;
+          hasPendingChange = false;
+          setTimeout(() => doAutoSave("blur"), 80);
+        }
+      }
+
+      function onDateChange() {
+        clearTimeout(debounceTimer);
+        setTimeout(() => doAutoSave("date change"), 50);
+      }
+
+      function attachAutosaveListeners() {
+        const note = document.getElementById("note");
+        if (note) {
+          note.addEventListener("input", onEditableInput);
+          note.addEventListener("keyup", () => {});
+          note.addEventListener("blur", onEditableBlur);
+        }
+
+        const table = document.getElementById("dispoTable");
+        if (table) {
+          table.addEventListener("input", function (e) {
+            if (e.target && e.target.matches("td[contenteditable]")) onEditableInput(e);
+          });
+          table.addEventListener("focusout", function (e) {
+            if (e.target && e.target.matches("td[contenteditable]")) onEditableBlur(e);
+          }, true);
+        }
+
+        const dateInput = document.getElementById("dp_custom_981");
+        if (dateInput) {
+          dateInput.addEventListener("change", onDateChange);
+        }
+
+        window.addEventListener("beforeunload", function () {
+          try { saveData(true); } catch (_) {}
+        });
+
+        console.log("Autosave dispos: listeners attachés.");
+      }
+
+      document.addEventListener("DOMContentLoaded", attachAutosaveListeners);
+    })();
+    // ---------- FIN : Autosave ----------
 
     // Cell focus behavior
     document.addEventListener("focusin", function(e) {

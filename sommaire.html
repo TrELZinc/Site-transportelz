@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
   <head>
+    <!-- Protection d'authentification - doit être chargé en premier -->
+    <script src="assets/auth-check.js"></script>
     <meta charset="UTF-8" />
     <meta
       name="viewport"
@@ -274,13 +276,27 @@
           });
       };
 
+      // Variable pour suivre la dernière date chargée (protection contre les race conditions)
+      let lastLoadedDate = null;
+      
       window.loadFromFirebase = function (date) {
+        // Mettre à jour la date actuelle immédiatement pour éviter les sauvegardes avec la mauvaise date
+        if (typeof window.updateCurrentDate === 'function') {
+          window.updateCurrentDate(date);
+        }
+        lastLoadedDate = date;
+        
         db.collection("disponibilites")
           .where("date", "==", date)
           .orderBy("timestamp", "desc")
           .limit(1)
           .get()
           .then((querySnapshot) => {
+            // Vérifier que la date n'a pas changé pendant le chargement
+            if (lastLoadedDate !== date) {
+              console.log("⚠️ Date a changé pendant le chargement, annulation");
+              return;
+            }
             if (!querySnapshot.empty) {
               const data = querySnapshot.docs[0].data();
 
@@ -313,21 +329,41 @@
                 elements.tableBody.appendChild(tr);
               });
 
+              // Mettre à jour currentDate après le chargement
+              if (typeof window.updateCurrentDate === 'function') {
+                window.updateCurrentDate(data.date || "");
+              }
+
+              // Vérifier à nouveau que la date n'a pas changé
+              if (lastLoadedDate !== date) {
+                console.log("⚠️ Date a changé pendant le chargement, annulation");
+                return;
+              }
+              
               console.log("✅ Données chargées depuis Firebase !");
             } else {
+              // Vérifier que la date n'a pas changé pendant le chargement
+              if (lastLoadedDate !== date) {
+                console.log("⚠️ Date a changé pendant le chargement, annulation");
+                return;
+              }
+              
               console.log(
                 "📭 Aucune donnée trouvée dans Firebase. Réinitialisation..."
               );
 
-              // Réinitialise le tableau (efface tout sauf la colonne rang et dernière ligne)
+              // Réinitialise le tableau (efface tout sauf la colonne rang, colonne copie et dernière ligne + avant-dernière ligne)
               elements.noteField.value = "";
               const rows = document.querySelectorAll("#tableBody tr");
               rows.forEach((row, index) => {
-                if (index === rows.length - 1) return;
+                // Ne pas toucher à la dernière ligne ni à l'avant-dernière ligne
+                if (index === rows.length - 1 || index === rows.length - 2) return;
                 const cells = row.querySelectorAll("td");
-                for (let i = 1; i < cells.length - 1; i++) {
-                  cells[i].textContent = "";
+                // Effacer de l'index 1 à 7 (sauf la colonne COPIE qui est à l'index 8)
+                for (let i = 1; i < 8; i++) {
+                  if (cells[i]) cells[i].textContent = "";
                 }
+                // Ne pas effacer l'index 8 (COPIE) ni l'index 9 (checkbox)
               });
               db.collection("disponibilites")
                 .orderBy("timestamp", "desc")
@@ -358,24 +394,30 @@
                     // Aucune sauvegarde garage trouvée → on génère 3 lignes vides
                     generateGarageRows(3);
                   }
+                  
+                  // Vérifier que la date n'a pas changé avant de mettre à jour
+                  if (lastLoadedDate === date) {
+                    // Mettre à jour currentDate après le reset
+                    if (typeof window.updateCurrentDate === 'function') {
+                      window.updateCurrentDate(date || "");
+                    }
+                  }
                 });
             }
           })
           .catch((error) => {
             console.error("❌ Erreur Firebase :", error);
+            // En cas d'erreur, s'assurer que currentDate est quand même mise à jour si la date n'a pas changé
+            if (lastLoadedDate === date && typeof window.updateCurrentDate === 'function') {
+              window.updateCurrentDate(date || "");
+            }
           });
       };
     </script>
   </head>
   <body>
     <div id="customHeader"></div>
-    <script>
-      fetch("assets/header.html")
-        .then((res) => res.text())
-        .then(
-          (html) => (document.getElementById("customHeader").innerHTML = html)
-        );
-    </script>
+    <script src="assets/header-loader.js"></script>
     <div class="container">
       <div class="top-bar">
         <input type="date" id="dateSelect" />
@@ -598,7 +640,7 @@
 
       function resetForm() {
         elements.noteField.value = "";
-        elements.dateSelect.value = "";
+        // Ne pas réinitialiser le date picker
         localStorage.clear();
 
         const rows = document.querySelectorAll("#tableBody tr");
@@ -612,13 +654,30 @@
             if (cells[i]) cells[i].textContent = "";
           }
         });
+        
+        // Sauvegarder après le reset pour que les changements soient persistés
+        // Seulement si une date est sélectionnée
+        if (elements.dateSelect.value) {
+          setTimeout(() => {
+            saveData(true); // Sauvegarde silencieuse après reset
+          }, 100);
+        }
       }
 
       function saveData(silent = false) {
         try {
-          const note = elements.noteField.value;
-          const date = elements.dateSelect.value;
+          // Capturer la date au début pour vérifier qu'elle n'a pas changé
+          const dateAtStart = elements.dateSelect.value;
+          
+          // Vérifier qu'une date est sélectionnée
+          if (!dateAtStart || dateAtStart.trim() === "") {
+            if (!silent) {
+              console.warn("⚠️ Impossible de sauvegarder : aucune date sélectionnée");
+            }
+            return;
+          }
 
+          const note = elements.noteField.value;
           const rows = Array.from(
             document.querySelectorAll("#dispoTable tbody tr")
           ).map((tr) => {
@@ -645,9 +704,18 @@
             };
           });
 
+          // Vérifier que la date n'a pas changé pendant la préparation des données
+          const dateAtEnd = elements.dateSelect.value;
+          if (dateAtStart !== dateAtEnd) {
+            if (!silent) {
+              console.warn("⚠️ Date a changé pendant la sauvegarde, annulation");
+            }
+            return;
+          }
+
           const data = {
             note,
-            date,
+            date: dateAtStart,
             rows,
             garage: garageRows,
             timestamp: new Date().toISOString(),
@@ -655,7 +723,7 @@
 
           localStorage.setItem("garage_rows", JSON.stringify(garageRows));
           localStorage.setItem(STORAGE_KEYS.note, note);
-          localStorage.setItem(STORAGE_KEYS.date, date);
+          localStorage.setItem(STORAGE_KEYS.date, dateAtStart);
           localStorage.setItem(STORAGE_KEYS.rows, JSON.stringify(rows));
 
           if (window.saveToFirebase) {
@@ -948,6 +1016,11 @@
                 JSON.stringify(data.rows || [])
               );
 
+              // Mettre à jour currentDate après le chargement
+              if (typeof window.updateCurrentDate === 'function') {
+                window.updateCurrentDate(data.date || "");
+              }
+
               console.log("🟢 Données chargées depuis Firebase.");
             } else {
               console.log(
@@ -959,14 +1032,23 @@
 
               rows.forEach((row, index) => {
                 const cells = row.querySelectorAll("td");
-                if (index === rows.length - 1) return; // Garde la dernière ligne intacte
+                // Ne pas toucher à la dernière ligne ni à l'avant-dernière ligne
+                if (index === rows.length - 1 || index === rows.length - 2) return;
 
-                for (let i = 1; i < cells.length - 1; i++) {
-                  cells[i].textContent = "";
+                // Effacer de l'index 1 à 7 (sauf la colonne COPIE qui est à l'index 8)
+                for (let i = 1; i < 8; i++) {
+                  if (cells[i]) cells[i].textContent = "";
                 }
+                // Ne pas effacer l'index 8 (COPIE) ni l'index 9 (checkbox)
               });
 
               generateGarageRows(3);
+              
+              // Mettre à jour currentDate même si aucune donnée
+              const dateFromSelect = elements.dateSelect.value;
+              if (typeof window.updateCurrentDate === 'function') {
+                window.updateCurrentDate(dateFromSelect || "");
+              }
             }
           });
         // setupArrowNavigation(); // Désactivé - flèche visuelle retirée
@@ -980,6 +1062,8 @@
         let lastSaveAt = 0;
         let isSaving = false;
         let hasPendingChange = false; // Flag pour suivre si une modification est en cours
+        let currentDate = ""; // Suivre la date actuelle pour éviter les sauvegardes avec la mauvaise date
+        let isChangingDate = false; // Flag pour indiquer qu'on est en train de changer de date
 
         function now() {
           return Date.now();
@@ -991,6 +1075,20 @@
 
         // wrapper qui évite les sauvegardes trop rapprochées
         function doAutoSave(reason) {
+          // Ne pas sauvegarder si on est en train de changer de date
+          if (isChangingDate) {
+            console.log("Autosave annulée : changement de date en cours");
+            return;
+          }
+          
+          // Vérifier que la date actuelle correspond à celle qu'on veut sauvegarder
+          const dateInput = elements.dateSelect;
+          const dateValue = dateInput ? dateInput.value : "";
+          if (dateValue && dateValue !== currentDate) {
+            console.log("Autosave annulée : date a changé pendant la sauvegarde");
+            return;
+          }
+          
           if (!canSaveNow() || isSaving) {
             // si trop proche ou déjà en train de sauvegarder, on annule/repousse
             clearTimeout(debounceTimer);
@@ -1070,10 +1168,22 @@
           // Sinon, aucune sauvegarde - la cellule a juste été sélectionnée sans modification
         }
 
-        // Sur changement de date -> sauvegarde immédiate (c'est une info importante)
+        // Sur changement de date -> annuler l'autosave en cours et mettre à jour la date
         function onDateChange(e) {
+          // Annuler tout autosave en cours
           clearTimeout(debounceTimer);
-          setTimeout(() => doAutoSave("date change"), 50);
+          debounceTimer = null;
+          hasPendingChange = false;
+          isChangingDate = true;
+          
+          // Mettre à jour la date actuelle après un court délai pour laisser le temps au changement de se faire
+          setTimeout(() => {
+            const dateInput = elements.dateSelect;
+            if (dateInput) {
+              currentDate = dateInput.value || "";
+            }
+            isChangingDate = false;
+          }, 200);
         }
 
         function attachAutosaveListeners() {
@@ -1140,6 +1250,8 @@
           const dateSelect = document.getElementById("dateSelect");
           if (dateSelect) {
             dateSelect.addEventListener("change", onDateChange);
+            // Initialiser currentDate avec la date actuelle
+            currentDate = dateSelect.value || "";
           }
 
           // sauvegarde lorsque l'utilisateur quitte la page (sécurité)
@@ -1151,6 +1263,12 @@
               /* silent */
             }
           });
+
+          // Exposer une fonction pour mettre à jour currentDate depuis l'extérieur
+          window.updateCurrentDate = function(newDate) {
+            currentDate = newDate || "";
+            isChangingDate = false;
+          };
 
           console.log("Autosave Firebase: listeners attachés.");
         }

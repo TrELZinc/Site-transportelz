@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+  <!-- Protection d'authentification - doit être chargé en premier -->
+  <script src="assets/auth-check.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -208,11 +210,7 @@
 </script>
 <!-- En-tête dynamique avec menu hamburger -->
 <div id="customHeader"></div>
-<script>
-  fetch("assets/header.html")
-    .then(res => res.text())
-    .then(html => document.getElementById("customHeader").innerHTML = html);
-</script>
+<script src="assets/header-loader.js"></script>
 
 </head>
 <body>
@@ -253,7 +251,50 @@
   <script>
 
     let fpInstance = null;
+    let filledDates = [];
 
+    // Fonction pour vérifier si une date a des données réelles (départ, note de ligne, ou note globale)
+    function hasRealData(data) {
+      // Vérifier la note globale
+      if (data.note && data.note.trim() !== "") {
+        return true;
+      }
+      
+      // Vérifier les lignes pour départ ou note
+      if (Array.isArray(data.rows)) {
+        for (let row of data.rows) {
+          if ((row.depart && row.depart.trim() !== "") || 
+              (row.note && row.note.trim() !== "")) {
+            return true;
+          }
+        }
+      }
+      
+      return false;
+    }
+
+    // Fonction pour mettre à jour la liste des dates remplies et recharger le date picker
+    function updateFilledDates() {
+      db.collection("disponibilites_dispos")
+        .get()
+        .then(snapshot => {
+          filledDates = [];
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            // Ne charger que les dates qui ont des données réelles
+            if (data.date && hasRealData(data)) {
+              filledDates.push(data.date);
+            }
+          });
+          // Recharger le date picker pour mettre à jour les dates en jaune
+          if (fpInstance) {
+            fpInstance.redraw();
+          }
+        })
+        .catch(error => {
+          console.error("Erreur lors de la mise à jour des dates:", error);
+        });
+    }
     
     function saveToFirebase(data, callback) {
       const collection = db.collection("disponibilites_dispos");
@@ -283,6 +324,8 @@
         })
         .then(() => {
           console.log("✅ Données enregistrées ou mises à jour.");
+          // Mettre à jour la liste des dates remplies pour afficher la date en jaune
+          updateFilledDates();
           if (typeof callback === "function") callback();
         })
         .catch(error => {
@@ -380,7 +423,7 @@
 
     function resetForm() {
       document.getElementById("note").value = "";
-      document.getElementById("dp_custom_981").value = "";
+      // Ne pas réinitialiser le date picker
       localStorage.clear();
 
       const rows = document.querySelectorAll("#dispoTable tbody tr");
@@ -401,13 +444,27 @@
     }
 
     function resetMinimal() {
+      // Effacer la note globale
       document.getElementById("note").value = "";
 
+      // S'assurer qu'il y a des lignes dans le tableau
+      const tbody = document.getElementById("tableBody");
+      if (!tbody || tbody.children.length === 0) {
+        generateDefaultRows(9);
+      }
+
+      // Effacer les colonnes "départ" et "note" de toutes les lignes
       const rows = document.querySelectorAll("#dispoTable tbody tr");
       rows.forEach(row => {
         const cells = row.querySelectorAll("td");
-        if (cells[4]) cells[4].textContent = ""; // colonne "départ"
-        if (cells[5]) cells[5].textContent = ""; // colonne "note"
+        if (cells[4]) {
+          cells[4].textContent = "";
+          cells[4].innerHTML = "";
+        }
+        if (cells[5]) {
+          cells[5].textContent = "";
+          cells[5].innerHTML = "";
+        }
       });
 
       console.log("🧹 Colonnes 'départ', 'note' et la note globale ont été réinitialisées.");
@@ -419,7 +476,17 @@
         const table = document.getElementById("dispoTable");
         if (!table) throw new Error("Table introuvable");
 
-        const date = document.getElementById("dp_custom_981").value;
+        const dateInput = document.getElementById("dp_custom_981");
+        const date = dateInput ? dateInput.value : "";
+        
+        // Vérifier qu'une date est sélectionnée
+        if (!date || date.trim() === "") {
+          if (!silent) {
+            console.warn("⚠️ Impossible de sauvegarder : aucune date sélectionnée");
+          }
+          return;
+        }
+        
         const note = document.getElementById("note").value;
 
         const rows = Array.from(document.querySelectorAll("#dispoTable tbody tr")).map(tr => {
@@ -467,11 +534,27 @@
       let lastSaveAt = 0;
       let isSaving = false;
       let hasPendingChange = false;
+      let currentDate = ""; // Suivre la date actuelle pour éviter les sauvegardes avec la mauvaise date
+      let isChangingDate = false; // Flag pour indiquer qu'on est en train de changer de date
 
       function now() { return Date.now(); }
       function canSaveNow() { return now() - lastSaveAt > MIN_SAVE_INTERVAL; }
 
       function doAutoSave(reason) {
+        // Ne pas sauvegarder si on est en train de changer de date
+        if (isChangingDate) {
+          console.log("Autosave annulée : changement de date en cours");
+          return;
+        }
+        
+        // Vérifier que la date actuelle correspond à celle qu'on veut sauvegarder
+        const dateInput = document.getElementById("dp_custom_981");
+        const dateValue = dateInput ? dateInput.value : "";
+        if (dateValue && dateValue !== currentDate) {
+          console.log("Autosave annulée : date a changé pendant la sauvegarde");
+          return;
+        }
+        
         if (!canSaveNow() || isSaving) {
           clearTimeout(debounceTimer);
           if (!isSaving) {
@@ -522,8 +605,20 @@
       }
 
       function onDateChange() {
+        // Annuler tout autosave en cours
         clearTimeout(debounceTimer);
-        setTimeout(() => doAutoSave("date change"), 50);
+        debounceTimer = null;
+        hasPendingChange = false;
+        isChangingDate = true;
+        
+        // Mettre à jour la date actuelle après un court délai pour laisser le temps au changement de se faire
+        setTimeout(() => {
+          const dateInput = document.getElementById("dp_custom_981");
+          if (dateInput) {
+            currentDate = dateInput.value;
+          }
+          isChangingDate = false;
+        }, 200);
       }
 
       function attachAutosaveListeners() {
@@ -547,11 +642,19 @@
         const dateInput = document.getElementById("dp_custom_981");
         if (dateInput) {
           dateInput.addEventListener("change", onDateChange);
+          // Initialiser currentDate avec la date actuelle
+          currentDate = dateInput.value || "";
         }
 
         window.addEventListener("beforeunload", function () {
           try { saveData(true); } catch (_) {}
         });
+
+        // Exposer une fonction pour mettre à jour currentDate depuis l'extérieur
+        window.updateCurrentDate = function(newDate) {
+          currentDate = newDate || "";
+          isChangingDate = false;
+        };
 
         console.log("Autosave dispos: listeners attachés.");
       }
@@ -583,7 +686,6 @@
   const note = localStorage.getItem("dispo_note");
   const date = localStorage.getItem("dispo_date");
   const table = localStorage.getItem("dispo_table");
-  const filledDates = [];
 
   if (note) document.getElementById("note").value = note;
   if (date) document.getElementById("dp_custom_981").value = date;
@@ -601,13 +703,15 @@
     generateDefaultRows(9);
   }
 
-  // Charger toutes les dates existantes
+  // Charger toutes les dates existantes avec des données réelles
   db.collection("disponibilites_dispos")
     .get()
     .then(snapshot => {
+      filledDates = [];
       snapshot.forEach(doc => {
         const data = doc.data();
-        if (data.date) {
+        // Ne charger que les dates qui ont des données réelles
+        if (data.date && hasRealData(data)) {
           filledDates.push(data.date);
         }
       });
@@ -616,7 +720,13 @@
       dateFormat: "Y-m-d",
       disableMobile: true,
       onChange: function (selectedDates, dateStr) {
+        // Mettre à jour la date dans le champ
         document.getElementById("dp_custom_981").value = dateStr;
+        
+        // Mettre à jour currentDate dans l'autosave (si accessible)
+        if (typeof window.updateCurrentDate === 'function') {
+          window.updateCurrentDate(dateStr);
+        }
 
           db.collection("disponibilites_dispos")
             .where("date", "==", dateStr)
@@ -625,6 +735,7 @@
             .get()
             .then(snapshot => {
               if (!snapshot.empty) {
+                // Charger les données existantes (ne pas supprimer la note)
                 const data = snapshot.docs[0].data();
                 document.getElementById("note").value = data.note || "";
                 document.getElementById("dispoTable").outerHTML = data.table;
@@ -632,9 +743,18 @@
                   document.querySelectorAll(".us-cell").forEach(cell => {
                     cell.onclick = () => toggleUS(cell);
                   });
+                  // Mettre à jour currentDate après le chargement
+                  if (typeof window.updateCurrentDate === 'function') {
+                    window.updateCurrentDate(dateStr);
+                  }
                 }, 0);
               } else {
+                // Journée vierge : effacer seulement départ et note
                 resetMinimal();
+                // Mettre à jour currentDate après le reset
+                if (typeof window.updateCurrentDate === 'function') {
+                  window.updateCurrentDate(dateStr);
+                }
               }
             });
         },
@@ -665,9 +785,19 @@
           usCells.forEach(cell => {
             cell.onclick = () => toggleUS(cell);
           });
+          // Mettre à jour currentDate après le chargement
+          if (typeof window.updateCurrentDate === 'function') {
+            window.updateCurrentDate(data.date || "");
+          }
         }, 0);
 
         console.log("✅ Dernière donnée Firebase chargée");
+      } else {
+        // Si aucune donnée Firebase, initialiser currentDate avec la date du localStorage ou vide
+        const dateFromStorage = document.getElementById("dp_custom_981").value;
+        if (typeof window.updateCurrentDate === 'function') {
+          window.updateCurrentDate(dateFromStorage || "");
+        }
       }
     });
 };
